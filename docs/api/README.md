@@ -1,8 +1,8 @@
-# 🌐 VWS API Documentation
+# THD (The Holo-Deck) API Documentation
 
 ## Overview
 
-The VWS (Virtual World Synthesizer) API enables creating, managing, and interacting with 3D virtual worlds through a RESTful interface. All endpoints are automatically generated from the OpenAPI 3.0.3 specification (`src/api.yaml`).
+The THD (The Holo-Deck) API enables creating, managing, and interacting with 3D virtual worlds through a RESTful interface. All endpoints are automatically generated from the OpenAPI 3.0.3 specification (`src/api.yaml`).
 
 ## Base URL
 ```
@@ -10,11 +10,11 @@ http://localhost:8080/api
 ```
 
 ## Authentication
-*Currently, VWS operates without authentication. All endpoints are publicly accessible.*
+*Currently, THD operates without authentication. All endpoints are publicly accessible.*
 
 ---
 
-## 📋 Session Management
+## Session Management
 
 ### Create Virtual World
 Create a new isolated virtual world session with automatic world initialization.
@@ -23,7 +23,7 @@ Create a new isolated virtual world session with automatic world initialization.
 POST /sessions
 ```
 
-**🚀 AUTOMATED BOOTSTRAPPING:** This endpoint now automatically initializes the 3D world coordinate system with a 25×25×25 grid and [-12, +12] bounds.
+**AUTOMATED BOOTSTRAPPING:** This endpoint now automatically initializes the 3D world coordinate system with a 25×25×25 grid and [-12, +12] bounds.
 
 **Response:**
 ```json
@@ -44,7 +44,7 @@ POST /sessions
         "max": 12
     },
     "coordinate_system": "fixed_grid",
-    "message": "Session created with world ready - VWS holo-deck activated"
+    "message": "Session created with world ready - THD holo-deck activated"
 }
 ```
 
@@ -152,7 +152,7 @@ DELETE /sessions/{sessionId}
 
 ---
 
-## 🌍 World Configuration
+## World Configuration
 
 ### Initialize Virtual World
 Set up the 3D coordinate system, camera position, and world parameters.
@@ -232,7 +232,7 @@ GET /sessions/{sessionId}/world
 
 ---
 
-## 📦 Object Management
+## Object Management
 
 ### Create 3D Object
 Add a new 3D object to the virtual world.
@@ -422,7 +422,7 @@ DELETE /sessions/{sessionId}/objects/{objectName}
 
 ---
 
-## 📹 Camera Controls
+## Camera Controls
 
 ### Set Camera Position
 Position the camera at specific 3D coordinates.
@@ -519,9 +519,9 @@ POST /sessions/{sessionId}/camera/orbit
 
 ---
 
-## 🌐 WebSocket Real-time Events
+## WebSocket Real-time Events
 
-VWS provides real-time updates via WebSocket connection at:
+THD provides real-time updates via WebSocket connection at:
 ```
 ws://localhost:8080/ws
 ```
@@ -608,7 +608,7 @@ ws://localhost:8080/ws
 
 ---
 
-## 🚨 Error Handling
+## Error Handling
 
 ### HTTP Status Codes
 - `200 OK` - Successful GET request
@@ -660,7 +660,7 @@ ws://localhost:8080/ws
 
 ---
 
-## 🎯 Complete Workflow Example
+## Complete Workflow Example
 
 ### 1. Create Virtual World
 ```bash
@@ -741,7 +741,7 @@ curl -X POST http://localhost:8080/api/sessions/$SESSION_ID/camera/orbit \
 
 ---
 
-## 🔗 Related Resources
+## Related Resources
 
 - **[OpenAPI Specification](../../src/api.yaml)** - Complete API definition
 - **[Architecture Guide](../architecture/)** - System design details
@@ -750,4 +750,4 @@ curl -X POST http://localhost:8080/api/sessions/$SESSION_ID/camera/orbit \
 
 ---
 
-*This documentation is automatically maintained in sync with the OpenAPI specification through VWS's specification-driven development approach.*
+*This documentation is automatically maintained in sync with the OpenAPI specification through THD's specification-driven development approach.*
