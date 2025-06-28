@@ -70,8 +70,8 @@ client:
 web:
 	@echo "SETTING UP WEB RESOURCES..."
 	@mkdir -p $(SHARE_DIR)/htdocs/static
-	@if [ -d renderer/static ]; then cp -r renderer/static/* $(SHARE_DIR)/htdocs/static/; fi
-	@echo "Web resources organized in $(SHARE_DIR)/htdocs/"
+	@echo "Web resources already organized in $(SHARE_DIR)/htdocs/"
+	@echo "Note: Static files are served directly from $(SHARE_DIR)/htdocs/static/"
 
 # Professional development status
 build-status:

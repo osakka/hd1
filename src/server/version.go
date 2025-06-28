@@ -20,8 +20,8 @@ func init() {
 
 func updateJSVersion() {
 	// Create version hash based on JS file contents and timestamp
-	rendererPath := "./renderer/static/js/renderer.js"
-	matrixPath := "./renderer/static/js/gl-matrix.js"
+	rendererPath := "../share/htdocs/static/js/renderer.js"
+	matrixPath := "../share/htdocs/static/js/gl-matrix.js"
 
 	rendererHash := getFileHash(rendererPath)
 	matrixHash := getFileHash(matrixPath)
