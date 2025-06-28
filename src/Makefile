@@ -54,9 +54,9 @@ run: build
 client:
 	@echo "CREATING THD API CLIENT..."
 	@mkdir -p $(BIN_DIR)
-	@echo '#!/bin/bash' > $(BIN_DIR)/vws-client
+	@echo '#!/bin/bash' > $(BIN_DIR)/thd-client
 	@echo '# THD (The Holo-Deck) API Client' >> $(BIN_DIR)/thd-client
-	@echo 'API_BASE="http://localhost:8080/api"' >> $(BIN_DIR)/vws-client
+	@echo 'API_BASE="http://localhost:8080/api"' >> $(BIN_DIR)/thd-client
 	@echo 'case "$${1:-help}" in' >> $(BIN_DIR)/thd-client
 	@echo '  "sessions") curl -s "$$API_BASE/sessions" | jq "." ;;' >> $(BIN_DIR)/thd-client
 	@echo '  "create-session") curl -s -X POST "$$API_BASE/sessions" | jq ".session_id" ;;' >> $(BIN_DIR)/thd-client
@@ -85,7 +85,7 @@ build-status:
 
 # Show recent logs
 logs:
-	@echo "VWS RECENT LOGS"
+	@echo "THD RECENT LOGS"
 	@echo "==============="
 	@if [ -f $(LOG_DIR)/test.log ]; then echo "Test logs:"; tail -10 $(LOG_DIR)/test.log; fi
 	@if [ -d $(LOG_DIR) ]; then echo "Available logs:"; ls -la $(LOG_DIR)/; fi
@@ -108,14 +108,14 @@ deep-clean:
 start: build
 	@echo "Starting THD daemon..."
 	@mkdir -p $(RUNTIME_DIR)
-	@if [ -f $(RUNTIME_DIR)/vws.pid ]; then \
-		PID=$$(cat $(RUNTIME_DIR)/vws.pid); \
+	@if [ -f $(RUNTIME_DIR)/thd.pid ]; then \
+		PID=$$(cat $(RUNTIME_DIR)/thd.pid); \
 		if kill -0 $$PID 2>/dev/null; then \
 			echo "ERROR: THD daemon already running (PID: $$PID)"; \
 			exit 1; \
 		else \
 			echo "Cleaning stale PID file"; \
-			rm -f $(RUNTIME_DIR)/vws.pid; \
+			rm -f $(RUNTIME_DIR)/thd.pid; \
 		fi \
 	fi
 	@echo "Checking port 8080..."
@@ -129,8 +129,8 @@ start: build
 	@echo "Port 8080 available"
 	@$(BIN_DIR)/thd --daemon
 	@sleep 2
-	@if [ -f $(RUNTIME_DIR)/vws.pid ]; then \
-		PID=$$(cat $(RUNTIME_DIR)/vws.pid); \
+	@if [ -f $(RUNTIME_DIR)/thd.pid ]; then \
+		PID=$$(cat $(RUNTIME_DIR)/thd.pid); \
 		if kill -0 $$PID 2>/dev/null; then \
 			echo "THD daemon started successfully (PID: $$PID)"; \
 		else \
@@ -144,8 +144,8 @@ start: build
 
 stop:
 	@echo "Stopping THD daemon..."
-	@if [ -f $(RUNTIME_DIR)/vws.pid ]; then \
-		PID=$$(cat $(RUNTIME_DIR)/vws.pid); \
+	@if [ -f $(RUNTIME_DIR)/thd.pid ]; then \
+		PID=$$(cat $(RUNTIME_DIR)/thd.pid); \
 		if kill -0 $$PID 2>/dev/null; then \
 			kill $$PID; \
 			sleep 2; \
@@ -158,7 +158,7 @@ stop:
 		else \
 			echo "WARNING: Process not running (stale PID file)"; \
 		fi; \
-		rm -f $(RUNTIME_DIR)/vws.pid; \
+		rm -f $(RUNTIME_DIR)/thd.pid; \
 	else \
 		echo "WARNING: No PID file found - daemon not running"; \
 	fi
@@ -167,7 +167,7 @@ force-stop:
 	@echo "Force stopping all THD processes..."
 	@pkill -f thd || echo "No THD processes found"
 	@lsof -ti:8080 | xargs -r kill -9 || echo "No processes on port 8080"
-	@rm -f $(RUNTIME_DIR)/vws.pid
+	@rm -f $(RUNTIME_DIR)/thd.pid
 	@echo "Force stop complete"
 
 restart: stop
@@ -178,8 +178,8 @@ restart: stop
 status:
 	@echo "THD DAEMON STATUS"
 	@echo "================="
-	@if [ -f $(RUNTIME_DIR)/vws.pid ]; then \
-		PID=$$(cat $(RUNTIME_DIR)/vws.pid); \
+	@if [ -f $(RUNTIME_DIR)/thd.pid ]; then \
+		PID=$$(cat $(RUNTIME_DIR)/thd.pid); \
 		if kill -0 $$PID 2>/dev/null; then \
 			echo "STATUS: THD daemon is running (PID: $$PID)"; \
 			echo "PORT: Checking port 8080..."; \
@@ -190,7 +190,7 @@ status:
 			fi \
 		else \
 			echo "ERROR: THD daemon is not running (stale PID file)"; \
-			rm -f $(RUNTIME_DIR)/vws.pid; \
+			rm -f $(RUNTIME_DIR)/thd.pid; \
 		fi \
 	else \
 		echo "STATUS: THD daemon is not running"; \

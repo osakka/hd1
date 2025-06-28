@@ -15,7 +15,7 @@ import (
 
 // THD Path Configuration - 100% Absolute Paths
 const (
-	THD_ROOT_DIR      = "/home/claude-3/3dv"
+	THD_ROOT_DIR      = "/opt/holo-deck"
 	THD_BUILD_DIR     = THD_ROOT_DIR + "/build"
 	THD_BIN_DIR       = THD_BUILD_DIR + "/bin"
 	THD_LOG_DIR       = THD_BUILD_DIR + "/logs"
@@ -131,7 +131,7 @@ func showHelp() {
 	fmt.Println()
 	fmt.Println("EXAMPLES:")
 	fmt.Println("  thd")
-	fmt.Println("  thd --daemon --log-file /home/claude-3/3dv/build/logs/thd.log")
+	fmt.Println("  thd --daemon --log-file /opt/holo-deck/build/logs/thd.log")
 	fmt.Println("  thd --host 127.0.0.1 --port 9090")
 	fmt.Println()
 	fmt.Printf("DEFAULT PATHS:\n")
