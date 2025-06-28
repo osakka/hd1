@@ -58,9 +58,12 @@ This document establishes the **absolute, non-negotiable standards** for THD (Th
 │   ├── bin/thd-client           # API client
 │   ├── logs/                    # Timestamped logs
 │   └── runtime/                 # PID files, runtime data
-├── share/                       # Static assets
-│   ├── htdocs/                  # Web interface
-│   ├── static/                  # WebGL renderer
+├── share/                       # Web assets and static files
+│   ├── htdocs/                  # Web interface root (THD_HTDOCS_DIR)
+│   │   ├── static/js/           # JavaScript: renderer.js, gl-matrix.js, debug.js
+│   │   ├── debug.html           # Debug interface
+│   │   └── force-session.html   # Session management tools
+│   ├── configs/                 # Configuration templates
 │   └── templates/               # HTML templates
 ├── docs/                        # Documentation
 │   ├── README.md                # THIS FILE - THE LAW
@@ -78,6 +81,8 @@ This document establishes the **absolute, non-negotiable standards** for THD (Th
 - ❌ **NO visualstream artifacts** (legacy naming)
 - ❌ **NO relative paths** in production code
 - ❌ **NO manual routing** (auto-generated only)
+- ❌ **NO duplicate JavaScript files** (single source of truth in share/htdocs/static/js/)
+- ❌ **NO manual edits to auto_router.go** (enhanced disclaimer prevents this)
 
 ---
 
@@ -105,7 +110,7 @@ make clean      # Clean build artifacts
 ```
 
 ### **FORBIDDEN COMMANDS:**
-- ❌ `cd /home/claude-3/` (wrong path)
+- ❌ `cd /home/claude-3/` (old legacy path)
 - ❌ `./dev-control.sh` (removed)
 - ❌ `vws` commands (legacy)
 - ❌ Short flags (`-d`, `-h`) (use `--daemon`, `--help`)
@@ -360,6 +365,42 @@ git status --ignored
 - 🚨 **Commit blocked** if workspace dirty
 - 🚨 **Professional review** for disorganized structure
 - 🚨 **Training required** for repeated violations
+
+---
+
+## 🚀 **RECENT PROFESSIONAL IMPROVEMENTS**
+
+### **ENHANCED CODE GENERATION PROTECTION**
+Auto-generated files now include comprehensive disclaimers:
+```go
+// ===================================================================
+// WARNING: AUTO-GENERATED CODE - DO NOT MODIFY THIS FILE
+// ===================================================================
+//
+// ⚠️  CRITICAL WARNING: ALL MANUAL CHANGES WILL BE LOST ⚠️
+//
+// • This file is regenerated on every build
+// • Changes made here are NON-PERSISTENT
+// • Manual modifications will be OVERWRITTEN
+```
+
+### **JAVASCRIPT ASSET CONSOLIDATION**
+- **SINGLE SOURCE OF TRUTH**: All JavaScript files consolidated to `/opt/holo-deck/share/htdocs/static/js/`
+- **DUPLICATE ELIMINATION**: Removed redundant `src/renderer/static/js/` directory
+- **ENHANCED RENDERER**: Latest version includes 25×25×25 grid system capabilities
+- **PATH STANDARDIZATION**: All references updated to canonical location
+
+### **PROJECT STRUCTURE CLEANUP**
+- **LEGACY REMOVAL**: Eliminated old VWS artifacts and backup files
+- **PATH MIGRATION**: All hardcoded paths updated from `/home/claude-3/3dv` to `/opt/holo-deck`
+- **PROFESSIONAL ORGANIZATION**: Clean separation of concerns (src/, share/, build/, docs/)
+- **WORKSPACE HYGIENE**: Implemented daily cleanup procedures and violation tracking
+
+### **DOCUMENTATION EXCELLENCE**
+- **COMPREHENSIVE ARCHITECTURE**: Complete system flow documentation in `docs/architecture/`
+- **PROFESSIONAL STANDARDS**: Definitive development law established
+- **GIT HYGIENE**: Mandatory commit standards and workspace policies
+- **SECURITY COMPLIANCE**: Input validation and boundary enforcement documented
 
 ---
 
