@@ -1,0 +1,316 @@
+#!/bin/bash
+
+# =========================================================================
+# GLIBSH (GL Library Shell) - THD Single Entry Point
+# =========================================================================
+#
+# "Single Entry Point. Surgical Precision. Bar-Raising Solutions Only."
+#
+# GLIBSH is the definitive automation layer for THD (The Holo-Deck).
+# Every 3D operation flows through this single entry point with 
+# professional excellence and xVC methodology principles.
+#
+# Usage: glibsh [CATEGORY] [ACTION] [OPTIONS]
+# 
+# Architecture: glibsh → core/ → thd-client → THD Server → 3D World
+# =========================================================================
+
+set -euo pipefail  # Professional error handling
+
+# GLIBSH Configuration - Professional Absolute Paths
+readonly GLIBSH_ROOT="/opt/holo-deck/share/glibsh"
+readonly THD_CLIENT="/opt/holo-deck/build/bin/thd-client"
+readonly THD_LOG_DIR="/opt/holo-deck/build/logs"
+
+# Core Library Paths
+readonly CORE_DIR="${GLIBSH_ROOT}/core"
+readonly OBJECTS_DIR="${GLIBSH_ROOT}/objects"
+readonly SHAPES_DIR="${GLIBSH_ROOT}/shapes"
+readonly SCENES_DIR="${GLIBSH_ROOT}/scenes"
+readonly CAPABILITIES_DIR="${GLIBSH_ROOT}/capabilities"
+
+# Professional Logging
+readonly LOG_FILE="${THD_LOG_DIR}/glibsh_$(date +%Y%m%d_%H%M%S).log"
+
+# =========================================================================
+# PROFESSIONAL STANDARDS - Error Handling & Validation
+# =========================================================================
+
+log() {
+    local level="$1"
+    shift
+    local message="$*"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[${timestamp}] [${level}] ${message}" | tee -a "${LOG_FILE}"
+}
+
+error_exit() {
+    log "ERROR" "$*"
+    echo "❌ GLIBSH Error: $*" >&2
+    exit 1
+}
+
+validate_environment() {
+    # Ensure THD client exists
+    [[ -x "${THD_CLIENT}" ]] || error_exit "THD client not found: ${THD_CLIENT}. Run 'make client' first."
+    
+    # Ensure log directory exists
+    mkdir -p "${THD_LOG_DIR}"
+    
+    # Validate GLIBSH directory structure
+    for dir in "${CORE_DIR}" "${OBJECTS_DIR}" "${SHAPES_DIR}" "${SCENES_DIR}" "${CAPABILITIES_DIR}"; do
+        [[ -d "${dir}" ]] || error_exit "GLIBSH directory missing: ${dir}"
+    done
+    
+    log "INFO" "GLIBSH environment validated successfully"
+}
+
+# =========================================================================
+# CORE ORCHESTRATION - Single Entry Point Logic
+# =========================================================================
+
+show_help() {
+    cat << 'EOF'
+GLIBSH (GL Library Shell) - THD Single Entry Point
+
+🎯 USAGE:
+    glibsh [CATEGORY] [ACTION] [OPTIONS]
+
+📋 CATEGORIES & ACTIONS:
+
+    OBJECTS (Primitive Creation)
+    ============================
+    glibsh object cube      --position X,Y,Z [--color COLOR] [--scale SIZE]
+    glibsh object sphere    --position X,Y,Z [--color COLOR] [--radius SIZE]  
+    glibsh object mesh      --position X,Y,Z [--file PATH] [--material TYPE]
+
+    SHAPES (Composite Patterns)
+    ============================
+    glibsh shape grid       --size NxN [--spacing DIST] [--object TYPE]
+    glibsh shape spiral     --radius R --height H [--turns N] [--object TYPE]
+    glibsh shape constellation --count N [--distribution random|grid]
+
+    SCENES (Complete Compositions)
+    ===============================
+    glibsh scene demo       [--camera PRESET] [--duration SEC]
+    glibsh scene stress     [--objects COUNT] [--distribution TYPE]
+    glibsh scene gallery    [--shapes LIST] [--layout TYPE]
+
+    CAPABILITIES (High-Level Operations)
+    ====================================
+    glibsh capability animate   --target OBJECT|all [--pattern TYPE]
+    glibsh capability camera    --preset TYPE [--smooth]
+    glibsh capability export    --format json|yaml [--session ID]
+
+🔧 GLOBAL OPTIONS:
+    --help              Show this help message
+    --verbose           Enable verbose logging
+    --dry-run           Show commands without executing
+    --session ID        Target specific session (default: auto-detect)
+
+🎯 EXAMPLES:
+    # Quick start - create a red cube
+    glibsh object cube --position 0,0,0 --color red
+
+    # Create a 5x5 grid of blue spheres
+    glibsh shape grid --size 5x5 --object sphere --color blue
+
+    # Run professional demo with orbital camera
+    glibsh scene demo --camera orbital --duration 30
+
+    # Animate all objects in a rotation pattern
+    glibsh capability animate --target all --pattern rotate
+
+📚 DOCUMENTATION:
+    Full documentation: /opt/holo-deck/share/glibsh/README.md
+    Architecture guide: /opt/holo-deck/docs/README.md
+
+🎖️ "Single Entry Point. Surgical Precision. Bar-Raising Solutions Only."
+EOF
+}
+
+# =========================================================================
+# CATEGORY ROUTING - Professional Dispatch System  
+# =========================================================================
+
+route_category() {
+    local category="$1"
+    shift
+    
+    case "${category}" in
+        "object"|"objects")
+            route_objects "$@"
+            ;;
+        "shape"|"shapes")
+            route_shapes "$@"
+            ;;
+        "scene"|"scenes") 
+            route_scenes "$@"
+            ;;
+        "capability"|"capabilities"|"cap")
+            route_capabilities "$@"
+            ;;
+        "help"|"--help"|"-h")
+            show_help
+            exit 0
+            ;;
+        *)
+            error_exit "Unknown category: ${category}. Use 'glibsh help' for usage."
+            ;;
+    esac
+}
+
+# =========================================================================
+# OBJECT ROUTING - Primitive Object Creation
+# =========================================================================
+
+route_objects() {
+    local action="$1"
+    shift
+    
+    log "INFO" "OBJECTS: ${action} with args: $*"
+    
+    case "${action}" in
+        "cube")
+            source "${OBJECTS_DIR}/cube.sh"
+            create_cube "$@"
+            ;;
+        "sphere")
+            source "${OBJECTS_DIR}/sphere.sh" 
+            create_sphere "$@"
+            ;;
+        "mesh")
+            source "${OBJECTS_DIR}/mesh.sh"
+            create_mesh "$@"
+            ;;
+        *)
+            error_exit "Unknown object type: ${action}. Available: cube, sphere, mesh"
+            ;;
+    esac
+}
+
+# =========================================================================
+# SHAPE ROUTING - Composite Shape Patterns
+# =========================================================================
+
+route_shapes() {
+    local action="$1"
+    shift
+    
+    log "INFO" "SHAPES: ${action} with args: $*"
+    
+    case "${action}" in
+        "grid")
+            source "${SHAPES_DIR}/grid.sh"
+            create_grid "$@"
+            ;;
+        "spiral")
+            source "${SHAPES_DIR}/spiral.sh"
+            create_spiral "$@"
+            ;;
+        "constellation")
+            source "${SHAPES_DIR}/constellation.sh"
+            create_constellation "$@"
+            ;;
+        *)
+            error_exit "Unknown shape type: ${action}. Available: grid, spiral, constellation"
+            ;;
+    esac
+}
+
+# =========================================================================
+# SCENE ROUTING - Complete Scene Compositions
+# =========================================================================
+
+route_scenes() {
+    local action="$1"
+    shift
+    
+    log "INFO" "SCENES: ${action} with args: $*"
+    
+    case "${action}" in
+        "demo")
+            source "${SCENES_DIR}/demo.sh"
+            create_demo_scene "$@"
+            ;;
+        "stress")
+            source "${SCENES_DIR}/stress.sh"
+            create_stress_scene "$@"
+            ;;
+        "gallery")
+            source "${SCENES_DIR}/gallery.sh"
+            create_gallery_scene "$@"
+            ;;
+        *)
+            error_exit "Unknown scene type: ${action}. Available: demo, stress, gallery"
+            ;;
+    esac
+}
+
+# =========================================================================
+# CAPABILITY ROUTING - High-Level Operations  
+# =========================================================================
+
+route_capabilities() {
+    local action="$1"
+    shift
+    
+    log "INFO" "CAPABILITIES: ${action} with args: $*"
+    
+    case "${action}" in
+        "animate")
+            source "${CAPABILITIES_DIR}/animate.sh"
+            execute_animation "$@"
+            ;;
+        "camera")
+            source "${CAPABILITIES_DIR}/camera.sh"
+            control_camera "$@"
+            ;;
+        "export")
+            source "${CAPABILITIES_DIR}/export.sh"
+            export_scene "$@"
+            ;;
+        *)
+            error_exit "Unknown capability: ${action}. Available: animate, camera, export"
+            ;;
+    esac
+}
+
+# =========================================================================
+# MAIN ENTRY POINT - Single Source of Truth
+# =========================================================================
+
+main() {
+    # Professional startup banner
+    log "INFO" "GLIBSH (GL Library Shell) starting - THD Single Entry Point"
+    log "INFO" "Command: glibsh $*"
+    
+    # Validate environment before proceeding
+    validate_environment
+    
+    # Source core libraries
+    source "${CORE_DIR}/session.sh"
+    source "${CORE_DIR}/world.sh" 
+    source "${CORE_DIR}/api.sh"
+    source "${CORE_DIR}/validation.sh"
+    
+    # Handle no arguments
+    if [[ $# -eq 0 ]]; then
+        show_help
+        exit 0
+    fi
+    
+    # Route to appropriate category
+    route_category "$@"
+    
+    log "INFO" "GLIBSH operation completed successfully"
+}
+
+# =========================================================================
+# EXECUTION - Professional Entry Point
+# =========================================================================
+
+# Only execute if called directly (not sourced)
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
