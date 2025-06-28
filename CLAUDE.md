@@ -36,20 +36,20 @@
 ## Key File Locations
 
 ### Source Code
-- `/home/claude-3/3dv/src/api.yaml` - Single source of truth specification
-- `/home/claude-3/3dv/src/main.go` - THD daemon with professional standards
-- `/home/claude-3/3dv/src/auto_router.go` - Auto-generated routing (DO NOT EDIT)
-- `/home/claude-3/3dv/src/Makefile` - Professional build system
+- `/opt/holo-deck/src/api.yaml` - Single source of truth specification
+- `/opt/holo-deck/src/main.go` - THD daemon with professional standards
+- `/opt/holo-deck/src/auto_router.go` - Auto-generated routing (DO NOT EDIT)
+- `/opt/holo-deck/src/Makefile` - Professional build system
 
 ### Runtime
-- `/home/claude-3/3dv/build/bin/thd` - Professional daemon binary
-- `/home/claude-3/3dv/build/runtime/thd.pid` - Process ID file
-- `/home/claude-3/3dv/build/logs/` - Professional logging directory
+- `/opt/holo-deck/build/bin/thd` - Professional daemon binary
+- `/opt/holo-deck/build/runtime/thd.pid` - Process ID file
+- `/opt/holo-deck/build/logs/` - Professional logging directory
 
 ### Documentation
-- `/home/claude-3/3dv/README.md` - Professional project overview
-- `/home/claude-3/3dv/CHANGELOG.md` - Complete project transformation history
-- `/home/claude-3/3dv/docs/api/README.md` - THD API documentation
+- `/opt/holo-deck/README.md` - Professional project overview
+- `/opt/holo-deck/CHANGELOG.md` - Complete project transformation history
+- `/opt/holo-deck/docs/api/README.md` - THD API documentation
 
 ## Development Workflow
 
@@ -113,7 +113,7 @@ git config user.email "claude@anthropic.com"
 
 When resuming development after session restart:
 
-1. **Check daemon status**: `cd /home/claude-3/3dv/src && make status`
+1. **Check daemon status**: `cd /opt/holo-deck/src && make status`
 2. **Verify build**: `make all` to ensure clean build
 3. **Git status**: Confirm all changes committed to `https://git.uk.home.arpa/itdlabs/holo-deck.git`
 4. **API validation**: `make test` to verify all endpoints functional

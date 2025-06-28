@@ -86,7 +86,7 @@ All logging updated:
 
 ```
 THD Project Structure (Professional):
-/home/claude-3/3dv/
+/opt/holo-deck/
 ├── .gitignore                 # Professional artifact exclusion
 ├── README.md                  # Professional project overview
 ├── CHANGELOG.md              # This file - project history

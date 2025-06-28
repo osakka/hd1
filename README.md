@@ -80,7 +80,7 @@ make status    # Show daemon status
 ## File Structure
 
 ```
-/home/claude-3/3dv/
+/opt/holo-deck/
 ├── src/           # Go source code
 ├── share/         # Web assets (htdocs, static files)
 ├── build/         # Build artifacts (excluded from git)

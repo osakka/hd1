@@ -149,7 +149,7 @@ build_server() {
 ### Artifact Management
 ```bash
 # Professional directory structure
-PROJECT_ROOT="/home/claude-3/3dv"
+PROJECT_ROOT="/opt/holo-deck"
 BUILD_DIR="$PROJECT_ROOT/build"
 BIN_DIR="$BUILD_DIR/bin"
 LOG_DIR="$BUILD_DIR/logs"
