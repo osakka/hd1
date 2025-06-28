@@ -246,6 +246,123 @@ curl -s http://localhost:8080/api/sessions
 
 ---
 
+## 📝 **GIT HYGIENE LAW**
+
+### **MANDATORY GIT STANDARDS:**
+- **CLEAN COMMITS:** One logical change per commit
+- **DESCRIPTIVE MESSAGES:** Clear, actionable commit messages
+- **SMALL COMMITS:** Atomic changes for easy review
+- **NO MERGE COMMITS:** Use rebase for clean history
+- **PROFESSIONAL LANGUAGE:** No informal commit messages
+
+### **COMMIT MESSAGE FORMAT:**
+```
+Brief summary (50 characters max)
+
+Detailed explanation if needed:
+• What was changed
+• Why it was changed  
+• Impact of the change
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+### **FORBIDDEN GIT PRACTICES:**
+- ❌ **"WIP" commits** in main branch
+- ❌ **Merge commits** (use rebase)
+- ❌ **Large binary files** without LFS
+- ❌ **Secrets in history** (immediate purge required)
+- ❌ **Unclear commit messages** ("fix", "update", etc.)
+
+### **BRANCH HYGIENE:**
+- **master** - Production-ready code only
+- **feature/** - New features (rebase before merge)
+- **hotfix/** - Critical fixes (fast-track approval)
+- **NO LONG-LIVED BRANCHES** (merge within 24-48 hours)
+
+### **MANDATORY CHECKS BEFORE COMMIT:**
+```bash
+# 1. Verify clean working directory
+git status
+
+# 2. Review all changes
+git diff
+
+# 3. Test functionality
+make test
+
+# 4. Verify daemon still works
+make status
+
+# 5. Professional commit message
+git commit -m "Descriptive message explaining the change"
+```
+
+---
+
+## 🧹 **CLEAN WORKSPACE LAW**
+
+### **MANDATORY WORKSPACE STANDARDS:**
+- **NO TEMPORARY FILES** in project directory
+- **NO BACKUP FILES** (*.bak, *.tmp, *.old)
+- **NO PERSONAL CONFIG** in shared directories
+- **NO DEVELOPMENT ARTIFACTS** in git
+- **CLEAN DESKTOP POLICY** - organized file structure
+
+### **WORKSPACE ORGANIZATION:**
+```
+/opt/holo-deck/           # Project root - CLEAN
+├── src/                  # Source code only
+├── build/                # Build artifacts (gitignored)
+├── docs/                 # Documentation only
+└── share/                # Static assets only
+
+# FORBIDDEN in project root:
+❌ test.txt, debug.log, backup.zip
+❌ Personal scripts or tools
+❌ IDE configuration files
+❌ Temporary development files
+```
+
+### **DAILY WORKSPACE HYGIENE:**
+```bash
+# Clean temporary files
+find . -name "*.tmp" -delete
+find . -name "*.bak" -delete
+find . -name "*.old" -delete
+
+# Remove editor artifacts
+find . -name ".DS_Store" -delete
+find . -name "Thumbs.db" -delete
+
+# Check for forgotten files
+git status --ignored
+```
+
+### **GITIGNORE COMPLIANCE:**
+- **build/** directory ignored
+- **IDE files** ignored (*.swp, *.swo, .vscode/)
+- **OS files** ignored (.DS_Store, Thumbs.db)
+- **Temporary files** ignored (*.tmp, *.log)
+- **Personal configs** ignored
+
+### **CLEAN DESKTOP POLICY:**
+- **PROJECT FILES** only in `/opt/holo-deck/`
+- **NO SCATTERED FILES** on desktop or home directory
+- **ORGANIZED DOWNLOADS** - clean up regularly
+- **PROFESSIONAL NAMING** - no spaces, special characters
+- **REGULAR CLEANUP** - weekly workspace maintenance
+
+### **WORKSPACE VIOLATIONS:**
+- 🚨 **Immediate cleanup required** for temp files
+- 🚨 **Commit blocked** if workspace dirty
+- 🚨 **Professional review** for disorganized structure
+- 🚨 **Training required** for repeated violations
+
+---
+
 ## ⚖️ **VIOLATION CONSEQUENCES**
 
 ### **IMMEDIATE ACTIONS:**
