@@ -120,7 +120,7 @@ func SetupFileLogging(logFile string) error {
 
 	// Set log output to file
 	log.SetOutput(file)
-	log.Printf("VWS logging initialized: %s", logFile)
+	log.Printf("THD logging initialized: %s", logFile)
 	
 	return nil
 }

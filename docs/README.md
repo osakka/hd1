@@ -8,6 +8,30 @@ This document establishes the **absolute, non-negotiable standards** for THD (Th
 
 ---
 
+## 🚀 **xVC METHODOLOGY**
+
+THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM collaboration:
+
+### **Core xVC Principles**
+- **Pattern Consistency**: Establish repeatable interaction patterns
+- **Cognitive Amplification**: LLMs as "pattern reflection engines"
+- **Surgical Precision**: Targeted, precise modifications
+- **One Source of Truth**: Single authoritative specification
+- **Bar-Raising Solutions**: Always improve, never regress
+- **Forward Progress Only**: No backward compatibility for experimentation
+
+### **xVC Development Stages**
+1. **Learning Phase (Weeks 1-2)**: Establishing interaction patterns
+2. **Productivity Phase (Weeks 3-8)**: Optimizing collaboration patterns  
+3. **Proficiency Phase (Months 3+)**: Automatic pattern application
+
+### **xVC Requirements**
+- **Discipline**: Consistent application of patterns
+- **Patience**: Allow patterns to develop over time
+- **Precision**: Clear, structured inputs to LLMs
+
+---
+
 ## 📋 **CARDINAL RULES**
 
 ### **RULE #1: API-FIRST DEVELOPMENT**
@@ -110,7 +134,7 @@ make clean      # Clean build artifacts
 ```
 
 ### **FORBIDDEN COMMANDS:**
-- ❌ `cd /home/claude-3/` (old legacy path)
+- ❌ Legacy path references (all paths must use `/opt/holo-deck`)
 - ❌ `./dev-control.sh` (removed)
 - ❌ `vws` commands (legacy)
 - ❌ Short flags (`-d`, `-h`) (use `--daemon`, `--help`)

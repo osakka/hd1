@@ -1,4 +1,4 @@
-class VisualStreamRenderer {
+class HolodeckRenderer {
     constructor(canvas) {
         this.canvas = canvas;
         this.gl = canvas.getContext('webgl2') || canvas.getContext('webgl');

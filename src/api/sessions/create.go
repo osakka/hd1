@@ -18,7 +18,7 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	// Create session using SessionStore
 	session := h.GetStore().CreateSession()
 	
-	// Automatically initialize world with default VWS settings (25x25x25 grid, [-12,+12] bounds)
+	// Automatically initialize world with default THD settings (25x25x25 grid, [-12,+12] bounds)
 	world, err := h.GetStore().InitializeWorld(session.ID, 25, 0.1, 10, 10, 10)
 	if err != nil {
 		http.Error(w, "Failed to initialize world: "+err.Error(), http.StatusInternalServerError)
@@ -47,7 +47,7 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		"world":            world,
 		"bounds":           map[string]int{"min": -12, "max": 12},
 		"coordinate_system": "fixed_grid",
-		"message":          "Session created with world ready - VWS holo-deck activated",
+		"message":          "Session created with world ready - THD holo-deck activated",
 	})
 }
 

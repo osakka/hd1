@@ -1,8 +1,8 @@
-// VWS Debug Helper - Run in browser console to test renderer directly
-// Usage: loadScript('/static/js/debug.js'); then call debugVWS();
+// THD Debug Helper - Run in browser console to test renderer directly
+// Usage: loadScript('/static/js/debug.js'); then call debugTHD();
 
-function debugVWS() {
-    console.log('🔍 VWS Debug Session Started');
+function debugTHD() {
+    console.log('🔍 THD Debug Session Started');
     
     // 1. Check if renderer exists and is initialized
     if (typeof renderer === 'undefined') {
@@ -63,8 +63,8 @@ function debugVWS() {
     renderer.createObject(testSphere);
     console.log('✅ Test sphere created. Objects now:', renderer.objects.size);
     
-    // 4. Force initialize the VWS grid
-    console.log('🌐 Initializing VWS coordinate grid...');
+    // 4. Force initialize the THD grid
+    console.log('🌐 Initializing THD coordinate grid...');
     renderer.initializeWorld({
         size: 25,
         transparency: 0.3,
@@ -99,7 +99,7 @@ function debugVWS() {
     console.log('🎨 Forcing manual render...');
     renderer.render(performance.now());
     
-    console.log('🔍 VWS Debug Complete! You should now see objects on screen.');
+    console.log('🔍 THD Debug Complete! You should now see objects on screen.');
     console.log('📋 Summary:');
     console.log(`   - Total objects: ${renderer.objects.size}`);
     console.log(`   - Camera: [${renderer.camera.position.join(', ')}] → [${renderer.camera.target.join(', ')}]`);
@@ -121,4 +121,4 @@ function loadScript(src) {
     return script;
 }
 
-console.log('🔧 VWS Debug Helper loaded. Run debugVWS() to start debugging.');
+console.log('🔧 THD Debug Helper loaded. Run debugTHD() to start debugging.');

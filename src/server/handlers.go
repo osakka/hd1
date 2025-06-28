@@ -164,8 +164,8 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             tooltip.textContent = message;
         }
         
-        // Persistent VWS session management
-        let currentSessionId = localStorage.getItem('vws_session_id');
+        // Persistent THD session management
+        let currentSessionId = localStorage.getItem('thd_session_id');
         async function ensureSession() {
             try {
                 // Check if we have a persistent session
@@ -213,12 +213,12 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                             console.log('No existing objects to load');
                         }
                         
-                        console.log('VWS Session restored:', currentSessionId);
-                        setStatus('connected', 'VWS session: ' + currentSessionId.slice(-8));
+                        console.log('THD Session restored:', currentSessionId);
+                        setStatus('connected', 'THD session: ' + currentSessionId.slice(-8));
                         return;
                     } else {
                         // Session expired, clear it
-                        localStorage.removeItem('vws_session_id');
+                        localStorage.removeItem('thd_session_id');
                         currentSessionId = null;
                     }
                 }
@@ -229,7 +229,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 
                 if (sessionData.success) {
                     currentSessionId = sessionData.session_id;
-                    localStorage.setItem('vws_session_id', currentSessionId);
+                    localStorage.setItem('thd_session_id', currentSessionId);
                     document.getElementById('session-id').textContent = currentSessionId;
                     
                     // Initialize world grid in renderer
@@ -268,8 +268,8 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         console.log('No existing objects to load');
                     }
                     
-                    console.log('VWS Session created:', currentSessionId);
-                    setStatus('connected', 'VWS session: ' + currentSessionId.slice(-8));
+                    console.log('THD Session created:', currentSessionId);
+                    setStatus('connected', 'THD session: ' + currentSessionId.slice(-8));
                 } else {
                     console.error('Failed to create session:', sessionData);
                     document.getElementById('session-id').textContent = 'Session Failed';
@@ -332,21 +332,21 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     
                     // Handle browser control messages
                     if (message.type === 'force_refresh') {
-                        console.log('[VWS] Force refresh command received');
+                        console.log('[THD] Force refresh command received');
                         if (message.clear_storage) {
                             localStorage.clear();
                         }
                         if (message.session_id) {
-                            localStorage.setItem('vws_session_id', message.session_id);
+                            localStorage.setItem('thd_session_id', message.session_id);
                         }
-                        setStatus('connecting', 'VWS forced refresh...');
+                        setStatus('connecting', 'THD forced refresh...');
                         window.location.reload(true);
                         return;
                     }
                     
                     // Handle direct canvas control
                     if (message.type === 'canvas_control') {
-                        console.log('[VWS] Canvas control command:', message.command, message.objects);
+                        console.log('[THD] Canvas control command:', message.command, message.objects);
                         if (message.clear) {
                             renderer.processMessage({type: 'clear'});
                         }
@@ -366,14 +366,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                                     wireframe: obj.wireframe || false,
                                     visible: obj.visible !== undefined ? obj.visible : true
                                 };
-                                console.log('[VWS] Converted object:', converted);
+                                console.log('[THD] Converted object:', converted);
                                 return converted;
                             });
                             renderer.processMessage({
                                 type: message.command,
                                 objects: rendererObjects
                             });
-                            console.log('[VWS] Sent to renderer:', message.command, rendererObjects);
+                            console.log('[THD] Sent to renderer:', message.command, rendererObjects);
                         }
                         if (message.camera) {
                             renderer.processMessage({
@@ -381,9 +381,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                                 ...message.camera
                             });
                         }
-                        setStatus('receiving', 'VWS canvas control');
+                        setStatus('receiving', 'THD canvas control');
                         setTimeout(() => {
-                            setStatus('connected', 'VWS active • objects: ' + renderer.objects.size);
+                            setStatus('connected', 'THD active • objects: ' + renderer.objects.size);
                         }, 500);
                         return;
                     }

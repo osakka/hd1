@@ -1,8 +1,8 @@
-# 🔧 VWS Source Code - Technical Implementation
+# 🔧 THD Source Code - Technical Implementation
 
 ## Overview
 
-This directory contains the core implementation of the **VWS (Virtual World Synthesizer)** engine. The architecture follows strict specification-driven development principles where `api.yaml` serves as the single source of truth.
+This directory contains the core implementation of the **THD (The Holo-Deck)** engine. The architecture follows strict specification-driven development principles where `api.yaml` serves as the single source of truth.
 
 ## 🏗️ Architecture Principles
 
@@ -66,7 +66,7 @@ src/
 
 ## 🎯 Core Files Explained
 
-### **api.yaml** - The Heart of VWS
+### **api.yaml** - The Heart of THD
 ```yaml
 # This file IS the system architecture
 # Changes here automatically update the entire system
@@ -213,7 +213,7 @@ make validate   # Check api.yaml exists
 make generate   # Auto-generate router from spec
 make build      # Compile Go binary
 make test       # Test API endpoints
-make run        # Start VWS server
+make run        # Start THD server
 make clean      # Remove build artifacts
 ```
 
@@ -329,6 +329,6 @@ curl -X POST http://localhost:8080/api/sessions/{id}/objects \
 
 ---
 
-**VWS Source Code represents the pinnacle of specification-driven development.**
+**THD Source Code represents the pinnacle of specification-driven development.**
 
 *Every line of code serves the vision: transforming API specifications into virtual worlds.*
