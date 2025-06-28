@@ -1,0 +1,7 @@
+- 100% api first development from our spec yaml
+- bar raising solutions only
+- one source of truth no parallels
+- no regressions ever
+- zen
+- client is 100% api driven.  clean seperation
+- always fix root cause never symptoms, symptoms always have or are a root cause, work backwards

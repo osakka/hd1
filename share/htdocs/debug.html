@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VWS Debug - Direct Object Test</title>
+    <style>
+        body { margin: 0; padding: 20px; background: #000; color: white; font-family: monospace; }
+        canvas { border: 1px solid #333; }
+        #info { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 10px; }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>🔍 VWS Direct Object Test</h3>
+        <div id="status">Initializing...</div>
+        <div id="objects">Objects: 0</div>
+    </div>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    
+    <script src="/static/js/gl-matrix.js"></script>
+    <script src="/static/js/renderer.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const status = document.getElementById('status');
+        const objectsDiv = document.getElementById('objects');
+        
+        try {
+            // Initialize renderer
+            const renderer = new VisualStreamRenderer(canvas);
+            status.textContent = '✅ Renderer initialized';
+            
+            // Set camera for good view
+            renderer.camera.position = [8, 8, 8];
+            renderer.camera.target = [0, 0, 0];
+            renderer.camera.fov = 45;
+            
+            // Initialize VWS grid
+            renderer.initializeWorld({
+                size: 25,
+                transparency: 0.1,
+                bounds: { min: -12, max: 12 }
+            });
+            
+            // Create test objects directly
+            const testObjects = [
+                {
+                    id: 'red-cube',
+                    name: 'red-cube',
+                    type: 'cube',
+                    transform: {
+                        position: { x: 0, y: 0, z: 0 },
+                        scale: { x: 2, y: 2, z: 2 },
+                        rotation: { x: 0, y: 0, z: 0 }
+                    },
+                    color: { r: 1, g: 0, b: 0, a: 1 },
+                    visible: true
+                },
+                {
+                    id: 'green-sphere',
+                    name: 'green-sphere', 
+                    type: 'sphere',
+                    transform: {
+                        position: { x: 4, y: 0, z: 0 },
+                        scale: { x: 1.5, y: 1.5, z: 1.5 },
+                        rotation: { x: 0, y: 0, z: 0 }
+                    },
+                    color: { r: 0, g: 1, b: 0, a: 1 },
+                    visible: true
+                },
+                {
+                    id: 'blue-wireframe',
+                    name: 'blue-wireframe',
+                    type: 'cube',
+                    transform: {
+                        position: { x: -4, y: 0, z: 0 },
+                        scale: { x: 1, y: 1, z: 1 },
+                        rotation: { x: 0, y: 0, z: 0 }
+                    },
+                    color: { r: 0, g: 0, b: 1, a: 1 },
+                    wireframe: true,
+                    visible: true
+                }
+            ];
+            
+            // Add objects to renderer
+            testObjects.forEach(obj => {
+                renderer.createObject(obj);
+                console.log('Created object:', obj.name);
+            });
+            
+            status.textContent = `✅ Created ${testObjects.length} test objects`;
+            objectsDiv.textContent = `Objects: ${renderer.objects.size}`;
+            
+            // Force render
+            renderer.render(performance.now());
+            
+        } catch (error) {
+            status.textContent = '❌ Error: ' + error.message;
+            console.error('Renderer error:', error);
+        }
+    </script>
+</body>
+</html>

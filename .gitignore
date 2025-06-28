@@ -1,0 +1,81 @@
+# THD (The Holo-Deck) - Professional .gitignore
+# Exclude all runtime artifacts, binaries, and temporary files
+
+# Build artifacts
+build/
+bin/
+*.o
+*.so
+*.a
+*.exe
+
+# Go build artifacts
+src/holodeck
+src/thd
+src/vws
+src/visualstream
+
+# Runtime files
+*.pid
+runtime/
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Go specific
+go.sum
+
+# Auto-generated files
+src/auto_router.go
+
+# Configuration files with secrets
+*.env
+.env.*
+config/secrets/
+
+# Documentation build artifacts
+docs/_build/
+docs/.doctrees/
+
+# Package files
+*.tar.gz
+*.zip
+*.7z
+
+# Test coverage
+coverage.out
+*.cover
+
+# Node modules (if any frontend tooling is added)
+node_modules/
+
+# Python cache (if any Python tooling is added)
+__pycache__/
+*.pyc
+*.pyo
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache directories
+.cache/
+cache/

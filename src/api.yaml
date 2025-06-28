@@ -1,0 +1,846 @@
+openapi: 3.0.3
+info:
+  title: THD (The Holo-Deck) API
+  description: |
+    Revolutionary API-first 3D coordinate system with universal world boundaries.
+    Single source of truth for sessions, worlds, objects, and real-time control.
+    
+    **CORE PRINCIPLES:**
+    - Everything API-driven (zero shell commands)
+    - Universal coordinate system [-12, +12] on all axes
+    - Objects honor world boundaries absolutely
+    - Named object persistence with full lifecycle
+    - Real-time WebSocket + REST hybrid
+    
+    **ARCHITECTURE:**
+    - Specification drives code generation
+    - Build fails if handlers missing
+    - Zero manual routing - auto-generated from spec
+    
+  version: 1.0.0
+  contact:
+    name: The Holo-Deck 3D Engine
+    
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+paths:
+  # ========================================
+  # SESSION MANAGEMENT
+  # ========================================
+  /sessions:
+    post:
+      operationId: createSession
+      tags: [Sessions]
+      summary: Create new 3D session
+      description: |
+        Generates unique session ID for isolated 3D world interaction.
+        Each session gets independent object registry and world state.
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCreated'
+              example:
+                success: true
+                session_id: "session_a1b2c3d4"
+                created: "2025-06-28T14:20:00Z"
+                message: "Session created - initialize world next"
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/sessions/create.go"
+      x-function: "CreateSession"
+      
+    get:
+      operationId: listSessions
+      tags: [Sessions]
+      summary: List all active sessions
+      description: Get comprehensive list of all sessions with status and object counts
+      responses:
+        '200':
+          description: Sessions list retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionsList'
+              example:
+                sessions:
+                  - id: "session_a1b2c3d4"
+                    created: "2025-06-28T14:20:00Z"
+                    world_initialized: true
+                    object_count: 3
+                    status: "active"
+                total: 1
+                timestamp: "2025-06-28T14:25:00Z"
+      x-handler: "api/sessions/list.go"
+      x-function: "ListSessions"
+
+  /sessions/{sessionId}:
+    get:
+      operationId: getSession
+      tags: [Sessions]
+      summary: Get session details
+      description: Retrieve detailed session information including all objects
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/sessions/get.go"
+      x-function: "GetSession"
+      
+    delete:
+      operationId: deleteSession
+      tags: [Sessions]
+      summary: Terminate session
+      description: Permanently delete session and all associated objects
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session terminated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/sessions/delete.go"
+      x-function: "DeleteSession"
+
+  # ========================================
+  # WORLD MANAGEMENT
+  # ========================================
+  /sessions/{sessionId}/world:
+    post:
+      operationId: initializeWorld
+      tags: [World]
+      summary: Initialize 3D world coordinate system
+      description: |
+        Sets up universal 25x25x25 grid with [-12, +12] boundaries.
+        Creates reference grid points at configurable transparency.
+        This MUST be called before any object operations.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorldInit'
+            example:
+              size: 25
+              transparency: 0.1
+              camera_position: [-10, -10, -10]
+      responses:
+        '201':
+          description: World initialized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorldInitialized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      x-handler: "api/world/init.go"
+      x-function: "InitializeWorld"
+
+    get:
+      operationId: getWorldSpec
+      tags: [World]
+      summary: Get world specifications
+      description: Returns current world boundaries, grid size, and coordinate system info
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: World specifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorldSpec'
+      x-handler: "api/world/spec.go"
+      x-function: "GetWorldSpec"
+
+  # ========================================
+  # OBJECT MANAGEMENT
+  # ========================================
+  /sessions/{sessionId}/objects:
+    post:
+      operationId: createObject
+      tags: [Objects]
+      summary: Create named 3D object
+      description: |
+        Creates object by connecting grid points within world boundaries.
+        All coordinates must be within [-12, +12] range.
+        Objects are built by connecting specific grid intersection points.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectCreate'
+            example:
+              name: "my_cube"
+              type: "cube"
+              position: [0, 0, 0]
+              scale: [2, 2, 2]
+              color: [1.0, 0.0, 0.0]
+      responses:
+        '201':
+          description: Object created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectCreated'
+        '400':
+          description: Invalid coordinates or object data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Coordinates (15, 0, 0) outside world bounds [-12, +12]"
+      x-handler: "api/objects/create.go"
+      x-function: "CreateObject"
+
+    get:
+      operationId: listObjects
+      tags: [Objects]
+      summary: List all objects in session
+      description: Get all named objects with their current properties
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Objects list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectsList'
+      x-handler: "api/objects/list.go"
+      x-function: "ListObjects"
+
+  /sessions/{sessionId}/objects/{objectName}:
+    get:
+      operationId: getObject
+      tags: [Objects]
+      summary: Get object details
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: objectName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Object details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/objects/get.go"
+      x-function: "GetObject"
+
+    put:
+      operationId: updateObject
+      tags: [Objects]
+      summary: Update object properties
+      description: |
+        Move, scale, or change object color.
+        New coordinates must still be within world boundaries.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: objectName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectUpdate'
+      responses:
+        '200':
+          description: Object updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectUpdated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/objects/update.go"
+      x-function: "UpdateObject"
+
+    delete:
+      operationId: deleteObject
+      tags: [Objects]
+      summary: Delete named object
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: objectName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Object deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/objects/delete.go"
+      x-function: "DeleteObject"
+
+  # ========================================
+  # BROWSER CONTROL
+  # ========================================
+  /browser/refresh:
+    post:
+      operationId: forceRefresh
+      tags: [Browser]
+      summary: Force browser refresh and session reset
+      description: |-
+        Forces all connected browsers to refresh and optionally reset to specific session.
+        Essential for THD session management and debugging.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session_id:
+                  type: string
+                  description: "Session ID to force browsers to connect to"
+                clear_storage:
+                  type: boolean
+                  default: true
+                  description: "Clear browser localStorage before refresh"
+            example:
+              session_id: "session_z41qg4sg"
+              clear_storage: true
+      responses:
+        '200':
+          description: Browser refresh command sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+      x-handler: "api/browser/control.go"
+      x-function: "ForceRefresh"
+
+  /browser/canvas:
+    post:
+      operationId: setCanvas
+      tags: [Browser]
+      summary: Direct WebGL canvas control
+      description: |-
+        Direct control over WebGL renderer via API.
+        Allows programmatic manipulation of 3D scene without page refresh.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [session_id, command]
+              properties:
+                session_id:
+                  type: string
+                command:
+                  type: string
+                  enum: [create, update, delete, clear, camera, render]
+                objects:
+                  type: array
+                  items:
+                    type: object
+                camera:
+                  type: object
+                clear:
+                  type: boolean
+            example:
+              session_id: "session_z41qg4sg"
+              command: "create"
+              objects: [{"id": "test", "type": "cube", "x": 0, "y": 0, "z": 0}]
+      responses:
+        '200':
+          description: Canvas command sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+      x-handler: "api/browser/control.go"
+      x-function: "SetCanvas"
+
+  # ========================================
+  # CAMERA CONTROL
+  # ========================================
+  /sessions/{sessionId}/camera/position:
+    put:
+      operationId: setCameraPosition
+      tags: [Camera]
+      summary: Set camera coordinates
+      description: Position camera anywhere within world boundaries
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CameraPosition'
+            example:
+              position: [0, 0, 0]
+      responses:
+        '200':
+          description: Camera positioned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      x-handler: "api/camera/position.go"
+      x-function: "SetCameraPosition"
+
+  /sessions/{sessionId}/camera/orbit:
+    post:
+      operationId: startCameraOrbit
+      tags: [Camera]
+      summary: Start camera orbital motion
+      description: Begin smooth camera rotation around target point
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CameraOrbit'
+      responses:
+        '200':
+          description: Camera orbit started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+      x-handler: "api/camera/orbit.go"
+      x-function: "StartCameraOrbit"
+
+# ========================================
+# SCHEMA DEFINITIONS
+# ========================================
+components:
+  schemas:
+    # Session Schemas
+    SessionCreated:
+      type: object
+      required: [success, session_id, created, message]
+      properties:
+        success:
+          type: boolean
+          example: true
+        session_id:
+          type: string
+          pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        created:
+          type: string
+          format: date-time
+        message:
+          type: string
+          example: "Session created - initialize world next"
+
+    SessionsList:
+      type: object
+      required: [sessions, total, timestamp]
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionSummary'
+        total:
+          type: integer
+          minimum: 0
+        timestamp:
+          type: string
+          format: date-time
+
+    SessionSummary:
+      type: object
+      required: [id, created, world_initialized, object_count, status]
+      properties:
+        id:
+          type: string
+        created:
+          type: string
+          format: date-time
+        world_initialized:
+          type: boolean
+        object_count:
+          type: integer
+          minimum: 0
+        status:
+          type: string
+          enum: [active, inactive, error]
+
+    SessionDetail:
+      allOf:
+        - $ref: '#/components/schemas/SessionSummary'
+        - type: object
+          properties:
+            objects:
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/ObjectDetail'
+
+    # World Schemas
+    WorldInit:
+      type: object
+      properties:
+        size:
+          type: integer
+          default: 25
+          minimum: 10
+          maximum: 50
+          description: "Grid size (size x size x size)"
+        transparency:
+          type: number
+          default: 0.1
+          minimum: 0.0
+          maximum: 1.0
+          description: "Grid transparency (0.1 = 90% transparent)"
+        camera_position:
+          $ref: '#/components/schemas/Coordinate3D'
+
+    WorldInitialized:
+      type: object
+      required: [success, bounds, grid_size, coordinate_system]
+      properties:
+        success:
+          type: boolean
+          example: true
+        bounds:
+          type: object
+          properties:
+            min:
+              type: integer
+              example: -12
+            max:
+              type: integer
+              example: 12
+        grid_size:
+          type: integer
+          example: 25
+        coordinate_system:
+          type: string
+          example: "fixed_grid"
+        message:
+          type: string
+          example: "World initialized - ready for objects"
+
+    WorldSpec:
+      type: object
+      required: [bounds, grid_size, total_points, coordinate_system]
+      properties:
+        bounds:
+          type: object
+          properties:
+            x: {type: array, items: {type: integer}, minItems: 2, maxItems: 2}
+            y: {type: array, items: {type: integer}, minItems: 2, maxItems: 2}
+            z: {type: array, items: {type: integer}, minItems: 2, maxItems: 2}
+        grid_size:
+          type: integer
+        total_points:
+          type: integer
+        coordinate_system:
+          type: string
+
+    # Object Schemas
+    ObjectCreate:
+      type: object
+      required: [name, type, position]
+      properties:
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]+$'
+          example: "my_cube"
+        type:
+          type: string
+          enum: [cube, sphere, plane, line]
+        position:
+          $ref: '#/components/schemas/Coordinate3D'
+        scale:
+          $ref: '#/components/schemas/Scale3D'
+        color:
+          $ref: '#/components/schemas/ColorRGB'
+
+    ObjectCreated:
+      type: object
+      required: [success, object_id, name, position]
+      properties:
+        success:
+          type: boolean
+        object_id:
+          type: string
+        name:
+          type: string
+        position:
+          $ref: '#/components/schemas/Coordinate3D'
+        message:
+          type: string
+
+    ObjectsList:
+      type: object
+      required: [objects, total]
+      properties:
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectSummary'
+        total:
+          type: integer
+
+    ObjectSummary:
+      type: object
+      required: [name, type, position]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        position:
+          $ref: '#/components/schemas/Coordinate3D'
+        created:
+          type: string
+          format: date-time
+
+    ObjectDetail:
+      allOf:
+        - $ref: '#/components/schemas/ObjectSummary'
+        - type: object
+          properties:
+            scale:
+              $ref: '#/components/schemas/Scale3D'
+            color:
+              $ref: '#/components/schemas/ColorRGB'
+            last_updated:
+              type: string
+              format: date-time
+
+    ObjectUpdate:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/Coordinate3D'
+        scale:
+          $ref: '#/components/schemas/Scale3D'
+        color:
+          $ref: '#/components/schemas/ColorRGB'
+
+    ObjectUpdated:
+      type: object
+      required: [success, name, updated_fields]
+      properties:
+        success:
+          type: boolean
+        name:
+          type: string
+        updated_fields:
+          type: array
+          items:
+            type: string
+        message:
+          type: string
+
+    # Camera Schemas
+    CameraPosition:
+      type: object
+      required: [position]
+      properties:
+        position:
+          $ref: '#/components/schemas/Coordinate3D'
+
+    CameraOrbit:
+      type: object
+      required: [radius, duration]
+      properties:
+        center:
+          $ref: '#/components/schemas/Coordinate3D'
+          default: [0, 0, 0]
+        radius:
+          type: number
+          minimum: 1
+          example: 20
+        height:
+          type: number
+          default: 10
+        duration:
+          type: number
+          minimum: 1
+          example: 30
+          description: "Duration in seconds"
+        speed:
+          type: number
+          default: 0.1
+          description: "Angular speed"
+
+    # Common Schemas
+    Coordinate3D:
+      type: array
+      items:
+        type: number
+        minimum: -12
+        maximum: 12
+      minItems: 3
+      maxItems: 3
+      example: [0, 0, 0]
+      description: "3D coordinates within world bounds [-12, +12]"
+
+    Scale3D:
+      type: array
+      items:
+        type: number
+        minimum: 0.1
+        maximum: 10
+      minItems: 3
+      maxItems: 3
+      example: [1, 1, 1]
+      default: [1, 1, 1]
+
+    ColorRGB:
+      type: array
+      items:
+        type: number
+        minimum: 0
+        maximum: 1
+      minItems: 3
+      maxItems: 3
+      example: [1.0, 0.0, 0.0]
+      default: [1.0, 1.0, 1.0]
+      description: "RGB color values [r, g, b] from 0.0 to 1.0"
+
+    Success:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        details:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+# ========================================
+# EXTENSION PROPERTIES
+# ========================================
+x-code-generation:
+  strict-validation: true
+  auto-routing: true
+  handler-validation: true
+  fail-on-missing-handlers: true
+  
+x-world-constraints:
+  coordinate-bounds: [-12, 12]
+  grid-size: 25
+  max-objects-per-session: 1000
+  
+x-performance:
+  max-concurrent-sessions: 100
+  session-timeout: 3600

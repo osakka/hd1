@@ -1,0 +1,197 @@
+package server
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/gorilla/websocket"
+)
+
+const (
+	writeWait      = 10 * time.Second
+	pongWait       = 60 * time.Second
+	pingPeriod     = (pongWait * 9) / 10
+	maxMessageSize = 512
+)
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Allow all origins for now
+	},
+}
+
+type ClientInfo struct {
+	Screen struct {
+		Width            int     `json:"width"`
+		Height           int     `json:"height"`
+		DevicePixelRatio float64 `json:"devicePixelRatio"`
+		Orientation      int     `json:"orientation"`
+	} `json:"screen"`
+	Canvas struct {
+		Width  int `json:"width"`
+		Height int `json:"height"`
+	} `json:"canvas"`
+	Capabilities struct {
+		WebGL  bool `json:"webgl"`
+		Touch  bool `json:"touch"`
+		Mobile bool `json:"mobile"`
+	} `json:"capabilities"`
+}
+
+type Client struct {
+	hub      *Hub
+	conn     *websocket.Conn
+	send     chan []byte
+	info     *ClientInfo
+	lastSeen time.Time
+}
+
+func (c *Client) readPump() {
+	defer func() {
+		c.hub.unregister <- c
+		c.conn.Close()
+	}()
+	
+	c.conn.SetReadLimit(maxMessageSize)
+	c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.conn.SetPongHandler(func(string) error {
+		c.conn.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
+	
+	for {
+		_, message, err := c.conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("error: %v", err)
+			}
+			break
+		}
+		
+		// Handle special client messages
+		c.handleClientMessage(message)
+	}
+}
+
+func (c *Client) handleClientMessage(message []byte) {
+	var msg map[string]interface{}
+	if err := json.Unmarshal(message, &msg); err != nil {
+		// Not JSON, broadcast as regular message
+		c.hub.broadcast <- message
+		return
+	}
+	
+	msgType, ok := msg["type"].(string)
+	if !ok {
+		c.hub.broadcast <- message
+		return
+	}
+	
+	switch msgType {
+	case "version_check":
+		clientVersion, _ := msg["js_version"].(string)
+		serverVersion := GetJSVersion()
+		
+		if clientVersion != serverVersion {
+			response := map[string]interface{}{
+				"type": "version_mismatch",
+				"server_version": serverVersion,
+				"client_version": clientVersion,
+			}
+			
+			responseJSON, _ := json.Marshal(response)
+			c.send <- responseJSON
+			
+			if c.hub.logger != nil {
+				c.hub.logger.Log("info", "SERVER", "Version mismatch detected", map[string]interface{}{
+					"client": clientVersion,
+					"server": serverVersion,
+				})
+			}
+		}
+		
+	case "client_log":
+		if c.hub.logger != nil {
+			var logMsg LogMessage
+			if err := json.Unmarshal(message, &logMsg); err == nil {
+				c.hub.logger.LogClientMessage(logMsg)
+			}
+		}
+		
+	case "client_info":
+		var info ClientInfo
+		if err := json.Unmarshal(message, &info); err == nil {
+			c.info = &info
+			c.lastSeen = time.Now()
+			
+			if c.hub.logger != nil {
+				c.hub.logger.Log("info", "CLIENT", "Client info updated", map[string]interface{}{
+					"screen": info.Screen,
+					"capabilities": info.Capabilities,
+				})
+			}
+		}
+		
+	case "interaction":
+		c.lastSeen = time.Now()
+		if c.hub.logger != nil {
+			var interaction map[string]interface{}
+			if err := json.Unmarshal(message, &interaction); err == nil {
+				c.hub.logger.Log("info", "CLIENT", "User interaction", interaction)
+			}
+		}
+		// Broadcast interaction to other systems that might be listening
+		c.hub.broadcast <- message
+		
+	default:
+		// Regular 3D visualization message
+		c.hub.broadcast <- message
+	}
+}
+
+func (c *Client) writePump() {
+	ticker := time.NewTicker(pingPeriod)
+	defer func() {
+		ticker.Stop()
+		c.conn.Close()
+	}()
+	
+	for {
+		select {
+		case message, ok := <-c.send:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if !ok {
+				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+			
+			if err := c.conn.WriteMessage(websocket.TextMessage, message); err != nil {
+				return
+			}
+			
+		case <-ticker.C:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
+		}
+	}
+}
+
+func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client.hub.register <- client
+	
+	go client.writePump()
+	go client.readPump()
+}
