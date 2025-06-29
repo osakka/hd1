@@ -821,24 +821,8 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         // Start mouse controls after a delay
         setTimeout(setupMouseControls, 1000);
         
-        // Debug panel collapsible functionality
+        // Debug panel collapsible functionality (initialized after cookie functions)
         let debugCollapsed = false;
-        debugHeader.addEventListener('click', function() {
-            debugCollapsed = !debugCollapsed;
-            const debugPanel = document.getElementById('debug-panel');
-            if (debugCollapsed) {
-                debugLog.classList.add('collapsed');
-                debugPanel.classList.add('collapsed');
-                debugHeader.textContent = 'THD Console [MINIMIZED]';
-            } else {
-                debugLog.classList.remove('collapsed');
-                debugPanel.classList.remove('collapsed');
-                debugHeader.textContent = 'THD Console [ACTIVE]';
-            }
-        });
-        
-        // Initialize debug header with professional status
-        debugHeader.textContent = 'THD Console [ACTIVE]';
         
         // Scene selection management
         const debugSceneSelect = document.getElementById('debug-scene-select');
@@ -920,10 +904,10 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             const statusLed = document.getElementById('debug-status-led');
             if (document.pointerLockElement) {
                 statusLed.className = 'connected';
-                addDebug('POINTER_LOCK', 'Mouse captured - ESC to release');
+                addDebug('FREELOOK_ACTIVE', 'Freelook engaged • Press ESC to exit');
             } else {
                 statusLed.className = 'connecting';
-                addDebug('POINTER_FREE', 'Click to capture mouse for freelook');
+                addDebug('FREELOOK_READY', 'Click holodeck for freelook navigation');
             }
         }
         
@@ -935,6 +919,35 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Initial status
         updatePointerLockStatus();
+        
+        // Initialize debug panel with cookie persistence (after cookie functions are defined)
+        debugCollapsed = getCookie('thd_console_collapsed') === 'true';
+        addDebug('CONSOLE_COOKIE', 'Loaded state: ' + (debugCollapsed ? 'collapsed' : 'expanded'));
+        
+        function setDebugState(collapsed, saveToCookie = true) {
+            debugCollapsed = collapsed;
+            const debugPanel = document.getElementById('debug-panel');
+            if (debugCollapsed) {
+                debugLog.classList.add('collapsed');
+                debugPanel.classList.add('collapsed');
+                debugHeader.textContent = 'THD Console [MINIMIZED]';
+            } else {
+                debugLog.classList.remove('collapsed');
+                debugPanel.classList.remove('collapsed');
+                debugHeader.textContent = 'THD Console [ACTIVE]';
+            }
+            if (saveToCookie) {
+                setCookie('thd_console_collapsed', debugCollapsed.toString(), 30); // 30 days
+                addDebug('CONSOLE_SAVE', 'State saved: ' + (debugCollapsed ? 'collapsed' : 'expanded'));
+            }
+        }
+        
+        debugHeader.addEventListener('click', function() {
+            setDebugState(!debugCollapsed, true);
+        });
+        
+        // Initialize debug panel state from cookie (don't save back to cookie)
+        setDebugState(debugCollapsed, false);
         
         // Start connection
         connectWebSocket();
