@@ -18,17 +18,16 @@ htdocs/
 ```
 **Purpose**: Web-based 3D visualization client served by THD daemon
 
-### **`glibsh/`** - GL Library Shell (GLIBSH)
+### **`scenes/`** - Professional Scene Collection
 ```
-glibsh/
-├── glibsh              # Single entry point script
-├── core/               # Core orchestration primitives
-├── objects/            # Primitive object creation
-├── shapes/             # Composite shape patterns  
-├── scenes/             # Complete scene compositions
-└── capabilities/       # High-level automation
+scenes/
+├── empty-grid.sh       # Clean holodeck foundation
+├── basic-shapes.sh     # Fundamental geometric demonstrations
+├── anime-ui.sh         # Advanced UI showcase
+├── ultimate-demo.sh    # Complete capabilities demonstration
+└── my-custom-scene.sh  # Custom development template
 ```
-**Purpose**: **Single source of truth** for THD automation - professional shell library for 3D operations
+**Purpose**: Professional holodeck scene collection accessible via API endpoints
 
 ### **`configs/`** - Configuration Templates
 ```
@@ -49,13 +48,13 @@ templates/
 ## 🎯 **Design Philosophy**
 
 ### **Single Source of Truth**
-- **GLIBSH**: One entry point for all THD automation
+- **Scenes**: Professional scene collection via API integration
 - **htdocs**: One web interface for visualization
 - **No duplication**: Every asset has exactly one canonical location
 
 ### **Professional Organization**
-- **Clear separation**: Web assets vs. automation vs. configuration
-- **Hierarchical structure**: From primitives → composites → complete systems
+- **Clear separation**: Web assets vs. scenes vs. configuration
+- **API-driven scenes**: Complete scene management via /api/scenes endpoints
 - **Specification-driven**: All capabilities align with api.yaml
 
 ### **xVC Methodology**
@@ -67,13 +66,15 @@ templates/
 
 ## 🔗 **Integration Points**
 
-### **GLIBSH → THD Integration**
+### **Scene → THD Integration**
 ```bash
-share/glibsh/glibsh create-scene demo
+# List available scenes
+curl http://localhost:8080/api/scenes
 # ↓
-# Orchestrates multiple thd-client calls
+# Load scene via API
+curl -X POST http://localhost:8080/api/scenes/ultimate-demo
 # ↓  
-# THD Server API (specification-driven)
+# THD Server executes scene script
 # ↓
 # Real-time 3D visualization in browser
 ```
@@ -121,12 +122,12 @@ cd /opt/holo-deck/src && make start
 # Access: http://localhost:8080/
 ```
 
-### **For Automation/Scripting**
+### **For Scene Management**
 ```bash
-# Single entry point for all operations
-/opt/holo-deck/share/glibsh/glibsh --help
-/opt/holo-deck/share/glibsh/glibsh create-object cube --position 0,0,0
-/opt/holo-deck/share/glibsh/glibsh create-scene gallery
+# Professional scene management via API
+curl http://localhost:8080/api/scenes                    # List scenes
+curl -X POST http://localhost:8080/api/scenes/ultimate   # Load scene
+# Or use web interface scene dropdown with cookie persistence
 ```
 
 ### **For Development**

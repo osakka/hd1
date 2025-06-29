@@ -158,10 +158,10 @@ func clearAllObjects(sessionID string, h *server.Hub) {
 // getSceneScript returns the script path for a given scene ID
 func getSceneScript(sceneID string) string {
 	scriptMap := map[string]string{
-		"empty":        "/opt/holo-deck/share/glibsh/scenes/empty-grid.sh",
-		"anime-ui":     "/opt/holo-deck/share/glibsh/scenes/anime-ui.sh",
-		"ultimate":     "/opt/holo-deck/share/glibsh/scenes/ultimate-demo.sh",
-		"basic-shapes": "/opt/holo-deck/share/glibsh/scenes/basic-shapes.sh",
+		"empty":        "/opt/holo-deck/share/scenes/empty-grid.sh",
+		"anime-ui":     "/opt/holo-deck/share/scenes/anime-ui.sh",
+		"ultimate":     "/opt/holo-deck/share/scenes/ultimate-demo.sh",
+		"basic-shapes": "/opt/holo-deck/share/scenes/basic-shapes.sh",
 	}
 	return scriptMap[sceneID]
 }

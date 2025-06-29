@@ -28,7 +28,7 @@ func ListScenesHandler(w http.ResponseWriter, r *http.Request, hub interface{}) 
 	// Dynamically discover scenes from script directory
 	scenes := []SceneInfo{}
 	
-	scenesDir := "/opt/holo-deck/share/glibsh/scenes"
+	scenesDir := "/opt/holo-deck/share/scenes"
 	if entries, err := os.ReadDir(scenesDir); err == nil {
 		for _, entry := range entries {
 			if strings.HasSuffix(entry.Name(), ".sh") {
