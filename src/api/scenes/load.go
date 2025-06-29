@@ -172,6 +172,7 @@ func executeSceneScript(scriptPath string, sessionID string) (int, string) {
 	
 	// Execute the scene script with session ID
 	cmd := exec.Command("/bin/bash", scriptPath, sessionID)
+	cmd.Dir = "/opt/holo-deck"  // Set working directory
 	output, err := cmd.Output()
 	
 	if err != nil {
