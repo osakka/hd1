@@ -270,8 +270,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         #session-id-tag {
-            background: #00ffff;
-            color: #000;
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.4);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 8px;
@@ -283,12 +284,15 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         #session-id-tag:hover {
-            background: #ffffff;
+            background: rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.6);
             transform: scale(1.05);
         }
         
         #session-id-tag.copied {
-            background: #00ff00;
+            background: rgba(0, 255, 0, 0.3);
+            border-color: rgba(0, 255, 0, 0.6);
+            color: #00ff00;
             transform: scale(1.1);
         }
         
@@ -423,10 +427,8 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 <span id="debug-collapse-icon">&#8679;</span>
             </div>
         </div>
-        <div id="debug-session-bar">
-            <div id="debug-session-id">No Session</div>
-        </div>
         <div id="debug-scene-bar">
+            <span style="margin-right: 4px;">Scene</span>
             <select id="debug-scene-select">
                 <option value="">Select Scene...</option>
                 <option value="empty">Empty Grid</option>
@@ -448,7 +450,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         const debugLog = document.getElementById('debug-log');
         const debugStatusLed = document.getElementById('debug-status-led');
         const debugLockIcon = document.getElementById('debug-lock-icon');
-        const debugSessionId = document.getElementById('debug-session-id');
         const debugHeader = document.getElementById('debug-header');
         const debugCollapseIcon = document.getElementById('debug-collapse-icon');
         const sessionIdTag = document.getElementById('session-id-tag');
@@ -477,8 +478,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Update debug session ID when session changes
         function updateDebugSession(sessionId) {
-            debugSessionId.textContent = sessionId || 'No Session';
-            
             // Update session ID tag
             if (sessionId && sessionId !== 'No Session') {
                 const shortId = sessionId.replace('session-', '');
