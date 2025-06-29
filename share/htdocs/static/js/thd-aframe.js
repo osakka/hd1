@@ -85,6 +85,15 @@ class THDAFrameManager {
             case 'update':
                 this.updateObjects(message.objects);
                 break;
+            case 'session_created':
+                console.log('[THD-AFrame] Session created:', message.data);
+                break;
+            case 'world_initialized':
+                console.log('[THD-AFrame] World initialized:', message.data);
+                if (message.data) {
+                    this.initializeWorld(message.data);
+                }
+                break;
             default:
                 console.warn('[THD-AFrame] Unknown message type:', message.type);
         }
@@ -347,6 +356,11 @@ class THDAFrameManager {
         }
         
         console.log('[THD-AFrame] World initialized');
+    }
+
+    // Get current object count for status display
+    getObjectCount() {
+        return this.objects.size;
     }
 
     // Utility methods
