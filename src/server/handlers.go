@@ -353,8 +353,8 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             </select>
         </div>
         <div id="debug-controls-bar">
-            <button id="photo-btn" class="control-btn photo-btn" title="Photo Mode: Save current session state as new scene">📷 PHOTO</button>
-            <button id="video-btn" class="control-btn video-btn" title="Video Mode: Start/Stop temporal recording">🎥 VIDEO</button>
+            <button id="photo-btn" class="control-btn photo-btn" title="Freeze-Frame Mode: Save current session state as new scene">FREEZE-FRAME</button>
+            <button id="video-btn" class="control-btn video-btn" title="Temporal Sequence Mode: Start/Stop temporal recording">TEMPORAL SEQUENCE</button>
             <span id="recording-status" class="recording-status"></span>
         </div>
         <div id="debug-log"></div>
@@ -994,17 +994,17 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 if (response.ok) {
                     const result = await response.json();
                     addDebug('PHOTO_SUCCESS', {scene: sceneId, objects: result.objects_count || 0});
-                    setStatus('receiving', 'Photo saved: ' + sceneName);
+                    setStatus('receiving', 'Freeze-frame saved: ' + sceneName);
                     
                     // Refresh scene dropdown
                     await refreshSceneDropdown();
                 } else {
                     addDebug('PHOTO_ERROR', {scene: sceneId, status: response.status});
-                    setStatus('error', 'Photo save failed');
+                    setStatus('error', 'Freeze-frame save failed');
                 }
             } catch (error) {
                 addDebug('PHOTO_FAIL', {error: error.message});
-                setStatus('error', 'Photo operation failed');
+                setStatus('error', 'Freeze-frame operation failed');
             }
         });
         
@@ -1031,16 +1031,16 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         isRecording = true;
                         recordingStartTime = Date.now();
                         videoBtn.classList.add('active');
-                        videoBtn.textContent = '⏹️ STOP';
+                        videoBtn.textContent = 'STOP SEQUENCE';
                         recordingStatus.textContent = 'REC';
                         addDebug('VIDEO_START', {session: currentSessionId});
-                        setStatus('receiving', 'Recording started');
+                        setStatus('receiving', 'Temporal sequence started');
                         
                         // Update recording timer
                         updateRecordingTimer();
                     } else {
                         addDebug('VIDEO_START_ERROR', {status: response.status});
-                        setStatus('error', 'Recording start failed');
+                        setStatus('error', 'Temporal sequence start failed');
                     }
                 } else {
                     // Stop recording
@@ -1053,18 +1053,18 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         isRecording = false;
                         recordingStartTime = null;
                         videoBtn.classList.remove('active');
-                        videoBtn.textContent = '🎥 VIDEO';
+                        videoBtn.textContent = 'TEMPORAL SEQUENCE';
                         recordingStatus.textContent = '';
                         addDebug('VIDEO_STOP', {session: currentSessionId});
-                        setStatus('receiving', 'Recording stopped');
+                        setStatus('receiving', 'Temporal sequence stopped');
                     } else {
                         addDebug('VIDEO_STOP_ERROR', {status: response.status});
-                        setStatus('error', 'Recording stop failed');
+                        setStatus('error', 'Temporal sequence stop failed');
                     }
                 }
             } catch (error) {
                 addDebug('VIDEO_FAIL', {error: error.message});
-                setStatus('error', 'Video operation failed');
+                setStatus('error', 'Temporal sequence operation failed');
             }
         });
         

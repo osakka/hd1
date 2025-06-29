@@ -161,6 +161,14 @@ make clean      # Clean build artifacts
 - **RESTful patterns** with proper HTTP status codes
 - **Validation** at API boundary level
 
+### **SCENE FORKING & CROWN JEWEL (v3.4.0):**
+- **FREEZE-FRAME MODE**: Scene snapshots with object tracking (base/modified/new)
+- **TEMPORAL SEQUENCE MODE**: Complete session recording and playback
+- **OBJECT PROVENANCE**: Full tracking of object lifecycle and source scenes
+- **👑 CROWN JEWEL**: Auto-generated web UI client achieving 100% single source of truth
+- **THREE-TIER GENERATION**: Go router + CLI client + Web UI client all from OpenAPI spec
+- **ZERO MANUAL SYNC**: API changes automatically update all client systems
+
 ### **LOGGING STANDARDS:**
 - **TIMESTAMPED:** All log entries have timestamps
 - **STRUCTURED:** JSON format for machine parsing
@@ -200,6 +208,9 @@ make clean      # Clean build artifacts
 - [ ] API specification validates
 - [ ] All handlers implemented
 - [ ] Auto-router generates successfully
+- [ ] Crown jewel auto-generated files present (thd-api-client.js, thd-ui-components.js, thd-form-system.js)
+- [ ] Scene forking system functional (fork/save endpoints)
+- [ ] Recording system operational (start/stop/play/status endpoints)
 - [ ] Tests pass completely
 - [ ] Daemon starts and stops cleanly
 - [ ] No memory leaks detected

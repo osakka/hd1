@@ -20,14 +20,17 @@
 
 ## Project Identity: THD (The Holo-Deck)
 
-### Current State (v3.3.0 - Professional UI Excellence & Scene Management)
+### Current State (v3.4.0 - Scene Forking & Crown Jewel Implementation)
 - **Binary**: `thd` (professional VR holodeck daemon)
 - **Module**: `holodeck` (Go module name)
 - **Rendering Engine**: A-Frame WebXR 1.4.0 (100% Local - 2.5MB ecosystem)
-- **UI Standards**: Complete professional interface with scene management system
-- **Cache Control**: Standards-compliant HTTP headers replacing hacky query strings
-- **Scene System**: API-driven scene selection with cookie persistence
-- **Sprint Controls**: Shift key acceleration for enhanced holodeck traversal
+- **Scene Forking System**: Revolutionary "photo vs video" content creation paradigm
+- **Object Tracking**: Complete provenance system (base/modified/new status)
+- **Temporal Recording**: Full session recording and playback capabilities
+- **👑 Crown Jewel**: Auto-generated web UI client achieving 100% single source of truth
+- **Professional Console**: FREEZE-FRAME and TEMPORAL SEQUENCE controls
+- **Dynamic Scene Discovery**: Script-based metadata parsing replacing hardcoded lists
+- **Session Restoration**: Fixed loop prevention eliminating object flickering
 - **Holodeck Containment**: Escape-proof boundary enforcement with 60fps monitoring
 - **Session Architecture**: Single source of truth with perfect isolation
 - **A-Frame Components**: Complete local library with zero CDN dependencies
@@ -48,6 +51,10 @@
 - **Multi-Backend Ready**: Framework-agnostic API layer supporting future engines
 - **Real-time Communication**: WebSocket Hub with thread-safe SessionStore
 - **Auto-generated Routing**: Complete routing layer generated from api.yaml
+- **👑 Crown Jewel Web UI**: Complete JavaScript client auto-generated from OpenAPI spec
+- **Three-Tier Generation**: Go router + CLI client + Web UI client all from single spec
+- **Scene Forking Architecture**: Photo mode (snapshots) and video mode (temporal recording)
+- **Object Lifecycle Tracking**: Complete provenance with base/modified/new state transitions
 - **Professional Build System**: Make-based with daemon control targets
 - **A-Frame Integration**: Seamless WebXR with 100% API compatibility
 
@@ -57,8 +64,12 @@
 - `/opt/holo-deck/src/api.yaml` - Single source of truth specification
 - `/opt/holo-deck/src/main.go` - THD daemon with professional standards
 - `/opt/holo-deck/src/auto_router.go` - Auto-generated routing (DO NOT EDIT)
-- `/opt/holo-deck/src/server/handlers.go` - A-Frame WebXR interface
+- `/opt/holo-deck/src/server/handlers.go` - A-Frame WebXR interface with FREEZE-FRAME/TEMPORAL SEQUENCE controls
+- `/opt/holo-deck/src/codegen/generator.go` - 👑 Crown jewel code generator with web UI generation
 - `/opt/holo-deck/share/htdocs/static/js/thd-aframe.js` - A-Frame holodeck manager
+- `/opt/holo-deck/share/htdocs/static/js/thd-api-client.js` - 👑 Auto-generated JavaScript API client
+- `/opt/holo-deck/share/htdocs/static/js/thd-ui-components.js` - 👑 Auto-generated UI components
+- `/opt/holo-deck/share/htdocs/static/js/thd-form-system.js` - 👑 Auto-generated dynamic form system
 - `/opt/holo-deck/src/Makefile` - Professional build system
 
 ### Runtime
@@ -71,6 +82,9 @@
 - `/opt/holo-deck/CHANGELOG.md` - Complete project transformation history
 - `/opt/holo-deck/docs/adr/ADR-001-aframe-webxr-integration.md` - A-Frame integration decision
 - `/opt/holo-deck/docs/adr/ADR-003-Professional-UI-Enhancement.md` - UI excellence & scene management
+- `/opt/holo-deck/docs/adr/ADR-004-Scene-Forking-System.md` - Scene forking and photo/video paradigm
+- `/opt/holo-deck/docs/adr/ADR-005-Temporal-Recording-System.md` - Temporal recording architecture
+- `/opt/holo-deck/docs/adr/ADR-006-Auto-Generated-Web-UI-Client.md` - 👑 Crown jewel implementation
 - `/opt/holo-deck/docs/api/README.md` - THD API documentation
 
 ### Holodeck Libraries
@@ -112,6 +126,9 @@ git config user.email "claude@anthropic.com"
 - **Phase 5 (RESOLVED)**: Cross-session object visibility (session isolation implemented)
 - **Phase 6 (RESOLVED)**: Text field transmission ("Holodeck Text" fallback eliminated)
 - **Phase 7 (RESOLVED)**: jq parsing errors from non-JSON API responses
+- **Phase 8 (RESOLVED)**: Session restoration loop causing object flickering
+- **Phase 9 (RESOLVED)**: Hardcoded scene metadata replaced with dynamic discovery
+- **Phase 10 (IMPLEMENTED)**: 👑 Crown jewel - Auto-generated web UI client system
 
 ### Professional Standards Implementation
 - **Zero Hacky Implementations** - proper HTTP cache control, professional status indicators
@@ -128,11 +145,26 @@ git config user.email "claude@anthropic.com"
 - **Constants**: `VWS_*` → `THD_*`
 - **PID files**: `vws.pid` → `thd.pid`
 
-## Professional UI Enhancement Context
+## Scene Forking & Crown Jewel Context (v3.4.0)
 
-### Scene Management System (v3.3.0)
+### Revolutionary Scene Forking System
+- **Photo Mode (FREEZE-FRAME)**: `POST /sessions/{sessionId}/scenes/save` - Save current session state as new scene
+- **Video Mode (TEMPORAL SEQUENCE)**: Recording endpoints for complete session capture and playback
+- **Scene Fork API**: `POST /scenes/{sceneId}/fork` - Load scenes into sessions for non-destructive editing
+- **Object Tracking**: Complete provenance system (base/modified/new) with source scene references
+- **Dynamic Scene Discovery**: Script-based metadata parsing replacing hardcoded scene lists
+- **Script Generation**: Automatic creation of executable scene files from session state
+
+### 👑 Crown Jewel Implementation - Auto-Generated Web UI Client
+- **JavaScript API Client**: Complete API wrapper auto-generated from OpenAPI specification
+- **UI Components**: Each API endpoint becomes an interactive UI component
+- **Dynamic Form System**: Forms automatically generated from request schemas
+- **100% Single Source of Truth**: All clients (Go router, CLI, Web UI) generated from same spec
+- **Zero Manual Synchronization**: API changes automatically update all client systems
+
+### Scene Management System (Legacy v3.3.0 Context)
 - **API Endpoints**: `/api/scenes` (list) and `/api/scenes/{sceneId}` (load)
-- **Predefined Scenes**: Empty Grid, Anime UI Demo, Ultimate Demo, Basic Shapes
+- **Dynamic Discovery**: Script-based metadata parsing replaces hardcoded scenes
 - **Cookie Persistence**: 30-day scene preference storage with automatic restoration
 - **Session Integration**: Scene dropdown appears under session ID in holodeck console
 - **Auto-Bootstrap**: Saved scenes automatically load on session restore/creation
@@ -170,7 +202,17 @@ git config user.email "claude@anthropic.com"
 - **Scene management**: API-driven scene loading with session isolation
 - **Real-time updates**: WebSocket hub broadcasts all changes
 
-### UI Enhancement Debugging
+### Scene Forking & Crown Jewel Debugging
+- **Scene Forking**: Check object tracking status (base/modified/new) in session object listings
+- **FREEZE-FRAME**: Monitor `POST /sessions/{sessionId}/scenes/save` for scene creation
+- **TEMPORAL SEQUENCE**: Check recording status with `GET /sessions/{sessionId}/recording/status`
+- **Crown Jewel Generation**: Verify auto-generated files in `/share/htdocs/static/js/thd-*.js`
+- **UI Components**: Test auto-generated components via `window.THDUIComponents` in browser console
+- **API Client**: Verify `window.thdAPI` provides all 23 auto-generated methods
+- **Form System**: Check `window.THDFormSystem` for schema-driven form generation
+- **Build Generation**: Ensure `make generate` produces all crown jewel files without errors
+
+### UI Enhancement Debugging (Legacy)
 - **Cache Issues**: Check HTTP headers in Network tab (should show no-cache for dev)
 - **Scene Loading**: Monitor console for `SCENE_LOADED` and `AUTO_SCENE` debug entries
 - **Sprint Controls**: Verify `thd-sprint-controls` component attachment on camera entity

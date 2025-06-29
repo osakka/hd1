@@ -15,12 +15,19 @@ Where professional engineering meets immersive holodeck technology.
 - **📊 Specification-Driven**: OpenAPI 3.0.3 single source of truth
 
 ### 🎬 Scene Forking & Recording System (v3.4.0)
-- **📷 Photo Mode**: Save current session state as new scenes
-- **🎥 Video Mode**: Full temporal recording with playback capabilities
+- **📷 FREEZE-FRAME Mode**: Save current session state as new scenes
+- **🎥 TEMPORAL SEQUENCE Mode**: Full temporal recording with playback capabilities
 - **🔀 Scene Forking**: Load scenes for non-destructive editing
 - **🏷️ Object Tracking**: Complete provenance system (base/modified/new)
 - **📝 Script Generation**: Dynamic scene file creation from session state
-- **🎛️ Professional Console**: Integrated photo/video controls
+- **🎛️ Professional Console**: Integrated FREEZE-FRAME/TEMPORAL SEQUENCE controls
+
+### 👑 Crown Jewel - Auto-Generated Web UI Client
+- **🌐 JavaScript API Client**: Complete API wrapper auto-generated from specification
+- **🎨 UI Component Library**: Each API endpoint becomes interactive component
+- **📝 Dynamic Form System**: Forms automatically generated from request schemas
+- **🔄 100% Single Source of Truth**: All clients generated from same OpenAPI spec
+- **⚡ Zero Manual Sync**: API changes automatically update all clients
 
 ### Professional Engineering
 - **🏗️ Auto-Generated APIs**: Complete routing from OpenAPI specification
@@ -45,7 +52,7 @@ make start
 
 ## 🎬 Scene Forking & Recording Workflow
 
-### Photo Mode (Scene Snapshots)
+### FREEZE-FRAME Mode (Scene Snapshots)
 ```bash
 # Create a session
 SESSION_ID=$(thd-client create-session | jq -r '.session_id')
@@ -54,12 +61,12 @@ SESSION_ID=$(thd-client create-session | jq -r '.session_id')
 thd-client fork-scene basic-shapes "{\"session_id\": \"$SESSION_ID\", \"clear_existing\": true}"
 
 # Make modifications in the UI (add/move/delete objects)
-# Then save as new scene using the 📷 PHOTO button in console
+# Then save as new scene using the FREEZE-FRAME button in console
 # Or via CLI:
 thd-client save-scene-from-session "$SESSION_ID" '{"scene_id": "my-scene", "name": "My Custom Scene"}'
 ```
 
-### Video Mode (Temporal Recording)
+### TEMPORAL SEQUENCE Mode (Recording)
 ```bash
 # Start recording session interactions
 thd-client start-recording "$SESSION_ID" '{"name": "Demo Recording", "description": "User interaction demo"}'
