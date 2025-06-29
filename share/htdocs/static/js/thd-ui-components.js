@@ -17,13 +17,15 @@ class THDUIComponents {
     initializeComponents() {
         console.log('🎨 Initializing auto-generated UI components...');
 
-        this.components.set('listobjects', this.createListObjectsComponent());
-
-        this.components.set('createobject', this.createCreateObjectComponent());
-
         this.components.set('listsessions', this.createListSessionsComponent());
 
         this.components.set('createsession', this.createCreateSessionComponent());
+
+        this.components.set('startrecording', this.createStartRecordingComponent());
+
+        this.components.set('listobjects', this.createListObjectsComponent());
+
+        this.components.set('createobject', this.createCreateObjectComponent());
 
         this.components.set('getsession', this.createGetSessionComponent());
 
@@ -31,103 +33,39 @@ class THDUIComponents {
 
         this.components.set('listscenes', this.createListScenesComponent());
 
-        this.components.set('startrecording', this.createStartRecordingComponent());
-
-        this.components.set('stoprecording', this.createStopRecordingComponent());
-
         this.components.set('playrecording', this.createPlayRecordingComponent());
 
-        this.components.set('setcameraposition', this.createSetCameraPositionComponent());
-
-        this.components.set('savescenefromsession', this.createSaveSceneFromSessionComponent());
-
         this.components.set('getrecordingstatus', this.createGetRecordingStatusComponent());
+
+        this.components.set('getobject', this.createGetObjectComponent());
 
         this.components.set('updateobject', this.createUpdateObjectComponent());
 
         this.components.set('deleteobject', this.createDeleteObjectComponent());
 
-        this.components.set('getobject', this.createGetObjectComponent());
-
         this.components.set('forcerefresh', this.createForceRefreshComponent());
+
+        this.components.set('startcameraorbit', this.createStartCameraOrbitComponent());
 
         this.components.set('getworldspec', this.createGetWorldSpecComponent());
 
         this.components.set('initializeworld', this.createInitializeWorldComponent());
 
-        this.components.set('forkscene', this.createForkSceneComponent());
-
-        this.components.set('startcameraorbit', this.createStartCameraOrbitComponent());
-
         this.components.set('loadscene', this.createLoadSceneComponent());
 
+        this.components.set('savescenefromsession', this.createSaveSceneFromSessionComponent());
+
+        this.components.set('forkscene', this.createForkSceneComponent());
+
+        this.components.set('stoprecording', this.createStopRecordingComponent());
+
         this.components.set('setcanvas', this.createSetCanvasComponent());
+
+        this.components.set('setcameraposition', this.createSetCameraPositionComponent());
 
         console.log('✅ UI components initialized');
     }
 
-
-    // Component for GET /sessions/{sessionId}/objects
-    createListObjectsComponent() {
-        return {
-            name: 'listobjects',
-            endpoint: '/sessions/{sessionId}/objects',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>ListObjects</h4><form id="listObjects-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><button type="submit">Execute</button></form><div id="listObjects-result" class="result-area"></div></div>';
-                this.attachEventListeners('listobjects', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.listObjects(formData.param1);
-                    this.showResult('listobjects', result);
-                    return result;
-                } catch (error) {
-                    this.showError('listobjects', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /sessions/{sessionId}/objects
-    createCreateObjectComponent() {
-        return {
-            name: 'createobject',
-            endpoint: '/sessions/{sessionId}/objects',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>CreateObject</h4><form id="createObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="createObject-result" class="result-area"></div></div>';
-                this.attachEventListeners('createobject', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.createObject(formData.param1, formData);
-                    this.showResult('createobject', result);
-                    return result;
-                } catch (error) {
-                    this.showError('createobject', error);
-                    throw error;
-                }
-            }
-        };
-    }
 
     // Component for GET /sessions
     createListSessionsComponent() {
@@ -185,6 +123,99 @@ class THDUIComponents {
                     return result;
                 } catch (error) {
                     this.showError('createsession', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /sessions/{sessionId}/recording/start
+    createStartRecordingComponent() {
+        return {
+            name: 'startrecording',
+            endpoint: '/sessions/{sessionId}/recording/start',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>StartRecording</h4><form id="startRecording-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="startRecording-result" class="result-area"></div></div>';
+                this.attachEventListeners('startrecording', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.startRecording(formData.param1, formData);
+                    this.showResult('startrecording', result);
+                    return result;
+                } catch (error) {
+                    this.showError('startrecording', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /sessions/{sessionId}/objects
+    createListObjectsComponent() {
+        return {
+            name: 'listobjects',
+            endpoint: '/sessions/{sessionId}/objects',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>ListObjects</h4><form id="listObjects-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><button type="submit">Execute</button></form><div id="listObjects-result" class="result-area"></div></div>';
+                this.attachEventListeners('listobjects', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.listObjects(formData.param1);
+                    this.showResult('listobjects', result);
+                    return result;
+                } catch (error) {
+                    this.showError('listobjects', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /sessions/{sessionId}/objects
+    createCreateObjectComponent() {
+        return {
+            name: 'createobject',
+            endpoint: '/sessions/{sessionId}/objects',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>CreateObject</h4><form id="createObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="createObject-result" class="result-area"></div></div>';
+                this.attachEventListeners('createobject', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.createObject(formData.param1, formData);
+                    this.showResult('createobject', result);
+                    return result;
+                } catch (error) {
+                    this.showError('createobject', error);
                     throw error;
                 }
             }
@@ -284,68 +315,6 @@ class THDUIComponents {
         };
     }
 
-    // Component for POST /sessions/{sessionId}/recording/start
-    createStartRecordingComponent() {
-        return {
-            name: 'startrecording',
-            endpoint: '/sessions/{sessionId}/recording/start',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>StartRecording</h4><form id="startRecording-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="startRecording-result" class="result-area"></div></div>';
-                this.attachEventListeners('startrecording', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.startRecording(formData.param1, formData);
-                    this.showResult('startrecording', result);
-                    return result;
-                } catch (error) {
-                    this.showError('startrecording', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /sessions/{sessionId}/recording/stop
-    createStopRecordingComponent() {
-        return {
-            name: 'stoprecording',
-            endpoint: '/sessions/{sessionId}/recording/stop',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>StopRecording</h4><form id="stopRecording-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="stopRecording-result" class="result-area"></div></div>';
-                this.attachEventListeners('stoprecording', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.stopRecording(formData.param1, formData);
-                    this.showResult('stoprecording', result);
-                    return result;
-                } catch (error) {
-                    this.showError('stoprecording', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
     // Component for POST /sessions/{sessionId}/recording/play
     createPlayRecordingComponent() {
         return {
@@ -377,68 +346,6 @@ class THDUIComponents {
         };
     }
 
-    // Component for PUT /sessions/{sessionId}/camera/position
-    createSetCameraPositionComponent() {
-        return {
-            name: 'setcameraposition',
-            endpoint: '/sessions/{sessionId}/camera/position',
-            method: 'PUT',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>SetCameraPosition</h4><form id="setCameraPosition-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setCameraPosition-result" class="result-area"></div></div>';
-                this.attachEventListeners('setcameraposition', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.setCameraPosition(formData.param1, formData);
-                    this.showResult('setcameraposition', result);
-                    return result;
-                } catch (error) {
-                    this.showError('setcameraposition', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /sessions/{sessionId}/scenes/save
-    createSaveSceneFromSessionComponent() {
-        return {
-            name: 'savescenefromsession',
-            endpoint: '/sessions/{sessionId}/scenes/save',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>SaveSceneFromSession</h4><form id="saveSceneFromSession-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="saveSceneFromSession-result" class="result-area"></div></div>';
-                this.attachEventListeners('savescenefromsession', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.saveSceneFromSession(formData.param1, formData);
-                    this.showResult('savescenefromsession', result);
-                    return result;
-                } catch (error) {
-                    this.showError('savescenefromsession', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
     // Component for GET /sessions/{sessionId}/recording/status
     createGetRecordingStatusComponent() {
         return {
@@ -464,6 +371,37 @@ class THDUIComponents {
                     return result;
                 } catch (error) {
                     this.showError('getrecordingstatus', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /sessions/{sessionId}/objects/{objectName}
+    createGetObjectComponent() {
+        return {
+            name: 'getobject',
+            endpoint: '/sessions/{sessionId}/objects/{objectName}',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>GetObject</h4><form id="getObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><button type="submit">Execute</button></form><div id="getObject-result" class="result-area"></div></div>';
+                this.attachEventListeners('getobject', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.getObject(formData.param1, formData.param2);
+                    this.showResult('getobject', result);
+                    return result;
+                } catch (error) {
+                    this.showError('getobject', error);
                     throw error;
                 }
             }
@@ -532,37 +470,6 @@ class THDUIComponents {
         };
     }
 
-    // Component for GET /sessions/{sessionId}/objects/{objectName}
-    createGetObjectComponent() {
-        return {
-            name: 'getobject',
-            endpoint: '/sessions/{sessionId}/objects/{objectName}',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>GetObject</h4><form id="getObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><button type="submit">Execute</button></form><div id="getObject-result" class="result-area"></div></div>';
-                this.attachEventListeners('getobject', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getObject(formData.param1, formData.param2);
-                    this.showResult('getobject', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getobject', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
     // Component for POST /browser/refresh
     createForceRefreshComponent() {
         return {
@@ -588,6 +495,37 @@ class THDUIComponents {
                     return result;
                 } catch (error) {
                     this.showError('forcerefresh', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /sessions/{sessionId}/camera/orbit
+    createStartCameraOrbitComponent() {
+        return {
+            name: 'startcameraorbit',
+            endpoint: '/sessions/{sessionId}/camera/orbit',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>StartCameraOrbit</h4><form id="startCameraOrbit-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="startCameraOrbit-result" class="result-area"></div></div>';
+                this.attachEventListeners('startcameraorbit', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.startCameraOrbit(formData.param1, formData);
+                    this.showResult('startcameraorbit', result);
+                    return result;
+                } catch (error) {
+                    this.showError('startcameraorbit', error);
                     throw error;
                 }
             }
@@ -656,68 +594,6 @@ class THDUIComponents {
         };
     }
 
-    // Component for POST /scenes/{sceneId}/fork
-    createForkSceneComponent() {
-        return {
-            name: 'forkscene',
-            endpoint: '/scenes/{sceneId}/fork',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>ForkScene</h4><form id="forkScene-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="forkScene-result" class="result-area"></div></div>';
-                this.attachEventListeners('forkscene', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.forkScene(formData.param1, formData);
-                    this.showResult('forkscene', result);
-                    return result;
-                } catch (error) {
-                    this.showError('forkscene', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /sessions/{sessionId}/camera/orbit
-    createStartCameraOrbitComponent() {
-        return {
-            name: 'startcameraorbit',
-            endpoint: '/sessions/{sessionId}/camera/orbit',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="thd-component"><h4>StartCameraOrbit</h4><form id="startCameraOrbit-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="startCameraOrbit-result" class="result-area"></div></div>';
-                this.attachEventListeners('startcameraorbit', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.startCameraOrbit(formData.param1, formData);
-                    this.showResult('startcameraorbit', result);
-                    return result;
-                } catch (error) {
-                    this.showError('startcameraorbit', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
     // Component for POST /scenes/{sceneId}
     createLoadSceneComponent() {
         return {
@@ -749,6 +625,99 @@ class THDUIComponents {
         };
     }
 
+    // Component for POST /sessions/{sessionId}/scenes/save
+    createSaveSceneFromSessionComponent() {
+        return {
+            name: 'savescenefromsession',
+            endpoint: '/sessions/{sessionId}/scenes/save',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>SaveSceneFromSession</h4><form id="saveSceneFromSession-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="saveSceneFromSession-result" class="result-area"></div></div>';
+                this.attachEventListeners('savescenefromsession', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.saveSceneFromSession(formData.param1, formData);
+                    this.showResult('savescenefromsession', result);
+                    return result;
+                } catch (error) {
+                    this.showError('savescenefromsession', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /scenes/{sceneId}/fork
+    createForkSceneComponent() {
+        return {
+            name: 'forkscene',
+            endpoint: '/scenes/{sceneId}/fork',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>ForkScene</h4><form id="forkScene-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="forkScene-result" class="result-area"></div></div>';
+                this.attachEventListeners('forkscene', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.forkScene(formData.param1, formData);
+                    this.showResult('forkscene', result);
+                    return result;
+                } catch (error) {
+                    this.showError('forkscene', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /sessions/{sessionId}/recording/stop
+    createStopRecordingComponent() {
+        return {
+            name: 'stoprecording',
+            endpoint: '/sessions/{sessionId}/recording/stop',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>StopRecording</h4><form id="stopRecording-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="stopRecording-result" class="result-area"></div></div>';
+                this.attachEventListeners('stoprecording', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.stopRecording(formData.param1, formData);
+                    this.showResult('stoprecording', result);
+                    return result;
+                } catch (error) {
+                    this.showError('stoprecording', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
     // Component for POST /browser/canvas
     createSetCanvasComponent() {
         return {
@@ -774,6 +743,37 @@ class THDUIComponents {
                     return result;
                 } catch (error) {
                     this.showError('setcanvas', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for PUT /sessions/{sessionId}/camera/position
+    createSetCameraPositionComponent() {
+        return {
+            name: 'setcameraposition',
+            endpoint: '/sessions/{sessionId}/camera/position',
+            method: 'PUT',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="thd-component"><h4>SetCameraPosition</h4><form id="setCameraPosition-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setCameraPosition-result" class="result-area"></div></div>';
+                this.attachEventListeners('setcameraposition', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.setCameraPosition(formData.param1, formData);
+                    this.showResult('setcameraposition', result);
+                    return result;
+                } catch (error) {
+                    this.showError('setcameraposition', error);
                     throw error;
                 }
             }

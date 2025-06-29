@@ -422,9 +422,10 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Persistent THD session management
         let currentSessionId = localStorage.getItem('thd_session_id');
-        let sessionInitialized = false; // Flag to prevent multiple scene loads
+        let sessionInitialized = localStorage.getItem('thd_session_initialized') === 'true'; // Persistent flag to prevent multiple scene loads
         
         async function ensureSession() {
+            addDebug('SESSION_ENSURE', 'ensureSession() called - initialized: ' + sessionInitialized);
             try {
                 // Check if we have a persistent session
                 if (currentSessionId) {
@@ -453,6 +454,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         // Auto-load saved scene after session is restored (ONCE only)
                         if (!sessionInitialized) {
                             sessionInitialized = true;
+                            localStorage.setItem('thd_session_initialized', 'true');
                             setTimeout(() => {
                                 const savedScene = getCookie('thd_scene');
                                 if (savedScene && debugSceneSelect) {
@@ -466,8 +468,10 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         }
                         return;
                     } else {
-                        // Session expired, clear it
+                        // Session expired, clear it and reset initialization flag
                         localStorage.removeItem('thd_session_id');
+                        localStorage.removeItem('thd_session_initialized');
+                        sessionInitialized = false;
                         currentSessionId = null;
                     }
                 }
@@ -500,6 +504,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     // Auto-load saved scene after session is established (ONCE only)
                     if (!sessionInitialized) {
                         sessionInitialized = true;
+                        localStorage.setItem('thd_session_initialized', 'true');
                         setTimeout(() => {
                             const savedScene = getCookie('thd_scene');
                             if (savedScene && debugSceneSelect) {
@@ -921,7 +926,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         debugSceneSelect.addEventListener('change', function() {
             const selectedScene = this.value;
             if (selectedScene && currentSessionId) {
-                addDebug('SCENE_SELECT', {scene: selectedScene, session: currentSessionId});
+                addDebug('SCENE_SELECT', {scene: selectedScene, session: currentSessionId, manual: true});
                 saveScene(selectedScene);
                 loadScene(selectedScene);
             }
