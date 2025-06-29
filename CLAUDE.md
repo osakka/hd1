@@ -2,53 +2,53 @@
 
 ## Core Development Principles
 
-- **100% API-first development** from our spec yaml
-- **Bar raising solutions only**
+- **API-first development** from our spec yaml
+- **Quality solutions only**
 - **One source of truth, no parallels**
 - **No regressions ever**
-- **Zen approach to development**
-- **Client is 100% API driven** - clean separation
+- **Simple approach to development**
+- **Client is API driven** - clean separation
 - **Always fix root cause, never symptoms** - symptoms always have or are a root cause, work backwards
 
-## Professional Engineering Standards
+## Engineering Standards
 
-- **Professional daemon control** - 100% absolute paths, long flags only, no emojis
+- **Daemon control** - absolute paths, long flags only, no emojis
 - **Specification-driven development** - OpenAPI 3.0.3 as single source of truth
-- **Professional logging** - timestamped, no decorative elements
+- **Structured logging** - timestamped, no decorative elements
 - **Clean shutdown procedures** - proper resource cleanup
 - **Build system validation** - prevents deployment of incomplete implementations
 
 ## Project Identity: THD (The Holo-Deck)
 
-### Current State (v3.6.0 - Ultra-Simple Scene Updates & Code Audit Perfection)
-- **Binary**: `thd` (professional VR holodeck daemon)
+### Current State (v3.6.0 - Scene Updates & Code Audit)
+- **Binary**: `thd` (standard VR holodeck daemon)
 - **Module**: `holodeck` (Go module name)
 - **Rendering Engine**: A-Frame WebXR 1.4.0 (100% Local - 2.5MB ecosystem)
-- **🎯 Ultra-Simple Architecture**: API-based scene updates replacing complex fsnotify monitoring
-- **🔍 Code Audit Excellence**: Surgical precision audit achieving zero ambiguity and duplicates
-- **🏆 Single Source of Truth**: Perfect specification-driven architecture validated
-- **✅ Clean Build System**: Zero warnings, all auto-generation verified current
-- **🌐 Scene System**: Ultra-simple API-driven scene loading with WebSocket connection trigger
-- **📋 Professional Standards**: Complete elimination of duplicate ADR files and ambiguity
-- **🏆 Revolutionary Integration**: Complete upstream/downstream API bridge system maintained
-- **👑 Crown Jewel**: Auto-generated web UI client achieving 100% single source of truth
-- **🎭 Scene Forking System**: Revolutionary "photo vs video" content creation paradigm
-- **⚡ Bulletproof Reliability**: Simple API calls immune to filesystem mount option constraints
+- **Simple Architecture**: API-based scene updates replacing complex fsnotify monitoring
+- **Code Audit**: Comprehensive audit achieving zero ambiguity and duplicates
+- **Single Source of Truth**: Specification-driven architecture validated
+- **Clean Build System**: Zero warnings, all auto-generation verified current
+- **Scene System**: API-driven scene loading with WebSocket connection trigger
+- **Standards**: Complete elimination of duplicate ADR files and ambiguity
+- **Integration**: Complete upstream/downstream API bridge system maintained
+- **Auto-generated Web UI**: Auto-generated web UI client achieving single source of truth
+- **Scene Forking System**: "Photo vs video" content creation paradigm
+- **Reliable**: Simple API calls immune to filesystem mount option constraints
 - **Holodeck Containment**: Escape-proof boundary enforcement with 60fps monitoring
-- **Session Architecture**: Single source of truth with perfect isolation
+- **Session Architecture**: Single source of truth with session isolation
 - **A-Frame Components**: Complete local library with zero CDN dependencies
 - **Git Repository**: `https://git.uk.home.arpa/itdlabs/holo-deck.git`
 - **Credentials**: `claude-3/claude-password`
-- **Directory Structure**: Professional organization with clean .gitignore
+- **Directory Structure**: Clean organization with .gitignore
 
-### Revolutionary Technical Architecture
-- **🏆 Upstream/Downstream Integration**: Single source of truth bridge between THD API and A-Frame capabilities
-- **Enhanced Shell Functions**: Complete A-Frame schema validation with professional parameter checking
+### Technical Architecture
+- **Upstream/Downstream Integration**: Single source of truth bridge between THD API and A-Frame capabilities
+- **Enhanced Shell Functions**: Complete A-Frame schema validation with parameter checking
 - **JavaScript Function Bridge**: Identical signatures to shell functions enabling seamless API usage
-- **Revolutionary Code Generation**: Unified generator producing both standard and enhanced clients
+- **Code Generation**: Unified generator producing both standard and enhanced clients
 - **VR/AR Holodeck**: Full WebXR support with A-Frame Entity-Component-System
 - **Session Isolation**: Single source of truth with perfect multi-user session separation
-- **Professional Error Handling**: All API responses return consistent JSON (zero parsing errors)
+- **Standard Error Handling**: All API responses return consistent JSON (zero parsing errors)
 - **Enhanced Text Rendering**: Complete A-Frame text field transmission and display
 - **WebSocket Session Association**: Automatic client-session binding for perfect isolation
 - **3D Coordinate System**: 25×25×25 grid with [-12, +12] boundaries (holodeck-grade)
@@ -58,42 +58,42 @@
 - **Multi-Backend Ready**: Framework-agnostic API layer supporting future engines
 - **Real-time Communication**: WebSocket Hub with thread-safe SessionStore
 - **Auto-generated Routing**: Complete routing layer generated from api.yaml
-- **👑 Crown Jewel Web UI**: Complete JavaScript client auto-generated from OpenAPI spec
+- **Auto-generated client Web UI**: Complete JavaScript client auto-generated from OpenAPI spec
 - **Three-Tier Generation**: Go router + CLI client + Web UI client all from single spec
 - **Scene Forking Architecture**: Photo mode (snapshots) and video mode (temporal recording)
 - **Object Lifecycle Tracking**: Complete provenance with base/modified/new state transitions
-- **Professional Build System**: Make-based with daemon control targets
+- **Standard Build System**: Make-based with daemon control targets
 - **A-Frame Integration**: Seamless WebXR with 100% API compatibility
 
 ## Key File Locations
 
 ### Source Code
 - `/opt/holo-deck/src/api.yaml` - Single source of truth specification
-- `/opt/holo-deck/src/main.go` - THD daemon with professional standards
+- `/opt/holo-deck/src/main.go` - THD daemon with standard standards
 - `/opt/holo-deck/src/auto_router.go` - Auto-generated routing (DO NOT EDIT)
 - `/opt/holo-deck/src/server/handlers.go` - A-Frame WebXR interface with FREEZE-FRAME/TEMPORAL SEQUENCE controls
-- `/opt/holo-deck/src/codegen/generator.go` - 👑 Crown jewel code generator with web UI generation
+- `/opt/holo-deck/src/codegen/generator.go` - Auto-generated client code generator with web UI generation
 - `/opt/holo-deck/share/htdocs/static/js/thd-aframe.js` - A-Frame holodeck manager
-- `/opt/holo-deck/share/htdocs/static/js/thd-api-client.js` - 👑 Auto-generated JavaScript API client
-- `/opt/holo-deck/share/htdocs/static/js/thd-ui-components.js` - 👑 Auto-generated UI components
-- `/opt/holo-deck/share/htdocs/static/js/thd-form-system.js` - 👑 Auto-generated dynamic form system
-- `/opt/holo-deck/src/Makefile` - Professional build system
+- `/opt/holo-deck/share/htdocs/static/js/thd-api-client.js` - Auto-generated JavaScript API client
+- `/opt/holo-deck/share/htdocs/static/js/thd-ui-components.js` - Auto-generated UI components
+- `/opt/holo-deck/share/htdocs/static/js/thd-form-system.js` - Auto-generated dynamic form system
+- `/opt/holo-deck/src/Makefile` - Standard build system
 
 ### Runtime
-- `/opt/holo-deck/build/bin/thd` - Professional daemon binary
+- `/opt/holo-deck/build/bin/thd` - Standard daemon binary
 - `/opt/holo-deck/build/runtime/thd.pid` - Process ID file
-- `/opt/holo-deck/build/logs/` - Professional logging directory
+- `/opt/holo-deck/build/logs/` - Standard logging directory
 
 ### Documentation
-- `/opt/holo-deck/README.md` - Professional project overview
+- `/opt/holo-deck/README.md` - Standard project overview
 - `/opt/holo-deck/CHANGELOG.md` - Complete project transformation history
 - `/opt/holo-deck/docs/adr/ADR-001-aframe-webxr-integration.md` - A-Frame integration decision
 - `/opt/holo-deck/docs/adr/ADR-002-Specification-Driven-Development.md` - OpenAPI specification-driven architecture
-- `/opt/holo-deck/docs/adr/ADR-003-Professional-UI-Enhancement.md` - UI excellence & scene management
+- `/opt/holo-deck/docs/adr/ADR-003-Standard-UI-Enhancement.md` - UI excellence & scene management
 - `/opt/holo-deck/docs/adr/ADR-004-Scene-Forking-System.md` - Scene forking and photo/video paradigm
-- `/opt/holo-deck/docs/adr/ADR-005-ultra-simple-scene-updates.md` - Ultra-simple scene update architecture
-- `/opt/holo-deck/docs/adr/ADR-006-Auto-Generated-Web-UI-Client.md` - 👑 Crown jewel implementation
-- `/opt/holo-deck/docs/adr/ADR-007-Revolutionary-Upstream-Downstream-Integration.md` - 🏆 Revolutionary API integration
+- `/opt/holo-deck/docs/adr/ADR-005-simple-scene-updates.md` - Simple scene update architecture
+- `/opt/holo-deck/docs/adr/ADR-006-Auto-Generated-Web-UI-Client.md` - Auto-generated client implementation
+- `/opt/holo-deck/docs/adr/ADR-007-Advanced-Upstream-Downstream-Integration.md` - Advanced API integration
 - `/opt/holo-deck/docs/adr/ADR-008-Thread-Safe-Session-Store.md` - Thread-safe session management
 - `/opt/holo-deck/docs/adr/ADR-009-WebSocket-Realtime-Architecture.md` - WebSocket real-time architecture
 - `/opt/holo-deck/docs/adr/ADR-010-3D-Coordinate-System.md` - 3D coordinate system design
@@ -102,18 +102,18 @@
 
 ### Holodeck Libraries
 - `/opt/holo-deck/lib/thd-functions.sh` - Comprehensive shell function library
-- `/opt/holo-deck/lib/thd-enhanced-functions.sh` - 🏆 Enhanced shell functions with A-Frame integration
-- `/opt/holo-deck/lib/thd-enhanced-bridge.js` - 🏆 JavaScript function bridge with identical signatures
-- `/opt/holo-deck/scenarios/ultimate-holodeck.thd` - Ultimate demonstration scenario
+- `/opt/holo-deck/lib/thd-enhanced-functions.sh` - Enhanced shell functions with A-Frame integration
+- `/opt/holo-deck/lib/thd-enhanced-bridge.js` - JavaScript function bridge with identical signatures
+- `/opt/holo-deck/scenarios/complete-holodeck.thd` - Complete demonstration scenario
 
 ## Development Workflow
 
-### Professional Daemon Control
+### Standard Daemon Control
 ```bash
 make start     # Start THD daemon
 make stop      # Stop THD daemon with proper cleanup
 make restart   # Restart with validation
-make status    # Professional status reporting
+make status    # Standard status reporting
 ```
 
 ### Build System
@@ -137,23 +137,23 @@ git config user.email "claude@anthropic.com"
 - **Phase 1 (RESOLVED)**: Empty object lists due to hardcoded returns instead of store calls
 - **Phase 2 (RESOLVED)**: Wireframe property missing from canvas control objects
 - **Phase 3 (RESOLVED)**: PID file writing issues in daemon mode
-- **Phase 4 (RESOLVED)**: Emoji removal for professional standards
+- **Phase 4 (RESOLVED)**: Emoji removal for standard standards
 - **Phase 5 (RESOLVED)**: Cross-session object visibility (session isolation implemented)
 - **Phase 6 (RESOLVED)**: Text field transmission ("Holodeck Text" fallback eliminated)
 - **Phase 7 (RESOLVED)**: jq parsing errors from non-JSON API responses
 - **Phase 8 (RESOLVED)**: Session restoration loop causing object flickering
 - **Phase 9 (RESOLVED)**: Hardcoded scene metadata replaced with dynamic discovery
-- **Phase 10 (IMPLEMENTED)**: 👑 Crown jewel - Auto-generated web UI client system
+- **Phase 10 (IMPLEMENTED)**: Auto-generated web UI client system
 
-### Professional Standards Implementation
-- **🎯 Ultra-Simple Solutions** - elegant API-based designs over complex infrastructure
-- **🔍 Single Source of Truth** - zero duplicate files or ambiguous documentation
-- **🚫 No emojis** in any system output or logging
-- **📁 Absolute paths only** - all configured from THD_* constants
-- **🏷️ Long flags only** - no short flags to eliminate confusion
-- **📝 Professional error messages** - clear, actionable, no decorative elements
-- **🌐 Clean URLs** - no query string versioning, standards-compliant caching
-- **⚡ Surgical Precision** - bar-raising solutions with zero regression tolerance
+### Standards Implementation
+- **Simple solutions** - elegant API-based designs over complex infrastructure
+- **Single source of truth** - zero duplicate files or ambiguous documentation
+- **No emojis** in any system output or logging
+- **Absolute paths only** - all configured from THD_* constants
+- **Long flags only** - no short flags to eliminate confusion
+- **Clear error messages** - clear, actionable, no decorative elements
+- **Clean URLs** - no query string versioning, standards-compliant caching
+- **Precise** - quality solutions with zero regression tolerance
 
 ### Breaking Changes from VWS to THD
 - **Module imports**: `visualstream/*` → `holodeck/*`
@@ -161,27 +161,27 @@ git config user.email "claude@anthropic.com"
 - **Constants**: `VWS_*` → `THD_*`
 - **PID files**: `vws.pid` → `thd.pid`
 
-## Ultra-Simple Scene Update Context (v3.6.0)
+## Simple Scene Update Context (v3.6.0)
 
-### Revolutionary Scene Update Architecture
-- **🎯 Ultra-Simple Design**: API-based scene loading instead of complex fsnotify monitoring
-- **🔍 Filesystem Discovery**: Root cause analysis revealed `noatime,lazytime` mount options interfering with fsnotify
-- **🌐 WebSocket Trigger**: `setTimeout(refreshSceneDropdown, 1000)` on connection for automatic scene discovery
-- **📊 Complete Scene Detection**: All 11+ scenes automatically discovered from filesystem via API
-- **👤 Natural Workflow**: Page refresh pattern users expect instead of complex file monitoring
-- **⚡ Bulletproof Reliability**: Simple API calls immune to filesystem mount option constraints
+### Scene Update Architecture
+- **Simple design**: API-based scene loading instead of complex fsnotify monitoring
+- **Filesystem discovery**: Root cause analysis revealed `noatime,lazytime` mount options interfering with fsnotify
+- **WebSocket trigger**: `setTimeout(refreshSceneDropdown, 1000)` on connection for automatic scene discovery
+- **Complete scene detection**: All 11+ scenes automatically discovered from filesystem via API
+- **Natural workflow**: Page refresh pattern users expect instead of complex file monitoring
+- **Reliable**: Simple API calls immune to filesystem mount option constraints
 
-### Professional Code Audit Excellence
-- **🔧 Surgical Precision**: Complete elimination of duplicate ADR-005 files
-- **🎯 Zero Ambiguity**: 100% single source of truth achieved throughout codebase  
-- **✅ Clean Build Verification**: `make all` and `make test` pass with zero warnings
-- **🤖 Auto-Generation Validation**: All clients perfectly generated from api.yaml specification
-- **📋 Documentation Audit**: Complete elimination of conflicting or redundant documentation
-- **🏆 Bar-Raising Standards**: Ultra-simple solutions preferred over complex infrastructure
+### Code Audit Results
+- **Precise**: Complete elimination of duplicate ADR-005 files
+- **Zero ambiguity**: 100% single source of truth achieved throughout codebase  
+- **Clean build verification**: `make all` and `make test` pass with zero warnings
+- **Auto-generation validation**: All clients perfectly generated from api.yaml specification
+- **Documentation audit**: Complete elimination of conflicting or redundant documentation
+- **Quality standards**: Simple solutions preferred over complex infrastructure
 
-### Ultra-Simple Implementation Details
+### Simple Implementation Details
 ```javascript
-// Ultra-simple scene loading on WebSocket connection
+// Simple scene loading on WebSocket connection
 setTimeout(refreshSceneDropdown, 1000);
 
 // Perfect scene discovery from API
@@ -198,13 +198,13 @@ async function refreshSceneDropdown() {
 ### Filesystem Mount Constraints Resolution
 - **Root Cause**: Filesystem mounted with `noatime,lazytime` options
 - **Technical Impact**: Mount options interfere with fsnotify reliability
-- **Ultra-Simple Solution**: API-based approach more reliable than filesystem events
-- **Professional Decision**: User-driven workflow instead of complex monitoring
+- **Simple Solution**: API-based approach more reliable than filesystem events
+- **Standard Decision**: User-driven workflow instead of complex monitoring
 - **Future Ready**: Infrastructure preserved for when filesystem constraints resolved
 
-## Scene Forking & Crown Jewel Context (v3.4.0)
+## Scene Forking & Auto-Generated Client Context (v3.4.0)
 
-### Revolutionary Scene Forking System
+### Advanced Scene Forking System
 - **Photo Mode (FREEZE-FRAME)**: `POST /sessions/{sessionId}/scenes/save` - Save current session state as new scene
 - **Video Mode (TEMPORAL SEQUENCE)**: Recording endpoints for complete session capture and playback
 - **Scene Fork API**: `POST /scenes/{sceneId}/fork` - Load scenes into sessions for non-destructive editing
@@ -212,7 +212,7 @@ async function refreshSceneDropdown() {
 - **Dynamic Scene Discovery**: Script-based metadata parsing replacing hardcoded scene lists
 - **Script Generation**: Automatic creation of executable scene files from session state
 
-### 👑 Crown Jewel Implementation - Auto-Generated Web UI Client
+### Auto-Generated Web UI Client Implementation
 - **JavaScript API Client**: Complete API wrapper auto-generated from OpenAPI specification
 - **UI Components**: Each API endpoint becomes an interactive UI component
 - **Dynamic Form System**: Forms automatically generated from request schemas
@@ -226,9 +226,9 @@ async function refreshSceneDropdown() {
 - **Session Integration**: Scene dropdown appears under session ID in holodeck console
 - **Auto-Bootstrap**: Saved scenes automatically load on session restore/creation
 
-### Professional Interface Standards
+### Standard Interface Standards
 - **Console Status**: `THD Console [ACTIVE]` / `THD Console [MINIMIZED]` (no unicode)
-- **Status LED**: 6px professional indicator with hover tooltips (50% size reduction)
+- **Status LED**: 6px standard indicator with hover tooltips (50% size reduction)
 - **VR Button**: Removed empty rectangle (`vr-mode-ui="enabled: false"`)
 - **Sprint Controls**: Shift key modifier for 3x speed boost (20 → 60 acceleration)
 - **Scrollbar Theming**: Cross-browser holodeck aesthetic with cyan accents
@@ -237,7 +237,7 @@ async function refreshSceneDropdown() {
 ### UI Component Architecture
 - **A-Frame Sprint Component**: `thd-sprint-controls` with dynamic acceleration switching
 - **Scene Selection Flow**: Dropdown → Cookie Save → API Call → WebSocket Broadcast
-- **Professional Scrollbars**: WebKit and Firefox theming for consistent holodeck look
+- **Standard Scrollbars**: WebKit and Firefox theming for consistent holodeck look
 - **HTTP Cache Strategy**: Development no-cache for JS/CSS, production caching for assets
 
 ## Debugging Context
@@ -259,21 +259,21 @@ async function refreshSceneDropdown() {
 - **Scene management**: API-driven scene loading with session isolation
 - **Real-time updates**: WebSocket hub broadcasts all changes
 
-### Scene Forking & Crown Jewel Debugging
+### Scene Forking & Auto-Generated Client Debugging
 - **Scene Forking**: Check object tracking status (base/modified/new) in session object listings
 - **FREEZE-FRAME**: Monitor `POST /sessions/{sessionId}/scenes/save` for scene creation
 - **TEMPORAL SEQUENCE**: Check recording status with `GET /sessions/{sessionId}/recording/status`
-- **Crown Jewel Generation**: Verify auto-generated files in `/share/htdocs/static/js/thd-*.js`
+- **Auto-Generated Client Generation**: Verify auto-generated files in `/share/htdocs/static/js/thd-*.js`
 - **UI Components**: Test auto-generated components via `window.THDUIComponents` in browser console
 - **API Client**: Verify `window.thdAPI` provides all 23 auto-generated methods
 - **Form System**: Check `window.THDFormSystem` for schema-driven form generation
-- **Build Generation**: Ensure `make generate` produces all crown jewel files without errors
+- **Build Generation**: Ensure `make generate` produces all auto-generated client files without errors
 
 ### UI Enhancement Debugging (Legacy)
 - **Cache Issues**: Check HTTP headers in Network tab (should show no-cache for dev)
 - **Scene Loading**: Monitor console for `SCENE_LOADED` and `AUTO_SCENE` debug entries
 - **Sprint Controls**: Verify `thd-sprint-controls` component attachment on camera entity
-- **Status Indicators**: Professional `[ACTIVE]`/`[MINIMIZED]` instead of unicode arrows
+- **Status Indicators**: Standard `[ACTIVE]`/`[MINIMIZED]` instead of unicode arrows
 - **Scrollbar Theme**: CSS custom properties for cross-browser holodeck styling
 
 ## Recovery Context for New Sessions
@@ -284,20 +284,20 @@ When resuming development after session restart:
 2. **Verify build**: `make all` to ensure clean build with zero warnings
 3. **Git status**: Confirm all changes committed to `https://git.uk.home.arpa/itdlabs/holo-deck.git`
 4. **API validation**: `make test` to verify all endpoints functional
-5. **Professional standards**: Confirm no emojis, absolute paths maintained
-6. **🎯 Ultra-simple architecture**: Verify scene loading works via API (not fsnotify)
-7. **🔍 Single source validation**: Confirm no duplicate ADR files or ambiguous documentation
+5. **Standards**: Confirm no emojis, absolute paths maintained
+6. **Simple architecture**: Verify scene loading works via API (not fsnotify)
+7. **Single source validation**: Confirm no duplicate ADR files or ambiguous documentation
 
 ## Project Philosophy
 
-> **"Where immersive holodeck technology meets professional engineering"**
+> **"Where immersive holodeck technology meets standard engineering"**
 
-THD represents the revolutionary evolution from basic 3D visualization to **professional VR/AR holodeck platform**, powered by A-Frame WebXR while maintaining all professional engineering standards and 100% API compatibility.
+THD represents the advanced evolution from basic 3D visualization to **standard VR/AR holodeck platform**, powered by A-Frame WebXR while maintaining all standard engineering standards and 100% API compatibility.
 
 **A-Frame Integration Philosophy:**
 - **Framework Flexibility**: Clean API layer enables multi-backend architecture
 - **Community Leverage**: Utilize best-in-class open-source WebXR framework
-- **Professional Standards**: Maintain engineering quality across all integrations
+- **Standard Standards**: Maintain engineering quality across all integrations
 - **Future-Ready**: WebXR standard compliance for long-term viability
 
-**Never compromise on professional standards while achieving revolutionary capabilities.**
+**Never compromise on standard standards while achieving advanced capabilities.**

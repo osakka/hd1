@@ -211,7 +211,7 @@ func main() {
 
 	// Initialize logging for code generation
 	logging.InitLogger("/opt/holo-deck/build/logs", logging.INFO, []string{})
-	logging.Info("revolutionary code generator starting", map[string]interface{}{
+	logging.Info("advanced code generator starting", map[string]interface{}{
 		"task": "upstream-downstream-integration",
 		"single_source_of_truth": true,
 	})
@@ -368,7 +368,7 @@ func main() {
 		fmt.Printf("🔧 Generated: /opt/holo-deck/lib/thdlib.sh (upstream core library)\n")
 	}
 
-	// Revolutionary enhanced generation with A-Frame integration
+	// Advanced enhanced generation with A-Frame integration
 	fmt.Println("\n🏆 GENERATING REVOLUTIONARY A-FRAME INTEGRATION...")
 	if err := generateEnhancedIntegration(spec, routes); err != nil {
 		logging.Error("enhanced integration generation failed", map[string]interface{}{
@@ -376,7 +376,7 @@ func main() {
 		})
 		fmt.Printf("⚠️  WARNING: Enhanced generation failed: %v\n", err)
 	} else {
-		fmt.Printf("🏆 SUCCESS: Revolutionary A-Frame integration generated\n")
+		fmt.Printf("🏆 SUCCESS: Advanced A-Frame integration generated\n")
 		fmt.Printf("✨ A-Frame shell integration: /opt/holo-deck/lib/downstream/aframelib.sh\n")
 		fmt.Printf("✨ A-Frame JavaScript bridge: /opt/holo-deck/lib/downstream/aframelib.js\n")
 	}
@@ -709,7 +709,7 @@ func generateGoImplementation(route RouteInfo) string {
 	}
 }
 
-// generateWebUIClient creates the revolutionary auto-generated web UI client
+// generateWebUIClient creates the advanced auto-generated web UI client
 func generateWebUIClient(spec OpenAPISpec, routes []RouteInfo) {
 	fmt.Println("🏗️  Creating Web UI Generator Infrastructure...")
 	
@@ -786,7 +786,7 @@ class THDAPIClient {
         };
     }
 
-    // Core HTTP request method with professional error handling
+    // Core HTTP request method with standard error handling
     async request(method, path, data = null, headers = {}) {
         const url = this.baseURL + path;
         const config = {
@@ -801,7 +801,7 @@ class THDAPIClient {
         try {
             const response = await fetch(url, config);
             
-            // Professional error handling
+            // Standard error handling
             if (!response.ok) {
                 const errorData = await response.text();
                 throw new Error('HTTP ' + response.status + ': ' + errorData);
@@ -899,7 +899,7 @@ func generateUIComponents(outputDir string, spec OpenAPISpec, routes []RouteInfo
 // AUTO-GENERATED UI COMPONENTS - DO NOT MODIFY
 // ===================================================================
 //
-// Professional UI components auto-generated from OpenAPI specification
+// Standard UI components auto-generated from OpenAPI specification
 // Updates automatically when API specification changes
 //
 // ===================================================================
@@ -1434,7 +1434,7 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 # • Complete A-Frame capability exposure through shell functions
 # • Perfect upstream/downstream API integration  
 # • Single source of truth architecture
-# • Bar-raising professional development experience
+# • Bar-raising standard development experience
 #
 # Generated from: api.yaml + A-Frame schemas
 # ===================================================================
@@ -1665,7 +1665,7 @@ func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
  * 🏆 REVOLUTIONARY FEATURES:
  * • Identical function signatures to shell functions
  * • Complete A-Frame capability exposure through JavaScript
- * • Professional upstream API integration
+ * • Standard upstream API integration
  * • Single source of truth architecture
  *
  * Generated from: api.yaml + A-Frame schemas
@@ -1888,7 +1888,7 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 #
 # 🎯 GENERATED FROM: api.yaml specification
 # 🔧 SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
-# 📋 PURPOSE: Professional shell wrapper for THD API endpoints
+# 📋 PURPOSE: Standard shell wrapper for THD API endpoints
 # 
 # DO NOT EDIT MANUALLY - Regenerate with: make generate
 # ===================================================================
@@ -1897,7 +1897,7 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 THD_API_BASE="http://localhost:8080/api"
 THD_SESSION_ID="${THD_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
 
-# Professional HTTP client with error handling
+# Standard HTTP client with error handling
 thd::api_call() {
     local method="$1"
     local endpoint="$2"
@@ -1913,7 +1913,7 @@ thd::api_call() {
         response=$(curl -s -X "$method" "$THD_API_BASE$endpoint")
     fi
     
-    # Professional JSON response parsing
+    # Standard JSON response parsing
     if echo "$response" | jq . >/dev/null 2>&1; then
         echo "$response" | jq -r '.message // .success // "Success"'
     else

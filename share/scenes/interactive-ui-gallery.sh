@@ -67,7 +67,7 @@ curl -X POST "http://localhost:8080/api/sessions/$SESSION_ID/objects" \
   -d '{"name":"title_text_plane","type":"plane","x":-1,"y":2.2,"z":-1.9,"color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"text":"Interactive UI Gallery","material":{"shader":"standard","transparent":true}}' \
   -s > /dev/null
 
-# Professional lighting setup
+# Standard lighting setup
 curl -X POST "http://localhost:8080/api/sessions/$SESSION_ID/objects" \
   -H "Content-Type: application/json" \
   -d '{"name":"ambient_light","type":"light","x":0,"y":3,"z":0,"lightType":"ambient","intensity":0.3,"color":{"r":0.9,"g":0.9,"b":1.0,"a":1.0}}' \

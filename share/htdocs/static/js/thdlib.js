@@ -28,7 +28,7 @@ class THDAPIClient {
         };
     }
 
-    // Core HTTP request method with professional error handling
+    // Core HTTP request method with standard error handling
     async request(method, path, data = null, headers = {}) {
         const url = this.baseURL + path;
         const config = {
@@ -43,7 +43,7 @@ class THDAPIClient {
         try {
             const response = await fetch(url, config);
             
-            // Professional error handling
+            // Standard error handling
             if (!response.ok) {
                 const errorData = await response.text();
                 throw new Error('HTTP ' + response.status + ': ' + errorData);

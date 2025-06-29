@@ -1,10 +1,10 @@
-# 🏆 THD Source Code - Revolutionary Specification-Driven Architecture
+# 🏆 THD Source Code - Advanced Specification-Driven Architecture
 
-**Professional VR/AR Holodeck Platform with Revolutionary Upstream/Downstream Integration**
+**Standard VR/AR Holodeck Platform with Advanced Upstream/Downstream Integration**
 
-This directory contains the core implementation of **THD (The Holo-Deck)** - the world's first **professional holodeck platform** with revolutionary specification-driven architecture and complete upstream/downstream API integration.
+This directory contains the core implementation of **THD (The Holo-Deck)** - the world's first **standard holodeck platform** with advanced specification-driven architecture and complete upstream/downstream API integration.
 
-## 🎯 Revolutionary Architecture Overview
+## 🎯 Advanced Architecture Overview
 
 ### **Single Source of Truth Pipeline**
 ```
@@ -17,7 +17,7 @@ api.yaml (specification) → generator.go → {
 }
 ```
 
-**Revolutionary Achievement**: Change the API specification = automatically regenerate ALL client libraries and routing across ALL environments.
+**Advanced Achievement**: Change the API specification = automatically regenerate ALL client libraries and routing across ALL environments.
 
 ## 🏗️ Architectural Principles
 
@@ -27,27 +27,27 @@ api.yaml (specification) → generator.go → {
 - **Perfect synchronization** - clients never fall out of sync
 - **Build-time validation** - prevents deployment of incomplete implementations
 
-### **2. Revolutionary Upstream/Downstream Integration**
+### **2. Advanced Upstream/Downstream Integration**
 - **Upstream**: Core THD API wrappers (`thdlib.*`)
 - **Downstream**: A-Frame WebXR integration (`aframelib.*`)
 - **Identical signatures** - shell and JavaScript functions have identical parameters
 - **Perfect layering** - downstream imports upstream maintaining single source of truth
 
-### **3. Professional Engineering Standards**
+### **3. Standard Engineering Standards**
 - **Thread-safe concurrency** - mutex-protected session management
-- **Enterprise-grade logging** - structured, timestamped, trace modules
+- **High-quality logging** - structured, timestamped, trace modules
 - **Quality assurance** - comprehensive validation preventing regressions
-- **Professional build system** - Make-based with daemon control
+- **Standard build system** - Make-based with daemon control
 
-## 📁 Revolutionary Directory Structure
+## 📁 Advanced Directory Structure
 
 ```
 src/
 ├── api.yaml                # 🎯 SINGLE SOURCE OF TRUTH - OpenAPI 3.0.3 Specification
-├── main.go                 # Professional THD daemon with holodeck integration
-├── auto_router.go          # 🤖 AUTO-GENERATED - Revolutionary routing from spec
+├── main.go                 # Standard THD daemon with holodeck integration
+├── auto_router.go          # 🤖 AUTO-GENERATED - Advanced routing from spec
 ├── go.mod & go.sum         # Go module dependencies
-├── Makefile               # Professional build system with validation
+├── Makefile               # Standard build system with validation
 │
 ├── codegen/               # 🏆 REVOLUTIONARY CODE GENERATION SYSTEM
 │   ├── generator.go       # Unified generator - upstream + downstream
@@ -74,7 +74,7 @@ src/
 │   │   ├── save.go        # POST /scenes/save - Save session as scene
 │   │   └── fork.go        # POST /scenes/{id}/fork - Scene forking
 │   │
-│   ├── camera/            # Professional camera control
+│   ├── camera/            # Standard camera control
 │   │   ├── position.go    # PUT /camera/position - Set coordinates
 │   │   └── orbit.go       # POST /camera/orbit - Orbital motion
 │   │
@@ -93,9 +93,9 @@ src/
 ├── server/                # 🛡️ ENTERPRISE-GRADE SERVER INFRASTRUCTURE
 │   ├── hub.go             # WebSocket hub with thread-safe SessionStore
 │   ├── client.go          # WebSocket client association and management
-│   ├── handlers.go        # Professional static file serving + A-Frame
+│   ├── handlers.go        # Standard static file serving + A-Frame
 │   ├── logging.go         # Structured logging with enterprise features
-│   ├── semantic.go        # Professional UI component generation
+│   ├── semantic.go        # Standard UI component generation
 │   └── version.go         # Version management and build info
 │
 └── logging/               # 🔍 PROFESSIONAL LOGGING SYSTEM
@@ -103,10 +103,10 @@ src/
     └── logger.go          # Thread-safe structured logging
 ```
 
-## 🎯 Revolutionary Code Generation
+## 🎯 Advanced Code Generation
 
 ### **Core Generator (`codegen/generator.go`)**
-**Revolutionary unified generator** producing:
+**Advanced unified generator** producing:
 - **Go routing** from OpenAPI specification
 - **Shell API client** (`thdlib.sh`) from API endpoints
 - **JavaScript API client** (`thdlib.js`) from API endpoints
@@ -128,7 +128,7 @@ make generate
 ✅ Web UI components with dynamic forms
 ```
 
-## 🏆 Revolutionary Features
+## 🏆 Advanced Features
 
 ### **1. Perfect Upstream/Downstream Integration**
 
@@ -158,19 +158,19 @@ thd::create_enhanced_object "crystal" "cone" 0 3 0 --color "#ff0000" --metalness
 await thd.createEnhancedObject('crystal', 'cone', 0, 3, 0, {color: '#ff0000', metalness: 0.8});
 ```
 
-### **2. Professional Scene Management**
-- **Scene Collection**: Professional scenes in `share/scenes/`
+### **2. Standard Scene Management**
+- **Scene Collection**: Standard scenes in `share/scenes/`
 - **API Integration**: Scenes accessible via `/api/scenes` endpoints
 - **Web UI**: Scene dropdown with 30-day cookie persistence
 - **Session Isolation**: Perfect scene separation across sessions
 
 ### **3. Holodeck Containment System**
-- **Universal Coordinates**: Professional [-12, +12] holodeck boundaries
+- **Universal Coordinates**: Standard [-12, +12] holodeck boundaries
 - **60fps Monitoring**: Real-time position checking with visual feedback
 - **Escape-proof Design**: Dual boundary enforcement system
-- **Professional Standards**: Enterprise-grade spatial control
+- **Standard Standards**: High-quality spatial control
 
-## 🔄 Professional Development Workflow
+## 🔄 Standard Development Workflow
 
 ### **1. API Specification Changes**
 ```bash
@@ -190,12 +190,12 @@ make generate
 ### **2. Build & Deployment**
 ```bash
 make all        # Complete build pipeline with validation
-make start      # Start THD daemon professionally  
-make status     # Professional status reporting
+make start      # Start THD daemon standardly  
+make status     # Standard status reporting
 make stop       # Clean shutdown with resource cleanup
 ```
 
-### **3. Professional Testing**
+### **3. Standard Testing**
 ```bash
 # Test scene functionality
 THD_SESSION=test-session bash share/scenes/basic-shapes.sh
@@ -217,7 +217,7 @@ type SessionStore struct {
 }
 ```
 
-**Revolutionary Features:**
+**Advanced Features:**
 - **Perfect Isolation**: Sessions cannot access each other's data
 - **Thread Safety**: Concurrent operations with proper mutex protection
 - **Real-time Updates**: WebSocket broadcasting with session association
@@ -233,25 +233,25 @@ type Hub struct {
 }
 ```
 
-## 🎮 Professional Holodeck Coordinates
+## 🎮 Standard Holodeck Coordinates
 
 **Coordinate System** (Specification: `docs/design/holodeck-coordinates.md`):
 - **Boundaries**: [-12, +12] on all axes (holodeck-grade)
-- **Grid System**: 25×25×25 professional grid
+- **Grid System**: 25×25×25 standard grid
 - **Human Standards**: Y=0 floor, Y=1.7 eye level, Y=3.0 ceiling
 - **Validation**: Automatic boundary enforcement throughout
 
-## 🔨 Professional Build System
+## 🔨 Standard Build System
 
 ### **Makefile Targets**
 ```bash
 make all        # Complete build pipeline with validation
-make generate   # Revolutionary code generation from spec
+make generate   # Advanced code generation from spec
 make build      # Compile THD daemon 
 make validate   # Validate API specification
-make start      # Professional daemon startup
+make start      # Standard daemon startup
 make stop       # Clean shutdown with resource cleanup
-make status     # Professional status reporting
+make status     # Standard status reporting
 make restart    # Restart with validation
 make test       # API endpoint testing
 make clean      # Remove build artifacts
@@ -262,14 +262,14 @@ make clean      # Remove build artifacts
 - ✅ **Handler Validation**: All referenced handlers must exist
 - ✅ **Generation Verification**: All clients successfully generated
 - ✅ **Build Validation**: Go compilation must succeed
-- ✅ **Professional Standards**: No regressions allowed
+- ✅ **Standard Standards**: No regressions allowed
 
 ## 🧪 API Handler Excellence
 
-**Professional Handler Pattern:**
+**Standard Handler Pattern:**
 ```go
 func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
-    // 1. Professional type casting with error handling
+    // 1. Standard type casting with error handling
     h, ok := hub.(*server.Hub)
     if !ok {
         w.Header().Set("Content-Type", "application/json")
@@ -282,10 +282,10 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
         return
     }
 
-    // 2. Professional parameter extraction and validation
+    // 2. Standard parameter extraction and validation
     sessionID := extractSessionID(r.URL.Path)
     if sessionID == "" {
-        // Professional error response...
+        // Standard error response...
     }
 
     // 3. Thread-safe business logic
@@ -294,7 +294,7 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
     // 4. Real-time WebSocket broadcasting
     h.BroadcastToSession(sessionID, "event_type", result)
 
-    // 5. Professional JSON response
+    // 5. Standard JSON response
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(SuccessResponse{
         Success: true,
@@ -319,7 +319,7 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 
 ### **DEVELOPMENT PRINCIPLES**
 1. **Specification First**: Design in `api.yaml` before implementation
-2. **Professional Standards**: Enterprise-grade logging, error handling
+2. **Standard Standards**: High-quality logging, error handling
 3. **Single Source of Truth**: Zero manual synchronization
 4. **Thread Safety**: All concurrent operations properly protected
 5. **Real-time Updates**: Broadcast all state changes via WebSocket
@@ -330,7 +330,7 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 ### **Adding New API Endpoints**
 1. **Define in specification**: Add to `api.yaml` with handler reference
 2. **Generate routing**: `make generate` creates routing automatically
-3. **Implement handler**: Create Go handler following professional pattern
+3. **Implement handler**: Create Go handler following standard pattern
 4. **Auto-generated clients**: Shell and JavaScript functions created automatically
 
 ### **Adding Downstream Integrations**
@@ -339,7 +339,7 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 3. **Implement JavaScript bridge**: Following `aframelib.js` pattern
 4. **Update generator**: Add generation logic for new framework
 
-### **Adding Professional Scenes**
+### **Adding Standard Scenes**
 1. **Create scene script**: In `share/scenes/` using THD functions
 2. **Update scene handler**: Add to scene mapping in `api/scenes/load.go`
 3. **Test integration**: Verify scene loads via API and web interface
@@ -350,13 +350,13 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 - **🔄 Zero Manual Synchronization**: All clients auto-generated and consistent
 - **🛡️ Enterprise Concurrency**: Thread-safe session management
 - **⚡ Real-time Communication**: WebSocket hub with session association
-- **🎮 Professional VR/AR**: Complete A-Frame WebXR integration
+- **🎮 Standard VR/AR**: Complete A-Frame WebXR integration
 - **🔧 Quality Assurance**: Build-time validation preventing regressions
-- **📊 Professional Logging**: Structured, timestamped, trace modules
-- **🎭 Scene Management**: Professional scene collection with API integration
+- **📊 Standard Logging**: Structured, timestamped, trace modules
+- **🎭 Scene Management**: Standard scene collection with API integration
 
 ---
 
-**THD Source Code represents the pinnacle of specification-driven development with revolutionary upstream/downstream integration architecture.**
+**THD Source Code represents the pinnacle of specification-driven development with advanced upstream/downstream integration architecture.**
 
 *Where API specifications become immersive holodeck experiences through surgical engineering precision.*

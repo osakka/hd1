@@ -4,7 +4,7 @@
 # THD Scene: Ultimate Demo - Complete Holodeck Showcase
 # =========================================================================
 #
-# Professional holodeck demonstration with advanced materials, lighting,
+# Standard holodeck demonstration with advanced materials, lighting,
 # and complex 3D structures showcasing THD capabilities
 #
 # Usage: ./ultimate-demo.sh [SESSION_ID]
@@ -47,7 +47,7 @@ thd::create_object "crystal_2" "box" 3 1.8 3
 thd::create_object "metallic_pillar_1" "cylinder" -5 2 0
 thd::create_object "energy_sphere" "sphere" 5 2 0
 
-# Professional lighting setup
+# Standard lighting setup
 thd::create_object "main_light" "light" 5 8 5
 thd::create_object "accent_light" "light" -3 6 -3
 

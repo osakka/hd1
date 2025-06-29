@@ -5,7 +5,7 @@
 
 ## Context
 
-Traditional API development suffers from inconsistency between API documentation and implementation. Manual routing configuration leads to errors, regressions, and maintenance overhead. For VWS (Virtual World Synthesizer), we needed a revolutionary approach that ensures the API specification IS the system architecture.
+Traditional API development suffers from inconsistency between API documentation and implementation. Manual routing configuration leads to errors, regressions, and maintenance overhead. For VWS (Virtual World Synthesizer), we needed a advanced approach that ensures the API specification IS the system architecture.
 
 ## Decision
 

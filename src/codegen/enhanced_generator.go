@@ -50,7 +50,7 @@ type FunctionParameter struct {
 	AFrameType  string // Maps to A-Frame schema type
 }
 
-// NewEnhancedCodeGenerator creates revolutionary dual-API generator
+// NewEnhancedCodeGenerator creates advanced dual-API generator
 func NewEnhancedCodeGenerator(apiSpec *OpenAPISpec, vendorPath string, outputDir string) (*EnhancedCodeGenerator, error) {
 	aframeReader := NewAFrameSchemaReader(vendorPath)
 	if err := aframeReader.ExtractSchemas(); err != nil {
@@ -80,7 +80,7 @@ func NewEnhancedCodeGenerator(apiSpec *OpenAPISpec, vendorPath string, outputDir
 
 // GenerateAll generates complete upstream/downstream integration
 func (g *EnhancedCodeGenerator) GenerateAll() error {
-	logging.Info("starting revolutionary code generation", map[string]interface{}{
+	logging.Info("starting advanced code generation", map[string]interface{}{
 		"task": "upstream-downstream-integration",
 		"single_source_of_truth": true,
 	})
@@ -110,7 +110,7 @@ func (g *EnhancedCodeGenerator) GenerateAll() error {
 		return fmt.Errorf("failed to generate enhanced CLI: %w", err)
 	}
 
-	logging.Info("revolutionary code generation completed", map[string]interface{}{
+	logging.Info("advanced code generation completed", map[string]interface{}{
 		"generated_files":    len(g.GeneratedFiles),
 		"upstream_functions": "shell + javascript + cli",
 		"downstream_integration": "A-Frame + WebXR",
@@ -142,7 +142,7 @@ func (g *EnhancedCodeGenerator) generateEnhancedShellFunctions() error {
 # • Complete A-Frame capability exposure through shell functions
 # • Perfect upstream/downstream API integration
 # • Single source of truth architecture
-# • Bar-raising professional development experience
+# • Bar-raising standard development experience
 #
 # 🎯 GENERATED FROM:
 # • api.yaml (THD API specification)
@@ -326,7 +326,7 @@ func (g *EnhancedCodeGenerator) generateJavaScriptBridge() error {
  * 🏆 REVOLUTIONARY FEATURES:
  * • Identical function signatures to shell functions
  * • Complete A-Frame capability exposure through JavaScript
- * • Professional upstream API integration
+ * • Standard upstream API integration
  * • Single source of truth architecture
  *
  * 🎯 GENERATED FROM:

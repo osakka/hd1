@@ -113,7 +113,7 @@ func main() {
 		http.StripPrefix("/static/", fileServer).ServeHTTP(w, r)
 	}))
 
-	// Professional startup banner
+	// Standard startup banner
 	logging.Info("THD (The Holo-Deck) daemon starting", map[string]interface{}{
 		"version":     "v3.4.0",
 		"architecture": "spec-driven",
@@ -158,7 +158,7 @@ func main() {
 }
 
 func showHelp() {
-	fmt.Println("THD (The Holo-Deck) - Professional 3D Visualization Engine")
+	fmt.Println("THD (The Holo-Deck) - Standard 3D Visualization Engine")
 	fmt.Println("============================================================")
 	fmt.Println()
 	fmt.Println("USAGE:")

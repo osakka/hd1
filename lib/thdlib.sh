@@ -5,7 +5,7 @@
 #
 # 🎯 GENERATED FROM: api.yaml specification
 # 🔧 SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
-# 📋 PURPOSE: Professional shell wrapper for THD API endpoints
+# 📋 PURPOSE: Standard shell wrapper for THD API endpoints
 # 
 # DO NOT EDIT MANUALLY - Regenerate with: make generate
 # ===================================================================
@@ -14,7 +14,7 @@
 THD_API_BASE="http://localhost:8080/api"
 THD_SESSION_ID="${THD_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
 
-# Professional HTTP client with error handling
+# Standard HTTP client with error handling
 thd::api_call() {
     local method="$1"
     local endpoint="$2"
@@ -30,7 +30,7 @@ thd::api_call() {
         response=$(curl -s -X "$method" "$THD_API_BASE$endpoint")
     fi
     
-    # Professional JSON response parsing
+    # Standard JSON response parsing
     if echo "$response" | jq . >/dev/null 2>&1; then
         echo "$response" | jq -r '.message // .success // "Success"'
     else

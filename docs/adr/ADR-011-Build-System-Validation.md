@@ -120,7 +120,7 @@ build: generate
 ### dev-control.sh Integration
 ```bash
 #!/bin/bash
-# Professional development lifecycle management
+# Standard development lifecycle management
 
 build_server() {
     echo "🏗️  BUILDING FROM SPECIFICATION"
@@ -148,7 +148,7 @@ build_server() {
 
 ### Artifact Management
 ```bash
-# Professional directory structure
+# Standard directory structure
 PROJECT_ROOT="/opt/holo-deck"
 BUILD_DIR="$PROJECT_ROOT/build"
 BIN_DIR="$BUILD_DIR/bin"
@@ -272,7 +272,7 @@ dev_cycle() {
 - **Rapid Development**: Fast build cycle with comprehensive validation
 - **Clear Error Messages**: Developers quickly identify and fix issues
 - **Specification Consistency**: Ensures API docs match implementation
-- **Professional Workflow**: Industry-standard build practices
+- **Standard Workflow**: Industry-standard build practices
 
 ### ⚠️ Trade-offs
 - **Build Complexity**: More sophisticated than simple `go build`

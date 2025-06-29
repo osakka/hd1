@@ -8,7 +8,7 @@
 # • Complete A-Frame capability exposure through shell functions
 # • Perfect upstream/downstream API integration  
 # • Single source of truth architecture
-# • Bar-raising professional development experience
+# • Bar-raising standard development experience
 #
 # Generated from: api.yaml + A-Frame schemas
 # ===================================================================

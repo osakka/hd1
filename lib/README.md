@@ -1,17 +1,17 @@
 # THD Library Architecture
 
-**Professional Upstream API Libraries - Auto-Generated from Specification**
+**Standard Upstream API Libraries - Auto-Generated from Specification**
 
-This directory contains the **upstream core libraries** for THD (The Holo-Deck), providing professional API wrapper functionality auto-generated directly from the OpenAPI specification.
+This directory contains the **upstream core libraries** for THD (The Holo-Deck), providing standard API wrapper functionality auto-generated directly from the OpenAPI specification.
 
 ## 📋 Upstream Libraries
 
 ### [thdlib.sh](thdlib.sh)
-**Core Shell API Library** - Professional shell wrapper for all THD API endpoints
+**Core Shell API Library** - Standard shell wrapper for all THD API endpoints
 
 - **Auto-generated** from `api.yaml` specification
 - **Single source of truth** - zero manual synchronization 
-- **Professional HTTP client** with unified error handling
+- **Standard HTTP client** with unified error handling
 - **Complete API coverage** - every endpoint wrapped with validation
 
 **Usage:**
@@ -25,11 +25,11 @@ thd::canvas_control "clear"
 ```
 
 ### [thdlib.js](../share/htdocs/static/js/thdlib.js)
-**Core JavaScript API Client** - Professional web client for all THD API endpoints
+**Core JavaScript API Client** - Standard web client for all THD API endpoints
 
 - **Auto-generated** from `api.yaml` specification  
 - **Identical API coverage** to shell library
-- **Professional async/await** HTTP client
+- **Standard async/await** HTTP client
 - **Type-safe parameter** handling
 
 **Usage:**
@@ -49,14 +49,14 @@ const result = await thdAPI.createObject('session-id', {
 - **Zero Manual Synchronization** - change spec, regenerate libraries automatically
 - **Perfect Consistency** - shell and JavaScript libraries have identical coverage
 
-### Professional Standards
+### Standard Standards
 - **Comprehensive Error Handling** - actionable error messages with context
 - **Parameter Validation** - all inputs validated before API calls
-- **Professional Logging** - structured, timestamped output
+- **Standard Logging** - structured, timestamped output
 - **Enterprise Quality** - production-ready reliability
 
-### Revolutionary Generation
-Generated via THD's revolutionary code generator:
+### Advanced Generation
+Generated via THD's advanced code generator:
 ```bash
 cd /opt/holo-deck/src && make generate
 ```
@@ -114,11 +114,11 @@ Current upstream library coverage:
 - **Generation verification** - ensure all endpoints covered
 - **Integration testing** - downstream compatibility maintained
 
-### Professional Standards
+### Standard Standards
 - **No manual edits** - libraries are 100% generated
 - **Consistent patterns** - identical function signatures across languages
-- **Error handling** - professional error reporting throughout
+- **Error handling** - standard error reporting throughout
 
 ---
 
-**The upstream libraries represent the foundation of THD's revolutionary specification-driven architecture - where changing the API specification automatically updates all client libraries across all environments.**
+**The upstream libraries represent the foundation of THD's advanced specification-driven architecture - where changing the API specification automatically updates all client libraries across all environments.**

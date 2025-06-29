@@ -4,11 +4,11 @@
 **ACCEPTED** - Implemented 2025-06-29
 
 ## Context
-THD needed a revolutionary approach to scene management that enables users to:
+THD needed a advanced approach to scene management that enables users to:
 - Load existing scenes for modification without affecting originals
 - Save modified sessions as new scenes  
 - Track object lifecycle and provenance
-- Implement professional "photo vs video" paradigm for content creation
+- Implement standard "photo vs video" paradigm for content creation
 
 ## Decision
 Implement a comprehensive **Scene Forking System** with the following components:
@@ -22,7 +22,7 @@ Implement a comprehensive **Scene Forking System** with the following components
 ### Photo vs Video Paradigm
 - **📷 Photo Mode**: Current state snapshots saved as scenes
 - **🎥 Video Mode**: Temporal recording for complete session playback
-- **Professional UI**: Console controls for both modes
+- **Standard UI**: Console controls for both modes
 
 ## Technical Implementation
 
@@ -51,7 +51,7 @@ type Object struct {
 ## Consequences
 
 ### Positive
-✅ **Professional Content Creation**: Industry-standard photo/video workflow
+✅ **Standard Content Creation**: Industry-standard photo/video workflow
 ✅ **Non-destructive Editing**: Original scenes never modified
 ✅ **Complete Audit Trail**: Full object provenance tracking
 ✅ **API-Driven Architecture**: Single source of truth maintained
@@ -64,12 +64,12 @@ type Object struct {
 ## Implementation Notes
 - All scene operations maintain session isolation
 - Fork operations support selective object clearing
-- Generated scripts include professional headers and metadata
+- Generated scripts include standard headers and metadata
 - Object tracking integrates seamlessly with existing APIs
 
 ## Related ADRs
 - ADR-001: A-Frame WebXR Integration
-- ADR-003: Professional UI Enhancement
+- ADR-003: Standard UI Enhancement
 
 ---
-*THD - Where immersive holodeck technology meets professional engineering*
+*THD - Where immersive holodeck technology meets standard engineering*

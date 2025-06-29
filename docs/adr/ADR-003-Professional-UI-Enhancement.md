@@ -1,16 +1,16 @@
-# ADR-003: Professional UI Enhancement and Scene Management System
+# ADR-003: Standard UI Enhancement and Scene Management System
 
 **Date**: 2025-06-29  
 **Status**: Accepted  
 **Deciders**: Claude Code Development Team  
-**Technical Story**: Complete overhaul of holodeck user interface with professional scene management system
+**Technical Story**: Complete overhaul of holodeck user interface with standard scene management system
 
 ## Context
 
-The THD holodeck interface required significant enhancement to meet professional standards while providing intuitive scene management capabilities. The existing interface had several issues that detracted from the bar-raising experience:
+The THD holodeck interface required significant enhancement to meet standard standards while providing intuitive scene management capabilities. The existing interface had several issues that detracted from the quality experience:
 
 1. **Cache Management**: Hacky query string versioning (`?v=timestamp`) for cache busting
-2. **Interface Elements**: Unprofessional console arrows (unicode characters causing encoding issues)
+2. **Interface Elements**: Unstandard console arrows (unicode characters causing encoding issues)
 3. **VR Button**: Empty rectangle with no functionality cluttering the interface
 4. **Movement Controls**: Lack of sprint/run functionality for efficient holodeck traversal
 5. **Scrollbar Theming**: Default browser scrollbars not matching holodeck aesthetic
@@ -18,7 +18,7 @@ The THD holodeck interface required significant enhancement to meet professional
 
 ## Decision Drivers
 
-- **Professional Standards**: "Bar raising solutions only" - eliminate all hacky implementations
+- **Standard Standards**: "Bar raising solutions only" - eliminate all hacky implementations
 - **User Experience**: Intuitive scene selection and enhanced movement controls
 - **Visual Consistency**: All UI elements must match holodeck cyan/black theme
 - **Technical Excellence**: Proper HTTP standards instead of workarounds
@@ -27,8 +27,8 @@ The THD holodeck interface required significant enhancement to meet professional
 ## Considered Options
 
 ### Cache Management
-1. **Continue query string versioning** - Easy but unprofessional
-2. **Implement proper HTTP cache headers** - Standards compliant, professional
+1. **Continue query string versioning** - Easy but unstandard
+2. **Implement proper HTTP cache headers** - Standards compliant, standard
 3. **Use service workers** - Overkill for current needs
 
 ### Scene Management
@@ -43,7 +43,7 @@ The THD holodeck interface required significant enhancement to meet professional
 
 ## Decision
 
-### 1. Professional Cache Control Implementation
+### 1. Standard Cache Control Implementation
 
 **Selected**: Proper HTTP cache headers in static file handler
 
@@ -84,20 +84,20 @@ Session → Scene Flow:
 **Predefined Scenes**:
 - **Empty Grid**: Clean holodeck with coordinate system only
 - **Anime UI Demo**: Interactive floating UI elements with blue lighting
-- **Ultimate Demo**: Complete showcase with metallic structures and effects
+- **Complete Demo**: Complete showcase with metallic structures and effects
 - **Basic Shapes**: Educational demonstration of fundamental 3D objects
 
-### 3. Professional UI Component Decisions
+### 3. Standard UI Component Decisions
 
 **Console Header**: `THD Console [ACTIVE]` / `THD Console [MINIMIZED]`
 - Eliminates hacky unicode characters (▾/▸) causing encoding issues
-- Professional status indicators worthy of enterprise holodeck operations
+- Standard status indicators worthy of enterprise holodeck operations
 - Clear semantic meaning for operational status
 
 **Status LED**: 50% size reduction (12px → 6px) with hover tooltips
 - Less visual clutter while maintaining functionality
 - Hover reveals detailed connection status
-- Professional information density
+- Standard information density
 
 **VR Button Removal**: `vr-mode-ui="enabled: false"`
 - Eliminates empty rectangle with no functionality
@@ -110,7 +110,7 @@ Session → Scene Flow:
 - Standard FPS convention (familiar to users)
 - 3x acceleration increase (20 → 60) when holding Shift
 - No additional UI elements required
-- Professional holodeck traversal efficiency
+- Standard holodeck traversal efficiency
 
 **Component Implementation**:
 ```javascript
@@ -125,17 +125,17 @@ AFRAME.registerComponent('thd-sprint-controls', {
 **Custom Scrollbar Design**:
 - **Webkit**: Cyan thumb with hover effects matching holodeck theme
 - **Firefox**: Thin scrollbar with consistent coloring
-- **Professional appearance** with rounded corners and transparency
+- **Standard appearance** with rounded corners and transparency
 - **Cross-browser compatibility** ensuring consistent experience
 
 ## Consequences
 
 ### Positive
 
-1. **Professional Standards Achieved**:
+1. **Standard Standards Achieved**:
    - Eliminated all hacky implementations
    - Standards-compliant HTTP caching
-   - Professional status indicators throughout
+   - Standard status indicators throughout
 
 2. **Enhanced User Experience**:
    - Intuitive scene selection with persistent preferences
@@ -172,7 +172,7 @@ AFRAME.registerComponent('thd-sprint-controls', {
    - Future enhancement path documented for when dependencies are resolved
 
 2. **Maintenance Overhead**:
-   - Professional documentation created for all components
+   - Standard documentation created for all components
    - Clear separation of concerns between UI and scene logic
    - Comprehensive testing of cross-browser compatibility
 
@@ -193,7 +193,7 @@ func LoadSceneHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 ### A-Frame Component Registration
 
 ```javascript
-// Professional component pattern
+// Standard component pattern
 AFRAME.registerComponent('component-name', {
     schema: { /* typed configuration */ },
     init: function() { /* initialization */ },
@@ -243,7 +243,7 @@ http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 ### Success Criteria Met
 
-✅ **Professional Standards**: No hacky implementations remaining  
+✅ **Standard Standards**: No hacky implementations remaining  
 ✅ **Cache Control**: Proper HTTP headers implemented  
 ✅ **Scene Management**: Complete API-driven system operational  
 ✅ **Movement Enhancement**: Sprint controls functional  
@@ -260,6 +260,6 @@ http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 ## Conclusion
 
-This ADR documents the complete transformation of THD's user interface from functional to professional-grade. Every decision prioritizes technical excellence while maintaining operational simplicity. The scene management system provides a foundation for future holodeck environment capabilities while current enhancements eliminate all substandard interface elements.
+This ADR documents the complete transformation of THD's user interface from functional to standard-grade. Every decision prioritizes technical excellence while maintaining operational simplicity. The scene management system provides a foundation for future holodeck environment capabilities while current enhancements eliminate all substandard interface elements.
 
 The implementation successfully achieves "bar raising solutions only" by replacing every hacky workaround with proper, standards-compliant implementations that enhance rather than detract from the holodeck experience.

@@ -254,7 +254,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             padding: 0;
         }
         
-        /* Professional holodeck-themed scrollbar */
+        /* Standard holodeck-themed scrollbar */
         #debug-log::-webkit-scrollbar {
             width: 8px;
         }

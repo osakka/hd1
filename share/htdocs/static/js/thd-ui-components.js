@@ -2,7 +2,7 @@
 // AUTO-GENERATED UI COMPONENTS - DO NOT MODIFY
 // ===================================================================
 //
-// Professional UI components auto-generated from OpenAPI specification
+// Standard UI components auto-generated from OpenAPI specification
 // Updates automatically when API specification changes
 //
 // ===================================================================

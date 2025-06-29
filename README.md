@@ -1,58 +1,41 @@
-# THD (The Holo-Deck) - Professional VR/AR Holodeck Platform
+# THD (The Holo-Deck) - VR/AR Holodeck Platform
 
-**Revolutionary API-first 3D/VR visualization engine powered by A-Frame WebXR**
+**API-first 3D/VR visualization engine powered by A-Frame WebXR**
 
-Where professional engineering meets immersive holodeck technology.
+## Features
 
-## 🌟 Revolutionary Features
+### Core 3D/VR Capabilities
+- **VR/AR Support**: WebXR integration with headset compatibility
+- **A-Frame WebXR Engine**: Built on Mozilla's A-Frame framework (MIT License)
+- **API-First Architecture**: Everything controlled via REST API
+- **Coordinate System**: [-12, +12] holodeck boundaries on all axes
+- **Real-time WebSocket**: Instant 3D object synchronization
+- **Specification-Driven**: OpenAPI 3.0.3 single source of truth
 
-### 🏆 Upstream/Downstream API Integration (v3.5.0)
-- **🔗 Revolutionary Bridge System**: Complete upstream/downstream API integration
-- **⚙️ Enhanced Shell Functions**: A-Frame capabilities exposed through professional shell interface
-- **🌐 JavaScript Function Bridge**: Identical signatures to shell functions with A-Frame validation
-- **📐 Single Source of Truth**: API specification + A-Frame schemas drive all generation
-- **🎯 Professional Parameter Validation**: Enterprise-grade error handling with actionable messages
-- **🚀 Zero Manual Synchronization**: Shell and JavaScript functions auto-generated from specs
+### Scene Management (v3.4.0 - v3.6.0)
+- **Scene Loading**: API-based scene discovery and loading
+- **Scene Forking**: Load scenes into sessions for non-destructive editing
+- **FREEZE-FRAME Mode**: Save current session state as new scenes
+- **TEMPORAL SEQUENCE Mode**: Session recording with playback capabilities
+- **Object Tracking**: Complete provenance system (base/modified/new)
+- **Script Generation**: Dynamic scene file creation from session state
 
-### Core Holodeck Technology
-- **🥽 Full VR/AR Support**: Complete WebXR integration with headset compatibility
-- **🎨 A-Frame WebXR Engine**: Built on Mozilla's powerful A-Frame framework (MIT License)
-- **⚡ API-First Architecture**: Everything controlled via REST API
-- **🌍 Universal Coordinate System**: Professional [-12, +12] holodeck boundaries
-- **🔄 Real-time WebSocket**: Instant 3D object synchronization
-- **📊 Specification-Driven**: OpenAPI 3.0.3 single source of truth
+### Auto-Generated Clients (v3.5.0)
+- **JavaScript API Client**: Complete API wrapper auto-generated from specification
+- **Shell Functions**: A-Frame capabilities exposed through shell interface
+- **Go CLI Client**: Command-line interface with all API endpoints
+- **UI Components**: Interactive components for each API endpoint
+- **Dynamic Forms**: Forms automatically generated from request schemas
+- **Synchronized Updates**: API changes automatically update all clients
 
-### 🎯 Ultra-Simple Scene Updates & Code Audit (v3.6.0)
-- **⚡ Ultra-Simple Architecture**: API-based scene loading replacing complex fsnotify
-- **🔍 Surgical Precision Audit**: Zero duplicates, ambiguity, or regressions
-- **📊 Complete Scene Discovery**: All 11+ scenes automatically detected via API
-- **🌐 WebSocket Integration**: Natural page refresh workflow users expect
-- **✅ Clean Build Validation**: Zero warnings, perfect auto-generation
-- **🎯 Single Source of Truth**: 100% specification-driven architecture verified
+### Development Features
+- **Auto-Generated APIs**: Complete routing from OpenAPI specification
+- **Session Isolation**: Multi-user separation
+- **Thread-Safe**: Concurrent session management
+- **WebSocket Hub**: Real-time object synchronization
+- **Build System**: Make-based with daemon control
 
-### 🎬 Scene Forking & Recording System (v3.4.0)
-- **📷 FREEZE-FRAME Mode**: Save current session state as new scenes
-- **🎥 TEMPORAL SEQUENCE Mode**: Full temporal recording with playback capabilities
-- **🔀 Scene Forking**: Load scenes for non-destructive editing
-- **🏷️ Object Tracking**: Complete provenance system (base/modified/new)
-- **📝 Script Generation**: Dynamic scene file creation from session state
-- **🎛️ Professional Console**: Integrated FREEZE-FRAME/TEMPORAL SEQUENCE controls
-
-### 👑 Crown Jewel - Auto-Generated Web UI Client
-- **🌐 JavaScript API Client**: Complete API wrapper auto-generated from specification
-- **🎨 UI Component Library**: Each API endpoint becomes interactive component
-- **📝 Dynamic Form System**: Forms automatically generated from request schemas
-- **🔄 100% Single Source of Truth**: All clients generated from same OpenAPI spec
-- **⚡ Zero Manual Sync**: API changes automatically update all clients
-
-### Professional Engineering
-- **🏗️ Auto-Generated APIs**: Complete routing from OpenAPI specification
-- **🛡️ Session Isolation**: Perfect multi-user separation
-- **📱 Professional UI**: Holodeck-themed interface with scene management
-- **⚡ Sprint Controls**: Shift-key acceleration for enhanced navigation
-- **🎭 Multiple Rendering Backends**: Extensible architecture for future engines
-
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Build the holodeck system
@@ -66,7 +49,7 @@ make start
 # Click VR button for full immersive experience
 ```
 
-## 🎬 Scene Forking & Recording Workflow
+## Scene Forking & Recording Workflow
 
 ### FREEZE-FRAME Mode (Scene Snapshots)
 ```bash
@@ -103,19 +86,19 @@ thd-client play-recording "$NEW_SESSION" '{"recording_id": "demo-recording"}'
 - **Modified Objects**: Base objects that have been changed (tracks source)
 - **New Objects**: Created directly in session (marked for inclusion in saved scenes)
 
-## 🏗️ Architecture
+## Architecture
 
 ### Core Engine: A-Frame WebXR
 THD leverages **[A-Frame](https://aframe.io)** (MIT License) as its primary rendering backend:
 
 - **A-Frame Version**: 1.4.0 WebXR
 - **License**: MIT License - [https://github.com/aframevr/aframe/blob/master/LICENSE](https://github.com/aframevr/aframe/blob/master/LICENSE)
-- **Entity-Component-System**: Professional ECS architecture
+- **Entity-Component-System**: ECS architecture
 - **WebXR Standard**: Full VR/AR headset compatibility
 - **Cross-Platform**: Desktop, mobile, and VR devices
 
 ### Multi-Backend Architecture
-THD is designed for **framework flexibility**:
+THD is designed for framework flexibility:
 
 ```
 ┌─────────────────────┐
@@ -131,44 +114,36 @@ THD is designed for **framework flexibility**:
 └─────────────────────┘
 ```
 
-**Future Vision**: Session-based backend selection allowing users to choose their preferred rendering engine based on needs:
-- **A-Frame**: For VR/AR immersive experiences
-- **Three.js**: For lightweight WebGL performance
-- **Babylon.js**: For advanced graphics features
-- **Custom**: For specialized industrial applications
-
-### Professional Backend
+### Backend
 - **Go Daemon**: High-performance concurrent server
 - **Session Management**: Isolated 3D worlds with persistence
 - **WebSocket Hub**: Real-time object synchronization
 - **Auto-Generated API**: Specification-driven development
 
-## 🎮 Holodeck Capabilities
+## 3D Object Capabilities
 
-### Basic 3D Objects
+### Basic Objects
 ```bash
 # Create objects via API
 curl -X POST localhost:8080/api/sessions/{id}/objects \
   -d '{"name": "red_cube", "type": "cube", "x": 0, "y": 1, "z": 0, "color": {"r": 1.0, "g": 0.2, "b": 0.2, "a": 1.0}}'
 ```
 
-### Advanced A-Frame Features
-- **🏗️ Physically-Based Rendering**: Metalness, roughness, emissive materials
-- **⚡ Physics Simulation**: Dynamic, static, and kinematic bodies  
-- **💡 Advanced Lighting**: Directional, point, ambient, and spot lights
-- **✨ Particle Effects**: Fire, smoke, sparkles, and custom systems
-- **📝 3D Text Rendering**: Holographic text displays in 3D space
-- **🌌 Environment Systems**: Sky domes, fog, and atmospheric effects
-- **🎭 Animation Support**: Object movement and transformation
-- **🔊 Spatial Audio**: 3D positional sound (future)
+### A-Frame Features
+- **Physically-Based Rendering**: Metalness, roughness, emissive materials
+- **Physics Simulation**: Dynamic, static, and kinematic bodies  
+- **Lighting**: Directional, point, ambient, and spot lights
+- **Particle Effects**: Fire, smoke, sparkles, and custom systems
+- **3D Text Rendering**: Text displays in 3D space
+- **Environment Systems**: Sky domes, fog, and atmospheric effects
+- **Animation Support**: Object movement and transformation
 
 ### VR/AR Interaction
-- **🥽 Headset Support**: Oculus, HTC Vive, Magic Leap, etc.
-- **🖱️ Desktop Controls**: WASD movement, mouse look
-- **📱 Mobile Compatible**: Touch controls for mobile devices
-- **🤲 Hand Tracking**: Future WebXR hand tracking support
+- **Headset Support**: Oculus, HTC Vive, Magic Leap, etc.
+- **Desktop Controls**: WASD movement, mouse look
+- **Mobile Compatible**: Touch controls for mobile devices
 
-## 📋 API Reference
+## API Reference
 
 ### Session Management
 ```bash
@@ -193,14 +168,14 @@ POST /api/browser/refresh                    # Force browser refresh
 POST /api/browser/canvas                     # Direct canvas control
 ```
 
-## 🛠️ Development
+## Development
 
-### Professional Standards
+### Development Standards
 - **Absolute Paths Only**: No relative path confusion
 - **Long Flags Only**: No short flags for clarity
 - **API-First Design**: Zero shell command dependencies
 - **Specification-Driven**: OpenAPI 3.0.3 generates all routing
-- **Professional Logging**: Timestamped, structured output
+- **Structured Logging**: Timestamped, structured output
 - **Clean Architecture**: Separation of concerns
 
 ### Build System
@@ -217,10 +192,10 @@ make test        # Run API endpoint tests
 make start       # Start THD holodeck daemon
 make stop        # Stop daemon with clean shutdown
 make restart     # Restart with validation
-make status      # Professional status reporting
+make status      # Status reporting
 ```
 
-## 🗂️ File Structure
+## File Structure
 
 ```
 /opt/holo-deck/
@@ -237,15 +212,15 @@ make status      # Professional status reporting
 ├── lib/
 │   └── thd-functions.sh          # Holodeck shell function library
 ├── scenarios/
-│   └── ultimate-holodeck.thd     # Example holodeck scenarios
+│   └── complete-holodeck.thd     # Example holodeck scenarios
 ├── docs/                         # Architecture Decision Records
 └── build/                        # Build artifacts (excluded from git)
     ├── bin/thd                   # THD daemon binary
     ├── runtime/thd.pid           # Process management
-    └── logs/                     # Professional logging
+    └── logs/                     # Logging
 ```
 
-## 🎯 Holodeck Script Library
+## Holodeck Script Library
 
 THD includes a comprehensive shell function library for rapid holodeck development:
 
@@ -265,20 +240,19 @@ thd::create_text "welcome" "HOLODECK ACTIVE" 0 3 -5 1.0 1.0 0.0
 thd::create_sky "environment" "#1a1a2e"
 ```
 
-## 🌍 World Constraints
+## World Constraints
 
-- **Coordinate System**: 25×25×25 professional grid
+- **Coordinate System**: 25×25×25 grid
 - **Boundaries**: [-12, +12] on all X, Y, Z axes
 - **Floor Level**: Y=0 (world floor)
 - **Eye Level**: Y=1.7 (human standing height)
 - **Max Objects**: 1000 per session
 - **Max Sessions**: 100 concurrent
 
-## 📄 Licensing & Attribution
+## Licensing & Attribution
 
 ### THD (The Holo-Deck)
 - **License**: MIT License
-- **Copyright**: Professional engineering standards
 
 ### A-Frame WebXR Framework
 - **Project**: [A-Frame](https://aframe.io) by Mozilla
@@ -290,13 +264,12 @@ thd::create_sky "environment" "#1a1a2e"
 THD gratefully acknowledges the A-Frame community for creating the world's most accessible WebXR framework. A-Frame's Entity-Component-System architecture and comprehensive WebXR support make THD's holodeck vision possible.
 
 ### Integration Philosophy
-THD demonstrates how easy it is to integrate powerful open-source frameworks:
+THD demonstrates how easy it is to integrate open-source frameworks:
 - **Clean API Layer**: Framework-agnostic REST/WebSocket interface
 - **Pluggable Architecture**: Easy to swap rendering backends
-- **Professional Standards**: Maintain engineering quality across integrations
 - **Community-Driven**: Leverage the best open-source tools available
 
-## 🔮 Future Roadmap
+## Future Roadmap
 
 ### Multi-Backend Support
 - **Configuration-Based Selection**: Choose rendering engine per session
@@ -312,30 +285,30 @@ THD demonstrates how easy it is to integrate powerful open-source frameworks:
 - **AI Integration**: Procedural content generation
 - **Cloud Deployment**: Scalable holodeck infrastructure
 
-## 🎬 Example Scenarios
+## Example Scenarios
 
-Run the ultimate holodeck demonstration:
+Run the complete holodeck demonstration:
 ```bash
 # Set your session ID
 export THD_SESSION_ID="your-session-id"
 
-# Run the ultimate scenario
-./scenarios/ultimate-holodeck.thd
+# Run the complete scenario
+./scenarios/complete-holodeck.thd
 ```
 
 This creates a complete holodeck experience with:
-- 🌌 Sky environment with atmospheric effects
-- 💡 Cinematic lighting system (4 light sources)
-- 🏗️ Circular metallic platform foundation
-- 💎 Crystal formations with ultimate materials
-- ✨ Particle effects (fire, smoke, sparkles)
-- ⚡ Physics simulation with bouncing spheres
-- 🏛️ Architectural elements (glass walls, metal beams)
-- 📝 3D holographic text displays
-- 🎛️ Interactive control panels
-- 🎨 Floating artistic sculptures
+- Sky environment with atmospheric effects
+- Cinematic lighting system (4 light sources)
+- Circular metallic platform foundation
+- Crystal formations with materials
+- Particle effects (fire, smoke, sparkles)
+- Physics simulation with bouncing spheres
+- Architectural elements (glass walls, metal beams)
+- 3D holographic text displays
+- Interactive control panels
+- Floating artistic sculptures
 
-## 🤝 Contributing
+## Contributing
 
 THD welcomes contributions to expand holodeck capabilities:
 - **New Rendering Backends**: Integrate additional 3D engines
@@ -346,6 +319,6 @@ THD welcomes contributions to expand holodeck capabilities:
 
 ---
 
-**THD (The Holo-Deck)** - Where professional engineering meets immersive holodeck technology.
+**THD (The Holo-Deck)** - VR/AR holodeck technology
 
 *Powered by A-Frame WebXR • Engineered for the future • Ready for VR*

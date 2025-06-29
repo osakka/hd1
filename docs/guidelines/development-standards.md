@@ -1,6 +1,6 @@
-# THD (The Holo-Deck) - Professional Development Standards
+# THD (The Holo-Deck) - Standard Development Standards
 
-> **"Where 3D visualization meets professional engineering"**
+> **"Where 3D visualization meets standard engineering"**
 
 ## 🚨 THE LAW: NON-NEGOTIABLE STANDARDS
 
@@ -15,7 +15,7 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 ### **Core xVC Principles**
 - **Pattern Consistency**: Establish repeatable interaction patterns
 - **Cognitive Amplification**: LLMs as "pattern reflection engines"
-- **Surgical Precision**: Targeted, precise modifications
+- **Precise**: Targeted, precise modifications
 - **One Source of Truth**: Single authoritative specification
 - **Bar-Raising Solutions**: Always improve, never regress
 - **Forward Progress Only**: No backward compatibility for experimentation
@@ -71,14 +71,14 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 │   ├── go.mod                   # CORRECT: module holodeck
 │   ├── go.sum                   # Go dependencies
 │   ├── main.go                  # THD daemon entry point
-│   ├── Makefile                 # Professional build system
+│   ├── Makefile                 # Standard build system
 │   ├── api.yaml                 # OpenAPI 3.0.3 specification
 │   ├── auto_router.go           # AUTO-GENERATED - DO NOT EDIT
 │   ├── api/                     # Handler implementations
 │   ├── server/                  # Core server components
 │   └── codegen/                 # Code generation tools
 ├── build/                       # Build artifacts (gitignored)
-│   ├── bin/thd                  # Professional daemon binary
+│   ├── bin/thd                  # Standard daemon binary
 │   ├── bin/thd-client           # API client
 │   ├── logs/                    # Timestamped logs
 │   └── runtime/                 # PID files, runtime data
@@ -117,9 +117,9 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 2. **Generate Routes** - `make generate` creates routing
 3. **Implement Handlers** - Write handler functions
 4. **Build & Validate** - `make all` ensures completeness
-5. **Professional Testing** - `make test` validates API
+5. **Standard Testing** - `make test` validates API
 6. **Daemon Control** - `make start/stop/status`
-7. **Commit Standards** - Professional commit messages
+7. **Commit Standards** - Standard commit messages
 
 ### **PROFESSIONAL COMMANDS:**
 ```bash
@@ -127,7 +127,7 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 make all        # Complete build pipeline
 make start      # Start THD daemon
 make stop       # Stop THD daemon
-make status     # Professional status reporting
+make status     # Standard status reporting
 make test       # Test API endpoints
 make generate   # Generate routing from spec
 make clean      # Clean build artifacts
@@ -208,14 +208,14 @@ make clean      # Clean build artifacts
 - [ ] API specification validates
 - [ ] All handlers implemented
 - [ ] Auto-router generates successfully
-- [ ] Crown jewel auto-generated files present (thd-api-client.js, thd-ui-components.js, thd-form-system.js)
+- [ ] Auto-generated client auto-generated files present (thd-api-client.js, thd-ui-components.js, thd-form-system.js)
 - [ ] Scene forking system functional (fork/save endpoints)
 - [ ] Recording system operational (start/stop/play/status endpoints)
 - [ ] Tests pass completely
 - [ ] Daemon starts and stops cleanly
 - [ ] No memory leaks detected
 - [ ] Coordinate validation enforced
-- [ ] Professional logging configured
+- [ ] Standard logging configured
 
 ---
 
@@ -336,7 +336,7 @@ make test
 # 4. Verify daemon still works
 make status
 
-# 5. Professional commit message
+# 5. Standard commit message
 git commit -m "Descriptive message explaining the change"
 ```
 
@@ -398,7 +398,7 @@ git status --ignored
 ### **WORKSPACE VIOLATIONS:**
 - 🚨 **Immediate cleanup required** for temp files
 - 🚨 **Commit blocked** if workspace dirty
-- 🚨 **Professional review** for disorganized structure
+- 🚨 **Standard review** for disorganized structure
 - 🚨 **Training required** for repeated violations
 
 ---
@@ -444,7 +444,7 @@ Auto-generated files now include comprehensive disclaimers:
 ### **IMMEDIATE ACTIONS:**
 - **Code Rejection** - Non-compliant code rejected
 - **Build Failure** - Specification violations block builds
-- **Deployment Block** - Professional standards not met
+- **Deployment Block** - Standard standards not met
 - **Rollback Required** - Breaking changes reverted
 
 ### **ZERO TOLERANCE:**
@@ -458,15 +458,15 @@ Auto-generated files now include comprehensive disclaimers:
 
 ## 🎖️ **EXCELLENCE STANDARDS**
 
-THD represents the evolution from innovative concept to **professional-grade engineering solution**. We maintain revolutionary capabilities while implementing proper software engineering practices.
+THD represents the evolution from innovative concept to **standard-grade engineering solution**. We maintain advanced capabilities while implementing proper software engineering practices.
 
 ### **CORE PHILOSOPHY:**
-> **"Professional engineering excellence with zero compromise on innovation"**
+> **"Standard engineering excellence with zero compromise on innovation"**
 
 ### **SUCCESS METRICS:**
 - ✅ 100% API-driven development
 - ✅ Zero regressions ever
-- ✅ Professional daemon control
+- ✅ Standard daemon control
 - ✅ Specification-driven architecture
 - ✅ Thread-safe session management
 - ✅ Real-time 3D visualization
@@ -490,10 +490,10 @@ THD represents the evolution from innovative concept to **professional-grade eng
 
 ---
 
-**REMEMBER: These standards are non-negotiable. They ensure THD remains a professional, reliable, and innovative 3D visualization platform.**
+**REMEMBER: These standards are non-negotiable. They ensure THD remains a standard, reliable, and innovative 3D visualization platform.**
 
 ---
 
 *Last Updated: 2025-06-28*  
 *THD Version: 2.0.0*  
-*Authority: Professional Development Standards*
+*Authority: Standard Development Standards*

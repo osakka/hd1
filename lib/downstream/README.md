@@ -1,6 +1,6 @@
 # THD Downstream Integrations
 
-**Professional A-Frame WebXR Integration Libraries**
+**Standard A-Frame WebXR Integration Libraries**
 
 This directory contains **downstream integration libraries** that bridge THD's upstream API capabilities with external frameworks and technologies. Currently focused on A-Frame WebXR integration with identical function signatures across shell and JavaScript environments.
 
@@ -11,9 +11,9 @@ This directory contains **downstream integration libraries** that bridge THD's u
 - **Importing upstream core** - All downstream libraries source `../thdlib.sh`
 - **Adding framework-specific features** - A-Frame schema validation, WebXR capabilities
 - **Maintaining identical signatures** - Shell and JavaScript functions have identical parameters
-- **Professional validation** - Complete parameter and schema validation
+- **Standard validation** - Complete parameter and schema validation
 
-### Revolutionary Bridge System
+### Advanced Bridge System
 ```
 api.yaml (upstream spec) → thdlib.* (core API)
          ↓
@@ -28,7 +28,7 @@ aframe-schemas (downstream spec) → aframelib.* (A-Frame integration)
 - **Imports upstream core** - Sources `../thdlib.sh` for API access
 - **A-Frame schema validation** - Complete validation using A-Frame component schemas
 - **Enhanced object creation** - Materials, lighting, physics, particles
-- **Professional error handling** - Actionable error messages with A-Frame context
+- **Standard error handling** - Actionable error messages with A-Frame context
 
 **Usage:**
 ```bash
@@ -42,10 +42,10 @@ thd::create_enhanced_light "key_light" "directional" 10 10 5 --intensity 1.5
 ### [aframelib.js](aframelib.js)
 **A-Frame JavaScript Bridge** - Enhanced JavaScript functions with identical shell signatures
 
-- **Revolutionary bridge** - Identical function signatures to shell functions
+- **Advanced bridge** - Identical function signatures to shell functions
 - **A-Frame integration** - Direct A-Frame entity manipulation
 - **Schema validation** - Browser-side A-Frame schema validation
-- **Professional API** - Async/await patterns with comprehensive error handling
+- **Standard API** - Async/await patterns with comprehensive error handling
 
 **Usage:**
 ```javascript
@@ -60,7 +60,7 @@ await thd.createEnhancedLight('key_light', 'directional', 10, 10, 5, {
 });
 ```
 
-## 🏆 Revolutionary Features
+## 🏆 Advanced Features
 
 ### Identical Function Signatures
 **Perfect symmetry** between shell and JavaScript:
@@ -78,7 +78,7 @@ thd.createEnhancedObject('name', 'type', x, y, z, {option: value})
 ### A-Frame Schema Validation
 - **Complete schema coverage** - All A-Frame component schemas available
 - **Real-time validation** - Parameters validated against A-Frame specifications
-- **Professional error messages** - Clear guidance when validation fails
+- **Standard error messages** - Clear guidance when validation fails
 - **Browser and shell** - Validation works in both environments
 
 ### Enhanced Capabilities
@@ -87,7 +87,7 @@ Beyond basic API functions, downstream libraries provide:
 - **Advanced Lighting** - Directional, point, ambient, spot lights with shadows
 - **Physics Integration** - Dynamic, static, kinematic physics bodies
 - **Particle Systems** - Fire, smoke, sparkle effects
-- **3D Text Rendering** - Professional 3D text with material properties
+- **3D Text Rendering** - Standard 3D text with material properties
 
 ## 🔗 Upstream Integration
 
@@ -97,13 +97,13 @@ aframelib.sh sources ../thdlib.sh
     ↓
 Enhanced functions use core API functions
     ↓
-Professional layered architecture maintained
+Standard layered architecture maintained
 ```
 
 ### Architectural Benefits
 - **Single source of truth** - Core API changes automatically affect enhanced functions
 - **Perfect compatibility** - Enhanced functions build on stable core foundation
-- **Professional separation** - Clear distinction between core API and framework integration
+- **Standard separation** - Clear distinction between core API and framework integration
 - **Maintainability** - Changes to A-Frame integration don't affect core API
 
 ## 🎨 A-Frame Specific Features
@@ -117,7 +117,7 @@ thd::create_enhanced_object "name" "geometry" x y z \
     --emission true/false
 ```
 
-### Professional Lighting
+### Standard Lighting
 ```bash
 thd::create_enhanced_light "name" "type" x y z \
     --intensity 0.0-5.0 \
@@ -148,7 +148,7 @@ source lib/downstream/aframelib.sh
 thd::create_enhanced_object "test" "box" 0 1 0 --color "#ff0000"
 
 # Test scenes using enhanced functions
-THD_SESSION=test bash share/scenes/ultimate-demo.sh
+THD_SESSION=test bash share/scenes/complete-demo.sh
 ```
 
 ## 📊 A-Frame Integration Coverage
@@ -172,4 +172,4 @@ The downstream architecture supports future integrations:
 
 ---
 
-**The downstream libraries represent THD's revolutionary capability to provide consistent, professional integration with any 3D framework while maintaining perfect single source of truth architecture.**
+**The downstream libraries represent THD's advanced capability to provide consistent, standard integration with any 3D framework while maintaining perfect single source of truth architecture.**

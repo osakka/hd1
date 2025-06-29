@@ -25,7 +25,7 @@ type LogManager struct {
 }
 
 func NewLogManager() *LogManager {
-	// Create logs directory using professional build structure
+	// Create logs directory using standard build structure
 	logsDir := "../build/logs"
 	os.MkdirAll(logsDir, 0755)
 

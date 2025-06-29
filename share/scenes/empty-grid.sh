@@ -4,7 +4,7 @@
 # THD Scene: Empty Grid - Clean Holodeck Environment
 # =========================================================================
 #
-# Professional minimal scene with just the coordinate grid system
+# Standard minimal scene with just the coordinate grid system
 # Perfect for custom object creation and experimentation
 #
 # Usage: ./empty-grid.sh [SESSION_ID]
