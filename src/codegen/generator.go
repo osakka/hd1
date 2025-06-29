@@ -365,7 +365,7 @@ func main() {
 		fmt.Printf("⚠️  WARNING: Core shell function generation failed: %v\n", err)
 	} else {
 		fmt.Printf("✅ SUCCESS: Core shell functions generated from API specification\n")
-		fmt.Printf("🔧 Generated: /opt/holo-deck/lib/thd-functions.sh\n")
+		fmt.Printf("🔧 Generated: /opt/holo-deck/lib/thdlib.sh (upstream core library)\n")
 	}
 
 	// Revolutionary enhanced generation with A-Frame integration
@@ -377,8 +377,8 @@ func main() {
 		fmt.Printf("⚠️  WARNING: Enhanced generation failed: %v\n", err)
 	} else {
 		fmt.Printf("🏆 SUCCESS: Revolutionary A-Frame integration generated\n")
-		fmt.Printf("✨ Enhanced shell functions: /opt/holo-deck/lib/thd-enhanced-functions.sh\n")
-		fmt.Printf("✨ JavaScript bridge: /opt/holo-deck/lib/thd-enhanced-bridge.js\n")
+		fmt.Printf("✨ A-Frame shell integration: /opt/holo-deck/lib/downstream/aframelib.sh\n")
+		fmt.Printf("✨ A-Frame JavaScript bridge: /opt/holo-deck/lib/downstream/aframelib.js\n")
 	}
 
 	fmt.Println("\n🚀 REVOLUTIONARY CODE GENERATION COMPLETE!")
@@ -879,7 +879,7 @@ console.log('Available methods:', Object.getOwnPropertyNames(THDAPIClient.protot
 		return fmt.Errorf("JavaScript API template parse error: %v", err)
 	}
 	
-	apiClientPath := filepath.Join(outputDir, "thd-api-client.js")
+	apiClientPath := filepath.Join(outputDir, "thdlib.js")
 	file, err := os.Create(apiClientPath)
 	if err != nil {
 		return fmt.Errorf("create API client file error: %v", err)
@@ -1439,9 +1439,9 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 # Generated from: api.yaml + A-Frame schemas
 # ===================================================================
 
-# Load THD configuration
-source "${THD_ROOT}/lib/thd-functions.sh" 2>/dev/null || {
-    echo "ERROR: THD function library not found"
+# Load THD upstream core library
+source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+    echo "ERROR: THD upstream library not found"
     exit 1
 }
 
@@ -1640,7 +1640,7 @@ logging.Info "enhanced shell function library loaded" \
     "bar_raising_status=achieved"
 `
 
-	outputPath := filepath.Join(outputDir, "thd-enhanced-functions.sh")
+	outputPath := filepath.Join(outputDir, "downstream/aframelib.sh")
 	if err := os.WriteFile(outputPath, []byte(functionsTemplate), 0755); err != nil {
 		return fmt.Errorf("failed to write enhanced shell functions: %w", err)
 	}
@@ -1858,7 +1858,7 @@ if (typeof console !== 'undefined') {
 }
 `
 
-	outputPath := filepath.Join(outputDir, "thd-enhanced-bridge.js")
+	outputPath := filepath.Join(outputDir, "downstream/aframelib.js")
 	if err := os.WriteFile(outputPath, []byte(bridgeTemplate), 0644); err != nil {
 		return fmt.Errorf("failed to write JavaScript bridge: %w", err)
 	}
@@ -2060,7 +2060,7 @@ echo "🌍 Session management: create_session, get_session, init_world"
 echo "🏆 Bar-raising status: ACHIEVED"
 `
 
-	outputPath := filepath.Join(outputDir, "thd-functions.sh")
+	outputPath := filepath.Join(outputDir, "thdlib.sh")
 	if err := os.WriteFile(outputPath, []byte(functionsTemplate), 0755); err != nil {
 		return fmt.Errorf("failed to write core shell functions: %w", err)
 	}

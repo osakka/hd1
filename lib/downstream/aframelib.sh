@@ -13,9 +13,9 @@
 # Generated from: api.yaml + A-Frame schemas
 # ===================================================================
 
-# Load THD configuration
-source "${THD_ROOT}/lib/thd-functions.sh" 2>/dev/null || {
-    echo "ERROR: THD function library not found"
+# Load THD upstream core library
+source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+    echo "ERROR: THD upstream library not found"
     exit 1
 }
 

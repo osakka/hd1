@@ -20,8 +20,13 @@ class THDFormSystem {
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('forkSceneForm', {
-        "title": "ForkScene",
+        this.formSchemas.set('startRecordingForm', {
+        "title": "StartRecording",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('playRecordingForm', {
+        "title": "PlayRecording",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -30,8 +35,8 @@ class THDFormSystem {
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('setLogLevelForm', {
-        "title": "SetLogLevel",
+        this.formSchemas.set('setTraceModulesForm', {
+        "title": "SetTraceModules",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -40,13 +45,28 @@ class THDFormSystem {
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
+        this.formSchemas.set('setCanvasForm', {
+        "title": "SetCanvas",
+        "submitText": "Execute POST",
+        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('startCameraOrbitForm', {
+        "title": "StartCameraOrbit",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('createSessionForm', {
+        "title": "CreateSession",
+        "submitText": "Execute POST",
+        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
         this.formSchemas.set('loadSceneForm', {
         "title": "LoadScene",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('createObjectForm', {
-        "title": "CreateObject",
+        this.formSchemas.set('forkSceneForm', {
+        "title": "ForkScene",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -60,45 +80,25 @@ class THDFormSystem {
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
+        this.formSchemas.set('createObjectForm', {
+        "title": "CreateObject",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('setLogLevelForm', {
+        "title": "SetLogLevel",
+        "submitText": "Execute POST",
+        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
         this.formSchemas.set('setCameraPositionForm', {
         "title": "SetCameraPosition",
         "submitText": "Execute PUT",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('startCameraOrbitForm', {
-        "title": "StartCameraOrbit",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('createSessionForm', {
-        "title": "CreateSession",
-        "submitText": "Execute POST",
-        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('startRecordingForm', {
-        "title": "StartRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('playRecordingForm', {
-        "title": "PlayRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('setCanvasForm', {
-        "title": "SetCanvas",
-        "submitText": "Execute POST",
-        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
         this.formSchemas.set('initializeWorldForm', {
         "title": "InitializeWorld",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('setTraceModulesForm', {
-        "title": "SetTraceModules",
-        "submitText": "Execute POST",
-        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         console.log('✅ Form schemas initialized');
     }
