@@ -88,11 +88,16 @@
 - `/opt/holo-deck/README.md` - Professional project overview
 - `/opt/holo-deck/CHANGELOG.md` - Complete project transformation history
 - `/opt/holo-deck/docs/adr/ADR-001-aframe-webxr-integration.md` - A-Frame integration decision
+- `/opt/holo-deck/docs/adr/ADR-002-Specification-Driven-Development.md` - OpenAPI specification-driven architecture
 - `/opt/holo-deck/docs/adr/ADR-003-Professional-UI-Enhancement.md` - UI excellence & scene management
 - `/opt/holo-deck/docs/adr/ADR-004-Scene-Forking-System.md` - Scene forking and photo/video paradigm
 - `/opt/holo-deck/docs/adr/ADR-005-Temporal-Recording-System.md` - Temporal recording architecture
 - `/opt/holo-deck/docs/adr/ADR-006-Auto-Generated-Web-UI-Client.md` - 👑 Crown jewel implementation
 - `/opt/holo-deck/docs/adr/ADR-007-Revolutionary-Upstream-Downstream-Integration.md` - 🏆 Revolutionary API integration
+- `/opt/holo-deck/docs/adr/ADR-008-Thread-Safe-Session-Store.md` - Thread-safe session management
+- `/opt/holo-deck/docs/adr/ADR-009-WebSocket-Realtime-Architecture.md` - WebSocket real-time architecture
+- `/opt/holo-deck/docs/adr/ADR-010-3D-Coordinate-System.md` - 3D coordinate system design
+- `/opt/holo-deck/docs/adr/ADR-011-Build-System-Validation.md` - Build system validation architecture
 - `/opt/holo-deck/docs/api/README.md` - THD API documentation
 
 ### Holodeck Libraries
