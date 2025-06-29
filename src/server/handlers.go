@@ -257,6 +257,18 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             gap: 6px;
         }
         
+        #debug-collapse-icon {
+            font-size: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 0.7;
+            transform-origin: center;
+        }
+        
+        #debug-collapse-icon.collapsed {
+            transform: rotate(180deg);
+        }
+        
         #debug-status-led.connecting {
             background: #ff9500;
             box-shadow: 0 0 6px rgba(255, 149, 0, 0.8);
@@ -384,7 +396,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
                 <span id="debug-lock-icon" class="unlocked" data-status="Mouse look available">&#128274;</span>
-                <span id="debug-collapse-icon">&#8593;</span>
+                <span id="debug-collapse-icon">&#8679;</span>
             </div>
         </div>
         <div id="debug-session-bar">
@@ -1222,11 +1234,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             if (debugCollapsed) {
                 debugLog.classList.add('collapsed');
                 debugPanel.classList.add('collapsed');
-                debugCollapseIcon.innerHTML = '&#8595;';
+                debugCollapseIcon.classList.add('collapsed');
             } else {
                 debugLog.classList.remove('collapsed');
                 debugPanel.classList.remove('collapsed');
-                debugCollapseIcon.innerHTML = '&#8593;';
+                debugCollapseIcon.classList.remove('collapsed');
             }
             if (saveToCookie) {
                 setCookie('thd_console_collapsed', debugCollapsed.toString(), 30); // 30 days
