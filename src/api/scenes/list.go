@@ -42,15 +42,7 @@ func ListScenesHandler(w http.ResponseWriter, r *http.Request, hub interface{}) 
 		}
 	}
 	
-	// Add built-in empty scene (always available)
-	scenes = append(scenes, SceneInfo{
-		ID:          "empty",
-		Name:        "Empty Grid",
-		Description: "Clean holodeck with just the coordinate grid system",
-		ObjectCount: 0,
-		Complexity:  "simple",
-		Tags:        []string{"basic", "grid", "clean"},
-	})
+	// No hardcoded scenes - all scenes come from files
 
 	response := ListScenesResponse{
 		Success: true,
@@ -103,7 +95,8 @@ func parseSceneScript(sceneID, scriptPath string) *SceneInfo {
 		}
 		
 		// Count object creation commands
-		if strings.Contains(line, "$THD_CLIENT create-object") && 
+		if (strings.Contains(line, "thd::create_object") || 
+		    strings.Contains(line, "$THD_CLIENT create-object")) && 
 		   !strings.HasPrefix(strings.TrimSpace(line), "#") {
 			objectCount++
 		}

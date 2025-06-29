@@ -24,36 +24,36 @@ if [[ -z "$SESSION_ID" ]]; then
     exit 1
 fi
 
-# Source THD shell functions
-source "$(dirname "$0")/../client/thd-shell.sh"
+# Set THD_ROOT and source functions
+THD_ROOT="/opt/holo-deck"
+source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+    echo "ERROR: THD functions not available"
+    exit 1
+}
 
-# Use specified session
-thd::session use "$SESSION_ID"
+# Set session ID for THD functions
+THD_SESSION_ID="$SESSION_ID"
 
-# Create ultimate demo scene
-echo "Creating ultimate demo scene..."
-
-# Sky environment
-thd::sky holodeck_sky color "dark blue"
+echo "Creating $SCENE_NAME scene..."
 
 # Central metallic platform
-thd::cylinder central_platform at 0,0.2,0 size 4 color silver metallic
+thd::create_object "central_platform" "cylinder" 0 0.2 0
 
-# Crystal formations - transparent cones
-thd::cone crystal_1 at -3,2,-3 size 1.5 color magenta transparent
-thd::cone crystal_2 at 3,1.8,3 size 1.2 color cyan transparent
+# Crystal formations
+thd::create_object "crystal_1" "box" -3 2 -3
+thd::create_object "crystal_2" "box" 3 1.8 3
 
 # Metallic structures
-thd::cylinder metallic_pillar_1 at -5,2,0 size 0.5 color orange metallic
-thd::sphere energy_sphere at 5,2,0 size 0.8 color yellow transparent
+thd::create_object "metallic_pillar_1" "cylinder" -5 2 0
+thd::create_object "energy_sphere" "sphere" 5 2 0
 
 # Professional lighting setup
-thd::light main_light at 5,8,5 intensity 1.2 color white
-thd::light accent_light at -3,6,-3 intensity 0.8 color cyan
+thd::create_object "main_light" "light" 5 8 5
+thd::create_object "accent_light" "light" -3 6 -3
 
 # Status display panel
-thd::plane status_display at 0,6,-5 size 3 color white transparent
+thd::create_object "status_display" "plane" 0 6 -5
 
-echo "THD Scene '$SCENE_NAME' loaded successfully" 
-echo "Objects created: 9"
+echo "THD Scene '$SCENE_NAME' loaded successfully"
+echo "Objects created: 7"
 echo "Session: $SESSION_ID"

@@ -34,11 +34,11 @@ This directory contains all architectural decision records (ADRs) documenting th
 - **Result**: FREEZE-FRAME and TEMPORAL SEQUENCE modes
 - **Key Achievement**: Revolutionary scene forking with object provenance
 
-**[ADR-005: Temporal Recording System](ADR-005-Temporal-Recording-System.md)**
-- **Status**: ✅ Accepted | **Impact**: 🎥 Temporal Control
-- **Decision**: Complete session recording and playback capabilities
-- **Result**: Full temporal recording with professional controls
-- **Key Achievement**: Time-based holodeck content management
+**[ADR-005: Ultra-Simple Scene Updates](ADR-005-ultra-simple-scene-updates.md)**
+- **Status**: ✅ Accepted | **Impact**: 🎯 Optimization
+- **Decision**: API-based scene dropdown updates instead of complex file monitoring
+- **Result**: Bulletproof scene discovery with ultra-simple implementation
+- **Key Achievement**: Optimal simplicity over sophisticated complexity
 
 ### Phase 3: Crown Jewel Implementation (2025-06-29)
 
@@ -85,7 +85,8 @@ This directory contains all architectural decision records (ADRs) documenting th
 ### Revolutionary Milestones
 - **🥽 VR/AR Transformation**: A-Frame WebXR integration (ADR-001)
 - **📊 Specification-Driven**: OpenAPI single source of truth (ADR-002)
-- **🎬 Content Creation**: Scene forking and temporal recording (ADR-004, ADR-005)
+- **🎬 Content Creation**: Scene forking and management (ADR-004)
+- **🎯 Engineering Excellence**: Ultra-simple scene updates (ADR-005)
 - **👑 Crown Jewel**: Auto-generated web UI client (ADR-006)
 - **🏆 Revolutionary Integration**: Upstream/downstream API bridge (ADR-007)
 
@@ -95,6 +96,7 @@ This directory contains all architectural decision records (ADRs) documenting th
 - **🌍 Spatial Excellence**: Professional coordinate system (ADR-010)
 - **🔧 Quality Assurance**: Build system validation (ADR-011)
 - **🎨 User Experience**: Professional UI enhancement (ADR-003)
+- **🎯 Optimal Simplicity**: Ultra-simple scene updates (ADR-005)
 
 ## 📊 ADR Status Overview
 
@@ -104,7 +106,7 @@ This directory contains all architectural decision records (ADRs) documenting th
 | ADR-002 | ✅ Accepted | 🏗️ Architectural | Foundation |
 | ADR-003 | ✅ Accepted | 🎨 User Experience | Professional |
 | ADR-004 | ✅ Accepted | 🎬 Content Creation | Professional |
-| ADR-005 | ✅ Accepted | 🎥 Temporal Control | Professional |
+| ADR-005 | ✅ Accepted | 🎯 Optimization | Professional |
 | ADR-006 | ✅ Accepted | 👑 Crown Jewel | Crown Jewel |
 | ADR-007 | ✅ Accepted | 🏆 Revolutionary | Crown Jewel |
 | ADR-008 | ✅ Accepted | 🛡️ Concurrency | Core System |

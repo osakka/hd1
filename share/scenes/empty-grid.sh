@@ -24,13 +24,21 @@ if [[ -z "$SESSION_ID" ]]; then
     exit 1
 fi
 
-# Source THD shell functions
-source "$(dirname "$0")/../client/thd-shell.sh"
+# Set THD_ROOT and source functions
+THD_ROOT="/opt/holo-deck"
+source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+    echo "ERROR: THD functions not available"
+    exit 1
+}
 
-# Use specified session
-thd::session use "$SESSION_ID"
+# Set session ID for THD functions
+THD_SESSION_ID="$SESSION_ID"
 
-# Empty grid scene - no objects to create
+echo "Creating $SCENE_NAME scene..."
+
+# Empty grid scene - clear any existing objects
+thd::clear
+
 # The grid system is automatically present in every holodeck session
 
 echo "THD Scene '$SCENE_NAME' loaded successfully"

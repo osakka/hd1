@@ -552,11 +552,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 // Send client capabilities
                 setTimeout(sendClientInfo, 500);
                 
+                // Load scenes on initial connection
+                setTimeout(refreshSceneDropdown, 1000);
+                
                 // Initialize session connection without object restoration
                 setTimeout(ensureSession, 2000);
             };
             
-            ws.onmessage = function(event) {
+            ws.onmessage = async function(event) {
                 try {
                     const message = JSON.parse(event.data);
                     addDebug('WS_RECV', message);
@@ -576,6 +579,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     if (message.type === 'reload') {
                         setStatus('connecting', 'forced reload...');
                         window.location.reload(true);
+                        return;
+                    }
+                    
+                    // Handle scene list changes
+                    if (message.type === 'scene_list_changed') {
+                        console.log('[THD] Scene list changed, refreshing dropdown');
+                        addDebug('SCENE_LIST_CHANGED', 'Refreshing scene dropdown');
+                        await refreshSceneDropdown();
                         return;
                     }
                     
@@ -1092,6 +1103,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     const data = await response.json();
                     const select = document.getElementById('debug-scene-select');
                     
+                    // Save current selection
+                    const currentValue = select.value;
+                    
                     // Clear existing options except first
                     while (select.children.length > 1) {
                         select.removeChild(select.lastChild);
@@ -1107,7 +1121,15 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         });
                     }
                     
-                    addDebug('SCENE_REFRESH', {count: data.scenes?.length || 0});
+                    // Restore selection (saved scene or previous value)
+                    const savedScene = getCookie('thd_scene');
+                    if (savedScene) {
+                        select.value = savedScene;
+                    } else if (currentValue) {
+                        select.value = currentValue;
+                    }
+                    
+                    addDebug('SCENE_REFRESH', {count: data.scenes?.length || 0, restored: savedScene || currentValue});
                 }
             } catch (error) {
                 addDebug('SCENE_REFRESH_ERROR', {error: error.message});

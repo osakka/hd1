@@ -10,6 +10,8 @@ import (
 	"os/exec"
 	"strconv"
 	"regexp"
+	"os"
+	"path/filepath"
 )
 
 type LoadSceneRequest struct {
@@ -157,13 +159,16 @@ func clearAllObjects(sessionID string, h *server.Hub) {
 
 // getSceneScript returns the script path for a given scene ID
 func getSceneScript(sceneID string) string {
-	scriptMap := map[string]string{
-		"empty":        "/opt/holo-deck/share/scenes/empty-grid.sh",
-		"anime-ui":     "/opt/holo-deck/share/scenes/anime-ui.sh",
-		"ultimate":     "/opt/holo-deck/share/scenes/ultimate-demo.sh",
-		"basic-shapes": "/opt/holo-deck/share/scenes/basic-shapes.sh",
+	// Dynamic scene discovery - single source of truth
+	scenesDir := "/opt/holo-deck/share/scenes"
+	scriptPath := filepath.Join(scenesDir, sceneID+".sh")
+	
+	// Check if file exists
+	if _, err := os.Stat(scriptPath); err == nil {
+		return scriptPath
 	}
-	return scriptMap[sceneID]
+	
+	return "" // Scene not found
 }
 
 // executeSceneScript runs the scene script and parses the output

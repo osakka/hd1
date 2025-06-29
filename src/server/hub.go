@@ -9,16 +9,18 @@ import (
 )
 
 type Hub struct {
-	clients    map[*Client]bool
-	broadcast  chan []byte
-	register   chan *Client
-	unregister chan *Client
-	logger     *LogManager
-	store      *SessionStore
+	clients       map[*Client]bool
+	broadcast     chan []byte
+	register      chan *Client
+	unregister    chan *Client
+	logger        *LogManager
+	store         *SessionStore
+	scenesWatcher *ScenesWatcher
+	mutex         sync.RWMutex
 }
 
 func NewHub() *Hub {
-	return &Hub{
+	hub := &Hub{
 		clients:    make(map[*Client]bool),
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
@@ -26,25 +28,43 @@ func NewHub() *Hub {
 		logger:     NewLogManager(),
 		store:      NewSessionStore(),
 	}
+	
+	// Initialize scenes watcher
+	hub.scenesWatcher = NewScenesWatcher(hub)
+	
+	return hub
 }
 
 func (h *Hub) Run() {
+	// Note: Scenes watcher disabled due to filesystem noatime/lazytime mount options
+	// Using API-based scene loading instead
+	logging.Info("hub started without scenes watcher", map[string]interface{}{
+		"reason": "filesystem mount options interfere with fsnotify",
+		"solution": "API-based scene loading on page load",
+	})
+	
 	for {
 		select {
 		case client := <-h.register:
+			h.mutex.Lock()
 			h.clients[client] = true
+			h.mutex.Unlock()
+			
 			logging.Info("client connected to hub", map[string]interface{}{
 				"total_clients": len(h.clients),
 			})
 
 		case client := <-h.unregister:
+			h.mutex.Lock()
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
+				
 				logging.Info("client disconnected from hub", map[string]interface{}{
 					"total_clients": len(h.clients),
 				})
 			}
+			h.mutex.Unlock()
 
 		case message := <-h.broadcast:
 			for client := range h.clients {
@@ -345,6 +365,7 @@ func (s *SessionStore) GetWorld(sessionID string) (*World, bool) {
 func (h *Hub) GetStore() *SessionStore {
 	return h.store
 }
+
 
 // BroadcastUpdate sends real-time updates to connected clients
 func (h *Hub) BroadcastUpdate(updateType string, data interface{}) {
