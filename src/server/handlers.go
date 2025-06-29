@@ -218,19 +218,17 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        #debug-lock-led {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #666;
-            box-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
+        #debug-lock-icon {
+            font-size: 10px;
+            color: #666;
             transition: all 0.3s ease;
             cursor: help;
             position: relative;
             margin-right: 6px;
+            text-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
         }
         
-        #debug-lock-led:hover::after {
+        #debug-lock-icon:hover::after {
             content: attr(data-status);
             position: absolute;
             bottom: 120%;
@@ -246,14 +244,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        #debug-lock-led.unlocked {
-            background: #666;
-            box-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
+        #debug-lock-icon.unlocked {
+            color: #666;
+            text-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
         }
         
-        #debug-lock-led.locked {
-            background: #00ff00;
-            box-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
+        #debug-lock-icon.locked {
+            color: #00ff00;
+            text-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
         }
         
         .debug-indicators {
@@ -385,7 +383,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         <div id="debug-header">
             <span>THD Console</span>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <div id="debug-lock-led" class="unlocked" data-status="Mouse look available"></div>
+                <span id="debug-lock-icon" class="unlocked" data-status="Mouse look available">&#128274;</span>
                 <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
                 <span id="debug-collapse-icon">&#8593;</span>
             </div>
@@ -414,7 +412,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         const scene = document.getElementById('holodeck-scene');
         const debugLog = document.getElementById('debug-log');
         const debugStatusLed = document.getElementById('debug-status-led');
-        const debugLockLed = document.getElementById('debug-lock-led');
+        const debugLockIcon = document.getElementById('debug-lock-icon');
         const debugSessionId = document.getElementById('debug-session-id');
         const debugHeader = document.getElementById('debug-header');
         const debugCollapseIcon = document.getElementById('debug-collapse-icon');
@@ -436,9 +434,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Lock status management
         function setLockStatus(status, message) {
-            // Update debug panel lock LED
-            debugLockLed.className = status;
-            debugLockLed.setAttribute('data-status', message || status);
+            // Update debug panel lock icon
+            debugLockIcon.className = status;
+            debugLockIcon.setAttribute('data-status', message || status);
         }
         
         // Update debug session ID when session changes
