@@ -1,0 +1,175 @@
+# THD Downstream Integrations
+
+**Professional A-Frame WebXR Integration Libraries**
+
+This directory contains **downstream integration libraries** that bridge THD's upstream API capabilities with external frameworks and technologies. Currently focused on A-Frame WebXR integration with identical function signatures across shell and JavaScript environments.
+
+## 🎯 Downstream Architecture
+
+### Integration Philosophy
+**Downstream libraries extend upstream capabilities** by:
+- **Importing upstream core** - All downstream libraries source `../thdlib.sh`
+- **Adding framework-specific features** - A-Frame schema validation, WebXR capabilities
+- **Maintaining identical signatures** - Shell and JavaScript functions have identical parameters
+- **Professional validation** - Complete parameter and schema validation
+
+### Revolutionary Bridge System
+```
+api.yaml (upstream spec) → thdlib.* (core API)
+         ↓
+aframe-schemas (downstream spec) → aframelib.* (A-Frame integration)
+```
+
+## 📋 A-Frame Integration Libraries
+
+### [aframelib.sh](aframelib.sh)
+**A-Frame Shell Integration** - Enhanced shell functions with complete A-Frame WebXR capabilities
+
+- **Imports upstream core** - Sources `../thdlib.sh` for API access
+- **A-Frame schema validation** - Complete validation using A-Frame component schemas
+- **Enhanced object creation** - Materials, lighting, physics, particles
+- **Professional error handling** - Actionable error messages with A-Frame context
+
+**Usage:**
+```bash
+source /opt/holo-deck/lib/downstream/aframelib.sh
+
+# Enhanced A-Frame functions (identical to JavaScript signatures)
+thd::create_enhanced_object "crystal" "cone" 0 3 0 --color "#ff0000" --metalness 0.8
+thd::create_enhanced_light "key_light" "directional" 10 10 5 --intensity 1.5
+```
+
+### [aframelib.js](aframelib.js)
+**A-Frame JavaScript Bridge** - Enhanced JavaScript functions with identical shell signatures
+
+- **Revolutionary bridge** - Identical function signatures to shell functions
+- **A-Frame integration** - Direct A-Frame entity manipulation
+- **Schema validation** - Browser-side A-Frame schema validation
+- **Professional API** - Async/await patterns with comprehensive error handling
+
+**Usage:**
+```javascript
+// Identical signatures to shell functions
+await thd.createEnhancedObject('crystal', 'cone', 0, 3, 0, {
+    color: '#ff0000', 
+    metalness: 0.8
+});
+
+await thd.createEnhancedLight('key_light', 'directional', 10, 10, 5, {
+    intensity: 1.5
+});
+```
+
+## 🏆 Revolutionary Features
+
+### Identical Function Signatures
+**Perfect symmetry** between shell and JavaScript:
+
+```bash
+# Shell
+thd::create_enhanced_object "name" "type" x y z --option value
+```
+
+```javascript
+// JavaScript (identical parameters)
+thd.createEnhancedObject('name', 'type', x, y, z, {option: value})
+```
+
+### A-Frame Schema Validation
+- **Complete schema coverage** - All A-Frame component schemas available
+- **Real-time validation** - Parameters validated against A-Frame specifications
+- **Professional error messages** - Clear guidance when validation fails
+- **Browser and shell** - Validation works in both environments
+
+### Enhanced Capabilities
+Beyond basic API functions, downstream libraries provide:
+- **Materials & Shaders** - PBR materials, custom shaders, metalness/roughness
+- **Advanced Lighting** - Directional, point, ambient, spot lights with shadows
+- **Physics Integration** - Dynamic, static, kinematic physics bodies
+- **Particle Systems** - Fire, smoke, sparkle effects
+- **3D Text Rendering** - Professional 3D text with material properties
+
+## 🔗 Upstream Integration
+
+### Dependency Chain
+```
+aframelib.sh sources ../thdlib.sh
+    ↓
+Enhanced functions use core API functions
+    ↓
+Professional layered architecture maintained
+```
+
+### Architectural Benefits
+- **Single source of truth** - Core API changes automatically affect enhanced functions
+- **Perfect compatibility** - Enhanced functions build on stable core foundation
+- **Professional separation** - Clear distinction between core API and framework integration
+- **Maintainability** - Changes to A-Frame integration don't affect core API
+
+## 🎨 A-Frame Specific Features
+
+### Enhanced Object Creation
+```bash
+thd::create_enhanced_object "name" "geometry" x y z \
+    --color "#rrggbb" \
+    --metalness 0.0-1.0 \
+    --roughness 0.0-1.0 \
+    --emission true/false
+```
+
+### Professional Lighting
+```bash
+thd::create_enhanced_light "name" "type" x y z \
+    --intensity 0.0-5.0 \
+    --color "#rrggbb" \
+    --cast-shadow true/false
+```
+
+### Physics Integration
+```bash
+thd::create_physics_object "name" "geometry" x y z \
+    --mass 0.0-100.0 \
+    --physics-type dynamic/static/kinematic
+```
+
+## 🚀 Development Workflow
+
+### Adding New A-Frame Features
+1. **Study A-Frame schemas** - Understand component parameters
+2. **Add to enhanced functions** - Implement in both shell and JavaScript
+3. **Maintain identical signatures** - Ensure shell and JS functions match
+4. **Test validation** - Verify A-Frame schema validation works
+5. **Document usage** - Update examples and documentation
+
+### Integration Testing
+```bash
+# Test enhanced functions
+source lib/downstream/aframelib.sh
+thd::create_enhanced_object "test" "box" 0 1 0 --color "#ff0000"
+
+# Test scenes using enhanced functions
+THD_SESSION=test bash share/scenes/ultimate-demo.sh
+```
+
+## 📊 A-Frame Integration Coverage
+
+| A-Frame Feature | Shell Support | JS Support | Schema Validation |
+|-----------------|---------------|------------|-------------------|
+| Basic Geometry | ✅ Complete | ✅ Complete | ✅ Full |
+| Materials/PBR | ✅ Complete | ✅ Complete | ✅ Full |
+| Lighting | ✅ Complete | ✅ Complete | ✅ Full |
+| Physics | ✅ Complete | ✅ Complete | ✅ Full |
+| Particles | ✅ Complete | ✅ Complete | ✅ Full |
+| Text Rendering | ✅ Complete | ✅ Complete | ✅ Full |
+
+## 🎯 Future Downstream Integrations
+
+The downstream architecture supports future integrations:
+- **Three.js integration** - `lib/downstream/threelib.*`
+- **Babylon.js integration** - `lib/downstream/babylonlib.*`
+- **Unity integration** - `lib/downstream/unitylib.*`
+- **Custom frameworks** - Easy to add new downstream integrations
+
+---
+
+**The downstream libraries represent THD's revolutionary capability to provide consistent, professional integration with any 3D framework while maintaining perfect single source of truth architecture.**
