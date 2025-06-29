@@ -93,8 +93,8 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         #debug-panel.collapsed {
-            min-height: 40px;
-            max-height: 40px;
+            min-height: 32px;
+            max-height: 32px;
         }
         
         #debug-header {
@@ -227,7 +227,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             position: relative;
             margin-right: 6px;
             opacity: 0.7;
-            filter: grayscale(100%);
         }
         
         #debug-lock-icon:hover::after {
@@ -248,10 +247,12 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         #debug-lock-icon.unlocked {
             opacity: 0.5;
+            text-shadow: none;
         }
         
         #debug-lock-icon.locked {
             opacity: 1.0;
+            text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
         }
         
         .debug-indicators {
