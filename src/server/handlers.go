@@ -17,10 +17,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 	html := `<!DOCTYPE html>
 <html>
 <head>
-    <title>Holodeck</title>
+    <title>THD Holodeck - A-Frame VR</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
         body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: monospace; }
-        canvas { display: block; }
+        a-scene { display: block; }
         
         #status-led {
             position: absolute;
@@ -182,7 +183,38 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
     </style>
 </head>
 <body>
-    <canvas id="canvas"></canvas>
+    <a-scene 
+        id="holodeck-scene" 
+        thd-holodeck
+        embedded
+        style="height: 100vh; width: 100vw;"
+        vr-mode-ui="enabled: true"
+        device-orientation-permission-ui="enabled: false">
+        
+        <!-- THD Holodeck Environment -->
+        <a-assets>
+            <!-- Asset preloading will go here -->
+        </a-assets>
+        
+        <!-- Default holodeck setup -->
+        <a-entity id="holodeck-camera" 
+                  camera 
+                  look-controls="reverseMouseDrag: true" 
+                  wasd-controls="acceleration: 20; fly: false"
+                  position="0 1.7 5">
+        </a-entity>
+        
+        <!-- Default lighting -->
+        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="directional" position="10 10 5" color="#ffffff" intensity="0.8"></a-light>
+        
+        <!-- Holodeck coordinate system grid -->
+        <a-entity id="holodeck-grid"></a-entity>
+        
+        <!-- Dynamic objects container -->
+        <a-entity id="holodeck-objects"></a-entity>
+    </a-scene>
+    
     <div id="text-overlay"></div>
     <div id="status-led" class="connecting">
         <div id="status-tooltip">connecting</div>
@@ -196,15 +228,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         <div id="debug-log"></div>
     </div>
     
-    <script src="/static/js/gl-matrix.js"></script>
-    <script src="/static/js/renderer.js"></script>
+    <script src="/static/js/thd-aframe.js"></script>
     <script>
-        const canvas = document.getElementById('canvas');
+        const scene = document.getElementById('holodeck-scene');
         const statusLed = document.getElementById('status-led');
         const tooltip = document.getElementById('status-tooltip');
         const debugLog = document.getElementById('debug-log');
         
-        let renderer;
+        let thdManager;
         let ws;
         let lastMessageTime = 0;
         let reconnectAttempts = 0;
@@ -265,8 +296,8 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         document.getElementById('session-id').textContent = currentSessionId;
                         
                         // Initialize world grid if it exists
-                        if (renderer && renderer.initializeWorld && sessionData.world) {
-                            renderer.initializeWorld(sessionData.world);
+                        if (thdManager && thdManager.initializeWorld && sessionData.world) {
+                            thdManager.initializeWorld(sessionData.world);
                         }
                         
                         console.log('THD Session restored:', currentSessionId);
@@ -288,9 +319,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     localStorage.setItem('thd_session_id', currentSessionId);
                     document.getElementById('session-id').textContent = currentSessionId;
                     
-                    // Initialize world grid in renderer
-                    if (renderer && renderer.initializeWorld) {
-                        renderer.initializeWorld(sessionData.world);
+                    // Initialize world grid in THD manager
+                    if (thdManager && thdManager.initializeWorld) {
+                        thdManager.initializeWorld(sessionData.world);
                     }
                     
                     console.log('THD Session created:', currentSessionId);
@@ -378,7 +409,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         console.log('[THD] Canvas control command:', controlData.command, controlData.objects);
                         addDebug('CANVAS_CTRL', {cmd: controlData.command, objs: controlData.objects?.length || 0});
                         if (controlData.clear) {
-                            renderer.processMessage({type: 'clear'});
+                            thdManager.processMessage({type: 'clear'});
                         }
                         if (controlData.objects) {
                             // Convert server objects to renderer format
@@ -399,27 +430,27 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                                 console.log('[THD] Converted object:', converted);
                                 return converted;
                             });
-                            if (!renderer) {
-                                console.error('[THD] RENDERER NOT FOUND - This is the root cause!');
-                                addDebug('ERROR', 'Renderer not initialized');
+                            if (!thdManager) {
+                                console.error('[THD] THD MANAGER NOT FOUND - This is the root cause!');
+                                addDebug('ERROR', 'THD Manager not initialized');
                                 return;
                             }
-                            if (!renderer.processMessage) {
-                                console.error('[THD] RENDERER.processMessage NOT FOUND - Missing method!');
-                                addDebug('ERROR', 'Renderer.processMessage missing');
+                            if (!thdManager.processMessage) {
+                                console.error('[THD] THD_MANAGER.processMessage NOT FOUND - Missing method!');
+                                addDebug('ERROR', 'THD Manager.processMessage missing');
                                 return;
                             }
-                            console.log('[THD] Calling renderer.processMessage with:', controlData.command, rendererObjects);
+                            console.log('[THD] Calling thdManager.processMessage with:', controlData.command, rendererObjects);
                             addDebug('RENDER_CALL', {cmd: controlData.command, count: rendererObjects.length});
                             try {
-                                renderer.processMessage({
+                                thdManager.processMessage({
                                     type: controlData.command,
                                     objects: rendererObjects
                                 });
-                                console.log('[THD] Renderer.processMessage SUCCESS');
-                                addDebug('RENDER_OK', 'Objects sent to renderer');
+                                console.log('[THD] THD Manager.processMessage SUCCESS');
+                                addDebug('RENDER_OK', 'Objects sent to THD Manager');
                             } catch(e) {
-                                console.error('[THD] Renderer.processMessage FAILED:', e);
+                                console.error('[THD] THD Manager.processMessage FAILED:', e);
                                 addDebug('RENDER_FAIL', {error: e.message});
                             }
                         }
@@ -514,94 +545,27 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         });
         
         try {
-            renderer = new HolodeckRenderer(canvas);
-            sendLog('info', 'HolodeckRenderer initialized successfully');
+            // Wait for A-Frame scene to be ready
+            scene.addEventListener('loaded', function() {
+                thdManager = new THDAFrameManager(scene);
+                sendLog('info', 'THD A-Frame Manager initialized successfully');
+                setStatus('connecting', 'THD A-Frame ready');
+            });
         } catch (e) {
-            setStatus('error', 'webgl not supported');
-            sendLog('error', 'WebGL initialization failed', e.message);
+            setStatus('error', 'A-Frame not supported');
+            sendLog('error', 'A-Frame initialization failed', e.message);
         }
         
-        // Resize canvas to window
+        // A-Frame handles canvas sizing automatically
         function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            // A-Frame scene automatically resizes
+            console.log('Window resized - A-Frame handles automatically');
         }
         window.addEventListener('resize', resize);
-        resize();
         
-        // Simple WASD Controls - Just move the camera
-        const keys = {};
+        // A-Frame provides built-in WASD and mouse controls
+        console.log('A-Frame controls: WASD to move, mouse to look, VR ready');
         
-        document.addEventListener('keydown', (e) => {
-            keys[e.key.toLowerCase()] = true;
-        });
-        
-        document.addEventListener('keyup', (e) => {
-            keys[e.key.toLowerCase()] = false;
-        });
-        
-        // Track camera direction independently
-        let cameraDirection = { yaw: 0, pitch: 0 }; // Looking direction in angles
-        
-        function updateCamera() {
-            if (!renderer || !renderer.camera) return;
-            
-            let moved = false;
-            const speed = 0.5;
-            const pos = renderer.camera.position;
-            
-            // Calculate forward/right directions from yaw angle (ignore pitch for horizontal movement)
-            const forward = [
-                Math.sin(cameraDirection.yaw),
-                0, // Keep horizontal for WASD movement
-                Math.cos(cameraDirection.yaw)
-            ];
-            
-            const right = [
-                Math.cos(cameraDirection.yaw),
-                0,
-                -Math.sin(cameraDirection.yaw)
-            ];
-            
-            // First-person movement - straight line movement
-            if (keys['w']) { // Move forward
-                pos[0] += forward[0] * speed;
-                pos[2] += forward[2] * speed;
-                moved = true;
-            }
-            if (keys['s']) { // Move backward
-                pos[0] -= forward[0] * speed;
-                pos[2] -= forward[2] * speed;
-                moved = true;
-            }
-            if (keys['a']) { // Strafe left
-                pos[0] -= right[0] * speed;
-                pos[2] -= right[2] * speed;
-                moved = true;
-            }
-            if (keys['d']) { // Strafe right
-                pos[0] += right[0] * speed;
-                pos[2] += right[2] * speed;
-                moved = true;
-            }
-            if (keys['q']) { pos[1] += speed; moved = true; } // Up
-            if (keys['e']) { pos[1] -= speed; moved = true; } // Down
-            
-            // Update target to be in front of camera based on direction
-            if (moved || !renderer.camera.target) {
-                renderer.camera.target = [
-                    pos[0] + forward[0],
-                    pos[1] + Math.sin(cameraDirection.pitch),
-                    pos[2] + forward[2]
-                ];
-            }
-            
-            if (moved) {
-                console.log('Camera at:', pos[0].toFixed(1), pos[1].toFixed(1), pos[2].toFixed(1));
-            }
-        }
-        
-        setInterval(updateCamera, 33);
         
         // Send client info to server
         function sendClientInfo() {
