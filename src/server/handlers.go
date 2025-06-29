@@ -382,13 +382,16 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
     <div id="text-overlay"></div>
     
     <div id="debug-panel">
-        <div id="debug-header">THD Console</div>
-        <div id="debug-session-bar">
-            <div id="debug-session-id">No Session</div>
-            <div class="debug-indicators">
+        <div id="debug-header">
+            <span>THD Console</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
                 <div id="debug-lock-led" class="unlocked" data-status="Mouse look available"></div>
                 <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
+                <span id="debug-collapse-icon">&#8593;</span>
             </div>
+        </div>
+        <div id="debug-session-bar">
+            <div id="debug-session-id">No Session</div>
         </div>
         <div id="debug-scene-bar">
             <select id="debug-scene-select">
@@ -414,6 +417,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         const debugLockLed = document.getElementById('debug-lock-led');
         const debugSessionId = document.getElementById('debug-session-id');
         const debugHeader = document.getElementById('debug-header');
+        const debugCollapseIcon = document.getElementById('debug-collapse-icon');
         
         let thdManager;
         let ws;
@@ -1221,11 +1225,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             if (debugCollapsed) {
                 debugLog.classList.add('collapsed');
                 debugPanel.classList.add('collapsed');
-                debugHeader.innerHTML = '<span>Holodeck Console</span><span>&#8595;</span>';
+                debugCollapseIcon.innerHTML = '&#8595;';
             } else {
                 debugLog.classList.remove('collapsed');
                 debugPanel.classList.remove('collapsed');
-                debugHeader.innerHTML = '<span>Holodeck Console</span><span>&#8593;</span>';
+                debugCollapseIcon.innerHTML = '&#8593;';
             }
             if (saveToCookie) {
                 setCookie('thd_console_collapsed', debugCollapsed.toString(), 30); // 30 days
