@@ -220,11 +220,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         #debug-lock-icon {
             font-size: 10px;
+            color: #00ffff;
             transition: all 0.3s ease;
             cursor: help;
             position: relative;
             margin-right: 6px;
             opacity: 0.7;
+            filter: grayscale(100%);
         }
         
         #debug-lock-icon:hover::after {
@@ -428,14 +430,16 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             </div>
         </div>
         <div id="debug-scene-bar">
-            <span style="margin-right: 4px;">Scene</span>
-            <select id="debug-scene-select">
-                <option value="">Select Scene...</option>
-                <option value="empty">Empty Grid</option>
-                <option value="anime-ui">Anime UI Demo</option>
-                <option value="ultimate">Ultimate Demo</option>
-                <option value="basic-shapes">Basic Shapes</option>
-            </select>
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <span>Scene</span>
+                <select id="debug-scene-select">
+                    <option value="">Select Scene...</option>
+                    <option value="empty">Empty Grid</option>
+                    <option value="anime-ui">Anime UI Demo</option>
+                    <option value="ultimate">Ultimate Demo</option>
+                    <option value="basic-shapes">Basic Shapes</option>
+                </select>
+            </div>
         </div>
         <div id="debug-controls-bar">
             <button id="photo-btn" class="control-btn photo-btn" title="Freeze-Frame Mode: Save current session state as new scene">FREEZE-FRAME</button>
