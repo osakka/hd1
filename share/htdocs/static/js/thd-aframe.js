@@ -83,6 +83,50 @@ AFRAME.registerComponent('holodeck-boundaries', {
     }
 });
 
+// Register THD sprint controls for Shift key running
+AFRAME.registerComponent('thd-sprint-controls', {
+    init: function() {
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.onKeyUp = this.onKeyUp.bind(this);
+        this.wasdControls = this.el.components['wasd-controls'];
+        this.originalAcceleration = 20;
+        this.sprintAcceleration = 60;
+        
+        // Add event listeners
+        document.addEventListener('keydown', this.onKeyDown, true);
+        document.addEventListener('keyup', this.onKeyUp, true);
+        
+        console.log('[THD-Sprint] Shift key sprint controls initialized');
+    },
+    
+    onKeyDown: function(event) {
+        if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+            // Get fresh reference to wasd-controls
+            this.wasdControls = this.el.components['wasd-controls'];
+            if (this.wasdControls) {
+                this.wasdControls.data.acceleration = this.sprintAcceleration;
+                console.log('[THD-Sprint] Sprint mode ON - acceleration:', this.sprintAcceleration);
+            }
+        }
+    },
+    
+    onKeyUp: function(event) {
+        if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+            // Get fresh reference to wasd-controls
+            this.wasdControls = this.el.components['wasd-controls'];
+            if (this.wasdControls) {
+                this.wasdControls.data.acceleration = this.originalAcceleration;
+                console.log('[THD-Sprint] Sprint mode OFF - acceleration:', this.originalAcceleration);
+            }
+        }
+    },
+    
+    remove: function() {
+        document.removeEventListener('keydown', this.onKeyDown, true);
+        document.removeEventListener('keyup', this.onKeyUp, true);
+    }
+});
+
 // Register THD keyboard controls for Q/E turning  
 AFRAME.registerComponent('thd-keyboard-controls', {
     init: function () {
@@ -601,14 +645,18 @@ class THDAFrameManager {
                 this.createSky(entity, obj);
                 return; // Sky doesn't need geometry
             case 'text':
-                this.createText(entity, obj);
-                return; // Text uses special component
+                // Text creation disabled - THREE.FontLoader issues
+                console.warn('[THD-AFrame] Text objects temporarily disabled due to FontLoader compatibility');
+                entity.setAttribute('geometry', {primitive: 'box', width: 2, height: 0.5, depth: 0.1});
+                break;
             case 'environment':
                 this.createEnvironment(entity, obj);
                 return; // Environment uses special component
             case 'particle':
-                this.createParticles(entity, obj);
-                return; // Particles use special component
+                // Particle systems disabled - require() compatibility issues
+                console.warn('[THD-AFrame] Particle systems temporarily disabled due to browser compatibility');
+                entity.setAttribute('geometry', {primitive: 'sphere', radius: 0.5});
+                break;
             default:
                 // Default to cube for unknown types
                 entity.setAttribute('geometry', {

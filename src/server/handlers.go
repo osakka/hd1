@@ -19,18 +19,20 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 <head>
     <title>THD Holodeck - A-Frame VR</title>
     <script src="/static/js/vendor/aframe.min.js"></script>
-    <script src="/static/js/vendor/aframe-animation-component.min.js"></script>
     <script src="/static/js/vendor/aframe-environment-component.min.js"></script>
-    <script src="/static/js/vendor/aframe-particle-system.js"></script>
     <script src="/static/js/vendor/aframe-teleport-controls.min.js"></script>
     <script src="/static/js/vendor/aframe-event-set-component.min.js"></script>
     <script src="/static/js/vendor/aframe-look-at-component.min.js"></script>
-    <script src="/static/js/vendor/aframe-text-geometry-component.min.js"></script>
-    <script src="/static/js/vendor/aframe-state-component.min.js"></script>
     <script src="/static/js/vendor/aframe-orbit-controls.min.js"></script>
-    <script src="/static/js/vendor/aframe-controller-cursor-component.min.js"></script>
-    <!-- <script src="/static/js/vendor/aframe-forcegraph-component.min.js"></script> -->
-    <script src="/static/js/thd-aframe.js?v=20250629-1414"></script>
+    <!-- Removed problematic components:
+         - aframe-animation-component.min.js (conflicts with core A-Frame animation)
+         - aframe-particle-system.js (uses Node.js require())
+         - aframe-text-geometry-component.min.js (THREE.FontLoader constructor error)
+         - aframe-state-component.min.js (not essential for core functionality)
+         - aframe-controller-cursor-component.min.js (VR-specific, not needed for holodeck)
+         - aframe-forcegraph-component.min.js (complex, not used yet)
+    -->
+    <script src="/static/js/thd-aframe.js"></script>
     <style>
         body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: monospace; }
         a-scene { display: block; }
@@ -113,40 +115,82 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             font-size: 9px;
         }
         
+        #debug-scene-bar {
+            background: rgba(0, 255, 255, 0.03);
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            font-size: 9px;
+        }
+        
+        #debug-scene-select {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            padding: 2px 4px;
+            border-radius: 2px;
+            width: 100%;
+            margin-top: 2px;
+        }
+        
+        #debug-scene-select:focus {
+            outline: none;
+            border-color: rgba(0, 255, 255, 0.6);
+        }
+        
         #debug-session-id {
             color: rgba(255, 255, 255, 0.8);
             font-weight: bold;
         }
         
         #debug-status-led {
-            width: 12px;
-            height: 12px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #666;
-            box-shadow: 0 0 6px rgba(102, 102, 102, 0.5);
+            box-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
             transition: all 0.3s ease;
+            cursor: help;
+            position: relative;
+        }
+        
+        #debug-status-led:hover::after {
+            content: attr(data-status);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            white-space: nowrap;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         #debug-status-led.connecting {
             background: #ff9500;
-            box-shadow: 0 0 12px rgba(255, 149, 0, 0.8);
+            box-shadow: 0 0 6px rgba(255, 149, 0, 0.8);
             animation: pulse 1.5s infinite;
         }
         
         #debug-status-led.connected {
             background: #00ff00;
-            box-shadow: 0 0 12px rgba(0, 255, 0, 0.8);
+            box-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
         }
         
         #debug-status-led.receiving {
             background: #00ffff;
-            box-shadow: 0 0 16px rgba(0, 255, 255, 1);
+            box-shadow: 0 0 8px rgba(0, 255, 255, 1);
             animation: flicker 0.2s;
         }
         
         #debug-status-led.error {
             background: #ff0000;
-            box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+            box-shadow: 0 0 6px rgba(255, 0, 0, 0.8);
             animation: pulse 0.8s infinite;
         }
         
@@ -161,6 +205,32 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         #debug-log.collapsed {
             height: 0;
             padding: 0;
+        }
+        
+        /* Professional holodeck-themed scrollbar */
+        #debug-log::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #debug-log::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        #debug-log::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.4);
+            border-radius: 4px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        #debug-log::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 255, 0.6);
+        }
+        
+        /* Firefox scrollbar theming */
+        #debug-log {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 255, 255, 0.4) rgba(0, 0, 0, 0.3);
         }
         
         .debug-entry {
@@ -180,29 +250,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             color: rgba(255, 255, 255, 0.8);
         }
         
-        /* Custom VR button styling */
-        .a-enter-vr-button {
-            position: fixed !important;
-            bottom: 20px !important;
-            right: 20px !important;
-            width: 40px !important;
-            height: 40px !important;
-            background: rgba(0, 0, 0, 0.3) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            border-radius: 8px !important;
-            opacity: 0.6 !important;
-            transition: opacity 0.3s ease !important;
-        }
-        
-        .a-enter-vr-button:hover {
-            opacity: 1 !important;
-            background: rgba(0, 0, 0, 0.5) !important;
-        }
-        
-        .a-enter-vr-button .a-enter-vr-button-icon {
-            width: 24px !important;
-            height: 24px !important;
-        }
     </style>
 </head>
 <body>
@@ -211,7 +258,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         thd-holodeck
         embedded
         style="height: 100vh; width: 100vw;"
-        vr-mode-ui="enabled: true"
+        vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false">
         
         <!-- THD Holodeck Environment -->
@@ -225,6 +272,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                   look-controls="enabled: true; pointerLockEnabled: true" 
                   wasd-controls="acceleration: 20; fly: false; enabled: true"
                   thd-keyboard-controls=""
+                  thd-sprint-controls=""
                   holodeck-boundaries=""
                   position="0 1.7 5">
         </a-entity>
@@ -246,7 +294,16 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         <div id="debug-header">THD Console</div>
         <div id="debug-session-bar">
             <div id="debug-session-id">No Session</div>
-            <div id="debug-status-led" class="connecting"></div>
+            <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
+        </div>
+        <div id="debug-scene-bar">
+            <select id="debug-scene-select">
+                <option value="">Select Scene...</option>
+                <option value="empty">Empty Grid</option>
+                <option value="anime-ui">Anime UI Demo</option>
+                <option value="ultimate">Ultimate Demo</option>
+                <option value="basic-shapes">Basic Shapes</option>
+            </select>
         </div>
         <div id="debug-log"></div>
     </div>
@@ -270,6 +327,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         function setStatus(status, message) {
             // Update debug panel status LED
             debugStatusLed.className = status;
+            debugStatusLed.setAttribute('data-status', message || status);
         }
         
         // Update debug session ID when session changes
@@ -338,6 +396,18 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         
                         // Associate WebSocket client with this session
                         associateSession(currentSessionId);
+                        
+                        // Auto-load saved scene after session is restored
+                        setTimeout(() => {
+                            const savedScene = getCookie('thd_scene');
+                            if (savedScene && debugSceneSelect) {
+                                debugSceneSelect.value = savedScene;
+                                if (savedScene !== '') {
+                                    addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_restore'});
+                                    loadScene(savedScene);
+                                }
+                            }
+                        }, 1500); // Wait for session to fully restore
                         return;
                     } else {
                         // Session expired, clear it
@@ -370,6 +440,18 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     
                     // Associate WebSocket client with this session
                     associateSession(currentSessionId);
+                    
+                    // Auto-load saved scene after session is established
+                    setTimeout(() => {
+                        const savedScene = getCookie('thd_scene');
+                        if (savedScene && debugSceneSelect) {
+                            debugSceneSelect.value = savedScene;
+                            if (savedScene !== '') {
+                                addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_restore'});
+                                loadScene(savedScene);
+                            }
+                        }
+                    }, 1000); // Wait for session to fully establish
                 } else {
                     console.error('Failed to create session:', sessionData);
                     updateDebugSession('Session Failed');
@@ -747,16 +829,91 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             if (debugCollapsed) {
                 debugLog.classList.add('collapsed');
                 debugPanel.classList.add('collapsed');
-                debugHeader.textContent = 'THD Console >';
+                debugHeader.textContent = 'THD Console [MINIMIZED]';
             } else {
                 debugLog.classList.remove('collapsed');
                 debugPanel.classList.remove('collapsed');
-                debugHeader.textContent = 'THD Console v';
+                debugHeader.textContent = 'THD Console [ACTIVE]';
             }
         });
         
-        // Initialize debug header with expand indicator
-        debugHeader.textContent = 'THD Console v';
+        // Initialize debug header with professional status
+        debugHeader.textContent = 'THD Console [ACTIVE]';
+        
+        // Scene selection management
+        const debugSceneSelect = document.getElementById('debug-scene-select');
+        
+        // Load saved scene from cookie
+        function loadSavedScene() {
+            const savedScene = getCookie('thd_scene');
+            if (savedScene) {
+                debugSceneSelect.value = savedScene;
+            }
+        }
+        
+        // Save scene to cookie
+        function saveScene(sceneId) {
+            setCookie('thd_scene', sceneId, 30); // 30 days
+        }
+        
+        // Cookie utilities
+        function setCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = name + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
+        }
+        
+        function getCookie(name) {
+            const nameEQ = name + '=';
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+        
+        // Handle scene selection
+        debugSceneSelect.addEventListener('change', function() {
+            const selectedScene = this.value;
+            if (selectedScene && currentSessionId) {
+                addDebug('SCENE_SELECT', {scene: selectedScene, session: currentSessionId});
+                saveScene(selectedScene);
+                loadScene(selectedScene);
+            }
+        });
+        
+        // Load scene via API call
+        async function loadScene(sceneId) {
+            try {
+                const response = await fetch('/api/scenes/' + sceneId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    addDebug('SCENE_LOADED', {scene: sceneId, objects: result.objects_created || 0});
+                    setStatus('receiving', 'Loading scene: ' + sceneId);
+                } else {
+                    addDebug('SCENE_ERROR', {scene: sceneId, status: response.status});
+                    setStatus('error', 'Failed to load scene');
+                }
+            } catch (error) {
+                console.error('Failed to load scene:', error);
+                addDebug('SCENE_FAIL', {scene: sceneId, error: error.message});
+                setStatus('error', 'Scene load failed');
+            }
+        }
+        
+        // Load saved scene on page load
+        loadSavedScene();
         
         // Pointer lock status indicator
         function updatePointerLockStatus() {

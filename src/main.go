@@ -83,9 +83,21 @@ func main() {
 	apiRouter := NewAPIRouter(hub)
 	http.Handle("/api/", apiRouter)
 	
-	// Serve static files from absolute path
+	// Serve static files with proper cache control headers
 	fileServer := http.FileServer(http.Dir(*staticDir))
-	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
+	http.Handle("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set cache control headers for static assets
+		if filepath.Ext(r.URL.Path) == ".js" || filepath.Ext(r.URL.Path) == ".css" {
+			// For development: no-cache for JS/CSS to avoid cache issues
+			w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+			w.Header().Set("Pragma", "no-cache")
+			w.Header().Set("Expires", "0")
+		} else {
+			// For other static assets (images, etc): cache for 1 hour
+			w.Header().Set("Cache-Control", "public, max-age=3600")
+		}
+		http.StripPrefix("/static/", fileServer).ServeHTTP(w, r)
+	}))
 
 	// Startup banner
 	log.Println("THD (The Holo-Deck) - Professional Daemon")

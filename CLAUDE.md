@@ -20,10 +20,14 @@
 
 ## Project Identity: THD (The Holo-Deck)
 
-### Current State (v3.2.0 - Complete Holodeck Containment)
+### Current State (v3.3.0 - Professional UI Excellence & Scene Management)
 - **Binary**: `thd` (professional VR holodeck daemon)
 - **Module**: `holodeck` (Go module name)
 - **Rendering Engine**: A-Frame WebXR 1.4.0 (100% Local - 2.5MB ecosystem)
+- **UI Standards**: Complete professional interface with scene management system
+- **Cache Control**: Standards-compliant HTTP headers replacing hacky query strings
+- **Scene System**: API-driven scene selection with cookie persistence
+- **Sprint Controls**: Shift key acceleration for enhanced holodeck traversal
 - **Holodeck Containment**: Escape-proof boundary enforcement with 60fps monitoring
 - **Session Architecture**: Single source of truth with perfect isolation
 - **A-Frame Components**: Complete local library with zero CDN dependencies
@@ -65,7 +69,8 @@
 ### Documentation
 - `/opt/holo-deck/README.md` - Professional project overview
 - `/opt/holo-deck/CHANGELOG.md` - Complete project transformation history
-- `/opt/holo-deck/docs/ADR-001-aframe-webxr-integration.md` - A-Frame integration decision
+- `/opt/holo-deck/docs/adr/ADR-001-aframe-webxr-integration.md` - A-Frame integration decision
+- `/opt/holo-deck/docs/adr/ADR-003-Professional-UI-Enhancement.md` - UI excellence & scene management
 - `/opt/holo-deck/docs/api/README.md` - THD API documentation
 
 ### Holodeck Libraries
@@ -109,16 +114,42 @@ git config user.email "claude@anthropic.com"
 - **Phase 7 (RESOLVED)**: jq parsing errors from non-JSON API responses
 
 ### Professional Standards Implementation
+- **Zero Hacky Implementations** - proper HTTP cache control, professional status indicators
 - **No emojis** in any system output or logging
 - **Absolute paths only** - all configured from THD_* constants
 - **Long flags only** - no short flags to eliminate confusion
 - **Professional error messages** - clear, actionable, no decorative elements
+- **Clean URLs** - no query string versioning, standards-compliant caching
+- **Semantic UI** - professional status indicators replacing unicode characters
 
 ### Breaking Changes from VWS to THD
 - **Module imports**: `visualstream/*` → `holodeck/*`
 - **Binary names**: `vws` → `thd`, `vws-client` → `thd-client`
 - **Constants**: `VWS_*` → `THD_*`
 - **PID files**: `vws.pid` → `thd.pid`
+
+## Professional UI Enhancement Context
+
+### Scene Management System (v3.3.0)
+- **API Endpoints**: `/api/scenes` (list) and `/api/scenes/{sceneId}` (load)
+- **Predefined Scenes**: Empty Grid, Anime UI Demo, Ultimate Demo, Basic Shapes
+- **Cookie Persistence**: 30-day scene preference storage with automatic restoration
+- **Session Integration**: Scene dropdown appears under session ID in holodeck console
+- **Auto-Bootstrap**: Saved scenes automatically load on session restore/creation
+
+### Professional Interface Standards
+- **Console Status**: `THD Console [ACTIVE]` / `THD Console [MINIMIZED]` (no unicode)
+- **Status LED**: 6px professional indicator with hover tooltips (50% size reduction)
+- **VR Button**: Removed empty rectangle (`vr-mode-ui="enabled: false"`)
+- **Sprint Controls**: Shift key modifier for 3x speed boost (20 → 60 acceleration)
+- **Scrollbar Theming**: Cross-browser holodeck aesthetic with cyan accents
+- **Cache Control**: Standards-compliant HTTP headers for development and production
+
+### UI Component Architecture
+- **A-Frame Sprint Component**: `thd-sprint-controls` with dynamic acceleration switching
+- **Scene Selection Flow**: Dropdown → Cookie Save → API Call → WebSocket Broadcast
+- **Professional Scrollbars**: WebKit and Firefox theming for consistent holodeck look
+- **HTTP Cache Strategy**: Development no-cache for JS/CSS, production caching for assets
 
 ## Debugging Context
 
@@ -136,7 +167,15 @@ git config user.email "claude@anthropic.com"
 ### API Control
 - **Browser control**: Force refresh and canvas manipulation APIs available
 - **Session bootstrap**: Complete world initialization with grid system
+- **Scene management**: API-driven scene loading with session isolation
 - **Real-time updates**: WebSocket hub broadcasts all changes
+
+### UI Enhancement Debugging
+- **Cache Issues**: Check HTTP headers in Network tab (should show no-cache for dev)
+- **Scene Loading**: Monitor console for `SCENE_LOADED` and `AUTO_SCENE` debug entries
+- **Sprint Controls**: Verify `thd-sprint-controls` component attachment on camera entity
+- **Status Indicators**: Professional `[ACTIVE]`/`[MINIMIZED]` instead of unicode arrows
+- **Scrollbar Theme**: CSS custom properties for cross-browser holodeck styling
 
 ## Recovery Context for New Sessions
 

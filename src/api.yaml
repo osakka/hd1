@@ -188,6 +188,94 @@ paths:
       x-function: "GetWorldSpec"
 
   # ========================================
+  # SCENE MANAGEMENT
+  # ========================================
+  /scenes:
+    get:
+      operationId: listScenes
+      tags: [Scenes]
+      summary: List available scenes
+      description: |
+        Returns all available THD scenes for holodeck environments.
+        Scenes are predefined THD scripts that create specific environments.
+      responses:
+        '200':
+          description: Available scenes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  scenes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SceneInfo'
+      x-handler: "api/scenes/list.go"
+      x-function: "ListScenes"
+
+  /scenes/{sceneId}:
+    post:
+      operationId: loadScene
+      tags: [Scenes]
+      summary: Load scene into session
+      description: |
+        Loads a predefined scene (THD script) into the specified session.
+        Clears existing objects and applies scene configuration.
+      parameters:
+        - name: sceneId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Scene identifier (empty, anime-ui, ultimate, basic-shapes)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session_id:
+                  type: string
+                  description: Target session for scene loading
+              required:
+                - session_id
+      responses:
+        '200':
+          description: Scene loaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  scene_id:
+                    type: string
+                  session_id:
+                    type: string
+                  objects_created:
+                    type: integer
+                  message:
+                    type: string
+        '404':
+          description: Scene not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Invalid session or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/scenes/load.go"
+      x-function: "LoadScene"
+
+  # ========================================
   # OBJECT MANAGEMENT
   # ========================================
   /sessions/{sessionId}/objects:
@@ -752,6 +840,40 @@ components:
           description: "Angular speed"
 
     # Common Schemas
+    SceneInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique scene identifier
+          example: "anime-ui"
+        name:
+          type: string
+          description: Human-readable scene name
+          example: "Anime UI Demo"
+        description:
+          type: string
+          description: Scene description
+          example: "Interactive anime-style holodeck with floating UI elements"
+        object_count:
+          type: integer
+          description: Number of objects this scene creates
+          example: 25
+        complexity:
+          type: string
+          enum: [simple, moderate, complex]
+          description: Scene complexity level
+        tags:
+          type: array
+          items:
+            type: string
+          description: Scene tags for categorization
+          example: ["ui", "interactive", "demo"]
+      required:
+        - id
+        - name
+        - description
+
     Coordinate3D:
       type: array
       items:
