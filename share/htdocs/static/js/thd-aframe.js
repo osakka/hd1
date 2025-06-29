@@ -4,6 +4,187 @@
  * Maintains 100% compatibility with existing THD WebSocket protocol
  */
 
+// Register boundary enforcement component
+AFRAME.registerComponent('holodeck-boundaries', {
+    schema: {
+        xMin: {type: 'number', default: -11},
+        xMax: {type: 'number', default: 11},
+        zMin: {type: 'number', default: -11},
+        zMax: {type: 'number', default: 11},
+        yMin: {type: 'number', default: 0.5},
+        yMax: {type: 'number', default: 7}
+    },
+    
+    init: function() {
+        this.lastValidPosition = this.el.getAttribute('position');
+        this.boundaryCheckInterval = setInterval(this.checkBoundaries.bind(this), 16); // ~60fps checking
+        console.log('[Holodeck-Boundaries] COMPONENT INITIALIZED with bounds:', this.data);
+        console.log('[Holodeck-Boundaries] Element:', this.el.id);
+        
+        // Test immediate boundary check
+        setTimeout(() => {
+            console.log('[Holodeck-Boundaries] Test boundary check in 1 second...');
+            this.checkBoundaries();
+        }, 1000);
+    },
+    
+    checkBoundaries: function() {
+        const position = this.el.getAttribute('position');
+        let corrected = false;
+        
+        // Check X boundaries
+        if (position.x < this.data.xMin) {
+            position.x = this.data.xMin;
+            corrected = true;
+        } else if (position.x > this.data.xMax) {
+            position.x = this.data.xMax;
+            corrected = true;
+        }
+        
+        // Check Z boundaries  
+        if (position.z < this.data.zMin) {
+            position.z = this.data.zMin;
+            corrected = true;
+        } else if (position.z > this.data.zMax) {
+            position.z = this.data.zMax;
+            corrected = true;
+        }
+        
+        // Check Y boundaries
+        if (position.y < this.data.yMin) {
+            position.y = this.data.yMin;
+            corrected = true;
+        } else if (position.y > this.data.yMax) {
+            position.y = this.data.yMax;
+            corrected = true;
+        }
+        
+        if (corrected) {
+            this.el.setAttribute('position', position);
+            console.log('[Holodeck-Boundaries] Position corrected to:', position);
+            
+            // Flash red border as visual feedback
+            const scene = document.querySelector('a-scene');
+            if (scene) {
+                scene.style.border = '5px solid red';
+                setTimeout(() => {
+                    scene.style.border = 'none';
+                }, 200);
+            }
+        } else {
+            this.lastValidPosition = {...position};
+        }
+    },
+    
+    remove: function() {
+        if (this.boundaryCheckInterval) {
+            clearInterval(this.boundaryCheckInterval);
+        }
+    }
+});
+
+// Register THD keyboard controls for Q/E turning  
+AFRAME.registerComponent('thd-keyboard-controls', {
+    init: function () {
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.onKeyUp = this.onKeyUp.bind(this);
+        this.keys = {};
+        this.rotationSpeed = 2.0; // degrees per frame
+        this.lookControls = this.el.components['look-controls'];
+        
+        // Add event listeners with higher priority
+        document.addEventListener('keydown', this.onKeyDown, true);
+        document.addEventListener('keyup', this.onKeyUp, true);
+        
+        console.log('[THD-Controls] Q/E turning controls initialized with look-controls override');
+    },
+
+    onKeyDown: function (event) {
+        console.log('[THD-Controls] ANY key pressed:', event.code, 'pointerLock:', !!document.pointerLockElement);
+        
+        // Handle ESC key to exit pointer lock
+        if (event.code === 'Escape') {
+            document.exitPointerLock();
+            console.log('[THD-Controls] Pointer lock released with ESC');
+            return;
+        }
+        
+        // Handle Q/E rotation
+        if (event.code === 'KeyQ' || event.code === 'KeyE') {
+            event.preventDefault();
+            event.stopPropagation();
+            this.keys[event.code] = true;
+            
+            // Temporarily disable look-controls to prevent conflict
+            if (this.lookControls) {
+                this.lookControls.pause();
+                console.log('[THD-Controls] Look-controls paused for Q/E rotation');
+            }
+            
+            console.log('[THD-Controls] Q/E Key pressed:', event.code, 'keys state:', this.keys);
+        }
+    },
+
+    onKeyUp: function (event) {
+        if (event.code === 'KeyQ' || event.code === 'KeyE') {
+            event.preventDefault();
+            event.stopPropagation();
+            this.keys[event.code] = false;
+            
+            // Re-enable look-controls when no Q/E keys are pressed
+            if (!this.keys['KeyQ'] && !this.keys['KeyE'] && this.lookControls) {
+                // Update look-controls internal rotation to match our current rotation
+                const currentRotation = this.el.getAttribute('rotation');
+                this.lookControls.yawObject.rotation.y = currentRotation.y * Math.PI / 180;
+                this.lookControls.pitchObject.rotation.x = currentRotation.x * Math.PI / 180;
+                
+                this.lookControls.play();
+                console.log('[THD-Controls] Look-controls resumed with synced rotation:', currentRotation.y);
+            }
+            
+            console.log('[THD-Controls] Key released:', event.code);
+        }
+    },
+
+    tick: function () {
+        // Debug what's happening each tick
+        if (this.keys['KeyQ'] || this.keys['KeyE']) {
+            console.log('[THD-Controls] TICK - Keys active:', this.keys, 'pointerLock:', !!document.pointerLockElement);
+        }
+        
+        // Rotate regardless of pointer lock for now (debugging)
+        const el = this.el;
+        const currentRotation = el.getAttribute('rotation');
+        
+        if (this.keys['KeyQ']) {
+            // Turn left - increase Y rotation
+            const newY = currentRotation.y + this.rotationSpeed;
+            el.setAttribute('rotation', {
+                x: currentRotation.x,
+                y: newY,
+                z: currentRotation.z
+            });
+            console.log('[THD-Controls] Turning left, new Y:', newY);
+        }
+        
+        if (this.keys['KeyE']) {
+            // Turn right - decrease Y rotation  
+            const newY = currentRotation.y - this.rotationSpeed;
+            el.setAttribute('rotation', {
+                x: currentRotation.x,
+                y: newY,
+                z: currentRotation.z
+            });
+            console.log('[THD-Controls] Turning right, new Y:', newY);
+        }
+    },
+
+    remove: function () {
+        document.removeEventListener('keydown', this.onKeyDown, true);
+        document.removeEventListener('keyup', this.onKeyUp, true);
+    }
+});
+
 // Register THD Holodeck component for scene management
 AFRAME.registerComponent('thd-holodeck', {
     schema: {
@@ -29,22 +210,255 @@ AFRAME.registerComponent('thd-holodeck', {
 
     setupCoordinateSystem: function() {
         // Create holodeck coordinate grid (25x25x25, Y=0 floor, Y=1.7 eye level)
-        const gridMaterial = `color: #00ffff; transparent: true; opacity: ${this.data.gridTransparency}`;
+        // Set default grid transparency for holodeck environment
+        this.data.gridTransparency = 0.15;
+        this.createHolodeckGrid();
+        console.log('[THD-AFrame] Holodeck coordinate system initialized with default grid');
+    },
+    
+    createHolodeckGrid: function() {
+        // Clear existing grid
+        while (this.gridContainer.firstChild) {
+            this.gridContainer.removeChild(this.gridContainer.firstChild);
+        }
         
-        // Floor grid lines
-        for (let x = -12; x <= 12; x++) {
-            for (let z = -12; z <= 12; z++) {
-                if (x % 2 === 0 || z % 2 === 0) {
-                    const gridLine = document.createElement('a-box');
-                    gridLine.setAttribute('position', `${x} 0 ${z}`);
-                    gridLine.setAttribute('scale', '0.1 0.02 0.1');
-                    gridLine.setAttribute('material', gridMaterial);
-                    this.gridContainer.appendChild(gridLine);
+        if (this.data.gridTransparency === 0) {
+            return; // Grid disabled
+        }
+        
+        const gridColor = '#00ffff';
+        const opacity = this.data.gridTransparency;
+        const lineOpacity = opacity * 0.6;
+        
+        // Create floor grid points
+        for (let x = -12; x <= 12; x += 4) {
+            for (let z = -12; z <= 12; z += 4) {
+                const gridPoint = document.createElement('a-sphere');
+                gridPoint.setAttribute('position', `${x} 0.1 ${z}`);
+                gridPoint.setAttribute('radius', '0.1');
+                gridPoint.setAttribute('material', `color: ${gridColor}; transparent: true; opacity: ${opacity}`);
+                this.gridContainer.appendChild(gridPoint);
+            }
+        }
+        
+        // Create horizontal connecting lines (X direction)
+        for (let x = -12; x < 12; x += 4) {
+            for (let z = -12; z <= 12; z += 4) {
+                const lineX = document.createElement('a-box');
+                lineX.setAttribute('position', `${x + 2} 0.1 ${z}`);
+                lineX.setAttribute('scale', '4 0.02 0.02');
+                lineX.setAttribute('material', `color: ${gridColor}; transparent: true; opacity: ${lineOpacity}`);
+                this.gridContainer.appendChild(lineX);
+            }
+        }
+        
+        // Create horizontal connecting lines (Z direction)
+        for (let x = -12; x <= 12; x += 4) {
+            for (let z = -12; z < 12; z += 4) {
+                const lineZ = document.createElement('a-box');
+                lineZ.setAttribute('position', `${x} 0.1 ${z + 2}`);
+                lineZ.setAttribute('scale', '0.02 0.02 4');
+                lineZ.setAttribute('material', `color: ${gridColor}; transparent: true; opacity: ${lineOpacity}`);
+                this.gridContainer.appendChild(lineZ);
+            }
+        }
+        
+        // Create ceiling grid points
+        for (let x = -8; x <= 8; x += 8) {
+            for (let z = -8; z <= 8; z += 8) {
+                const ceilingPoint = document.createElement('a-sphere');
+                ceilingPoint.setAttribute('position', `${x} 8 ${z}`);
+                ceilingPoint.setAttribute('radius', '0.05');
+                ceilingPoint.setAttribute('material', `color: ${gridColor}; transparent: true; opacity: ${opacity * 0.5}`);
+                this.gridContainer.appendChild(ceilingPoint);
+            }
+        }
+        
+        // Create vertical connecting lines to ceiling
+        for (let x = -8; x <= 8; x += 8) {
+            for (let z = -8; z <= 8; z += 8) {
+                const verticalLine = document.createElement('a-box');
+                verticalLine.setAttribute('position', `${x} 4 ${z}`);
+                verticalLine.setAttribute('scale', '0.01 8 0.01');
+                verticalLine.setAttribute('material', `color: ${gridColor}; transparent: true; opacity: ${lineOpacity * 0.5}`);
+                this.gridContainer.appendChild(verticalLine);
+            }
+        }
+        
+        // Create ceiling connecting lines
+        const ceilingLineOpacity = lineOpacity * 0.3;
+        
+        // Ceiling X lines
+        for (let z = -8; z <= 8; z += 8) {
+            const ceilingLineX = document.createElement('a-box');
+            ceilingLineX.setAttribute('position', `0 8 ${z}`);
+            ceilingLineX.setAttribute('scale', '16 0.01 0.01');
+            ceilingLineX.setAttribute('material', `color: ${gridColor}; transparent: true; opacity: ${ceilingLineOpacity}`);
+            this.gridContainer.appendChild(ceilingLineX);
+        }
+        
+        // Ceiling Z lines
+        for (let x = -8; x <= 8; x += 8) {
+            const ceilingLineZ = document.createElement('a-box');
+            ceilingLineZ.setAttribute('position', `${x} 8 0`);
+            ceilingLineZ.setAttribute('scale', '0.01 0.01 16');
+            ceilingLineZ.setAttribute('material', `color: ${gridColor}; transparent: true; opacity: ${ceilingLineOpacity}`);
+            this.gridContainer.appendChild(ceilingLineZ);
+        }
+        
+        // Create invisible collision walls to contain player within holodeck
+        this.createHolodeckBoundaries();
+    },
+    
+    createHolodeckBoundaries: function() {
+        const wallHeight = 8;
+        const wallThickness = 0.5;
+        const boundaryDistance = 11; // Closer to visible grid
+        
+        // North wall (negative Z) - RED with label
+        const northWall = document.createElement('a-box');
+        northWall.setAttribute('position', `0 ${wallHeight/2} ${-boundaryDistance}`);
+        northWall.setAttribute('scale', `22 ${wallHeight} ${wallThickness}`);
+        northWall.setAttribute('material', 'color: red');
+        northWall.setAttribute('static-body', '');
+        this.gridContainer.appendChild(northWall);
+        
+        const northText = document.createElement('a-text');
+        northText.setAttribute('position', `0 ${wallHeight/2} ${-boundaryDistance + 0.3}`);
+        northText.setAttribute('value', 'NORTH WALL - RED');
+        northText.setAttribute('align', 'center');
+        northText.setAttribute('color', 'white');
+        northText.setAttribute('scale', '2 2 2');
+        this.gridContainer.appendChild(northText);
+        
+        // South wall (positive Z) - GREEN with label
+        const southWall = document.createElement('a-box');
+        southWall.setAttribute('position', `0 ${wallHeight/2} ${boundaryDistance}`);
+        southWall.setAttribute('scale', `22 ${wallHeight} ${wallThickness}`);
+        southWall.setAttribute('material', 'color: green');
+        southWall.setAttribute('static-body', '');
+        this.gridContainer.appendChild(southWall);
+        
+        const southText = document.createElement('a-text');
+        southText.setAttribute('position', `0 ${wallHeight/2} ${boundaryDistance - 0.3}`);
+        southText.setAttribute('value', 'SOUTH WALL - GREEN');
+        southText.setAttribute('align', 'center');
+        southText.setAttribute('color', 'white');
+        southText.setAttribute('scale', '2 2 2');
+        southText.setAttribute('rotation', '0 180 0');
+        this.gridContainer.appendChild(southText);
+        
+        // East wall (positive X) - BLUE with label
+        const eastWall = document.createElement('a-box');
+        eastWall.setAttribute('position', `${boundaryDistance} ${wallHeight/2} 0`);
+        eastWall.setAttribute('scale', `${wallThickness} ${wallHeight} 22`);
+        eastWall.setAttribute('material', 'color: blue');
+        eastWall.setAttribute('static-body', '');
+        this.gridContainer.appendChild(eastWall);
+        
+        const eastText = document.createElement('a-text');
+        eastText.setAttribute('position', `${boundaryDistance - 0.3} ${wallHeight/2} 0`);
+        eastText.setAttribute('value', 'EAST WALL - BLUE');
+        eastText.setAttribute('align', 'center');
+        eastText.setAttribute('color', 'white');
+        eastText.setAttribute('scale', '2 2 2');
+        eastText.setAttribute('rotation', '0 -90 0');
+        this.gridContainer.appendChild(eastText);
+        
+        // West wall (negative X) - YELLOW with label
+        const westWall = document.createElement('a-box');
+        westWall.setAttribute('position', `${-boundaryDistance} ${wallHeight/2} 0`);
+        westWall.setAttribute('scale', `${wallThickness} ${wallHeight} 22`);
+        westWall.setAttribute('material', 'color: yellow');
+        westWall.setAttribute('static-body', '');
+        this.gridContainer.appendChild(westWall);
+        
+        const westText = document.createElement('a-text');
+        westText.setAttribute('position', `${-boundaryDistance + 0.3} ${wallHeight/2} 0`);
+        westText.setAttribute('value', 'WEST WALL - YELLOW');
+        westText.setAttribute('align', 'center');
+        westText.setAttribute('color', 'black');
+        westText.setAttribute('scale', '2 2 2');
+        westText.setAttribute('rotation', '0 90 0');
+        this.gridContainer.appendChild(westText);
+        
+        // Add floor indicator (visual only, boundary checking handles containment)
+        const floor = document.createElement('a-box');
+        floor.setAttribute('position', '0 -0.5 0');
+        floor.setAttribute('scale', '24 1 24');
+        floor.setAttribute('material', 'color: #333; transparent: true; opacity: 0.1');
+        floor.setAttribute('static-body', '');
+        this.gridContainer.appendChild(floor);
+        
+        console.log('[THD-AFrame] Solid test barriers with labels and floor created');
+    },
+    
+    createGridPlane: function(type, yPos, color, opacity) {
+        // Create horizontal grid lines (floor/ceiling)
+        for (let x = -12; x <= 12; x += 2) {
+            for (let z = -12; z <= 12; z += 2) {
+                // Grid intersection points
+                const point = document.createElement('a-box');
+                point.setAttribute('position', `${x} ${yPos} ${z}`);
+                point.setAttribute('scale', '0.05 0.01 0.05');
+                point.setAttribute('material', `color: ${color}; transparent: true; opacity: ${opacity}`);
+                this.gridContainer.appendChild(point);
+                
+                // Horizontal lines
+                if (x < 12) {
+                    const lineX = document.createElement('a-box');
+                    lineX.setAttribute('position', `${x + 1} ${yPos} ${z}`);
+                    lineX.setAttribute('scale', '2 0.005 0.01');
+                    lineX.setAttribute('material', `color: ${color}; transparent: true; opacity: ${opacity * 0.5}`);
+                    this.gridContainer.appendChild(lineX);
+                }
+                
+                // Vertical lines
+                if (z < 12) {
+                    const lineZ = document.createElement('a-box');
+                    lineZ.setAttribute('position', `${x} ${yPos} ${z + 1}`);
+                    lineZ.setAttribute('scale', '0.01 0.005 2');
+                    lineZ.setAttribute('material', `color: ${color}; transparent: true; opacity: ${opacity * 0.5}`);
+                    this.gridContainer.appendChild(lineZ);
+                }
+            }
+        }
+    },
+    
+    createGridWalls: function(color, opacity) {
+        // Create vertical grid lines on walls
+        const wallOpacity = opacity * 0.3;
+        
+        // North and South walls (Z = -12 and Z = 12)
+        for (let wall of [-12, 12]) {
+            for (let x = -12; x <= 12; x += 2) {
+                for (let y = 0; y <= 12; y += 2) {
+                    const point = document.createElement('a-box');
+                    point.setAttribute('position', `${x} ${y} ${wall}`);
+                    point.setAttribute('scale', '0.02 0.02 0.02');
+                    point.setAttribute('material', `color: ${color}; transparent: true; opacity: ${wallOpacity}`);
+                    this.gridContainer.appendChild(point);
                 }
             }
         }
         
-        console.log('[THD-AFrame] Holodeck coordinate system initialized');
+        // East and West walls (X = -12 and X = 12)
+        for (let wall of [-12, 12]) {
+            for (let z = -12; z <= 12; z += 2) {
+                for (let y = 0; y <= 12; y += 2) {
+                    const point = document.createElement('a-box');
+                    point.setAttribute('position', `${wall} ${y} ${z}`);
+                    point.setAttribute('scale', '0.02 0.02 0.02');
+                    point.setAttribute('material', `color: ${color}; transparent: true; opacity: ${wallOpacity}`);
+                    this.gridContainer.appendChild(point);
+                }
+            }
+        }
+    },
+    
+    updateGrid: function(transparency) {
+        this.data.gridTransparency = transparency;
+        this.createHolodeckGrid();
     }
 });
 
@@ -79,6 +493,9 @@ class THDAFrameManager {
             case 'clear':
                 this.clearObjects();
                 break;
+            case 'delete':
+                this.deleteObject(message.object_name);
+                break;
             case 'camera':
                 this.updateCamera(message.camera);
                 break;
@@ -93,6 +510,10 @@ class THDAFrameManager {
                 if (message.data) {
                     this.initializeWorld(message.data);
                 }
+                break;
+            case 'grid_control':
+                console.log('[THD-AFrame] Grid control:', message.data);
+                this.updateHolodeckGrid(message.data);
                 break;
             default:
                 console.warn('[THD-AFrame] Unknown message type:', message.type);
@@ -182,6 +603,9 @@ class THDAFrameManager {
             case 'text':
                 this.createText(entity, obj);
                 return; // Text uses special component
+            case 'environment':
+                this.createEnvironment(entity, obj);
+                return; // Environment uses special component
             case 'particle':
                 this.createParticles(entity, obj);
                 return; // Particles use special component
@@ -229,12 +653,16 @@ class THDAFrameManager {
         
         // Add physics if enabled
         if (obj.physics && obj.physics.enabled) {
-            const physicsProps = {
-                shape: 'auto',
-                mass: obj.physics.mass || 1.0,
-                type: obj.physics.type || 'dynamic'
-            };
-            entity.setAttribute('dynamic-body', physicsProps);
+            if (obj.physics.type === 'static') {
+                entity.setAttribute('static-body', {
+                    shape: 'auto'
+                });
+            } else {
+                entity.setAttribute('dynamic-body', {
+                    shape: 'auto',
+                    mass: obj.physics.mass || 1.0
+                });
+            }
         }
     }
 
@@ -287,6 +715,28 @@ class THDAFrameManager {
         console.log('[THD-AFrame] Created 3D text:', obj.text);
     }
 
+    createEnvironment(entity, obj) {
+        // Create procedural environments using A-Frame environment component
+        const envType = obj.envType || 'forest';
+        const envProps = {
+            preset: envType,
+            groundColor: obj.groundColor || '#553e35',
+            grid: '1x1',
+            gridColor: obj.gridColor || '#ccc',
+            groundTexture: 'none',
+            skyType: 'atmosphere',
+            lighting: 'distant'
+        };
+        
+        // Override with custom environment settings if provided
+        if (obj.environmentSettings) {
+            Object.assign(envProps, obj.environmentSettings);
+        }
+        
+        entity.setAttribute('environment', envProps);
+        console.log('[THD-AFrame] Created environment:', envType, envProps);
+    }
+
     createParticles(entity, obj) {
         // Create particle effects (fire, smoke, sparkles, etc.)
         const particleType = obj.particleType || 'sparkle';
@@ -323,6 +773,20 @@ class THDAFrameManager {
         }
         
         console.log('[THD-AFrame] Created particle system:', particleType);
+    }
+
+    deleteObject(objectName) {
+        // Delete specific object by name
+        const entity = this.objects.get(objectName);
+        if (entity) {
+            if (entity.parentNode) {
+                entity.parentNode.removeChild(entity);
+            }
+            this.objects.delete(objectName);
+            console.log('[THD-AFrame] Deleted object:', objectName);
+        } else {
+            console.warn('[THD-AFrame] Object not found for deletion:', objectName);
+        }
     }
 
     clearObjects() {
@@ -363,6 +827,15 @@ class THDAFrameManager {
         return this.objects.size;
     }
 
+    updateHolodeckGrid(gridData) {
+        const sceneEl = document.getElementById('holodeck-scene');
+        const holodeckComponent = sceneEl.components['thd-holodeck'];
+        
+        if (holodeckComponent && gridData.transparency !== undefined) {
+            holodeckComponent.updateGrid(gridData.transparency);
+        }
+    }
+
     // Utility methods
     colorToHex(color) {
         const r = Math.round(color.r * 255).toString(16).padStart(2, '0');
@@ -373,3 +846,30 @@ class THDAFrameManager {
 }
 
 console.log('[THD-AFrame] THD A-Frame manager loaded');
+console.log('[THD-AFrame] THDAFrameManager class defined:', typeof THDAFrameManager);
+console.log('[THD-AFrame] Registered components:', Object.keys(AFRAME.components));
+console.log('[THD-AFrame] holodeck-boundaries registered:', !!AFRAME.components['holodeck-boundaries']);
+
+// Check if camera element exists and has the component, if not add it manually
+setTimeout(() => {
+    const camera = document.getElementById('holodeck-camera');
+    console.log('[THD-AFrame] Camera element found:', !!camera);
+    if (camera) {
+        console.log('[THD-AFrame] Camera components:', Object.keys(camera.components || {}));
+        console.log('[THD-AFrame] Has holodeck-boundaries component:', !!camera.components['holodeck-boundaries']);
+        
+        // If component not attached, force attach it
+        if (!camera.components['holodeck-boundaries']) {
+            console.log('[THD-AFrame] Manually attaching holodeck-boundaries component...');
+            camera.setAttribute('holodeck-boundaries', '');
+            
+            // Check again after 1 second
+            setTimeout(() => {
+                console.log('[THD-AFrame] After manual attach - Has holodeck-boundaries:', !!camera.components['holodeck-boundaries']);
+            }, 1000);
+        }
+    }
+}, 2000);
+
+// Global export to ensure it's available
+window.THDAFrameManager = THDAFrameManager;

@@ -97,13 +97,29 @@ func (c *Client) handleClientMessage(message []byte) {
 		clientVersion, _ := msg["js_version"].(string)
 		serverVersion := GetJSVersion()
 		
-		// Log version info but do not trigger reloads for holodeck scenarios
+		// Log version info and trigger reloads when versions don't match
 		if c.hub.logger != nil {
 			c.hub.logger.Log("info", "SERVER", "Version check", map[string]interface{}{
 				"client": clientVersion,
 				"server": serverVersion,
 				"match": clientVersion == serverVersion,
 			})
+		}
+		
+		// Send version mismatch response to trigger browser refresh
+		if clientVersion != serverVersion {
+			versionMismatchMsg := map[string]interface{}{
+				"type": "version_mismatch",
+				"server_version": serverVersion,
+				"client_version": clientVersion,
+			}
+			if jsonData, err := json.Marshal(versionMismatchMsg); err == nil {
+				select {
+				case c.send <- jsonData:
+				default:
+					// Client channel blocked, don't wait
+				}
+			}
 		}
 		
 	case "client_log":

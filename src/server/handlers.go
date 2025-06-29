@@ -18,47 +18,23 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 <html>
 <head>
     <title>THD Holodeck - A-Frame VR</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="/static/js/vendor/aframe.min.js"></script>
+    <script src="/static/js/vendor/aframe-animation-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-environment-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-particle-system.js"></script>
+    <script src="/static/js/vendor/aframe-teleport-controls.min.js"></script>
+    <script src="/static/js/vendor/aframe-event-set-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-look-at-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-text-geometry-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-state-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-orbit-controls.min.js"></script>
+    <script src="/static/js/vendor/aframe-controller-cursor-component.min.js"></script>
+    <!-- <script src="/static/js/vendor/aframe-forcegraph-component.min.js"></script> -->
+    <script src="/static/js/thd-aframe.js?v=20250629-1414"></script>
     <style>
         body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: monospace; }
         a-scene { display: block; }
         
-        #status-led {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #666;
-            box-shadow: 0 0 8px rgba(102, 102, 102, 0.5);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            z-index: 100;
-        }
-        
-        #status-led.connecting {
-            background: #ff9500;
-            box-shadow: 0 0 16px rgba(255, 149, 0, 0.8);
-            animation: pulse 1.5s infinite;
-        }
-        
-        #status-led.connected {
-            background: #00ff00;
-            box-shadow: 0 0 16px rgba(0, 255, 0, 0.8);
-        }
-        
-        #status-led.receiving {
-            background: #00ffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 1);
-            animation: flicker 0.2s;
-        }
-        
-        #status-led.error {
-            background: #ff0000;
-            box-shadow: 0 0 16px rgba(255, 0, 0, 0.8);
-            animation: pulse 0.8s infinite;
-        }
         
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
@@ -70,26 +46,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             50% { opacity: 0.3; }
         }
         
-        #status-tooltip {
-            position: absolute;
-            bottom: 45px;
-            right: 0;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        #status-led:hover #status-tooltip {
-            opacity: 1;
-            visibility: visible;
-        }
         
         #text-overlay {
             position: absolute;
@@ -115,30 +71,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             transition: transform 0.1s linear;
         }
         
-        #session-info {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            font-family: 'Courier New', monospace;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 8px 12px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
-        }
-        
-        #session-id {
-            font-weight: bold;
-        }
         
         #debug-panel {
             position: absolute;
             top: 20px;
             right: 20px;
             width: 300px;
-            height: 200px;
+            min-height: 60px;
+            max-height: 400px;
             background: rgba(0, 0, 0, 0.7);
             border: 1px solid rgba(0, 255, 255, 0.3);
             border-radius: 6px;
@@ -147,6 +87,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             color: #00ffff;
             z-index: 100;
             overflow: hidden;
+            transition: min-height 0.3s ease;
+        }
+        
+        #debug-panel.collapsed {
+            min-height: 40px;
         }
         
         #debug-header {
@@ -155,13 +100,67 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
             font-weight: bold;
             text-align: center;
+            cursor: pointer;
+        }
+        
+        #debug-session-bar {
+            background: rgba(0, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+        }
+        
+        #debug-session-id {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+        
+        #debug-status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #666;
+            box-shadow: 0 0 6px rgba(102, 102, 102, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        #debug-status-led.connecting {
+            background: #ff9500;
+            box-shadow: 0 0 12px rgba(255, 149, 0, 0.8);
+            animation: pulse 1.5s infinite;
+        }
+        
+        #debug-status-led.connected {
+            background: #00ff00;
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.8);
+        }
+        
+        #debug-status-led.receiving {
+            background: #00ffff;
+            box-shadow: 0 0 16px rgba(0, 255, 255, 1);
+            animation: flicker 0.2s;
+        }
+        
+        #debug-status-led.error {
+            background: #ff0000;
+            box-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+            animation: pulse 0.8s infinite;
         }
         
         #debug-log {
-            height: 170px;
+            height: 200px;
             overflow-y: auto;
             padding: 4px 8px;
             line-height: 1.2;
+            transition: height 0.3s ease;
+        }
+        
+        #debug-log.collapsed {
+            height: 0;
+            padding: 0;
         }
         
         .debug-entry {
@@ -179,6 +178,30 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         .debug-data {
             color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Custom VR button styling */
+        .a-enter-vr-button {
+            position: fixed !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            width: 40px !important;
+            height: 40px !important;
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 8px !important;
+            opacity: 0.6 !important;
+            transition: opacity 0.3s ease !important;
+        }
+        
+        .a-enter-vr-button:hover {
+            opacity: 1 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .a-enter-vr-button .a-enter-vr-button-icon {
+            width: 24px !important;
+            height: 24px !important;
         }
     </style>
 </head>
@@ -199,8 +222,10 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         <!-- Default holodeck setup -->
         <a-entity id="holodeck-camera" 
                   camera 
-                  look-controls="reverseMouseDrag: true" 
-                  wasd-controls="acceleration: 20; fly: false"
+                  look-controls="enabled: true; pointerLockEnabled: true" 
+                  wasd-controls="acceleration: 20; fly: false; enabled: true"
+                  thd-keyboard-controls=""
+                  holodeck-boundaries=""
                   position="0 1.7 5">
         </a-entity>
         
@@ -216,24 +241,22 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
     </a-scene>
     
     <div id="text-overlay"></div>
-    <div id="status-led" class="connecting">
-        <div id="status-tooltip">connecting</div>
-    </div>
-    <div id="session-info">
-        <div id="session-id">No Session</div>
-    </div>
     
     <div id="debug-panel">
-        <div id="debug-header">THD Debug Console</div>
+        <div id="debug-header">THD Console</div>
+        <div id="debug-session-bar">
+            <div id="debug-session-id">No Session</div>
+            <div id="debug-status-led" class="connecting"></div>
+        </div>
         <div id="debug-log"></div>
     </div>
     
-    <script src="/static/js/thd-aframe.js"></script>
     <script>
         const scene = document.getElementById('holodeck-scene');
-        const statusLed = document.getElementById('status-led');
-        const tooltip = document.getElementById('status-tooltip');
         const debugLog = document.getElementById('debug-log');
+        const debugStatusLed = document.getElementById('debug-status-led');
+        const debugSessionId = document.getElementById('debug-session-id');
+        const debugHeader = document.getElementById('debug-header');
         
         let thdManager;
         let ws;
@@ -245,8 +268,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Status management
         function setStatus(status, message) {
-            statusLed.className = status;
-            tooltip.textContent = message;
+            // Update debug panel status LED
+            debugStatusLed.className = status;
+        }
+        
+        // Update debug session ID when session changes
+        function updateDebugSession(sessionId) {
+            debugSessionId.textContent = sessionId || 'No Session';
         }
         
         // Debug logging function
@@ -293,7 +321,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     const checkResponse = await fetch('/api/sessions/' + currentSessionId);
                     if (checkResponse.ok) {
                         const sessionData = await checkResponse.json();
-                        document.getElementById('session-id').textContent = currentSessionId;
+                        updateDebugSession(currentSessionId);
                         
                         // Initialize world grid if it exists (defer if manager not ready)
                         if (sessionData.world) {
@@ -325,7 +353,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 if (sessionData.success) {
                     currentSessionId = sessionData.session_id;
                     localStorage.setItem('thd_session_id', currentSessionId);
-                    document.getElementById('session-id').textContent = currentSessionId;
+                    updateDebugSession(currentSessionId);
                     
                     // Initialize world grid in THD manager (defer if not ready)
                     if (sessionData.world) {
@@ -344,11 +372,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     associateSession(currentSessionId);
                 } else {
                     console.error('Failed to create session:', sessionData);
-                    document.getElementById('session-id').textContent = 'Session Failed';
+                    updateDebugSession('Session Failed');
                 }
             } catch (error) {
                 console.error('Error managing session:', error);
-                document.getElementById('session-id').textContent = 'Connection Error';
+                updateDebugSession('Connection Error');
             }
         }
         
@@ -426,6 +454,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         addDebug('CANVAS_CTRL', {cmd: controlData.command, objs: controlData.objects?.length || 0});
                         if (controlData.clear) {
                             thdManager.processMessage({type: 'clear'});
+                        }
+                        if (controlData.command === 'delete' && controlData.object_name) {
+                            thdManager.processMessage({
+                                type: 'delete', 
+                                object_name: controlData.object_name
+                            });
+                            addDebug('DELETE', {obj: controlData.object_name});
                         }
                         if (controlData.objects) {
                             // Convert server objects to renderer format
@@ -703,6 +738,46 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Start mouse controls after a delay
         setTimeout(setupMouseControls, 1000);
+        
+        // Debug panel collapsible functionality
+        let debugCollapsed = false;
+        debugHeader.addEventListener('click', function() {
+            debugCollapsed = !debugCollapsed;
+            const debugPanel = document.getElementById('debug-panel');
+            if (debugCollapsed) {
+                debugLog.classList.add('collapsed');
+                debugPanel.classList.add('collapsed');
+                debugHeader.textContent = 'THD Console >';
+            } else {
+                debugLog.classList.remove('collapsed');
+                debugPanel.classList.remove('collapsed');
+                debugHeader.textContent = 'THD Console v';
+            }
+        });
+        
+        // Initialize debug header with expand indicator
+        debugHeader.textContent = 'THD Console v';
+        
+        // Pointer lock status indicator
+        function updatePointerLockStatus() {
+            const statusLed = document.getElementById('debug-status-led');
+            if (document.pointerLockElement) {
+                statusLed.className = 'connected';
+                addDebug('POINTER_LOCK', 'Mouse captured - ESC to release');
+            } else {
+                statusLed.className = 'connecting';
+                addDebug('POINTER_FREE', 'Click to capture mouse for freelook');
+            }
+        }
+        
+        // Listen for pointer lock changes
+        document.addEventListener('pointerlockchange', updatePointerLockStatus);
+        document.addEventListener('pointerlockerror', function() {
+            addDebug('POINTER_ERROR', 'Pointer lock failed');
+        });
+        
+        // Initial status
+        updatePointerLockStatus();
         
         // Start connection
         connectWebSocket();

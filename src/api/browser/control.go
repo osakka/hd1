@@ -33,7 +33,7 @@ func ForceRefreshHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		}
 	}
 
-	// Broadcast force refresh message to all connected clients
+	// Broadcast force refresh message
 	refreshMessage := map[string]interface{}{
 		"type": "force_refresh",
 		"session_id": req.SessionID,
@@ -42,7 +42,13 @@ func ForceRefreshHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	}
 
 	if jsonData, err := json.Marshal(refreshMessage); err == nil {
-		h.BroadcastMessage(jsonData)
+		if req.SessionID != "" {
+			// Session-specific refresh - only refresh browsers in this session
+			h.BroadcastToSession(req.SessionID, "force_refresh", refreshMessage)
+		} else {
+			// Global refresh - refresh all connected browsers
+			h.BroadcastMessage(jsonData)
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -103,7 +109,13 @@ func SetCanvasHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 
 	// Broadcast canvas control message
 	if jsonData, err := json.Marshal(canvasMessage); err == nil {
-		h.BroadcastMessage(jsonData)
+		if req.SessionID != "" {
+			// Session-specific canvas control
+			h.BroadcastToSession(req.SessionID, "canvas_control", canvasMessage)
+		} else {
+			// Global canvas control - all sessions
+			h.BroadcastMessage(jsonData)
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

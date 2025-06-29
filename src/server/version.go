@@ -19,17 +19,22 @@ func init() {
 }
 
 func updateJSVersion() {
-	// Create version hash based on JS file contents and timestamp
+	// Create version hash based on JS file contents, A-Frame manager, and handlers.go bootstrapping code
 	rendererPath := "../share/htdocs/static/js/renderer.js"
 	matrixPath := "../share/htdocs/static/js/gl-matrix.js"
+	aframePath := "../share/htdocs/static/js/thd-aframe.js"
+	handlersPath := "server/handlers.go"
 
 	rendererHash := getFileHash(rendererPath)
 	matrixHash := getFileHash(matrixPath)
+	aframeHash := getFileHash(aframePath)
+	handlersHash := getFileHash(handlersPath)
 
-	jsVersion = fmt.Sprintf("%s-%s-%d", 
+	jsVersion = fmt.Sprintf("%s-%s-%s-%s", 
 		rendererHash[:8], 
-		matrixHash[:8], 
-		time.Now().Unix())
+		matrixHash[:8],
+		aframeHash[:8],
+		handlersHash[:8])
 	jsVersionTime = time.Now()
 }
 
@@ -49,10 +54,8 @@ func getFileHash(filepath string) string {
 }
 
 func GetJSVersion() string {
-	// Update version if files changed recently
-	if time.Since(jsVersionTime) > time.Minute {
-		updateJSVersion()
-	}
+	// Only update version when explicitly requested or if files actually changed
+	// Remove automatic time-based updates to prevent unnecessary refreshes
 	return jsVersion
 }
 
