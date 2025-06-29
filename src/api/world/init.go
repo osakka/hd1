@@ -9,11 +9,12 @@ import (
 
 // InitializeWorldRequest represents the request body for world initialization
 type InitializeWorldRequest struct {
-	Size         int     `json:"size"`
-	Transparency float64 `json:"transparency"`
-	CameraX      float64 `json:"camera_x"`
-	CameraY      float64 `json:"camera_y"`
-	CameraZ      float64 `json:"camera_z"`
+	Size                int     `json:"size"`
+	GridTransparency    float64 `json:"grid_transparency"`     // Internal grid lines
+	SurfaceTransparency float64 `json:"surface_transparency"`  // Boundary surfaces
+	CameraX             float64 `json:"camera_x"`
+	CameraY             float64 `json:"camera_y"`
+	CameraZ             float64 `json:"camera_z"`
 }
 
 // InitializeWorldHandler - POST /sessions/{sessionId}/world
@@ -43,11 +44,12 @@ func InitializeWorldHandler(w http.ResponseWriter, r *http.Request, hub interfac
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		// Use defaults if no body provided
 		req = InitializeWorldRequest{
-			Size:         25,
-			Transparency: 0.1,
-			CameraX:      10,
-			CameraY:      10,
-			CameraZ:      10,
+			Size:                25,
+			GridTransparency:    0.01,  // 99% transparent grid
+			SurfaceTransparency: 0.3,   // 70% transparent surfaces
+			CameraX:             10,
+			CameraY:             10,
+			CameraZ:             10,
 		}
 	}
 	
@@ -57,7 +59,7 @@ func InitializeWorldHandler(w http.ResponseWriter, r *http.Request, hub interfac
 	}
 	
 	// Initialize world using SessionStore
-	world, err := h.GetStore().InitializeWorld(sessionID, req.Size, req.Transparency, req.CameraX, req.CameraY, req.CameraZ)
+	world, err := h.GetStore().InitializeWorld(sessionID, req.Size, req.GridTransparency, req.CameraX, req.CameraY, req.CameraZ)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -65,8 +67,10 @@ func InitializeWorldHandler(w http.ResponseWriter, r *http.Request, hub interfac
 	
 	// Broadcast world initialization for real-time updates
 	h.BroadcastUpdate("world_initialized", map[string]interface{}{
-		"session_id": sessionID,
-		"world":      world,
+		"session_id":           sessionID,
+		"world":               world,
+		"grid_transparency":    req.GridTransparency,
+		"surface_transparency": req.SurfaceTransparency,
 	})
 	
 	w.Header().Set("Content-Type", "application/json")

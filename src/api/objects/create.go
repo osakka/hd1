@@ -58,10 +58,41 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 	
-	// Broadcast object creation for real-time updates
-	h.BroadcastUpdate("object_created", map[string]interface{}{
-		"session_id": sessionID,
-		"object":     object,
+	// Broadcast object creation for real-time updates via canvas control
+	h.BroadcastUpdate("canvas_control", map[string]interface{}{
+		"command": "create",
+		"objects": []map[string]interface{}{
+			{
+				"id":   object.Name,
+				"name": object.Name,
+				"type": object.Type,
+				"transform": map[string]interface{}{
+					"position": map[string]interface{}{
+						"x": object.X,
+						"y": object.Y,
+						"z": object.Z,
+					},
+					"scale": map[string]interface{}{
+						"x": object.Scale,
+						"y": object.Scale,
+						"z": object.Scale,
+					},
+					"rotation": map[string]interface{}{
+						"x": 0,
+						"y": 0,
+						"z": 0,
+					},
+				},
+				"color": map[string]interface{}{
+					"r": 0.2,
+					"g": 0.8,
+					"b": 0.2,
+					"a": 1.0,
+				},
+				"visible":   true,
+				"wireframe": false,
+			},
+		},
 	})
 	
 	w.Header().Set("Content-Type", "application/json")

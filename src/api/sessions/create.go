@@ -18,8 +18,8 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	// Create session using SessionStore
 	session := h.GetStore().CreateSession()
 	
-	// Automatically initialize world with default THD settings (25x25x25 grid, [-12,+12] bounds)
-	world, err := h.GetStore().InitializeWorld(session.ID, 25, 0.1, 10, 10, 10)
+	// Automatically initialize world with holodeck coordinate system (floor=Y:0, human eye level=Y:1.7)
+	world, err := h.GetStore().InitializeWorld(session.ID, 25, 0.01, 0, 1.7, 0)
 	if err != nil {
 		http.Error(w, "Failed to initialize world: "+err.Error(), http.StatusInternalServerError)
 		return

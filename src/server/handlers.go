@@ -131,6 +131,54 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         #session-id {
             font-weight: bold;
         }
+        
+        #debug-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #00ffff;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        #debug-header {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        #debug-log {
+            height: 170px;
+            overflow-y: auto;
+            padding: 4px 8px;
+            line-height: 1.2;
+        }
+        
+        .debug-entry {
+            margin-bottom: 2px;
+            word-wrap: break-word;
+        }
+        
+        .debug-time {
+            color: rgba(0, 255, 255, 0.6);
+        }
+        
+        .debug-command {
+            color: #00ff00;
+        }
+        
+        .debug-data {
+            color: rgba(255, 255, 255, 0.8);
+        }
     </style>
 </head>
 <body>
@@ -143,12 +191,18 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         <div id="session-id">No Session</div>
     </div>
     
+    <div id="debug-panel">
+        <div id="debug-header">THD Debug Console</div>
+        <div id="debug-log"></div>
+    </div>
+    
     <script src="/static/js/gl-matrix.js"></script>
     <script src="/static/js/renderer.js"></script>
     <script>
         const canvas = document.getElementById('canvas');
         const statusLed = document.getElementById('status-led');
         const tooltip = document.getElementById('status-tooltip');
+        const debugLog = document.getElementById('debug-log');
         
         let renderer;
         let ws;
@@ -164,8 +218,42 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             tooltip.textContent = message;
         }
         
+        // Debug logging function
+        function addDebug(command, data = null) {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'debug-entry';
+            
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'debug-time';
+            timeSpan.textContent = time + ' ';
+            
+            const commandSpan = document.createElement('span');
+            commandSpan.className = 'debug-command';
+            commandSpan.textContent = command;
+            
+            entry.appendChild(timeSpan);
+            entry.appendChild(commandSpan);
+            
+            if (data) {
+                const dataSpan = document.createElement('span');
+                dataSpan.className = 'debug-data';
+                dataSpan.textContent = ' ' + JSON.stringify(data, null, 0);
+                entry.appendChild(dataSpan);
+            }
+            
+            debugLog.appendChild(entry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            // Keep only last 50 entries
+            while (debugLog.children.length > 50) {
+                debugLog.removeChild(debugLog.firstChild);
+            }
+        }
+        
         // Persistent THD session management
         let currentSessionId = localStorage.getItem('thd_session_id');
+        
         async function ensureSession() {
             try {
                 // Check if we have a persistent session
@@ -179,38 +267,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         // Initialize world grid if it exists
                         if (renderer && renderer.initializeWorld && sessionData.world) {
                             renderer.initializeWorld(sessionData.world);
-                        }
-                        
-                        // Load existing objects in the session
-                        try {
-                            const objectsResponse = await fetch('/api/sessions/' + currentSessionId + '/objects');
-                            if (objectsResponse.ok) {
-                                const objectsData = await objectsResponse.json();
-                                if (objectsData.objects && objectsData.objects.length > 0) {
-                                    // Convert server objects to renderer format
-                                    const rendererObjects = objectsData.objects.map(obj => ({
-                                        id: obj.name,
-                                        name: obj.name,
-                                        type: obj.type,
-                                        transform: {
-                                            position: { x: obj.x || 0, y: obj.y || 0, z: obj.z || 0 },
-                                            scale: { x: obj.scale || 1, y: obj.scale || 1, z: obj.scale || 1 },
-                                            rotation: { x: 0, y: 0, z: 0 }
-                                        },
-                                        color: { r: 1, g: 1, b: 1, a: 1 },
-                                        visible: true
-                                    }));
-                                    
-                                    // Send converted objects to renderer
-                                    renderer.processMessage({
-                                        type: 'create',
-                                        objects: rendererObjects
-                                    });
-                                    console.log('Loaded', rendererObjects.length, 'existing objects');
-                                }
-                            }
-                        } catch (e) {
-                            console.log('No existing objects to load');
                         }
                         
                         console.log('THD Session restored:', currentSessionId);
@@ -235,37 +291,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     // Initialize world grid in renderer
                     if (renderer && renderer.initializeWorld) {
                         renderer.initializeWorld(sessionData.world);
-                    }
-                    
-                    // Load any existing objects (in case session already had objects)
-                    try {
-                        const objectsResponse = await fetch('/api/sessions/' + currentSessionId + '/objects');
-                        if (objectsResponse.ok) {
-                            const objectsData = await objectsResponse.json();
-                            if (objectsData.objects && objectsData.objects.length > 0) {
-                                // Convert server objects to renderer format
-                                const rendererObjects = objectsData.objects.map(obj => ({
-                                    id: obj.name,
-                                    name: obj.name,
-                                    type: obj.type,
-                                    transform: {
-                                        position: { x: obj.x || 0, y: obj.y || 0, z: obj.z || 0 },
-                                        scale: { x: obj.scale || 1, y: obj.scale || 1, z: obj.scale || 1 },
-                                        rotation: { x: 0, y: 0, z: 0 }
-                                    },
-                                    color: { r: 1, g: 1, b: 1, a: 1 },
-                                    visible: true
-                                }));
-                                
-                                renderer.processMessage({
-                                    type: 'create',
-                                    objects: rendererObjects
-                                });
-                                console.log('Loaded', rendererObjects.length, 'existing objects');
-                            }
-                        }
-                    } catch (e) {
-                        console.log('No existing objects to load');
                     }
                     
                     console.log('THD Session created:', currentSessionId);
@@ -296,21 +321,24 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 setStatus('connected', 'connected');
                 
                 // Send version check
-                ws.send(JSON.stringify({
+                const versionMsg = {
                     type: 'version_check',
                     js_version: jsVersion
-                }));
+                };
+                addDebug('WS_SEND', versionMsg);
+                ws.send(JSON.stringify(versionMsg));
                 
                 // Send client capabilities
                 setTimeout(sendClientInfo, 500);
                 
-                // Ensure session exists and initialize world with grid (delay to avoid race conditions)
+                // Initialize session connection without object restoration
                 setTimeout(ensureSession, 2000);
             };
             
             ws.onmessage = function(event) {
                 try {
                     const message = JSON.parse(event.data);
+                    addDebug('WS_RECV', message);
                     
                     // Handle system messages
                     if (message.type === 'version_mismatch') {
@@ -346,13 +374,15 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     
                     // Handle direct canvas control
                     if (message.type === 'canvas_control') {
-                        console.log('[THD] Canvas control command:', message.command, message.objects);
-                        if (message.clear) {
+                        const controlData = message.data || message;
+                        console.log('[THD] Canvas control command:', controlData.command, controlData.objects);
+                        addDebug('CANVAS_CTRL', {cmd: controlData.command, objs: controlData.objects?.length || 0});
+                        if (controlData.clear) {
                             renderer.processMessage({type: 'clear'});
                         }
-                        if (message.objects) {
+                        if (controlData.objects) {
                             // Convert server objects to renderer format
-                            const rendererObjects = message.objects.map(obj => {
+                            const rendererObjects = controlData.objects.map(obj => {
                                 const converted = {
                                     id: obj.id || obj.name,
                                     name: obj.name || obj.id,
@@ -362,18 +392,36 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                                         scale: { x: obj.scale || 1, y: obj.scale || 1, z: obj.scale || 1 },
                                         rotation: { x: 0, y: 0, z: 0 }
                                     },
-                                    color: obj.color || { r: 1, g: 1, b: 1, a: 1 },
+                                    color: obj.color || { r: 0.2, g: 0.8, b: 0.2, a: 1.0 },
                                     wireframe: obj.wireframe || false,
                                     visible: obj.visible !== undefined ? obj.visible : true
                                 };
                                 console.log('[THD] Converted object:', converted);
                                 return converted;
                             });
-                            renderer.processMessage({
-                                type: message.command,
-                                objects: rendererObjects
-                            });
-                            console.log('[THD] Sent to renderer:', message.command, rendererObjects);
+                            if (!renderer) {
+                                console.error('[THD] RENDERER NOT FOUND - This is the root cause!');
+                                addDebug('ERROR', 'Renderer not initialized');
+                                return;
+                            }
+                            if (!renderer.processMessage) {
+                                console.error('[THD] RENDERER.processMessage NOT FOUND - Missing method!');
+                                addDebug('ERROR', 'Renderer.processMessage missing');
+                                return;
+                            }
+                            console.log('[THD] Calling renderer.processMessage with:', controlData.command, rendererObjects);
+                            addDebug('RENDER_CALL', {cmd: controlData.command, count: rendererObjects.length});
+                            try {
+                                renderer.processMessage({
+                                    type: controlData.command,
+                                    objects: rendererObjects
+                                });
+                                console.log('[THD] Renderer.processMessage SUCCESS');
+                                addDebug('RENDER_OK', 'Objects sent to renderer');
+                            } catch(e) {
+                                console.error('[THD] Renderer.processMessage FAILED:', e);
+                                addDebug('RENDER_FAIL', {error: e.message});
+                            }
                         }
                         if (message.camera) {
                             renderer.processMessage({
@@ -421,7 +469,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         // Send logs to server
         function sendLog(level, message, data = null) {
             if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
+                const logMsg = {
                     type: 'client_log',
                     level: level,
                     message: message,
@@ -429,7 +477,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     timestamp: new Date().toISOString(),
                     url: window.location.href,
                     userAgent: navigator.userAgent
-                }));
+                };
+                addDebug('LOG_' + level.toUpperCase(), {msg: message});
+                ws.send(JSON.stringify(logMsg));
             }
         }
         
@@ -479,6 +529,80 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         window.addEventListener('resize', resize);
         resize();
         
+        // Simple WASD Controls - Just move the camera
+        const keys = {};
+        
+        document.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+        
+        // Track camera direction independently
+        let cameraDirection = { yaw: 0, pitch: 0 }; // Looking direction in angles
+        
+        function updateCamera() {
+            if (!renderer || !renderer.camera) return;
+            
+            let moved = false;
+            const speed = 0.5;
+            const pos = renderer.camera.position;
+            
+            // Calculate forward/right directions from yaw angle (ignore pitch for horizontal movement)
+            const forward = [
+                Math.sin(cameraDirection.yaw),
+                0, // Keep horizontal for WASD movement
+                Math.cos(cameraDirection.yaw)
+            ];
+            
+            const right = [
+                Math.cos(cameraDirection.yaw),
+                0,
+                -Math.sin(cameraDirection.yaw)
+            ];
+            
+            // First-person movement - straight line movement
+            if (keys['w']) { // Move forward
+                pos[0] += forward[0] * speed;
+                pos[2] += forward[2] * speed;
+                moved = true;
+            }
+            if (keys['s']) { // Move backward
+                pos[0] -= forward[0] * speed;
+                pos[2] -= forward[2] * speed;
+                moved = true;
+            }
+            if (keys['a']) { // Strafe left
+                pos[0] -= right[0] * speed;
+                pos[2] -= right[2] * speed;
+                moved = true;
+            }
+            if (keys['d']) { // Strafe right
+                pos[0] += right[0] * speed;
+                pos[2] += right[2] * speed;
+                moved = true;
+            }
+            if (keys['q']) { pos[1] += speed; moved = true; } // Up
+            if (keys['e']) { pos[1] -= speed; moved = true; } // Down
+            
+            // Update target to be in front of camera based on direction
+            if (moved || !renderer.camera.target) {
+                renderer.camera.target = [
+                    pos[0] + forward[0],
+                    pos[1] + Math.sin(cameraDirection.pitch),
+                    pos[2] + forward[2]
+                ];
+            }
+            
+            if (moved) {
+                console.log('Camera at:', pos[0].toFixed(1), pos[1].toFixed(1), pos[2].toFixed(1));
+            }
+        }
+        
+        setInterval(updateCamera, 33);
+        
         // Send client info to server
         function sendClientInfo() {
             if (ws && ws.readyState === WebSocket.OPEN) {
@@ -507,6 +631,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         } : null
                     }
                 };
+                addDebug('WS_SEND', {type: 'client_info', summary: 'capabilities'});
                 ws.send(JSON.stringify(clientInfo));
             }
         }
@@ -534,6 +659,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     },
                     timestamp: Date.now()
                 };
+                addDebug('CLICK', {x: interaction.position.x, y: interaction.position.y});
                 ws.send(JSON.stringify(interaction));
             }
         });
@@ -561,12 +687,19 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 renderer.camera.target = [0, 0, 0];
             }
             
-            // Mouse down
+            // Mouse down - initialize first-person look
             canvas.onmousedown = function(e) {
                 mouseDown = true;
                 lastMouseX = e.clientX;
                 lastMouseY = e.clientY;
-                setStatus('connected', 'MOUSE ACTIVE - drag to orbit, wheel to zoom');
+                
+                // Initialize camera direction if not set
+                if (!cameraDirection.yaw && !cameraDirection.pitch) {
+                    cameraDirection.yaw = 0;
+                    cameraDirection.pitch = 0;
+                }
+                
+                setStatus('connected', 'MOUSE ACTIVE - drag to look around');
                 return false;
             };
             
@@ -576,37 +709,41 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 setStatus('connected', 'connected - click and drag to control camera');
             };
             
-            // Mouse move
+            // Mouse move - first-person look
             document.onmousemove = function(e) {
                 if (mouseDown) {
                     const deltaX = e.clientX - lastMouseX;
                     const deltaY = e.clientY - lastMouseY;
                     
-                    cameraAngleY += deltaX * 0.005;
-                    cameraAngleX -= deltaY * 0.005;
+                    // Update camera direction
+                    cameraDirection.yaw += deltaX * 0.005;
+                    cameraDirection.pitch -= deltaY * 0.005;
                     
-                    // Clamp vertical angle
-                    cameraAngleX = Math.max(-1.4, Math.min(1.4, cameraAngleX));
+                    // Clamp pitch to prevent over-rotation
+                    cameraDirection.pitch = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, cameraDirection.pitch));
                     
-                    updateCameraFromAngles();
+                    // Update camera target based on new direction
+                    const pos = renderer.camera.position;
+                    renderer.camera.target = [
+                        pos[0] + Math.sin(cameraDirection.yaw),
+                        pos[1] + Math.sin(cameraDirection.pitch),
+                        pos[2] + Math.cos(cameraDirection.yaw)
+                    ];
                     
                     lastMouseX = e.clientX;
                     lastMouseY = e.clientY;
                 }
             };
             
-            // Mouse wheel
+            // Mouse wheel - adjust movement speed
             canvas.onwheel = function(e) {
-                cameraDistance += e.deltaY * 0.005;
-                cameraDistance = Math.max(1, Math.min(15, cameraDistance));
-                updateCameraFromAngles();
+                // Could adjust movement speed or do nothing for first-person
                 e.preventDefault();
                 return false;
             };
             
-            // Set initial camera position
-            updateCameraFromAngles();
-            setStatus('connected', 'Mouse controls ready - click and drag to orbit');
+            // Set initial first-person setup
+            setStatus('connected', 'First-person controls ready - WASD to move, mouse to look');
         }
         
         // Start mouse controls after a delay
