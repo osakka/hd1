@@ -218,6 +218,50 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
+        #debug-lock-led {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #666;
+            box-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
+            transition: all 0.3s ease;
+            cursor: help;
+            position: relative;
+            margin-right: 6px;
+        }
+        
+        #debug-lock-led:hover::after {
+            content: attr(data-status);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            white-space: nowrap;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        #debug-lock-led.unlocked {
+            background: #666;
+            box-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
+        }
+        
+        #debug-lock-led.locked {
+            background: #00ff00;
+            box-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
+        }
+        
+        .debug-indicators {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
         #debug-status-led.connecting {
             background: #ff9500;
             box-shadow: 0 0 6px rgba(255, 149, 0, 0.8);
@@ -341,7 +385,10 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         <div id="debug-header">THD Console</div>
         <div id="debug-session-bar">
             <div id="debug-session-id">No Session</div>
-            <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
+            <div class="debug-indicators">
+                <div id="debug-lock-led" class="unlocked" data-status="Mouse look available"></div>
+                <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
+            </div>
         </div>
         <div id="debug-scene-bar">
             <select id="debug-scene-select">
@@ -364,6 +411,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         const scene = document.getElementById('holodeck-scene');
         const debugLog = document.getElementById('debug-log');
         const debugStatusLed = document.getElementById('debug-status-led');
+        const debugLockLed = document.getElementById('debug-lock-led');
         const debugSessionId = document.getElementById('debug-session-id');
         const debugHeader = document.getElementById('debug-header');
         
@@ -380,6 +428,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             // Update debug panel status LED
             debugStatusLed.className = status;
             debugStatusLed.setAttribute('data-status', message || status);
+        }
+        
+        // Lock status management
+        function setLockStatus(status, message) {
+            // Update debug panel lock LED
+            debugLockLed.className = status;
+            debugLockLed.setAttribute('data-status', message || status);
         }
         
         // Update debug session ID when session changes
@@ -1138,12 +1193,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Pointer lock status indicator
         function updatePointerLockStatus() {
-            const statusLed = document.getElementById('debug-status-led');
             if (document.pointerLockElement) {
-                statusLed.className = 'connected';
+                setLockStatus('locked', 'Freelook engaged • Press ESC to exit');
                 addDebug('FREELOOK_ACTIVE', 'Freelook engaged • Press ESC to exit');
             } else {
-                statusLed.className = 'connecting';
+                setLockStatus('unlocked', 'Click holodeck for freelook navigation');
                 addDebug('FREELOOK_READY', 'Click holodeck for freelook navigation');
             }
         }
