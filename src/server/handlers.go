@@ -269,6 +269,29 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             transform: rotate(180deg);
         }
         
+        #session-id-tag {
+            background: #00ffff;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 6px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        #session-id-tag:hover {
+            background: #ffffff;
+            transform: scale(1.05);
+        }
+        
+        #session-id-tag.copied {
+            background: #00ff00;
+            transform: scale(1.1);
+        }
+        
         #debug-status-led.connecting {
             background: #ff9500;
             box-shadow: 0 0 6px rgba(255, 149, 0, 0.8);
@@ -393,6 +416,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             <div style="display: flex; align-items: center; gap: 6px;">
                 <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
                 <span>THD Console</span>
+                <span id="session-id-tag" style="display: none;" title="Click to copy session ID">---</span>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
                 <span id="debug-lock-icon" class="unlocked" data-status="Mouse look available">&#128274;</span>
@@ -427,6 +451,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         const debugSessionId = document.getElementById('debug-session-id');
         const debugHeader = document.getElementById('debug-header');
         const debugCollapseIcon = document.getElementById('debug-collapse-icon');
+        const sessionIdTag = document.getElementById('session-id-tag');
         
         let thdManager;
         let ws;
@@ -453,6 +478,15 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         // Update debug session ID when session changes
         function updateDebugSession(sessionId) {
             debugSessionId.textContent = sessionId || 'No Session';
+            
+            // Update session ID tag
+            if (sessionId && sessionId !== 'No Session') {
+                const shortId = sessionId.replace('session-', '');
+                sessionIdTag.textContent = shortId;
+                sessionIdTag.style.display = 'inline';
+            } else {
+                sessionIdTag.style.display = 'none';
+            }
         }
         
         // Debug logging function
@@ -1246,8 +1280,36 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             }
         }
         
-        debugHeader.addEventListener('click', function() {
+        debugHeader.addEventListener('click', function(e) {
+            // Don't toggle if clicking on session ID tag
+            if (e.target === sessionIdTag) return;
             setDebugState(!debugCollapsed, true);
+        });
+        
+        // Session ID tag click handler for copying
+        sessionIdTag.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent header click
+            const sessionId = currentSessionId;
+            if (sessionId) {
+                const shortId = sessionId.replace('session-', '');
+                navigator.clipboard.writeText(shortId).then(() => {
+                    // Visual feedback
+                    sessionIdTag.classList.add('copied');
+                    setTimeout(() => {
+                        sessionIdTag.classList.remove('copied');
+                    }, 500);
+                    addDebug('COPY_SESSION', {id: shortId});
+                }).catch(err => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = shortId;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    addDebug('COPY_SESSION_FALLBACK', {id: shortId});
+                });
+            }
         });
         
         // Initialize debug panel state from cookie (don't save back to cookie)
