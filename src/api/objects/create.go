@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 	"holodeck/server"
 )
 
@@ -140,6 +141,13 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		})
 		return
 	}
+	
+	// Mark object as "new" for session object tracking
+	updates := map[string]interface{}{
+		"tracking_status": "new",
+		"created_at": time.Now(),
+	}
+	h.GetStore().UpdateObject(sessionID, object.Name, updates)
 	
 	// Use provided color or default to green
 	objectColor := map[string]interface{}{

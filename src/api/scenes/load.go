@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"os/exec"
+	"strconv"
+	"regexp"
 )
 
 type LoadSceneRequest struct {
@@ -103,25 +106,9 @@ func LoadSceneHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 	var objectsCreated int
 	var message string
 
-	// Load scene based on ID
-	switch sceneID {
-	case "empty":
-		message = "Empty grid scene loaded"
-		objectsCreated = 0
-		
-	case "anime-ui":
-		objectsCreated = loadAnimeUIScene(req.SessionID, h)
-		message = fmt.Sprintf("Anime UI scene loaded with %d objects", objectsCreated)
-		
-	case "ultimate":
-		objectsCreated = loadUltimateScene(req.SessionID, h)
-		message = fmt.Sprintf("Ultimate demo scene loaded with %d objects", objectsCreated)
-		
-	case "basic-shapes":
-		objectsCreated = loadBasicShapesScene(req.SessionID, h)
-		message = fmt.Sprintf("Basic shapes scene loaded with %d objects", objectsCreated)
-		
-	default:
+	// Execute scene script based on ID
+	sceneScript := getSceneScript(sceneID)
+	if sceneScript == "" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(ErrorResponse{
@@ -131,6 +118,9 @@ func LoadSceneHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 		})
 		return
 	}
+
+	// Execute scene script with session ID
+	objectsCreated, message = executeSceneScript(sceneScript, req.SessionID)
 
 	log.Printf("[THD] Scene '%s' loaded into session '%s' with %d objects", sceneID, req.SessionID, objectsCreated)
 
@@ -165,231 +155,65 @@ func clearAllObjects(sessionID string, h *server.Hub) {
 	}
 }
 
-// Scene creation functions
-func loadAnimeUIScene(sessionID string, h *server.Hub) int {
-	objects := []map[string]interface{}{
-		// Central anime ring interface
-		{
-			"name": "central_ring",
-			"type": "cylinder",
-			"x": 0, "y": 2, "z": 0,
-			"scale": 3,
-			"color": map[string]float64{"r": 0.2, "g": 0.8, "b": 1.0, "a": 0.3},
-			"wireframe": true,
-		},
-		// Floating UI cubes
-		{
-			"name": "ui_cube_1",
-			"type": "cube",
-			"x": -4, "y": 3, "z": 2,
-			"scale": 0.8,
-			"color": map[string]float64{"r": 1.0, "g": 0.4, "b": 0.8, "a": 0.8},
-		},
-		{
-			"name": "ui_cube_2",
-			"type": "cube",
-			"x": 4, "y": 3.5, "z": -2,
-			"scale": 0.6,
-			"color": map[string]float64{"r": 0.4, "g": 1.0, "b": 0.8, "a": 0.8},
-		},
-		// Data visualization spheres
-		{
-			"name": "data_sphere_1",
-			"type": "sphere",
-			"x": -2, "y": 4, "z": -4,
-			"scale": 0.5,
-			"color": map[string]float64{"r": 0.8, "g": 0.2, "b": 1.0, "a": 0.9},
-		},
-		{
-			"name": "data_sphere_2",
-			"type": "sphere",
-			"x": 3, "y": 2.5, "z": 4,
-			"scale": 0.7,
-			"color": map[string]float64{"r": 1.0, "g": 0.8, "b": 0.2, "a": 0.9},
-		},
-		// Info panel (replacing text)
-		{
-			"name": "info_panel",
-			"type": "plane",
-			"x": 0, "y": 5, "z": -3,
-			"scale": 2,
-			"color": map[string]float64{"r": 0.2, "g": 1.0, "b": 1.0, "a": 0.3},
-		},
+// getSceneScript returns the script path for a given scene ID
+func getSceneScript(sceneID string) string {
+	scriptMap := map[string]string{
+		"empty":        "/opt/holo-deck/share/glibsh/scenes/empty-grid.sh",
+		"anime-ui":     "/opt/holo-deck/share/glibsh/scenes/anime-ui.sh",
+		"ultimate":     "/opt/holo-deck/share/glibsh/scenes/ultimate-demo.sh",
+		"basic-shapes": "/opt/holo-deck/share/glibsh/scenes/basic-shapes.sh",
 	}
-
-	// Send objects via WebSocket
-	h.BroadcastToSession(sessionID, "canvas_control", map[string]interface{}{
-		"command": "create",
-		"objects": objects,
-	})
-	
-	return len(objects)
+	return scriptMap[sceneID]
 }
 
-func loadUltimateScene(sessionID string, h *server.Hub) int {
-	objects := []map[string]interface{}{
-		// Sky environment
-		{
-			"name": "holodeck_sky",
-			"type": "sky",
-			"x": 0, "y": 0, "z": 0,
-			"color": map[string]float64{"r": 0.1, "g": 0.2, "b": 0.4, "a": 1.0},
-		},
-		// Central metallic platform
-		{
-			"name": "central_platform",
-			"type": "cylinder",
-			"x": 0, "y": 0.2, "z": 0,
-			"scale": 4,
-			"color": map[string]float64{"r": 0.7, "g": 0.7, "b": 0.8, "a": 1.0},
-			"material": map[string]interface{}{
-				"metalness": 0.8,
-				"roughness": 0.2,
-			},
-		},
-		// Crystal formations
-		{
-			"name": "crystal_1",
-			"type": "cone",
-			"x": -3, "y": 2, "z": -3,
-			"scale": 1.5,
-			"color": map[string]float64{"r": 0.8, "g": 0.2, "b": 0.8, "a": 0.7},
-			"material": map[string]interface{}{
-				"transparent": true,
-				"metalness": 0.1,
-				"roughness": 0.1,
-			},
-		},
-		{
-			"name": "crystal_2",
-			"type": "cone",
-			"x": 3, "y": 1.8, "z": 3,
-			"scale": 1.2,
-			"color": map[string]float64{"r": 0.2, "g": 0.8, "b": 0.8, "a": 0.7},
-			"material": map[string]interface{}{
-				"transparent": true,
-				"metalness": 0.1,
-				"roughness": 0.1,
-			},
-		},
-		// Additional metallic structures (replacing particle effects)
-		{
-			"name": "metallic_pillar_1",
-			"type": "cylinder",
-			"x": -5, "y": 2, "z": 0,
-			"scale": 0.5,
-			"color": map[string]float64{"r": 0.8, "g": 0.3, "b": 0.1, "a": 1.0},
-			"material": map[string]interface{}{
-				"metalness": 0.9,
-				"roughness": 0.1,
-			},
-		},
-		{
-			"name": "energy_sphere",
-			"type": "sphere",
-			"x": 5, "y": 2, "z": 0,
-			"scale": 0.8,
-			"color": map[string]float64{"r": 1.0, "g": 1.0, "b": 0.2, "a": 0.8},
-			"material": map[string]interface{}{
-				"transparent": true,
-				"metalness": 0.1,
-				"roughness": 0.1,
-			},
-		},
-		// Professional lighting
-		{
-			"name": "main_light",
-			"type": "light",
-			"x": 5, "y": 8, "z": 5,
-			"lightType": "directional",
-			"intensity": 1.2,
-			"color": map[string]float64{"r": 1.0, "g": 1.0, "b": 0.9, "a": 1.0},
-		},
-		{
-			"name": "accent_light",
-			"type": "light",
-			"x": -3, "y": 6, "z": -3,
-			"lightType": "point",
-			"intensity": 0.8,
-			"color": map[string]float64{"r": 0.2, "g": 0.8, "b": 1.0, "a": 1.0},
-		},
-		// Status display panel
-		{
-			"name": "status_display",
-			"type": "plane",
-			"x": 0, "y": 6, "z": -5,
-			"scale": 3,
-			"color": map[string]float64{"r": 1.0, "g": 1.0, "b": 1.0, "a": 0.2},
-		},
-	}
-
-	// Send objects via WebSocket
-	h.BroadcastToSession(sessionID, "canvas_control", map[string]interface{}{
-		"command": "create",
-		"objects": objects,
-	})
+// executeSceneScript runs the scene script and parses the output
+func executeSceneScript(scriptPath string, sessionID string) (int, string) {
+	log.Printf("[THD] Executing scene script: %s with session %s", scriptPath, sessionID)
 	
-	return len(objects)
+	// Execute the scene script with session ID
+	cmd := exec.Command("/bin/bash", scriptPath, sessionID)
+	output, err := cmd.Output()
+	
+	if err != nil {
+		log.Printf("[THD] Scene script execution failed: %v", err)
+		return 0, fmt.Sprintf("Scene script execution failed: %v", err)
+	}
+	
+	outputStr := string(output)
+	log.Printf("[THD] Scene script output: %s", outputStr)
+	
+	// Parse object count from script output
+	objectCount := parseObjectCount(outputStr)
+	
+	// Extract success message
+	message := parseSceneMessage(outputStr)
+	if message == "" {
+		message = "Scene loaded successfully"
+	}
+	
+	return objectCount, message
 }
 
-func loadBasicShapesScene(sessionID string, h *server.Hub) int {
-	objects := []map[string]interface{}{
-		// Basic cube
-		{
-			"name": "demo_cube",
-			"type": "cube",
-			"x": -3, "y": 1, "z": 0,
-			"scale": 1,
-			"color": map[string]float64{"r": 1.0, "g": 0.2, "b": 0.2, "a": 1.0},
-		},
-		// Basic sphere
-		{
-			"name": "demo_sphere",
-			"type": "sphere",
-			"x": 0, "y": 1, "z": 0,
-			"scale": 1,
-			"color": map[string]float64{"r": 0.2, "g": 1.0, "b": 0.2, "a": 1.0},
-		},
-		// Basic cylinder
-		{
-			"name": "demo_cylinder",
-			"type": "cylinder",
-			"x": 3, "y": 1, "z": 0,
-			"scale": 1,
-			"color": map[string]float64{"r": 0.2, "g": 0.2, "b": 1.0, "a": 1.0},
-		},
-		// Basic cone
-		{
-			"name": "demo_cone",
-			"type": "cone",
-			"x": -1.5, "y": 1, "z": -3,
-			"scale": 1,
-			"color": map[string]float64{"r": 1.0, "g": 1.0, "b": 0.2, "a": 1.0},
-		},
-		// Wireframe cube
-		{
-			"name": "wireframe_cube",
-			"type": "cube",
-			"x": 1.5, "y": 1, "z": -3,
-			"scale": 1,
-			"color": map[string]float64{"r": 0.8, "g": 0.8, "b": 0.8, "a": 1.0},
-			"wireframe": true,
-		},
-		// Label panel
-		{
-			"name": "shapes_label",
-			"type": "plane",
-			"x": 0, "y": 3, "z": -1,
-			"scale": 2,
-			"color": map[string]float64{"r": 1.0, "g": 1.0, "b": 1.0, "a": 0.3},
-		},
+// parseObjectCount extracts object count from script output
+func parseObjectCount(output string) int {
+	re := regexp.MustCompile(`Objects created: (\d+)`)
+	matches := re.FindStringSubmatch(output)
+	if len(matches) > 1 {
+		if count, err := strconv.Atoi(matches[1]); err == nil {
+			return count
+		}
 	}
+	return 0
+}
 
-	// Send objects via WebSocket
-	h.BroadcastToSession(sessionID, "canvas_control", map[string]interface{}{
-		"command": "create",
-		"objects": objects,
-	})
-	
-	return len(objects)
+// parseSceneMessage extracts success message from script output
+func parseSceneMessage(output string) string {
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "THD Scene") && strings.Contains(line, "loaded successfully") {
+			return line
+		}
+	}
+	return ""
 }

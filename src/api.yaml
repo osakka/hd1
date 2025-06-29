@@ -276,6 +276,366 @@ paths:
       x-function: "LoadScene"
 
   # ========================================
+  # SCENE FORKING & MANAGEMENT
+  # ========================================
+  /sessions/{sessionId}/scenes/save:
+    post:
+      operationId: saveSceneFromSession
+      tags: [Scenes]
+      summary: Save session state as new scene
+      description: |
+        Creates a new scene script from current session objects.
+        Generates a .sh script in share/glibsh/scenes/ with all session objects.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scene_id:
+                  type: string
+                  description: ID for new scene (becomes filename)
+                  example: "my-custom-scene"
+                name:
+                  type: string
+                  description: Human-readable scene name
+                  example: "My Custom Scene"
+                description:
+                  type: string
+                  description: Scene description
+                  example: "Custom scene with modified objects"
+                overwrite:
+                  type: boolean
+                  description: Allow overwriting existing scene
+                  default: false
+              required: [scene_id, name, description]
+      responses:
+        '201':
+          description: Scene saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  scene_id:
+                    type: string
+                  scene_path:
+                    type: string
+                  objects_exported:
+                    type: integer
+        '400':
+          description: Invalid request or scene already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Scene already exists (use overwrite=true)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/scenes/save.go"
+      x-function: "SaveSceneFromSession"
+
+  /scenes/{sceneId}/fork:
+    post:
+      operationId: forkScene
+      tags: [Scenes]
+      summary: Fork scene to session for editing
+      description: |
+        Loads a scene into session and marks objects as "base" for tracking changes.
+        Enables sandbox editing while preserving original scene integrity.
+      parameters:
+        - name: sceneId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session_id:
+                  type: string
+                  description: Target session for forked scene
+                clear_existing:
+                  type: boolean
+                  description: Clear existing objects before fork
+                  default: true
+              required: [session_id]
+      responses:
+        '200':
+          description: Scene forked to session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  scene_id:
+                    type: string
+                  session_id:
+                    type: string
+                  objects_forked:
+                    type: integer
+                  fork_timestamp:
+                    type: string
+        '400':
+          description: Invalid scene or session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/scenes/fork.go"  
+      x-function: "ForkScene"
+
+  # ========================================
+  # SESSION RECORDING (VIDEO)
+  # ========================================
+  /sessions/{sessionId}/recording/start:
+    post:
+      operationId: startRecording
+      tags: [Recording]
+      summary: Start session recording (video mode)
+      description: |
+        Begin temporal recording of all object changes in session.
+        Captures create/update/delete operations with timestamps for playback.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recording_name:
+                  type: string
+                  description: Name for this recording
+                  example: "my-holodeck-sequence"
+                description:
+                  type: string
+                  description: Recording description
+                  example: "Building a 3D scene step by step"
+                clear_on_start:
+                  type: boolean
+                  description: Clear existing objects when recording starts
+                  default: true
+      responses:
+        '200':
+          description: Recording started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  session_id:
+                    type: string
+                  recording_id:
+                    type: string
+                  start_time:
+                    type: string
+        '400':
+          description: Recording already active or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/recording/start.go"
+      x-function: "StartRecording"
+
+  /sessions/{sessionId}/recording/stop:
+    post:
+      operationId: stopRecording
+      tags: [Recording]
+      summary: Stop session recording
+      description: |
+        End temporal recording and generate playback script.
+        Creates .thd recording file with temporal sequence.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recording stopped and saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  session_id:
+                    type: string
+                  recording_id:
+                    type: string
+                  duration:
+                    type: string
+                  operations_recorded:
+                    type: integer
+                  recording_path:
+                    type: string
+        '400':
+          description: No active recording or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/recording/stop.go"
+      x-function: "StopRecording"
+
+  /sessions/{sessionId}/recording/play:
+    post:
+      operationId: playRecording
+      tags: [Recording]
+      summary: Play back recorded sequence
+      description: |
+        Replay temporal sequence of object changes.
+        Recreates the original object creation/modification timeline.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recording_id:
+                  type: string
+                  description: ID of recording to play
+                speed:
+                  type: number
+                  description: Playback speed multiplier
+                  default: 1.0
+                  example: 2.0
+                clear_before_play:
+                  type: boolean
+                  description: Clear session before playback
+                  default: true
+              required: [recording_id]
+      responses:
+        '200':
+          description: Playback started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  session_id:
+                    type: string
+                  recording_id:
+                    type: string
+                  playback_duration:
+                    type: string
+                  operations_count:
+                    type: integer
+        '400':
+          description: Recording not found or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/recording/play.go"
+      x-function: "PlayRecording"
+
+  /sessions/{sessionId}/recording/status:
+    get:
+      operationId: getRecordingStatus
+      tags: [Recording]
+      summary: Get recording status
+      description: Get current recording state and available recordings
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recording status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id:
+                    type: string
+                  recording_active:
+                    type: boolean
+                  current_recording:
+                    type: object
+                    properties:
+                      recording_id:
+                        type: string
+                      start_time:
+                        type: string
+                      operations_count:
+                        type: integer
+                  available_recordings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        recording_id:
+                          type: string
+                        name:
+                          type: string
+                        created_at:
+                          type: string
+                        duration:
+                          type: string
+                        operations_count:
+                          type: integer
+        '400':
+          description: Invalid session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/recording/status.go"
+      x-function: "GetRecordingStatus"
+
+  # ========================================
   # OBJECT MANAGEMENT
   # ========================================
   /sessions/{sessionId}/objects:

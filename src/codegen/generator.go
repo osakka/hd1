@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -322,6 +323,10 @@ func main() {
 		fmt.Printf("⚠️  WARNING: %d handlers missing (build will continue)\n", len(missingHandlers))
 	}
 
+	// Generate THD Client from same spec
+	fmt.Println("\n🔧 GENERATING THD CLIENT...")
+	generateTHDClient(spec, routes)
+
 	fmt.Println("\n🚀 SPEC-DRIVEN DEVELOPMENT COMPLETE!")
 	fmt.Println("   • API specification drives all routing")
 	fmt.Println("   • Handler files validated at build time")
@@ -354,4 +359,286 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+// generateTHDClient creates complete auto-generated Go THD client
+func generateTHDClient(spec OpenAPISpec, routes []RouteInfo) {
+	clientGoPath := "client/main.go"
+	clientBinPath := "../build/bin/thd-client"
+	
+	// Ensure directory exists
+	if err := os.MkdirAll("client", 0755); err != nil {
+		log.Printf("❌ Failed to create client directory: %v", err)
+		return
+	}
+	
+	if err := os.MkdirAll(filepath.Dir(clientBinPath), 0755); err != nil {
+		log.Printf("❌ Failed to create bin directory: %v", err)
+		return
+	}
+	
+	// Generate Go client source
+	if err := generateGoClient(clientGoPath, spec, routes); err != nil {
+		log.Printf("❌ Failed to generate Go client: %v", err)
+		return
+	}
+	
+	// Build Go client binary
+	if err := buildGoClient(clientGoPath, clientBinPath); err != nil {
+		log.Printf("❌ Failed to build client binary: %v", err)
+		return
+	}
+	
+	fmt.Printf("✅ SUCCESS: thd-client Go binary generated with %d commands\n", len(routes))
+}
+
+// generateGoClient creates the Go source code for THD client
+func generateGoClient(clientPath string, spec OpenAPISpec, routes []RouteInfo) error {
+	clientTemplate := `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+const APIBase = "http://localhost:8080/api"
+
+func main() {
+	if len(os.Args) < 2 {
+		showHelp()
+		return
+	}
+
+	command := os.Args[1]
+	
+	switch command {
+{{range .Routes}}	case "{{.CommandName}}":
+		{{.FunctionName}}()
+{{end}}	case "help":
+		showHelp()
+	default:
+		fmt.Printf("Unknown command: %s\n", command)
+		showHelp()
+		os.Exit(1)
+	}
+}
+
+func showHelp() {
+	fmt.Println("THD Client - Auto-generated from API specification")
+	fmt.Println("Available commands:")
+{{range .Routes}}	fmt.Println("  {{.CommandName}} - {{.Method}} {{.Path}}")
+{{end}}
+}
+
+func makeRequest(method, path string, body interface{}) {
+	url := APIBase + path
+	
+	var reqBody io.Reader
+	if body != nil {
+		jsonData, err := json.Marshal(body)
+		if err != nil {
+			fmt.Printf("Error marshaling JSON: %v\n", err)
+			os.Exit(1)
+		}
+		reqBody = bytes.NewBuffer(jsonData)
+	}
+	
+	req, err := http.NewRequest(method, url, reqBody)
+	if err != nil {
+		fmt.Printf("Error creating request: %v\n", err)
+		os.Exit(1)
+	}
+	
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error making request: %v\n", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+	
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("Error reading response: %v\n", err)
+		os.Exit(1)
+	}
+	
+	// Pretty print JSON
+	var jsonData interface{}
+	if err := json.Unmarshal(responseBody, &jsonData); err == nil {
+		prettyJSON, _ := json.MarshalIndent(jsonData, "", "  ")
+		fmt.Println(string(prettyJSON))
+	} else {
+		fmt.Println(string(responseBody))
+	}
+}
+
+{{range .Routes}}
+func {{.FunctionName}}() {
+	{{.Implementation}}
+}
+{{end}}
+`
+
+	// Process routes for template
+	type ClientRoute struct {
+		CommandName    string
+		FunctionName   string
+		Method         string
+		Path           string
+		Implementation string
+	}
+	
+	var clientRoutes []ClientRoute
+	for _, route := range routes {
+		clientRoute := ClientRoute{
+			CommandName:    getCommandName(route),
+			FunctionName:   getFunctionName(route),
+			Method:         strings.ToUpper(route.Method),
+			Path:           route.Path,
+			Implementation: generateGoImplementation(route),
+		}
+		clientRoutes = append(clientRoutes, clientRoute)
+	}
+	
+	tmplData := struct {
+		Routes []ClientRoute
+	}{
+		Routes: clientRoutes,
+	}
+	
+	tmpl, err := template.New("client").Parse(clientTemplate)
+	if err != nil {
+		return fmt.Errorf("template parse error: %v", err)
+	}
+	
+	file, err := os.Create(clientPath)
+	if err != nil {
+		return fmt.Errorf("create file error: %v", err)
+	}
+	defer file.Close()
+	
+	if err := tmpl.Execute(file, tmplData); err != nil {
+		return fmt.Errorf("template execute error: %v", err)
+	}
+	
+	return nil
+}
+
+// buildGoClient compiles the Go client source into binary
+func buildGoClient(sourcePath, binaryPath string) error {
+	cmd := exec.Command("go", "build", "-o", binaryPath, sourcePath)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("build failed: %v\nOutput: %s", err, string(output))
+	}
+	return nil
+}
+
+// getCommandName converts route info to command name
+func getCommandName(route RouteInfo) string {
+	// Convert operationId to kebab-case
+	name := route.OperationID
+	result := ""
+	for i, r := range name {
+		if i > 0 && r >= 'A' && r <= 'Z' {
+			result += "-"
+		}
+		result += strings.ToLower(string(r))
+	}
+	return result
+}
+
+// getFunctionName converts route info to Go function name
+func getFunctionName(route RouteInfo) string {
+	// Convert operationId to camelCase
+	name := route.OperationID
+	return strings.ToLower(string(name[0])) + name[1:]
+}
+
+// generateGoImplementation creates Go code for each route
+func generateGoImplementation(route RouteInfo) string {
+	method := strings.ToUpper(route.Method)
+	path := route.Path
+	
+	// Count path parameters
+	paramCount := strings.Count(path, "{")
+	
+	if paramCount == 0 {
+		// No path parameters
+		if method == "GET" || method == "DELETE" {
+			return fmt.Sprintf(`makeRequest("%s", "%s", nil)`, method, path)
+		} else {
+			// POST/PUT with no path params - optional JSON body
+			return fmt.Sprintf(`var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %%v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("%s", "%s", body)`, method, path)
+		}
+	} else if paramCount == 1 {
+		// One path parameter
+		pathTemplate := strings.Replace(path, "{sessionId}", `" + os.Args[2] + "`, 1)
+		pathTemplate = strings.Replace(pathTemplate, "{sceneId}", `" + os.Args[2] + "`, 1)
+		pathTemplate = strings.Replace(pathTemplate, "{objectName}", `" + os.Args[2] + "`, 1)
+		pathTemplate = `"` + pathTemplate + `"`
+		
+		if method == "GET" || method == "DELETE" {
+			return fmt.Sprintf(`if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("%s", %s, nil)`, method, pathTemplate)
+		} else {
+			return fmt.Sprintf(`if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %%v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("%s", %s, body)`, method, pathTemplate)
+		}
+	} else {
+		// Two path parameters
+		pathTemplate := strings.Replace(path, "{sessionId}", `" + os.Args[2] + "`, 1)
+		pathTemplate = strings.Replace(pathTemplate, "{objectName}", `" + os.Args[3] + "`, 1)
+		pathTemplate = `"` + pathTemplate + `"`
+		
+		if method == "GET" || method == "DELETE" {
+			return fmt.Sprintf(`if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	makeRequest("%s", %s, nil)`, method, pathTemplate)
+		} else {
+			return fmt.Sprintf(`if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 4 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %%v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("%s", %s, body)`, method, pathTemplate)
+		}
+	}
 }

@@ -6,12 +6,27 @@ Where professional engineering meets immersive holodeck technology.
 
 ## 🌟 Revolutionary Features
 
+### Core Holodeck Technology
 - **🥽 Full VR/AR Support**: Complete WebXR integration with headset compatibility
 - **🎨 A-Frame WebXR Engine**: Built on Mozilla's powerful A-Frame framework (MIT License)
 - **⚡ API-First Architecture**: Everything controlled via REST API
 - **🌍 Universal Coordinate System**: Professional [-12, +12] holodeck boundaries
 - **🔄 Real-time WebSocket**: Instant 3D object synchronization
 - **📊 Specification-Driven**: OpenAPI 3.0.3 single source of truth
+
+### 🎬 Scene Forking & Recording System (v3.4.0)
+- **📷 Photo Mode**: Save current session state as new scenes
+- **🎥 Video Mode**: Full temporal recording with playback capabilities
+- **🔀 Scene Forking**: Load scenes for non-destructive editing
+- **🏷️ Object Tracking**: Complete provenance system (base/modified/new)
+- **📝 Script Generation**: Dynamic scene file creation from session state
+- **🎛️ Professional Console**: Integrated photo/video controls
+
+### Professional Engineering
+- **🏗️ Auto-Generated APIs**: Complete routing from OpenAPI specification
+- **🛡️ Session Isolation**: Perfect multi-user separation
+- **📱 Professional UI**: Holodeck-themed interface with scene management
+- **⚡ Sprint Controls**: Shift-key acceleration for enhanced navigation
 - **🎭 Multiple Rendering Backends**: Extensible architecture for future engines
 
 ## 🚀 Quick Start
@@ -27,6 +42,43 @@ make start
 # Use WASD to move, mouse to look around
 # Click VR button for full immersive experience
 ```
+
+## 🎬 Scene Forking & Recording Workflow
+
+### Photo Mode (Scene Snapshots)
+```bash
+# Create a session
+SESSION_ID=$(thd-client create-session | jq -r '.session_id')
+
+# Fork an existing scene for editing
+thd-client fork-scene basic-shapes "{\"session_id\": \"$SESSION_ID\", \"clear_existing\": true}"
+
+# Make modifications in the UI (add/move/delete objects)
+# Then save as new scene using the 📷 PHOTO button in console
+# Or via CLI:
+thd-client save-scene-from-session "$SESSION_ID" '{"scene_id": "my-scene", "name": "My Custom Scene"}'
+```
+
+### Video Mode (Temporal Recording)
+```bash
+# Start recording session interactions
+thd-client start-recording "$SESSION_ID" '{"name": "Demo Recording", "description": "User interaction demo"}'
+
+# Perform actions (create/modify objects, move camera, etc.)
+# Recording captures ALL changes with timestamps
+
+# Stop recording
+thd-client stop-recording "$SESSION_ID"
+
+# Play back recorded session in another session
+NEW_SESSION=$(thd-client create-session | jq -r '.session_id')
+thd-client play-recording "$NEW_SESSION" '{"recording_id": "demo-recording"}'
+```
+
+### Object Tracking System
+- **Base Objects**: Loaded from forked scenes (original state preserved)
+- **Modified Objects**: Base objects that have been changed (tracks source)
+- **New Objects**: Created directly in session (marked for inclusion in saved scenes)
 
 ## 🏗️ Architecture
 

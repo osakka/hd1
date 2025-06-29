@@ -141,6 +141,51 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             border-color: rgba(0, 255, 255, 0.6);
         }
         
+        #debug-controls-bar {
+            background: rgba(0, 255, 255, 0.03);
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            font-size: 9px;
+        }
+        
+        .control-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            font-size: 8px;
+            padding: 3px 6px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+        
+        .control-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+        }
+        
+        .control-btn:active {
+            background: rgba(0, 255, 255, 0.3);
+        }
+        
+        .control-btn.active {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: rgba(255, 0, 0, 0.5);
+            color: #ff6666;
+        }
+        
+        .recording-status {
+            color: rgba(255, 0, 0, 0.8);
+            font-weight: bold;
+            font-size: 8px;
+            margin-left: 4px;
+        }
+        
         #debug-session-id {
             color: rgba(255, 255, 255, 0.8);
             font-weight: bold;
@@ -307,6 +352,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 <option value="basic-shapes">Basic Shapes</option>
             </select>
         </div>
+        <div id="debug-controls-bar">
+            <button id="photo-btn" class="control-btn photo-btn" title="Photo Mode: Save current session state as new scene">📷 PHOTO</button>
+            <button id="video-btn" class="control-btn video-btn" title="Video Mode: Start/Stop temporal recording">🎥 VIDEO</button>
+            <span id="recording-status" class="recording-status"></span>
+        </div>
         <div id="debug-log"></div>
     </div>
     
@@ -372,6 +422,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Persistent THD session management
         let currentSessionId = localStorage.getItem('thd_session_id');
+        let sessionInitialized = false; // Flag to prevent multiple scene loads
         
         async function ensureSession() {
             try {
@@ -399,17 +450,20 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         // Associate WebSocket client with this session
                         associateSession(currentSessionId);
                         
-                        // Auto-load saved scene after session is restored
-                        setTimeout(() => {
-                            const savedScene = getCookie('thd_scene');
-                            if (savedScene && debugSceneSelect) {
-                                debugSceneSelect.value = savedScene;
-                                if (savedScene !== '') {
-                                    addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_restore'});
-                                    loadScene(savedScene);
+                        // Auto-load saved scene after session is restored (ONCE only)
+                        if (!sessionInitialized) {
+                            sessionInitialized = true;
+                            setTimeout(() => {
+                                const savedScene = getCookie('thd_scene');
+                                if (savedScene && debugSceneSelect) {
+                                    debugSceneSelect.value = savedScene;
+                                    if (savedScene !== '') {
+                                        addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_restore'});
+                                        loadScene(savedScene);
+                                    }
                                 }
-                            }
-                        }, 1500); // Wait for session to fully restore
+                            }, 1500); // Wait for session to fully restore
+                        }
                         return;
                     } else {
                         // Session expired, clear it
@@ -443,17 +497,20 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     // Associate WebSocket client with this session
                     associateSession(currentSessionId);
                     
-                    // Auto-load saved scene after session is established
-                    setTimeout(() => {
-                        const savedScene = getCookie('thd_scene');
-                        if (savedScene && debugSceneSelect) {
-                            debugSceneSelect.value = savedScene;
-                            if (savedScene !== '') {
-                                addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_restore'});
-                                loadScene(savedScene);
+                    // Auto-load saved scene after session is established (ONCE only)
+                    if (!sessionInitialized) {
+                        sessionInitialized = true;
+                        setTimeout(() => {
+                            const savedScene = getCookie('thd_scene');
+                            if (savedScene && debugSceneSelect) {
+                                debugSceneSelect.value = savedScene;
+                                if (savedScene !== '') {
+                                    addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_create'});
+                                    loadScene(savedScene);
+                                }
                             }
-                        }
-                    }, 1000); // Wait for session to fully establish
+                        }, 1000); // Wait for session to fully establish
+                    }
                 } else {
                     console.error('Failed to create session:', sessionData);
                     updateDebugSession('Session Failed');
@@ -900,6 +957,157 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Load saved scene on page load
         loadSavedScene();
+        
+        // Photo/Video Controls Implementation
+        const photoBtn = document.getElementById('photo-btn');
+        const videoBtn = document.getElementById('video-btn');
+        const recordingStatus = document.getElementById('recording-status');
+        let isRecording = false;
+        let recordingStartTime = null;
+        
+        // Photo Mode: Save current session state as new scene
+        photoBtn.addEventListener('click', async function() {
+            if (!currentSessionId) {
+                addDebug('PHOTO_ERROR', 'No active session');
+                return;
+            }
+            
+            // Prompt for scene name
+            const sceneName = prompt('Enter scene name:');
+            if (!sceneName) return;
+            
+            const sceneId = sceneName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            
+            try {
+                addDebug('PHOTO_START', {session: currentSessionId, scene: sceneId});
+                
+                const response = await fetch('/api/sessions/' + currentSessionId + '/scenes/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        scene_id: sceneId,
+                        name: sceneName,
+                        description: 'Scene captured from session ' + currentSessionId
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    addDebug('PHOTO_SUCCESS', {scene: sceneId, objects: result.objects_count || 0});
+                    setStatus('receiving', 'Photo saved: ' + sceneName);
+                    
+                    // Refresh scene dropdown
+                    await refreshSceneDropdown();
+                } else {
+                    addDebug('PHOTO_ERROR', {scene: sceneId, status: response.status});
+                    setStatus('error', 'Photo save failed');
+                }
+            } catch (error) {
+                addDebug('PHOTO_FAIL', {error: error.message});
+                setStatus('error', 'Photo operation failed');
+            }
+        });
+        
+        // Video Mode: Start/Stop recording
+        videoBtn.addEventListener('click', async function() {
+            if (!currentSessionId) {
+                addDebug('VIDEO_ERROR', 'No active session');
+                return;
+            }
+            
+            try {
+                if (!isRecording) {
+                    // Start recording
+                    const response = await fetch('/api/sessions/' + currentSessionId + '/recording/start', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: 'Recording-' + Date.now(),
+                            description: 'Temporal session recording'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        isRecording = true;
+                        recordingStartTime = Date.now();
+                        videoBtn.classList.add('active');
+                        videoBtn.textContent = '⏹️ STOP';
+                        recordingStatus.textContent = 'REC';
+                        addDebug('VIDEO_START', {session: currentSessionId});
+                        setStatus('receiving', 'Recording started');
+                        
+                        // Update recording timer
+                        updateRecordingTimer();
+                    } else {
+                        addDebug('VIDEO_START_ERROR', {status: response.status});
+                        setStatus('error', 'Recording start failed');
+                    }
+                } else {
+                    // Stop recording
+                    const response = await fetch('/api/sessions/' + currentSessionId + '/recording/stop', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        isRecording = false;
+                        recordingStartTime = null;
+                        videoBtn.classList.remove('active');
+                        videoBtn.textContent = '🎥 VIDEO';
+                        recordingStatus.textContent = '';
+                        addDebug('VIDEO_STOP', {session: currentSessionId});
+                        setStatus('receiving', 'Recording stopped');
+                    } else {
+                        addDebug('VIDEO_STOP_ERROR', {status: response.status});
+                        setStatus('error', 'Recording stop failed');
+                    }
+                }
+            } catch (error) {
+                addDebug('VIDEO_FAIL', {error: error.message});
+                setStatus('error', 'Video operation failed');
+            }
+        });
+        
+        // Update recording timer
+        function updateRecordingTimer() {
+            if (isRecording && recordingStartTime) {
+                const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                recordingStatus.textContent = 'REC ' + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                setTimeout(updateRecordingTimer, 1000);
+            }
+        }
+        
+        // Refresh scene dropdown from API
+        async function refreshSceneDropdown() {
+            try {
+                const response = await fetch('/api/scenes');
+                if (response.ok) {
+                    const data = await response.json();
+                    const select = document.getElementById('debug-scene-select');
+                    
+                    // Clear existing options except first
+                    while (select.children.length > 1) {
+                        select.removeChild(select.lastChild);
+                    }
+                    
+                    // Add updated scenes
+                    if (data.scenes) {
+                        data.scenes.forEach(scene => {
+                            const option = document.createElement('option');
+                            option.value = scene.id;
+                            option.textContent = scene.name;
+                            select.appendChild(option);
+                        });
+                    }
+                    
+                    addDebug('SCENE_REFRESH', {count: data.scenes?.length || 0});
+                }
+            } catch (error) {
+                addDebug('SCENE_REFRESH_ERROR', {error: error.message});
+            }
+        }
         
         // Pointer lock status indicator
         function updatePointerLockStatus() {

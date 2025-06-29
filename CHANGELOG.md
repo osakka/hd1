@@ -7,6 +7,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.4.0] - 2025-06-29 - **🎬 SCENE FORKING & TEMPORAL RECORDING SYSTEM**
+
+### **REVOLUTIONARY CONTENT CREATION: PHOTO VS VIDEO PARADIGM**
+
+This **bar-raising milestone** introduces a **revolutionary scene forking and temporal recording system** implementing professional content creation workflows with **complete object provenance tracking** and **non-destructive editing capabilities**.
+
+### **Added - Scene Forking System**
+
+#### **Professional Photo Mode (Scene Snapshots)**
+- **Scene Fork API**: `POST /scenes/{sceneId}/fork` - Load scenes into sessions for non-destructive editing
+- **Scene Save API**: `POST /sessions/{sessionId}/scenes/save` - Export session state as new scene scripts
+- **Dynamic Scene Discovery**: Script-based metadata parsing replacing hardcoded scene lists
+- **Object Tracking System**: Three-state provenance (base/modified/new) with source scene references
+- **Script Generation**: Automatic creation of executable scene files from session state
+
+#### **Revolutionary Video Mode (Temporal Recording)**
+- **Recording API**: `POST /sessions/{sessionId}/recording/start` - Begin temporal session capture
+- **Stop Recording**: `POST /sessions/{sessionId}/recording/stop` - End recording with metadata
+- **Playback Engine**: `POST /sessions/{sessionId}/recording/play` - Complete session recreation
+- **Status Monitoring**: `GET /sessions/{sessionId}/recording/status` - Real-time recording state
+
+#### **Professional Console Controls**
+- **📷 PHOTO Button**: Instant scene saving with name prompt and dropdown refresh
+- **🎥 VIDEO Button**: Start/stop recording with professional timer display (MM:SS)
+- **Recording Status**: Real-time timer with professional "REC" indicator
+- **Error Handling**: Graceful failure modes with user notifications
+
+### **Enhanced - Object Lifecycle Management**
+
+#### **Complete Object Provenance System**
+```go
+type Object struct {
+    TrackingStatus string    `json:"tracking_status,omitempty"` // "base", "modified", "new"
+    SourceScene    string    `json:"source_scene,omitempty"`    // Original scene ID
+    CreatedAt      time.Time `json:"created_at,omitempty"`      // Modification timestamp
+}
+```
+
+#### **Smart Object State Transitions**
+- **Base Objects**: Loaded from forked scenes, marked with source scene reference
+- **Modified Objects**: Base objects automatically transition when changed
+- **New Objects**: Created directly in session, marked for scene inclusion
+- **Temporal Tracking**: All state changes captured with precise timestamps
+
+### **Fixed - Critical Session Management**
+
+#### **Session Restoration Loop Resolution**
+- **Root Cause Fix**: Eliminated race condition causing object flickering
+- **Single Initialization**: Ensured session restoration happens exactly once after bootstrap
+- **Professional State Management**: Added `sessionInitialized` flag to prevent multiple restoration cycles
+- **Improved User Experience**: Objects no longer appear/disappear during session startup
+
+### **Technical Achievements**
+
+#### **Dynamic Scene Architecture**
+- **Script-Based Storage**: Scenes stored as executable `.sh` files with metadata headers
+- **API Metadata Parsing**: Dynamic discovery replaces hardcoded scene definitions
+- **Auto-Generated Scripts**: Complete scene recreation from session object state
+- **Professional Headers**: Include object counts, descriptions, and generation timestamps
+
+#### **Professional Error Handling**
+- **Consistent JSON Responses**: All APIs return structured error information
+- **Graceful Degradation**: Professional error modes with actionable messages
+- **Real-time Feedback**: Immediate status updates for all user operations
+- **Debug Integration**: Complete operation logging in holodeck console
+
+---
+
 ## [3.3.0] - 2025-06-29 - **🎯 PROFESSIONAL UI EXCELLENCE & SCENE MANAGEMENT**
 
 ### **PROFESSIONAL UI REVOLUTION: BAR-RAISING INTERFACE STANDARDS**

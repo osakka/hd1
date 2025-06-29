@@ -128,6 +128,10 @@ type Object struct {
 	Color    string  `json:"color,omitempty"`
 	Scale    float64 `json:"scale,omitempty"`
 	Rotation string  `json:"rotation,omitempty"`
+	// Session object tracking for scene forking
+	TrackingStatus string    `json:"tracking_status,omitempty"` // "base", "modified", "new"
+	SourceScene    string    `json:"source_scene,omitempty"`    // Original scene ID if forked
+	CreatedAt      time.Time `json:"created_at,omitempty"`      // When object was created/modified
 }
 
 // World represents the 3D world coordinate system
