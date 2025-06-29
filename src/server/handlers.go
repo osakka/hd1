@@ -220,12 +220,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         #debug-lock-icon {
             font-size: 10px;
-            color: #00ffff;
             transition: all 0.3s ease;
             cursor: help;
             position: relative;
             margin-right: 6px;
-            text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+            opacity: 0.7;
         }
         
         #debug-lock-icon:hover::after {
@@ -245,13 +244,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         #debug-lock-icon.unlocked {
-            color: #00ffff;
-            text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+            opacity: 0.5;
         }
         
         #debug-lock-icon.locked {
-            color: #00ffff;
-            text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
+            opacity: 1.0;
         }
         
         .debug-indicators {
