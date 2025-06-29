@@ -295,9 +295,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         const sessionData = await checkResponse.json();
                         document.getElementById('session-id').textContent = currentSessionId;
                         
-                        // Initialize world grid if it exists
-                        if (thdManager && thdManager.initializeWorld && sessionData.world) {
-                            thdManager.initializeWorld(sessionData.world);
+                        // Initialize world grid if it exists (defer if manager not ready)
+                        if (sessionData.world) {
+                            if (thdManager && thdManager.initializeWorld) {
+                                thdManager.initializeWorld(sessionData.world);
+                            } else {
+                                // Store world data for later initialization
+                                window.pendingWorldData = sessionData.world;
+                            }
                         }
                         
                         console.log('THD Session restored:', currentSessionId);
@@ -319,9 +324,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     localStorage.setItem('thd_session_id', currentSessionId);
                     document.getElementById('session-id').textContent = currentSessionId;
                     
-                    // Initialize world grid in THD manager
-                    if (thdManager && thdManager.initializeWorld) {
-                        thdManager.initializeWorld(sessionData.world);
+                    // Initialize world grid in THD manager (defer if not ready)
+                    if (sessionData.world) {
+                        if (thdManager && thdManager.initializeWorld) {
+                            thdManager.initializeWorld(sessionData.world);
+                        } else {
+                            // Store world data for later initialization
+                            window.pendingWorldData = sessionData.world;
+                        }
                     }
                     
                     console.log('THD Session created:', currentSessionId);
@@ -455,26 +465,28 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                             }
                         }
                         if (message.camera) {
-                            renderer.processMessage({
+                            thdManager.processMessage({
                                 type: 'camera',
                                 ...message.camera
                             });
                         }
                         setStatus('receiving', 'THD canvas control');
                         setTimeout(() => {
-                            setStatus('connected', 'THD active • objects: ' + renderer.objects.size);
+                            setStatus('connected', 'THD active • objects: ' + (thdManager?.getObjectCount() || 0));
                         }, 500);
                         return;
                     }
                     
                     // Regular 3D messages
-                    renderer.processMessage(message);
-                    
-                    setStatus('receiving', 'receiving data');
-                    clearTimeout(window.receivingTimeout);
-                    window.receivingTimeout = setTimeout(() => {
-                        setStatus('connected', 'connected • objects: ' + renderer.objects.size);
-                    }, 200);
+                    if (thdManager) {
+                        thdManager.processMessage(message);
+                        
+                        setStatus('receiving', 'receiving data');
+                        clearTimeout(window.receivingTimeout);
+                        window.receivingTimeout = setTimeout(() => {
+                            setStatus('connected', 'connected • objects: ' + (thdManager?.getObjectCount() || 0));
+                        }, 200);
+                    }
                     
                 } catch (e) {
                     console.error('Failed to process message:', e, event.data);
@@ -545,12 +557,35 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         });
         
         try {
-            // Wait for A-Frame scene to be ready
+            // Initialize A-Frame manager when scene is ready
             scene.addEventListener('loaded', function() {
                 thdManager = new THDAFrameManager(scene);
                 sendLog('info', 'THD A-Frame Manager initialized successfully');
-                setStatus('connecting', 'THD A-Frame ready');
+                console.log('[THD] A-Frame scene loaded and manager ready');
+                
+                // Initialize any pending world data
+                if (window.pendingWorldData) {
+                    thdManager.initializeWorld(window.pendingWorldData);
+                    window.pendingWorldData = null;
+                    console.log('[THD] Applied pending world data');
+                }
             });
+            
+            // Fallback: initialize even if scene doesn't fire loaded event
+            setTimeout(function() {
+                if (!thdManager) {
+                    thdManager = new THDAFrameManager(scene);
+                    console.log('[THD] A-Frame manager initialized via fallback');
+                    
+                    // Initialize any pending world data
+                    if (window.pendingWorldData) {
+                        thdManager.initializeWorld(window.pendingWorldData);
+                        window.pendingWorldData = null;
+                        console.log('[THD] Applied pending world data via fallback');
+                    }
+                }
+            }, 2000);
+            
         } catch (e) {
             setStatus('error', 'A-Frame not supported');
             sendLog('error', 'A-Frame initialization failed', e.message);
@@ -579,11 +614,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         orientation: screen.orientation ? screen.orientation.angle : 0
                     },
                     canvas: {
-                        width: canvas.width,
-                        height: canvas.height
+                        width: window.innerWidth,
+                        height: window.innerHeight
                     },
                     capabilities: {
-                        webgl: !!renderer,
+                        webgl: !!thdManager,
+                        aframe: !!scene,
+                        vr: AFRAME && AFRAME.utils.device.checkHeadsetConnected(),
                         touch: 'ontouchstart' in window,
                         mobile: /Mobi|Android/i.test(navigator.userAgent)
                     },
@@ -606,19 +643,18 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             setTimeout(sendClientInfo, 100); // Delay to get accurate dimensions
         });
         
-        // Add click interaction tracking
-        canvas.addEventListener('click', function(e) {
+        // Add click interaction tracking on A-Frame scene
+        scene.addEventListener('click', function(e) {
             if (ws && ws.readyState === WebSocket.OPEN) {
-                const rect = canvas.getBoundingClientRect();
                 const interaction = {
                     type: 'interaction',
                     event: 'click',
                     position: {
-                        x: e.clientX - rect.left,
-                        y: e.clientY - rect.top,
+                        x: e.clientX,
+                        y: e.clientY,
                         normalized: {
-                            x: (e.clientX - rect.left) / canvas.width,
-                            y: (e.clientY - rect.top) / canvas.height
+                            x: e.clientX / window.innerWidth,
+                            y: e.clientY / window.innerHeight
                         }
                     },
                     timestamp: Date.now()
@@ -628,86 +664,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             }
         });
         
-        // Wait for renderer to be ready, then add mouse controls
+        // A-Frame provides built-in controls, no manual setup needed
         function setupMouseControls() {
-            if (!renderer) {
-                setTimeout(setupMouseControls, 100);
-                return;
-            }
-            
-            let mouseDown = false;
-            let lastMouseX = 0;
-            let lastMouseY = 0;
-            let cameraDistance = 8;
-            let cameraAngleX = 0.3;  // Start slightly angled
-            let cameraAngleY = 0.3;
-            
-            function updateCameraFromAngles() {
-                const x = Math.cos(cameraAngleY) * Math.cos(cameraAngleX) * cameraDistance;
-                const y = Math.sin(cameraAngleX) * cameraDistance;
-                const z = Math.sin(cameraAngleY) * Math.cos(cameraAngleX) * cameraDistance;
-                
-                renderer.camera.position = [x, y, z];
-                renderer.camera.target = [0, 0, 0];
-            }
-            
-            // Mouse down - initialize first-person look
-            canvas.onmousedown = function(e) {
-                mouseDown = true;
-                lastMouseX = e.clientX;
-                lastMouseY = e.clientY;
-                
-                // Initialize camera direction if not set
-                if (!cameraDirection.yaw && !cameraDirection.pitch) {
-                    cameraDirection.yaw = 0;
-                    cameraDirection.pitch = 0;
-                }
-                
-                setStatus('connected', 'MOUSE ACTIVE - drag to look around');
-                return false;
-            };
-            
-            // Mouse up
-            document.onmouseup = function(e) {
-                mouseDown = false;
-                setStatus('connected', 'connected - click and drag to control camera');
-            };
-            
-            // Mouse move - first-person look
-            document.onmousemove = function(e) {
-                if (mouseDown) {
-                    const deltaX = e.clientX - lastMouseX;
-                    const deltaY = e.clientY - lastMouseY;
-                    
-                    // Update camera direction
-                    cameraDirection.yaw += deltaX * 0.005;
-                    cameraDirection.pitch -= deltaY * 0.005;
-                    
-                    // Clamp pitch to prevent over-rotation
-                    cameraDirection.pitch = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, cameraDirection.pitch));
-                    
-                    // Update camera target based on new direction
-                    const pos = renderer.camera.position;
-                    renderer.camera.target = [
-                        pos[0] + Math.sin(cameraDirection.yaw),
-                        pos[1] + Math.sin(cameraDirection.pitch),
-                        pos[2] + Math.cos(cameraDirection.yaw)
-                    ];
-                    
-                    lastMouseX = e.clientX;
-                    lastMouseY = e.clientY;
-                }
-            };
-            
-            // Mouse wheel - adjust movement speed
-            canvas.onwheel = function(e) {
-                // Could adjust movement speed or do nothing for first-person
-                e.preventDefault();
-                return false;
-            };
-            
-            // Set initial first-person setup
-            setStatus('connected', 'First-person controls ready - WASD to move, mouse to look');
+            // A-Frame handles all mouse and keyboard controls automatically
+            // WASD movement via wasd-controls component
+            // Mouse look via look-controls component
+            console.log('A-Frame controls initialized: WASD to move, mouse to look, VR ready');
+            setStatus('connected', 'A-Frame controls ready - WASD to move, mouse to look');
         }
         
         // Start mouse controls after a delay
