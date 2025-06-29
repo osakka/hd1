@@ -43,11 +43,12 @@ type ClientInfo struct {
 }
 
 type Client struct {
-	hub      *Hub
-	conn     *websocket.Conn
-	send     chan []byte
-	info     *ClientInfo
-	lastSeen time.Time
+	hub       *Hub
+	conn      *websocket.Conn
+	send      chan []byte
+	info      *ClientInfo
+	lastSeen  time.Time
+	sessionID string  // THD session isolation
 }
 
 func (c *Client) readPump() {
@@ -123,6 +124,17 @@ func (c *Client) handleClientMessage(message []byte) {
 				c.hub.logger.Log("info", "CLIENT", "Client info updated", map[string]interface{}{
 					"screen": info.Screen,
 					"capabilities": info.Capabilities,
+				})
+			}
+		}
+
+	case "session_associate":
+		// Associate this client with a specific THD session
+		if sessionID, ok := msg["session_id"].(string); ok {
+			c.sessionID = sessionID
+			if c.hub.logger != nil {
+				c.hub.logger.Log("info", "CLIENT", "Session associated", map[string]interface{}{
+					"session_id": sessionID,
 				})
 			}
 		}

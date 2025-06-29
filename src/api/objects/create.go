@@ -15,14 +15,58 @@ type Color struct {
 	A float64 `json:"a"`
 }
 
-// CreateObjectRequest represents the request body for creating objects
+// Material represents A-Frame material properties
+type Material struct {
+	Shader      string  `json:"shader,omitempty"`
+	Metalness   float64 `json:"metalness,omitempty"`
+	Roughness   float64 `json:"roughness,omitempty"`
+	Transparent bool    `json:"transparent,omitempty"`
+	Emissive    bool    `json:"emissive,omitempty"`
+}
+
+// Physics represents physics simulation properties
+type Physics struct {
+	Enabled bool    `json:"enabled,omitempty"`
+	Mass    float64 `json:"mass,omitempty"`
+	Type    string  `json:"type,omitempty"` // static, dynamic, kinematic
+}
+
+// Lighting represents shadow and lighting properties
+type Lighting struct {
+	CastShadow    bool `json:"castShadow,omitempty"`
+	ReceiveShadow bool `json:"receiveShadow,omitempty"`
+}
+
+// Light represents light source properties
+type Light struct {
+	LightType string  `json:"lightType,omitempty"` // ambient, directional, point, spot
+	Intensity float64 `json:"intensity,omitempty"`
+}
+
+// Particle represents particle system properties
+type Particle struct {
+	ParticleType string `json:"particleType,omitempty"` // fire, smoke, sparkle
+	Count        int    `json:"count,omitempty"`
+}
+
+// CreateObjectRequest represents the complete request body for creating A-Frame objects
 type CreateObjectRequest struct {
-	Name  string  `json:"name"`
-	Type  string  `json:"type"`
-	X     float64 `json:"x"`
-	Y     float64 `json:"y"`
-	Z     float64 `json:"z"`
-	Color *Color  `json:"color,omitempty"`
+	Name         string     `json:"name"`
+	Type         string     `json:"type"`
+	X            float64    `json:"x"`
+	Y            float64    `json:"y"`
+	Z            float64    `json:"z"`
+	Color        *Color     `json:"color,omitempty"`
+	Material     *Material  `json:"material,omitempty"`
+	Physics      *Physics   `json:"physics,omitempty"`
+	Lighting     *Lighting  `json:"lighting,omitempty"`
+	Light        *Light     `json:"light,omitempty"`
+	Particle     *Particle  `json:"particle,omitempty"`
+	Text         string     `json:"text,omitempty"`
+	LightType    string     `json:"lightType,omitempty"`
+	Intensity    float64    `json:"intensity,omitempty"`
+	ParticleType string     `json:"particleType,omitempty"`
+	Count        int        `json:"count,omitempty"`
 }
 
 // CreateObjectHandler - POST /sessions/{sessionId}/objects
@@ -37,33 +81,63 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Extract session ID from path
 	sessionID := extractSessionID(r.URL.Path)
 	if sessionID == "" {
-		http.Error(w, "Invalid session ID", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid session ID",
+			"message": "Session ID is required",
+		})
 		return
 	}
 	
 	// Validate session exists
 	if _, exists := h.GetStore().GetSession(sessionID); !exists {
-		http.Error(w, "Session not found", http.StatusNotFound)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Session not found",
+			"message": "Session does not exist or has expired",
+		})
 		return
 	}
 	
 	// Parse request body
 	var req CreateObjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON request body", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid JSON",
+			"message": "Request body must be valid JSON",
+		})
 		return
 	}
 	
 	// Validate required fields
 	if req.Name == "" || req.Type == "" {
-		http.Error(w, "Missing required fields: name, type", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Missing required fields",
+			"message": "name and type are required",
+		})
 		return
 	}
 	
 	// Create object using SessionStore with coordinate validation
 	object, err := h.GetStore().CreateObject(sessionID, req.Name, req.Type, req.X, req.Y, req.Z)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Object creation failed",
+			"message": err.Error(),
+		})
 		return
 	}
 	
@@ -83,8 +157,8 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		}
 	}
 
-	// Broadcast object creation for real-time updates via canvas control
-	h.BroadcastUpdate("canvas_control", map[string]interface{}{
+	// Broadcast object creation for real-time updates via canvas control (session-specific)
+	h.BroadcastToSession(sessionID, "canvas_control", map[string]interface{}{
 		"command": "create",
 		"objects": []map[string]interface{}{
 			{
@@ -109,23 +183,96 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 					},
 				},
 				"color": objectColor,
-				"material": map[string]interface{}{
-					"shader":     "standard",
-					"metalness":  0.1,
-					"roughness":  0.7,
-					"transparent": false,
-				},
-				"physics": map[string]interface{}{
-					"enabled": false,
-					"mass":    1.0,
-					"type":    "static",
-				},
-				"lighting": map[string]interface{}{
-					"castShadow":    true,
-					"receiveShadow": true,
-				},
+				"material": func() map[string]interface{} {
+					material := map[string]interface{}{
+						"shader":     "standard",
+						"metalness":  0.1,
+						"roughness":  0.7,
+						"transparent": false,
+					}
+					if req.Material != nil {
+						if req.Material.Shader != "" {
+							material["shader"] = req.Material.Shader
+						}
+						if req.Material.Metalness > 0 {
+							material["metalness"] = req.Material.Metalness
+						}
+						if req.Material.Roughness > 0 {
+							material["roughness"] = req.Material.Roughness
+						}
+						material["transparent"] = req.Material.Transparent
+						material["emissive"] = req.Material.Emissive
+					}
+					return material
+				}(),
+				"physics": func() map[string]interface{} {
+					physics := map[string]interface{}{
+						"enabled": false,
+						"mass":    1.0,
+						"type":    "static",
+					}
+					if req.Physics != nil {
+						physics["enabled"] = req.Physics.Enabled
+						if req.Physics.Mass > 0 {
+							physics["mass"] = req.Physics.Mass
+						}
+						if req.Physics.Type != "" {
+							physics["type"] = req.Physics.Type
+						}
+					}
+					return physics
+				}(),
+				"lighting": func() map[string]interface{} {
+					lighting := map[string]interface{}{
+						"castShadow":    true,
+						"receiveShadow": true,
+					}
+					if req.Lighting != nil {
+						lighting["castShadow"] = req.Lighting.CastShadow
+						lighting["receiveShadow"] = req.Lighting.ReceiveShadow
+					}
+					return lighting
+				}(),
 				"visible":   true,
 				"wireframe": false,
+				// A-Frame specific properties
+				"text": req.Text,
+				"lightType": func() string {
+					if req.LightType != "" {
+						return req.LightType
+					}
+					if req.Light != nil && req.Light.LightType != "" {
+						return req.Light.LightType
+					}
+					return ""
+				}(),
+				"intensity": func() float64 {
+					if req.Intensity > 0 {
+						return req.Intensity
+					}
+					if req.Light != nil && req.Light.Intensity > 0 {
+						return req.Light.Intensity
+					}
+					return 1.0
+				}(),
+				"particleType": func() string {
+					if req.ParticleType != "" {
+						return req.ParticleType
+					}
+					if req.Particle != nil && req.Particle.ParticleType != "" {
+						return req.Particle.ParticleType
+					}
+					return ""
+				}(),
+				"count": func() int {
+					if req.Count > 0 {
+						return req.Count
+					}
+					if req.Particle != nil && req.Particle.Count > 0 {
+						return req.Particle.Count
+					}
+					return 0
+				}(),
 			},
 		},
 	})

@@ -4,7 +4,7 @@
 
 # Configuration
 THD_API_BASE="http://localhost:8080/api"
-THD_SESSION_ID="${SESSION_ID:-session-19cdcfgj}"
+THD_SESSION_ID="${THD_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
 
 # Core object creation function
 thd::create_object() {
@@ -30,9 +30,16 @@ thd::create_object() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "📦 $name at ($x,$y,$z)"
 }
@@ -87,9 +94,16 @@ thd::create_light() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Light Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Light Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "💡 $name light ($type) at ($x,$y,$z)"
 }
@@ -118,9 +132,16 @@ thd::create_physics() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Physics Object Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Physics Object Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "⚡ $name (physics: $physics_type, mass: $mass) at ($x,$y,$z)"
 }
@@ -150,9 +171,16 @@ thd::create_material() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Material Object Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Material Object Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "🎨 $name ($shader material) at ($x,$y,$z)"
 }
@@ -174,9 +202,16 @@ thd::create_sky() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Sky Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Sky Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "🌤️  $name sky environment created"
 }
@@ -218,9 +253,16 @@ thd::create_enhanced() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Enhanced Object Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Enhanced Object Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "✨ $name (enhanced) at ($x,$y,$z)"
 }
@@ -252,9 +294,16 @@ thd::create_text() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Text Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Text Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "📝 $name text ('$text') at ($x,$y,$z)"
 }
@@ -279,9 +328,16 @@ thd::create_particles() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Particles Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Particles Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "✨ $name particles ($type) at ($x,$y,$z)"
 }
@@ -330,9 +386,16 @@ thd::create_ultimate() {
 EOF
 )
     
-    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+    local response=$(curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
          -H "Content-Type: application/json" \
-         -d "$payload" | jq -r '.message // "Ultimate Object Created"'
+         -d "$payload")
+    
+    # Parse JSON response safely
+    if echo "$response" | jq . >/dev/null 2>&1; then
+        echo "$response" | jq -r '.message // "Ultimate Object Created"'
+    else
+        echo "ERROR: $response"
+    fi
     
     echo "🌟 $name (ultimate holodeck object) at ($x,$y,$z)"
 }

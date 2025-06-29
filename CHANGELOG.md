@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.1.0] - 2025-06-29 - **🎯 PROFESSIONAL SESSION ISOLATION & TEXT RENDERING**
+
+### **SINGLE SOURCE OF TRUTH SESSION ARCHITECTURE**
+
+This critical release implements **professional-grade session isolation** and **complete text field transmission**, achieving true enterprise-level multi-user holodeck capabilities with perfect session separation.
+
+### **Added - Session Isolation & Text Rendering**
+
+#### **Professional Session Management**
+- **Session-Specific WebSocket Broadcasting**: Each browser session now completely isolated
+- **Single Source of Truth Architecture**: Session association via WebSocket client tracking
+- **Professional Error Handling**: All API responses now return consistent JSON (no more parsing errors)
+- **Session-Aware Hub Architecture**: Complete rewrite of broadcast system for perfect isolation
+
+#### **Complete Text Field Transmission**
+- **A-Frame Text Rendering**: Text objects now display actual content instead of "Holodeck Text"
+- **Enhanced WebSocket Pipeline**: All A-Frame properties (text, lightType, particleType, etc.) properly transmitted
+- **Professional Console Logging**: Enhanced debugging with proper text field tracking
+
+#### **Enhanced API Support**
+- **Complete A-Frame Feature Support**: Material, Physics, Lighting, Particle, Light, Text object types
+- **Professional JSON Responses**: All error conditions return structured JSON instead of plain text
+- **Safe Shell Function Parsing**: Eliminated all jq parsing errors with robust error handling
+
+### **Technical Architecture**
+- **Client Session Association**: WebSocket clients automatically associate with THD sessions
+- **Session-Specific Broadcasting**: `BroadcastToSession` method with proper client filtering
+- **Enhanced Object Creation**: Full support for all A-Frame object properties in API
+- **Professional Error Handling**: Consistent JSON error responses across all endpoints
+
+### **Breaking Changes**
+- **Session Isolation**: Objects now only appear in their target session (breaking cross-session visibility)
+- **Text Rendering**: Text objects now require proper text field (no more default "Holodeck Text")
+
+### **Professional Standards**
+- **Zero jq Parsing Errors**: Complete elimination of shell function parsing issues
+- **Consistent JSON Responses**: All API endpoints return structured JSON responses
+- **Session-Aware Architecture**: Professional multi-user session management
+- **Enhanced Console Debugging**: Comprehensive WebSocket message tracking
+
+---
+
 ## [3.0.0] - 2025-06-29 - **🚀 VR HOLODECK REVOLUTION**
 
 ### **A-FRAME WEBXR TRANSFORMATION: THD → VR/AR HOLODECK PLATFORM**

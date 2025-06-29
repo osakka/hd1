@@ -68,6 +68,41 @@ func (h *Hub) BroadcastMessage(message []byte) {
 	h.broadcast <- message
 }
 
+// BroadcastToSession sends a message only to clients in a specific session
+func (h *Hub) BroadcastToSession(sessionID string, updateType string, data interface{}) {
+	update := map[string]interface{}{
+		"type": updateType,
+		"data": data,
+		"timestamp": time.Now().Unix(),
+		"session_id": sessionID,
+	}
+	
+	if jsonData, err := json.Marshal(update); err == nil {
+		// Send only to clients associated with this specific session
+		clientCount := 0
+		for client := range h.clients {
+			if client.sessionID == sessionID {
+				select {
+				case client.send <- jsonData:
+					clientCount++
+				default:
+					close(client.send)
+					delete(h.clients, client)
+				}
+			}
+		}
+		
+		// Log session-specific broadcast for debugging
+		if h.logger != nil {
+			h.logger.Log("debug", "HUB", "Session broadcast", map[string]interface{}{
+				"session_id": sessionID,
+				"type": updateType,
+				"clients": clientCount,
+			})
+		}
+	}
+}
+
 // SessionStore provides persistence for 3D visualization sessions
 type SessionStore struct {
 	mutex    sync.RWMutex

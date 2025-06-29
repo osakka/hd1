@@ -307,6 +307,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                         
                         console.log('THD Session restored:', currentSessionId);
                         setStatus('connected', 'THD session: ' + currentSessionId.slice(-8));
+                        
+                        // Associate WebSocket client with this session
+                        associateSession(currentSessionId);
                         return;
                     } else {
                         // Session expired, clear it
@@ -336,6 +339,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     
                     console.log('THD Session created:', currentSessionId);
                     setStatus('connected', 'THD session: ' + currentSessionId.slice(-8));
+                    
+                    // Associate WebSocket client with this session
+                    associateSession(currentSessionId);
                 } else {
                     console.error('Failed to create session:', sessionData);
                     document.getElementById('session-id').textContent = 'Session Failed';
@@ -435,9 +441,18 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                                     },
                                     color: obj.color || { r: 0.2, g: 0.8, b: 0.2, a: 1.0 },
                                     wireframe: obj.wireframe || false,
-                                    visible: obj.visible !== undefined ? obj.visible : true
+                                    visible: obj.visible !== undefined ? obj.visible : true,
+                                    // A-Frame specific properties
+                                    text: obj.text,
+                                    lightType: obj.lightType,
+                                    intensity: obj.intensity,
+                                    particleType: obj.particleType,
+                                    count: obj.count,
+                                    material: obj.material,
+                                    physics: obj.physics,
+                                    lighting: obj.lighting
                                 };
-                                console.log('[THD] Converted object:', converted);
+                                console.log('[THD] Converted object with text:', converted.text, converted);
                                 return converted;
                             });
                             if (!thdManager) {
@@ -601,6 +616,19 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         // A-Frame provides built-in WASD and mouse controls
         console.log('A-Frame controls: WASD to move, mouse to look, VR ready');
         
+        
+        // Associate WebSocket client with THD session for isolation
+        function associateSession(sessionId) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const associateMsg = {
+                    type: 'session_associate',
+                    session_id: sessionId
+                };
+                addDebug('WS_SEND', {type: 'session_associate', session: sessionId});
+                ws.send(JSON.stringify(associateMsg));
+                console.log('[THD] WebSocket associated with session:', sessionId);
+            }
+        }
         
         // Send client info to server
         function sendClientInfo() {
