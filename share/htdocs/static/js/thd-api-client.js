@@ -74,24 +74,19 @@ class THDAPIClient {
     }
 
 
-    // POST /sessions - createSession
-    createSession(data = null) {
-        return this.request('POST', '/sessions', data);
-    }
-
     // GET /sessions - listSessions
     listSessions() {
         return this.request('GET', '/sessions');
     }
 
-    // GET /scenes - listScenes
-    listScenes() {
-        return this.request('GET', '/scenes');
+    // POST /sessions - createSession
+    createSession(data = null) {
+        return this.request('POST', '/sessions', data);
     }
 
-    // POST /sessions/{sessionId}/recording/play - playRecording
-    playRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/play', [param1]);
+    // POST /sessions/{sessionId}/recording/stop - stopRecording
+    stopRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/stop', [param1]);
         return this.request('POST', path, data);
     }
 
@@ -101,9 +96,55 @@ class THDAPIClient {
         return this.request('GET', path);
     }
 
-    // POST /sessions/{sessionId}/objects - createObject
-    createObject(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
+    // POST /admin/logging/level - setLogLevel
+    setLogLevel(data = null) {
+        return this.request('POST', '/admin/logging/level', data);
+    }
+
+    // POST /browser/refresh - forceRefresh
+    forceRefresh(data = null) {
+        return this.request('POST', '/browser/refresh', data);
+    }
+
+    // GET /sessions/{sessionId} - getSession
+    getSession(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+        return this.request('GET', path);
+    }
+
+    // DELETE /sessions/{sessionId} - deleteSession
+    deleteSession(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+        return this.request('DELETE', path);
+    }
+
+    // GET /sessions/{sessionId}/world - getWorldSpec
+    getWorldSpec(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/world - initializeWorld
+    initializeWorld(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /scenes/{sceneId} - loadScene
+    loadScene(param1, data = null) {
+        const path = this.extractPathParams('/scenes/{sceneId}', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/scenes/save - saveSceneFromSession
+    saveSceneFromSession(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scenes/save', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/recording/play - playRecording
+    playRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/play', [param1]);
         return this.request('POST', path, data);
     }
 
@@ -113,15 +154,9 @@ class THDAPIClient {
         return this.request('GET', path);
     }
 
-    // POST /scenes/{sceneId} - loadScene
-    loadScene(param1, data = null) {
-        const path = this.extractPathParams('/scenes/{sceneId}', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /scenes/{sceneId}/fork - forkScene
-    forkScene(param1, data = null) {
-        const path = this.extractPathParams('/scenes/{sceneId}/fork', [param1]);
+    // POST /sessions/{sessionId}/objects - createObject
+    createObject(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
         return this.request('POST', path, data);
     }
 
@@ -143,9 +178,20 @@ class THDAPIClient {
         return this.request('DELETE', path);
     }
 
-    // GET /admin/logging/config - getLoggingConfig
-    getLoggingConfig() {
-        return this.request('GET', '/admin/logging/config');
+    // POST /admin/logging/trace - setTraceModules
+    setTraceModules(data = null) {
+        return this.request('POST', '/admin/logging/trace', data);
+    }
+
+    // GET /scenes - listScenes
+    listScenes() {
+        return this.request('GET', '/scenes');
+    }
+
+    // POST /scenes/{sceneId}/fork - forkScene
+    forkScene(param1, data = null) {
+        const path = this.extractPathParams('/scenes/{sceneId}/fork', [param1]);
+        return this.request('POST', path, data);
     }
 
     // POST /admin/logging/config - setLoggingConfig
@@ -153,9 +199,25 @@ class THDAPIClient {
         return this.request('POST', '/admin/logging/config', data);
     }
 
-    // POST /admin/logging/trace - setTraceModules
-    setTraceModules(data = null) {
-        return this.request('POST', '/admin/logging/trace', data);
+    // GET /admin/logging/config - getLoggingConfig
+    getLoggingConfig() {
+        return this.request('GET', '/admin/logging/config');
+    }
+
+    // GET /admin/logging/logs - getLogs
+    getLogs() {
+        return this.request('GET', '/admin/logging/logs');
+    }
+
+    // POST /browser/canvas - setCanvas
+    setCanvas(data = null) {
+        return this.request('POST', '/browser/canvas', data);
+    }
+
+    // POST /sessions/{sessionId}/recording/start - startRecording
+    startRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/start', [param1]);
+        return this.request('POST', path, data);
     }
 
     // PUT /sessions/{sessionId}/camera/position - setCameraPosition
@@ -168,68 +230,6 @@ class THDAPIClient {
     startCameraOrbit(param1, data = null) {
         const path = this.extractPathParams('/sessions/{sessionId}/camera/orbit', [param1]);
         return this.request('POST', path, data);
-    }
-
-    // GET /sessions/{sessionId}/world - getWorldSpec
-    getWorldSpec(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/world - initializeWorld
-    initializeWorld(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/recording/start - startRecording
-    startRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/start', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/recording/stop - stopRecording
-    stopRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/stop', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /admin/logging/logs - getLogs
-    getLogs() {
-        return this.request('GET', '/admin/logging/logs');
-    }
-
-    // POST /browser/refresh - forceRefresh
-    forceRefresh(data = null) {
-        return this.request('POST', '/browser/refresh', data);
-    }
-
-    // DELETE /sessions/{sessionId} - deleteSession
-    deleteSession(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
-        return this.request('DELETE', path);
-    }
-
-    // GET /sessions/{sessionId} - getSession
-    getSession(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/scenes/save - saveSceneFromSession
-    saveSceneFromSession(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scenes/save', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /admin/logging/level - setLogLevel
-    setLogLevel(data = null) {
-        return this.request('POST', '/admin/logging/level', data);
-    }
-
-    // POST /browser/canvas - setCanvas
-    setCanvas(data = null) {
-        return this.request('POST', '/browser/canvas', data);
     }
 
 }
