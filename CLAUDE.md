@@ -20,18 +20,22 @@
 
 ## Project Identity: THD (The Holo-Deck)
 
-### Current State (v2.0.0)
-- **Binary**: `thd` (professional daemon)
+### Current State (v3.0.0 - A-Frame VR Revolution)
+- **Binary**: `thd` (professional VR holodeck daemon)
 - **Module**: `holodeck` (Go module name)
+- **Rendering Engine**: A-Frame WebXR 1.4.0 (MIT License)
 - **Git Repository**: `https://git.uk.home.arpa/itdlabs/holo-deck.git`
 - **Credentials**: `claude-3/claude-password`
 - **Directory Structure**: Professional organization with clean .gitignore
 
-### Technical Architecture
-- **3D Coordinate System**: 25×25×25 grid with [-12, +12] boundaries
+### Revolutionary Technical Architecture
+- **VR/AR Holodeck**: Full WebXR support with A-Frame Entity-Component-System
+- **3D Coordinate System**: 25×25×25 grid with [-12, +12] boundaries (holodeck-grade)
+- **Multi-Backend Ready**: Framework-agnostic API layer supporting future engines
 - **Real-time Communication**: WebSocket Hub with thread-safe SessionStore
 - **Auto-generated Routing**: Complete routing layer generated from api.yaml
 - **Professional Build System**: Make-based with daemon control targets
+- **A-Frame Integration**: Seamless WebXR with 100% API compatibility
 
 ## Key File Locations
 
@@ -39,6 +43,8 @@
 - `/opt/holo-deck/src/api.yaml` - Single source of truth specification
 - `/opt/holo-deck/src/main.go` - THD daemon with professional standards
 - `/opt/holo-deck/src/auto_router.go` - Auto-generated routing (DO NOT EDIT)
+- `/opt/holo-deck/src/server/handlers.go` - A-Frame WebXR interface
+- `/opt/holo-deck/share/htdocs/static/js/thd-aframe.js` - A-Frame holodeck manager
 - `/opt/holo-deck/src/Makefile` - Professional build system
 
 ### Runtime
@@ -49,7 +55,12 @@
 ### Documentation
 - `/opt/holo-deck/README.md` - Professional project overview
 - `/opt/holo-deck/CHANGELOG.md` - Complete project transformation history
+- `/opt/holo-deck/docs/ADR-001-aframe-webxr-integration.md` - A-Frame integration decision
 - `/opt/holo-deck/docs/api/README.md` - THD API documentation
+
+### Holodeck Libraries
+- `/opt/holo-deck/lib/thd-functions.sh` - Comprehensive shell function library
+- `/opt/holo-deck/scenarios/ultimate-holodeck.thd` - Ultimate demonstration scenario
 
 ## Development Workflow
 
@@ -98,11 +109,14 @@ git config user.email "claude@anthropic.com"
 
 ## Debugging Context
 
-### WebGL Rendering
-- **Coordinate system**: Fixed boundaries [-12, +12] on all axes
-- **Object creation**: Must validate coordinates at API level
-- **Wireframe support**: Ensure `wireframe: obj.wireframe || false` in canvas control
-- **Session isolation**: Each session maintains independent object store
+### A-Frame VR Holodeck Rendering
+- **Coordinate system**: Fixed boundaries [-12, +12] on all axes (holodeck-grade)
+- **Entity-Component-System**: A-Frame ECS architecture with THDAFrameManager
+- **WebXR Integration**: Full VR/AR headset support via A-Frame 1.4.0
+- **Object creation**: Enhanced with color, materials, physics, lighting support
+- **Session isolation**: Each session maintains independent A-Frame object store
+- **Color rendering**: Proper hex conversion from RGBA to A-Frame materials
+- **Advanced features**: PBR materials, particle effects, 3D text, physics simulation
 
 ### API Control
 - **Browser control**: Force refresh and canvas manipulation APIs available
@@ -121,8 +135,14 @@ When resuming development after session restart:
 
 ## Project Philosophy
 
-> **"Where 3D visualization meets professional engineering"**
+> **"Where immersive holodeck technology meets professional engineering"**
 
-THD represents the evolution from innovative VWS concept to professional-grade engineering solution, maintaining all revolutionary capabilities while implementing proper software engineering practices.
+THD represents the revolutionary evolution from basic 3D visualization to **professional VR/AR holodeck platform**, powered by A-Frame WebXR while maintaining all professional engineering standards and 100% API compatibility.
 
-**Never compromise on professional standards while preserving innovation.**
+**A-Frame Integration Philosophy:**
+- **Framework Flexibility**: Clean API layer enables multi-backend architecture
+- **Community Leverage**: Utilize best-in-class open-source WebXR framework
+- **Professional Standards**: Maintain engineering quality across all integrations
+- **Future-Ready**: WebXR standard compliance for long-term viability
+
+**Never compromise on professional standards while achieving revolutionary capabilities.**

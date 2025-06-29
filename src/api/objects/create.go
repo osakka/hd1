@@ -7,13 +7,22 @@ import (
 	"holodeck/server"
 )
 
+// Color represents RGBA color values
+type Color struct {
+	R float64 `json:"r"`
+	G float64 `json:"g"`
+	B float64 `json:"b"`
+	A float64 `json:"a"`
+}
+
 // CreateObjectRequest represents the request body for creating objects
 type CreateObjectRequest struct {
-	Name string  `json:"name"`
-	Type string  `json:"type"`
-	X    float64 `json:"x"`
-	Y    float64 `json:"y"`
-	Z    float64 `json:"z"`
+	Name  string  `json:"name"`
+	Type  string  `json:"type"`
+	X     float64 `json:"x"`
+	Y     float64 `json:"y"`
+	Z     float64 `json:"z"`
+	Color *Color  `json:"color,omitempty"`
 }
 
 // CreateObjectHandler - POST /sessions/{sessionId}/objects
@@ -58,6 +67,22 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 	
+	// Use provided color or default to green
+	objectColor := map[string]interface{}{
+		"r": 0.2,
+		"g": 0.8,
+		"b": 0.2,
+		"a": 1.0,
+	}
+	if req.Color != nil {
+		objectColor = map[string]interface{}{
+			"r": req.Color.R,
+			"g": req.Color.G,
+			"b": req.Color.B,
+			"a": req.Color.A,
+		}
+	}
+
 	// Broadcast object creation for real-time updates via canvas control
 	h.BroadcastUpdate("canvas_control", map[string]interface{}{
 		"command": "create",
@@ -83,11 +108,21 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 						"z": 0,
 					},
 				},
-				"color": map[string]interface{}{
-					"r": 0.2,
-					"g": 0.8,
-					"b": 0.2,
-					"a": 1.0,
+				"color": objectColor,
+				"material": map[string]interface{}{
+					"shader":     "standard",
+					"metalness":  0.1,
+					"roughness":  0.7,
+					"transparent": false,
+				},
+				"physics": map[string]interface{}{
+					"enabled": false,
+					"mass":    1.0,
+					"type":    "static",
+				},
+				"lighting": map[string]interface{}{
+					"castShadow":    true,
+					"receiveShadow": true,
 				},
 				"visible":   true,
 				"wireframe": false,
