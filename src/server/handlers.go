@@ -220,12 +220,12 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         #debug-lock-icon {
             font-size: 10px;
-            color: #666;
+            color: #00ffff;
             transition: all 0.3s ease;
             cursor: help;
             position: relative;
             margin-right: 6px;
-            text-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
+            text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
         }
         
         #debug-lock-icon:hover::after {
@@ -245,13 +245,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         #debug-lock-icon.unlocked {
-            color: #666;
-            text-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
+            color: #00ffff;
+            text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
         }
         
         #debug-lock-icon.locked {
-            color: #00ff00;
-            text-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
+            color: #00ffff;
+            text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
         }
         
         .debug-indicators {
@@ -381,10 +381,12 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
     
     <div id="debug-panel">
         <div id="debug-header">
-            <span>THD Console</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
+                <span>THD Console</span>
+            </div>
             <div style="display: flex; align-items: center; gap: 6px;">
                 <span id="debug-lock-icon" class="unlocked" data-status="Mouse look available">&#128274;</span>
-                <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
                 <span id="debug-collapse-icon">&#8593;</span>
             </div>
         </div>
