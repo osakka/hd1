@@ -101,8 +101,10 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             padding: 4px 8px;
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
             font-weight: bold;
-            text-align: center;
             cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         #debug-session-bar {
@@ -930,11 +932,11 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             if (debugCollapsed) {
                 debugLog.classList.add('collapsed');
                 debugPanel.classList.add('collapsed');
-                debugHeader.textContent = 'THD Console [MINIMIZED]';
+                debugHeader.innerHTML = '<span>Holodeck Console</span><span>&#8595;</span>';
             } else {
                 debugLog.classList.remove('collapsed');
                 debugPanel.classList.remove('collapsed');
-                debugHeader.textContent = 'THD Console [ACTIVE]';
+                debugHeader.innerHTML = '<span>Holodeck Console</span><span>&#8593;</span>';
             }
             if (saveToCookie) {
                 setCookie('thd_console_collapsed', debugCollapsed.toString(), 30); // 30 days
