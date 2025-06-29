@@ -1,0 +1,138 @@
+#!/bin/bash
+# ULTIMATE HOLODECK SCENARIO
+# The definitive demonstration of A-Frame enhanced THD capabilities
+# A complete immersive VR experience showcase
+
+# Load THD functions
+source "$(dirname "$0")/../lib/thd-functions.sh"
+
+echo "=================================================="
+echo "🌟 ULTIMATE HOLODECK SCENARIO 🌟"
+echo "Showcasing the complete A-Frame enhanced THD system"
+echo "=================================================="
+
+# Clear existing objects first
+thd::clear
+
+# ENVIRONMENT SETUP
+echo "🌌 Creating ultimate holodeck environment..."
+thd::create_sky "holodeck_sky" "#1a1a2e"
+
+# ADVANCED LIGHTING SYSTEM
+echo "💡 Setting up cinematic lighting..."
+thd::create_light "key_light" "directional" 15 20 10 1.2 "#ffffff"
+thd::create_light "fill_light" "directional" -10 15 5 0.6 "#87ceeb"
+thd::create_light "ambient_base" "ambient" 0 0 0 0.2 "#404060"
+thd::create_light "rim_light" "point" 0 8 8 2.0 "#ff6600"
+
+# WELCOME TEXT
+echo "📝 Creating holodeck welcome message..."
+thd::create_text "welcome_text" "ULTIMATE HOLODECK" 0 5 -8 0.0 1.0 1.0
+thd::create_text "subtitle_text" "A-Frame Enhanced THD System" 0 4 -8 1.0 1.0 0.0
+
+# FOUNDATION - Metallic platform
+echo "🏗️  Building foundation platform..."
+for x in {-8..8}; do
+    for z in {-8..8}; do
+        if [ $((($x * $x) + ($z * $z))) -le 64 ]; then # Circular platform
+            thd::create_material "platform_${x}_${z}" cube $x 0 $z "standard" 0.8 0.2
+        fi
+    done
+done
+
+# CRYSTAL FORMATIONS - Ultimate objects
+echo "💎 Creating crystal formations..."
+thd::create_ultimate "crystal_tower_1" cone -5 3 -5 0.9 0.3 1.0 0.9 0.1
+thd::create_ultimate "crystal_tower_2" cone 5 4 -3 1.0 0.8 0.9 0.9 0.1
+thd::create_ultimate "crystal_tower_3" cone -3 2 5 0.8 0.9 1.0 0.9 0.1
+thd::create_ultimate "crystal_tower_4" cone 4 5 4 1.0 0.9 0.8 0.9 0.1
+
+# PARTICLE EFFECTS SHOWCASE
+echo "✨ Adding magical particle effects..."
+thd::create_particles "fire_center" "fire" 0 1 0 1500
+thd::create_particles "sparkle_left" "sparkle" -6 3 0 800
+thd::create_particles "sparkle_right" "sparkle" 6 3 0 800
+thd::create_particles "smoke_back" "smoke" 0 2 -6 600
+
+# PHYSICS PLAYGROUND
+echo "⚡ Creating physics demonstration..."
+# Bouncing spheres of different materials
+thd::create_physics "gold_sphere" sphere -3 4 -2 2.0 "dynamic"
+thd::create_physics "silver_sphere" sphere 3 4 -2 1.5 "dynamic"
+thd::create_physics "crystal_sphere" sphere 0 6 -3 0.8 "dynamic"
+
+# Static pillars with different materials
+thd::create_enhanced "marble_pillar_1" cylinder -6 2 -6 0.9 0.9 0.8 0.1 0.8
+thd::create_enhanced "marble_pillar_2" cylinder 6 2 -6 0.9 0.9 0.8 0.1 0.8
+thd::create_enhanced "obsidian_pillar_1" cylinder -6 2 6 0.1 0.1 0.2 0.8 0.1
+thd::create_enhanced "obsidian_pillar_2" cylinder 6 2 6 0.1 0.1 0.2 0.8 0.1
+
+# INTERACTIVE LIGHT SOURCES
+echo "🌟 Adding interactive lighting..."
+thd::create_light "orb_blue" "point" -4 3 2 3.0 "#00ffff"
+thd::create_light "orb_red" "point" 4 3 2 3.0 "#ff0066"
+thd::create_light "orb_green" "point" 0 4 4 2.5 "#00ff66"
+thd::create_light "orb_purple" "point" 0 3 -4 2.5 "#ff00ff"
+
+# ARCHITECTURAL ELEMENTS
+echo "🏛️  Adding architectural showcase..."
+# Glass structures
+for y in {1..6}; do
+    thd::create_enhanced "glass_wall_north_${y}" cube 0 $y -7 0.8 0.9 1.0 0.0 0.0
+    thd::create_enhanced "glass_wall_south_${y}" cube 0 $y 7 0.8 0.9 1.0 0.0 0.0
+done
+
+# Metallic beams
+for x in {-7..7}; do
+    thd::create_enhanced "beam_top_${x}" cube $x 7 0 0.7 0.7 0.8 0.9 0.1
+done
+
+# HOLODECK CONTROL PANELS
+echo "🎛️  Installing holodeck controls..."
+thd::create_enhanced "control_panel_1" cube -7 2 0 0.2 0.3 0.4 0.7 0.3
+thd::create_enhanced "control_panel_2" cube 7 2 0 0.2 0.3 0.4 0.7 0.3
+thd::create_text "panel_label_1" "CONTROLS" -7 3 0 0.0 1.0 0.0
+thd::create_text "panel_label_2" "SYSTEMS" 7 3 0 0.0 1.0 0.0
+
+# FLOATING GEOMETRIC SCULPTURES
+echo "🎨 Creating floating art installations..."
+thd::create_ultimate "sculpture_1" sphere -2 5 -1 1.0 0.7 0.3 0.6 0.2
+thd::create_ultimate "sculpture_2" cylinder 2 4 1 0.3 0.7 1.0 0.8 0.1
+thd::create_ultimate "sculpture_3" cone 1 6 -2 0.7 1.0 0.3 0.4 0.4
+
+# ENERGY FIELDS
+echo "⚡ Generating energy field effects..."
+thd::create_particles "energy_1" "sparkle" -4 2 -4 1000
+thd::create_particles "energy_2" "sparkle" 4 2 4 1000
+thd::create_particles "energy_3" "fire" 0 1 6 800
+
+# HOLODECK STATUS DISPLAY
+echo "📊 Installing status displays..."
+thd::create_text "status_1" "HOLODECK ACTIVE" -6 6 -2 0.0 1.0 0.0
+thd::create_text "status_2" "VR MODE ENABLED" 6 6 -2 0.0 0.8 1.0
+thd::create_text "status_3" "PHYSICS SIMULATION ON" 0 7 -2 1.0 1.0 0.0
+thd::create_text "instructions" "USE VR HEADSET FOR FULL EXPERIENCE" 0 1 8 1.0 0.5 0.0
+
+echo ""
+echo "=================================================="
+echo "🎉 ULTIMATE HOLODECK SCENARIO COMPLETE! 🎉"
+echo "=================================================="
+echo ""
+echo "FEATURES DEMONSTRATED:"
+echo "🌌 Advanced sky environment"
+echo "💡 Cinematic lighting system (4 light sources)"
+echo "📝 3D text displays and signage"
+echo "💎 Ultimate material showcase (metallic crystals)"
+echo "✨ Particle effects (fire, smoke, sparkles)"
+echo "⚡ Physics simulation (bouncing spheres)"
+echo "🏛️  Architectural elements (glass, metal, marble)"
+echo "🎨 Floating sculptural elements"
+echo "🎛️  Interactive control panels"
+echo "⚡ Energy field visualizations"
+echo ""
+echo "🚀 READY FOR VR EXPERIENCE!"
+echo "Navigate to http://localhost:8080 and enable VR mode"
+echo "Use WASD to move, mouse to look around"
+echo "Click VR button for full immersive experience"
+echo ""
+echo "Welcome to the future of holodeck technology! 🌟"

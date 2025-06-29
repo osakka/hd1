@@ -225,5 +225,118 @@ EOF
     echo "✨ $name (enhanced) at ($x,$y,$z)"
 }
 
-echo "🎯 THD Holodeck Functions Loaded (A-Frame Enhanced)"
-echo "💡 New functions: thd::create_light, thd::create_physics, thd::create_material, thd::create_sky, thd::create_enhanced"
+# Create 3D text
+thd::create_text() {
+    local name="$1"
+    local text="$2"
+    local x="$3" y="$4" z="$5"
+    local color_r="${6:-1.0}"
+    local color_g="${7:-1.0}"
+    local color_b="${8:-1.0}"
+    
+    local payload=$(cat <<EOF
+{
+    "name": "$name",
+    "type": "text",
+    "text": "$text",
+    "x": $x,
+    "y": $y,
+    "z": $z,
+    "color": {
+        "r": $color_r,
+        "g": $color_g,
+        "b": $color_b,
+        "a": 1.0
+    }
+}
+EOF
+)
+    
+    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+         -H "Content-Type: application/json" \
+         -d "$payload" | jq -r '.message // "Text Created"'
+    
+    echo "📝 $name text ('$text') at ($x,$y,$z)"
+}
+
+# Create particle effects
+thd::create_particles() {
+    local name="$1"
+    local type="$2"  # fire, smoke, sparkle
+    local x="$3" y="$4" z="$5"
+    local count="${6:-500}"
+    
+    local payload=$(cat <<EOF
+{
+    "name": "$name",
+    "type": "particle",
+    "particleType": "$type",
+    "x": $x,
+    "y": $y,
+    "z": $z,
+    "count": $count
+}
+EOF
+)
+    
+    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+         -H "Content-Type: application/json" \
+         -d "$payload" | jq -r '.message // "Particles Created"'
+    
+    echo "✨ $name particles ($type) at ($x,$y,$z)"
+}
+
+# Ultimate holodeck object creation
+thd::create_ultimate() {
+    local name="$1"
+    local type="$2"
+    local x="$3" y="$4" z="$5"
+    local color_r="${6:-0.5}"
+    local color_g="${7:-0.8}"
+    local color_b="${8:-1.0}"
+    local metalness="${9:-0.5}"
+    local roughness="${10:-0.3}"
+    local emissive="${11:-false}"
+    
+    local payload=$(cat <<EOF
+{
+    "name": "$name",
+    "type": "$type",
+    "x": $x,
+    "y": $y,
+    "z": $z,
+    "color": {
+        "r": $color_r,
+        "g": $color_g,
+        "b": $color_b,
+        "a": 1.0
+    },
+    "material": {
+        "shader": "standard",
+        "metalness": $metalness,
+        "roughness": $roughness,
+        "emissive": $emissive
+    },
+    "physics": {
+        "enabled": true,
+        "mass": 1.0,
+        "type": "dynamic"
+    },
+    "lighting": {
+        "castShadow": true,
+        "receiveShadow": true
+    }
+}
+EOF
+)
+    
+    curl -s -X POST "$THD_API_BASE/sessions/$THD_SESSION_ID/objects" \
+         -H "Content-Type: application/json" \
+         -d "$payload" | jq -r '.message // "Ultimate Object Created"'
+    
+    echo "🌟 $name (ultimate holodeck object) at ($x,$y,$z)"
+}
+
+echo "🎯 THD Holodeck Functions Loaded (ULTIMATE A-Frame)"
+echo "💡 Functions: thd::create_light, thd::create_physics, thd::create_material, thd::create_sky, thd::create_enhanced"
+echo "🌟 Ultimate: thd::create_text, thd::create_particles, thd::create_ultimate"

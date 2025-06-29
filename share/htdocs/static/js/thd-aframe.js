@@ -170,6 +170,12 @@ class THDAFrameManager {
             case 'sky':
                 this.createSky(entity, obj);
                 return; // Sky doesn't need geometry
+            case 'text':
+                this.createText(entity, obj);
+                return; // Text uses special component
+            case 'particle':
+                this.createParticles(entity, obj);
+                return; // Particles use special component
             default:
                 // Default to cube for unknown types
                 entity.setAttribute('geometry', {
@@ -256,6 +262,58 @@ class THDAFrameManager {
         entity.setAttribute('scale', '-1 1 1'); // Invert to see from inside
         
         console.log('[THD-AFrame] Created sky environment:', color);
+    }
+
+    createText(entity, obj) {
+        // Create 3D text in holodeck space
+        const textProps = {
+            value: obj.text || 'Holodeck Text',
+            color: obj.color ? this.colorToHex(obj.color) : '#ffffff',
+            align: 'center',
+            width: obj.width || 6,
+            font: 'roboto'
+        };
+        
+        entity.setAttribute('text', textProps);
+        console.log('[THD-AFrame] Created 3D text:', obj.text);
+    }
+
+    createParticles(entity, obj) {
+        // Create particle effects (fire, smoke, sparkles, etc.)
+        const particleType = obj.particleType || 'sparkle';
+        
+        switch (particleType) {
+            case 'fire':
+                entity.setAttribute('particle-system', {
+                    preset: 'fire',
+                    particleCount: obj.count || 1000,
+                    maxAge: 2,
+                    color: '#ff6600,#ff0000,#ffaa00',
+                    size: '0.5, 0'
+                });
+                break;
+            case 'smoke':
+                entity.setAttribute('particle-system', {
+                    preset: 'smoke',
+                    particleCount: obj.count || 500,
+                    maxAge: 4,
+                    color: '#888888,#aaaaaa,#cccccc',
+                    size: '1, 3'
+                });
+                break;
+            case 'sparkle':
+            default:
+                entity.setAttribute('particle-system', {
+                    preset: 'sparkle',
+                    particleCount: obj.count || 200,
+                    maxAge: 3,
+                    color: '#ffffff,#00ffff,#ffff00',
+                    size: '0.1, 0.5'
+                });
+                break;
+        }
+        
+        console.log('[THD-AFrame] Created particle system:', particleType);
     }
 
     clearObjects() {
