@@ -1268,14 +1268,21 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         function setDebugState(collapsed, saveToCookie = true) {
             debugCollapsed = collapsed;
             const debugPanel = document.getElementById('debug-panel');
+            const debugSceneBar = document.getElementById('debug-scene-bar');
+            const debugControlsBar = document.getElementById('debug-controls-bar');
+            
             if (debugCollapsed) {
                 debugLog.classList.add('collapsed');
                 debugPanel.classList.add('collapsed');
                 debugCollapseIcon.classList.add('collapsed');
+                debugSceneBar.style.display = 'none';
+                debugControlsBar.style.display = 'none';
             } else {
                 debugLog.classList.remove('collapsed');
                 debugPanel.classList.remove('collapsed');
                 debugCollapseIcon.classList.remove('collapsed');
+                debugSceneBar.style.display = 'block';
+                debugControlsBar.style.display = 'flex';
             }
             if (saveToCookie) {
                 setCookie('thd_console_collapsed', debugCollapsed.toString(), 30); // 30 days
