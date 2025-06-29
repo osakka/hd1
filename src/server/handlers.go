@@ -433,7 +433,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         </div>
         <div id="debug-scene-bar">
             <div style="display: flex; align-items: center; gap: 4px;">
-                <span style="background: transparent; border: 1px solid rgba(0, 255, 255, 0.3); padding: 2px 6px; border-radius: 2px; font-size: 9px;">Scene</span>
+                <span style="background: transparent; padding: 4px 6px; font-size: 9px; display: inline-block; height: 18px; line-height: 18px;">Scene</span>
                 <select id="debug-scene-select">
                     <option value="">Select Scene...</option>
                     <option value="empty">Empty Grid</option>
