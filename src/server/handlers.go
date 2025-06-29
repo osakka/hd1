@@ -78,7 +78,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 300px;
+            width: 450px;
             min-height: 60px;
             max-height: 400px;
             background: rgba(0, 0, 0, 0.7);
@@ -94,6 +94,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         #debug-panel.collapsed {
             min-height: 40px;
+            max-height: 40px;
         }
         
         #debug-header {
@@ -1275,14 +1276,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                 debugLog.classList.add('collapsed');
                 debugPanel.classList.add('collapsed');
                 debugCollapseIcon.classList.add('collapsed');
-                debugSceneBar.style.display = 'none';
-                debugControlsBar.style.display = 'none';
+                if (debugSceneBar) debugSceneBar.style.display = 'none';
+                if (debugControlsBar) debugControlsBar.style.display = 'none';
             } else {
                 debugLog.classList.remove('collapsed');
                 debugPanel.classList.remove('collapsed');
                 debugCollapseIcon.classList.remove('collapsed');
-                debugSceneBar.style.display = 'block';
-                debugControlsBar.style.display = 'flex';
+                if (debugSceneBar) debugSceneBar.style.display = 'block';
+                if (debugControlsBar) debugControlsBar.style.display = 'flex';
             }
             if (saveToCookie) {
                 setCookie('thd_console_collapsed', debugCollapsed.toString(), 30); // 30 days
