@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"holodeck/logging"
 	"holodeck/server"
 )
 
@@ -75,6 +77,9 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Cast hub to proper type
 	h, ok := hub.(*server.Hub)
 	if !ok {
+		logging.Error("failed to cast hub interface", map[string]interface{}{
+			"expected_type": "*server.Hub",
+		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -82,6 +87,9 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Extract session ID from path
 	sessionID := extractSessionID(r.URL.Path)
 	if sessionID == "" {
+		logging.Warn("object creation attempted without session ID", map[string]interface{}{
+			"path": r.URL.Path,
+		})
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -94,6 +102,9 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	
 	// Validate session exists
 	if _, exists := h.GetStore().GetSession(sessionID); !exists {
+		logging.Warn("object creation attempted for non-existent session", map[string]interface{}{
+			"session_id": sessionID,
+		})
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -107,6 +118,10 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Parse request body
 	var req CreateObjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		logging.Error("invalid JSON in object creation request", map[string]interface{}{
+			"session_id": sessionID,
+			"error": err.Error(),
+		})
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -132,6 +147,13 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Create object using SessionStore with coordinate validation
 	object, err := h.GetStore().CreateObject(sessionID, req.Name, req.Type, req.X, req.Y, req.Z)
 	if err != nil {
+		logging.Error("object creation failed", map[string]interface{}{
+			"session_id": sessionID,
+			"object_name": req.Name,
+			"object_type": req.Type,
+			"position": map[string]float64{"x": req.X, "y": req.Y, "z": req.Z},
+			"error": err.Error(),
+		})
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -285,6 +307,13 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		},
 	})
 	
+	logging.Info("object created successfully", map[string]interface{}{
+		"session_id": sessionID,
+		"object_name": object.Name,
+		"object_type": object.Type,
+		"position": map[string]float64{"x": object.X, "y": object.Y, "z": object.Z},
+	})
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{

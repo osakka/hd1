@@ -2,9 +2,10 @@ package server
 
 import (
 	"encoding/json"
-	"log"
 	"sync"
 	"time"
+
+	"holodeck/logging"
 )
 
 type Hub struct {
@@ -32,23 +33,17 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
-			log.Printf("Client connected. Total: %d", len(h.clients))
-			if h.logger != nil {
-				h.logger.Log("info", "SERVER", "Client connected", map[string]interface{}{
-					"total_clients": len(h.clients),
-				})
-			}
+			logging.Info("client connected to hub", map[string]interface{}{
+				"total_clients": len(h.clients),
+			})
 
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
-				log.Printf("Client disconnected. Total: %d", len(h.clients))
-				if h.logger != nil {
-					h.logger.Log("info", "SERVER", "Client disconnected", map[string]interface{}{
-						"total_clients": len(h.clients),
-					})
-				}
+				logging.Info("client disconnected from hub", map[string]interface{}{
+					"total_clients": len(h.clients),
+				})
 			}
 
 		case message := <-h.broadcast:
@@ -93,13 +88,11 @@ func (h *Hub) BroadcastToSession(sessionID string, updateType string, data inter
 		}
 		
 		// Log session-specific broadcast for debugging
-		if h.logger != nil {
-			h.logger.Log("debug", "HUB", "Session broadcast", map[string]interface{}{
-				"session_id": sessionID,
-				"type": updateType,
-				"clients": clientCount,
-			})
-		}
+		logging.Debug("session broadcast sent", map[string]interface{}{
+			"session_id": sessionID,
+			"type": updateType,
+			"clients": clientCount,
+		})
 	}
 }
 

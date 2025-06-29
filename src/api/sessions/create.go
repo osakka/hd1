@@ -3,6 +3,8 @@ package sessions
 import (
 	"encoding/json"
 	"net/http"
+
+	"holodeck/logging"
 	"holodeck/server"
 )
 
@@ -11,16 +13,27 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	// Cast hub to proper type
 	h, ok := hub.(*server.Hub)
 	if !ok {
+		logging.Error("failed to cast hub interface", map[string]interface{}{
+			"expected_type": "*server.Hub",
+		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	
 	// Create session using SessionStore
 	session := h.GetStore().CreateSession()
+	logging.Info("session created successfully", map[string]interface{}{
+		"session_id": session.ID,
+		"created_at": session.CreatedAt,
+	})
 	
 	// Automatically initialize world with holodeck coordinate system (floor=Y:0, human eye level=Y:1.7)
 	world, err := h.GetStore().InitializeWorld(session.ID, 25, 0.01, 0, 1.7, 0)
 	if err != nil {
+		logging.Error("failed to initialize world for session", map[string]interface{}{
+			"session_id": session.ID,
+			"error": err.Error(),
+		})
 		http.Error(w, "Failed to initialize world: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"holodeck/logging"
 	"holodeck/server"
 )
 
@@ -12,12 +14,18 @@ func ListSessionsHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Cast hub to proper type
 	h, ok := hub.(*server.Hub)
 	if !ok {
+		logging.Error("failed to cast hub interface", map[string]interface{}{
+			"expected_type": "*server.Hub",
+		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	
 	// Get all sessions from SessionStore
 	sessions := h.GetStore().ListSessions()
+	logging.Debug("sessions list requested", map[string]interface{}{
+		"total_sessions": len(sessions),
+	})
 	
 	// Transform to response format with object counts
 	var sessionList []map[string]interface{}

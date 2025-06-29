@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"syscall"
 
+	"holodeck/logging"
 	"holodeck/server"
 )
 
@@ -51,22 +52,35 @@ func main() {
 		log.Fatalf("FATAL: Failed to create directories: %v", err)
 	}
 
-	// Setup logging with absolute path
+	// Initialize unified logging system
+	logConfig := logging.LoadConfig()
+	if err := logging.ApplyConfig(logConfig); err != nil {
+		log.Fatalf("FATAL: Failed to initialize logging: %v", err)
+	}
+
+	// Setup legacy logging compatibility (deprecated)
 	if err := setupLogging(*logFile); err != nil {
-		log.Fatalf("FATAL: Failed to setup logging: %v", err)
+		logging.Warn("legacy logging setup failed", map[string]interface{}{
+			"error": err.Error(),
+		})
 	}
 
 	// Handle daemon mode
 	if *daemonize {
 		if err := becomedaemon(*pidFile); err != nil {
-			log.Fatalf("FATAL: Failed to daemonize: %v", err)
+			logging.Fatal("failed to daemonize process", map[string]interface{}{
+				"pid_file": *pidFile,
+				"error":    err.Error(),
+			})
 		}
 		defer removePidFile(*pidFile)
 	}
 
 	// Validate static directory
 	if _, err := os.Stat(*staticDir); os.IsNotExist(err) {
-		log.Fatalf("FATAL: Static directory does not exist: %s", *staticDir)
+		logging.Fatal("static directory does not exist", map[string]interface{}{
+			"static_dir": *staticDir,
+		})
 	}
 
 	// Initialize THD
@@ -99,30 +113,48 @@ func main() {
 		http.StripPrefix("/static/", fileServer).ServeHTTP(w, r)
 	}))
 
-	// Startup banner
-	log.Println("THD (The Holo-Deck) - Professional Daemon")
-	log.Println("SPEC-DRIVEN ARCHITECTURE - Single Source of Truth")
-	log.Println("api.yaml drives all routing automatically")
-	log.Println("")
-	log.Printf("Root Directory: %s", THD_ROOT_DIR)
-	log.Printf("Static Directory: %s", *staticDir)
-	log.Printf("Log Directory: %s", THD_LOG_DIR)
-	log.Printf("Runtime Directory: %s", THD_RUNTIME_DIR)
+	// Professional startup banner
+	logging.Info("THD (The Holo-Deck) daemon starting", map[string]interface{}{
+		"version":     "v3.4.0",
+		"architecture": "spec-driven",
+	})
+	
+	logging.Info("directory configuration", map[string]interface{}{
+		"root_dir":    THD_ROOT_DIR,
+		"static_dir":  *staticDir,
+		"log_dir":     THD_LOG_DIR,
+		"runtime_dir": THD_RUNTIME_DIR,
+	})
+	
 	if *daemonize {
-		log.Printf("PID File: %s", *pidFile)
+		logging.Info("daemon mode enabled", map[string]interface{}{
+			"pid_file": *pidFile,
+		})
 	}
-	log.Println("")
-	log.Println("API Endpoints:")
-	log.Println("   POST /api/sessions - Create session")
-	log.Println("   GET  /api/sessions - List sessions")
-	log.Println("   POST /api/sessions/{id}/world - Initialize world")
-	log.Println("   POST /api/sessions/{id}/objects - Create objects")
-	log.Println("   PUT  /api/sessions/{id}/camera/position - Set camera")
-	log.Println("")
+
+	logging.Info("core API endpoints initialized", map[string]interface{}{
+		"sessions":    "/api/sessions",
+		"objects":     "/api/sessions/{id}/objects", 
+		"world":       "/api/sessions/{id}/world",
+		"camera":      "/api/sessions/{id}/camera/position",
+		"scenes":      "/api/scenes",
+		"recording":   "/api/sessions/{id}/recording/*",
+		"admin":       "/admin/logging/*",
+	})
 	
 	bindAddr := fmt.Sprintf("%s:%s", *host, *port)
-	log.Printf("THD Server starting on %s", bindAddr)
-	log.Fatal(http.ListenAndServe(bindAddr, nil))
+	logging.Info("server binding to address", map[string]interface{}{
+		"address": bindAddr,
+		"host":    *host,
+		"port":    *port,
+	})
+	
+	if err := http.ListenAndServe(bindAddr, nil); err != nil {
+		logging.Fatal("server failed to start", map[string]interface{}{
+			"address": bindAddr,
+			"error":   err.Error(),
+		})
+	}
 }
 
 func showHelp() {

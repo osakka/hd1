@@ -798,6 +798,255 @@ paths:
       x-function: "DeleteObject"
 
   # ========================================
+  # LOGGING CONFIGURATION
+  # ========================================
+  /admin/logging/config:
+    get:
+      operationId: getLoggingConfig
+      tags: [Admin]
+      summary: Get current logging configuration
+      description: |
+        Returns current logging level and trace module configuration.
+        Used for debugging and system administration.
+      responses:
+        '200':
+          description: Current logging configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  level:
+                    type: string
+                    enum: [TRACE, DEBUG, INFO, WARN, ERROR, FATAL]
+                    description: Current logging level
+                  trace_modules:
+                    type: array
+                    items:
+                      type: string
+                    description: List of modules with tracing enabled
+                  log_dir:
+                    type: string
+                    description: Directory where logs are written
+      x-handler: "api/logging/handlers.go"
+      x-function: "GetLoggingConfig"
+
+    post:
+      operationId: setLoggingConfig
+      tags: [Admin]
+      summary: Update logging configuration
+      description: |
+        Updates logging level and trace module configuration.
+        Changes take effect immediately.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                level:
+                  type: string
+                  enum: [TRACE, DEBUG, INFO, WARN, ERROR, FATAL]
+                  description: New logging level
+                trace_modules:
+                  type: array
+                  items:
+                    type: string
+                  description: List of modules to enable tracing for
+      responses:
+        '200':
+          description: Configuration updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  level:
+                    type: string
+                  trace_modules:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/logging/handlers.go"
+      x-function: "SetLoggingConfig"
+
+  /admin/logging/level:
+    post:
+      operationId: setLogLevel
+      tags: [Admin]
+      summary: Set logging level
+      description: |
+        Sets the global logging level. All log messages below this level
+        will be filtered out to reduce overhead.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                level:
+                  type: string
+                  enum: [TRACE, DEBUG, INFO, WARN, ERROR, FATAL]
+                  description: New logging level
+              required: [level]
+      responses:
+        '200':
+          description: Log level updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  level:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: Invalid log level
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/logging/handlers.go"
+      x-function: "SetLogLevel"
+
+  /admin/logging/trace:
+    post:
+      operationId: setTraceModules
+      tags: [Admin]
+      summary: Configure trace modules
+      description: |
+        Enable or disable tracing for specific modules. Tracing provides
+        detailed execution information for debugging specific components.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enable:
+                  type: array
+                  items:
+                    type: string
+                  description: Modules to enable tracing for
+                disable:
+                  type: array
+                  items:
+                    type: string
+                  description: Modules to disable tracing for
+      responses:
+        '200':
+          description: Trace configuration updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  enabled:
+                    type: array
+                    items:
+                      type: string
+                  disabled:
+                    type: array
+                    items:
+                      type: string
+                  message:
+                    type: string
+      x-handler: "api/logging/handlers.go"
+      x-function: "SetTraceModules"
+
+  /admin/logging/logs:
+    get:
+      operationId: getLogs
+      tags: [Admin, Logging]
+      summary: Get recent log entries
+      description: |
+        Retrieve the last N log entries from the unified logging system.
+        Supports log rotation - reads from current and rotated log files.
+        Professional troubleshooting and monitoring endpoint.
+      parameters:
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+          description: "Number of recent log entries to return (max 1000)"
+          example: 50
+      responses:
+        '200':
+          description: Log entries retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                        process_id:
+                          type: integer
+                        thread_id:
+                          type: string
+                        level:
+                          type: string
+                          enum: [TRACE, DEBUG, INFO, WARN, ERROR, FATAL]
+                        function:
+                          type: string
+                        file:
+                          type: string
+                        line:
+                          type: integer
+                        message:
+                          type: string
+                        data:
+                          type: object
+                  count:
+                    type: integer
+                    description: "Number of entries returned"
+                  requested:
+                    type: integer
+                    description: "Number of entries requested"
+              example:
+                entries:
+                  - timestamp: "2025-06-29T18:30:00.123Z"
+                    process_id: 12345
+                    thread_id: "main"
+                    level: "INFO"
+                    function: "CreateSession"
+                    file: "create"
+                    line: 42
+                    message: "session created successfully"
+                    data:
+                      session_id: "session_abc123"
+                count: 1
+                requested: 50
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/logging/handlers.go"
+      x-function: "GetLogs"
+
+  # ========================================
   # BROWSER CONTROL
   # ========================================
   /browser/refresh:

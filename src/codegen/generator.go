@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,6 +9,7 @@ import (
 	"text/template"
 	
 	"gopkg.in/yaml.v3"
+	"holodeck/logging"
 )
 
 // OpenAPI Specification Structure
@@ -105,9 +105,9 @@ package main
 import (
 	"net/http"
 	"strings"
-	"log"
+	"holodeck/logging"
 {{range .Imports}}
-	"{{.}}"{{end}}
+	{{if eq . "holodeck/api/logging"}}apiLogging "{{.}}"{{else}}"{{.}}"{{end}}{{end}}
 )
 
 // Route represents a single API route
@@ -148,7 +148,11 @@ func (r *APIRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	path := strings.TrimPrefix(req.URL.Path, "/api")
 	for _, route := range r.routes {
 		if r.matchRoute(route.Path, path) && route.Method == req.Method {
-			log.Printf("API: %s %s -> %s", req.Method, req.URL.Path, route.OperationID)
+			logging.Debug("API request routed", map[string]interface{}{
+				"method": req.Method,
+				"path": req.URL.Path,
+				"operation_id": route.OperationID,
+			})
 			route.Handler(w, req)
 			return
 		}
@@ -195,7 +199,7 @@ func (r *APIRouter) generateRoutes() {
 {{range .HandlerStubs}}
 // {{.Comment}}
 func (r *APIRouter) {{.FuncName}}(w http.ResponseWriter, req *http.Request) {
-	{{.Package}}.{{.FuncName}}Handler(w, req, r.hub)
+	{{if eq .Package "logging"}}apiLogging{{else}}{{.Package}}{{end}}.{{.FuncName}}Handler(w, req, r.hub)
 }
 {{end}}
 `
@@ -205,17 +209,33 @@ func main() {
 	fmt.Println("🧠 BRAIN SURGEON CODE GENERATOR - SPEC-DRIVEN DEVELOPMENT")
 	fmt.Println("========================================================")
 
+	// Initialize logging for code generation
+	logging.InitLogger("/opt/holo-deck/build/logs", logging.INFO, []string{})
+	logging.Info("code generator starting", map[string]interface{}{
+		"task": "specification-driven development",
+	})
+
 	// Load API specification
 	specData, err := os.ReadFile("api.yaml")
 	if err != nil {
-		log.Fatal("❌ FATAL: Cannot read api.yaml - Specification is REQUIRED!")
+		logging.Fatal("cannot read api.yaml specification", map[string]interface{}{
+			"error": err.Error(),
+			"note": "specification is required for code generation",
+		})
 	}
 
 	var spec OpenAPISpec
 	if err := yaml.Unmarshal(specData, &spec); err != nil {
-		log.Fatal("❌ FATAL: Invalid YAML in api.yaml:", err)
+		logging.Fatal("invalid YAML in api.yaml", map[string]interface{}{
+			"error": err.Error(),
+		})
 	}
 
+	logging.Info("API specification loaded successfully", map[string]interface{}{
+		"title": spec.Info.Title,
+		"version": spec.Info.Version,
+		"total_paths": len(spec.Paths),
+	})
 	fmt.Printf("✅ Loaded API Spec: %s v%s\n", spec.Info.Title, spec.Info.Version)
 	fmt.Printf("📊 Found %d paths to process\n", len(spec.Paths))
 
@@ -297,7 +317,9 @@ func main() {
 	
 	routerFile, err := os.Create("auto_router.go")
 	if err != nil {
-		log.Fatal("❌ Cannot create auto_router.go:", err)
+		logging.Fatal("failed to create auto_router.go", map[string]interface{}{
+			"error": err.Error(),
+		})
 	}
 	defer routerFile.Close()
 
@@ -312,7 +334,9 @@ func main() {
 	}
 
 	if err := tmpl.Execute(routerFile, templateData); err != nil {
-		log.Fatal("❌ Template generation failed:", err)
+		logging.Fatal("template generation failed", map[string]interface{}{
+			"error": err.Error(),
+		})
 	}
 
 	fmt.Println("✅ SUCCESS: auto_router.go generated")
@@ -373,24 +397,32 @@ func generateTHDClient(spec OpenAPISpec, routes []RouteInfo) {
 	
 	// Ensure directory exists
 	if err := os.MkdirAll("client", 0755); err != nil {
-		log.Printf("❌ Failed to create client directory: %v", err)
+		logging.Error("failed to create client directory", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	
 	if err := os.MkdirAll(filepath.Dir(clientBinPath), 0755); err != nil {
-		log.Printf("❌ Failed to create bin directory: %v", err)
+		logging.Error("failed to create bin directory", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	
 	// Generate Go client source
 	if err := generateGoClient(clientGoPath, spec, routes); err != nil {
-		log.Printf("❌ Failed to generate Go client: %v", err)
+		logging.Error("failed to generate Go client", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	
 	// Build Go client binary
 	if err := buildGoClient(clientGoPath, clientBinPath); err != nil {
-		log.Printf("❌ Failed to build client binary: %v", err)
+		logging.Error("failed to build client binary", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	
@@ -655,25 +687,33 @@ func generateWebUIClient(spec OpenAPISpec, routes []RouteInfo) {
 	// Create web UI client directory structure
 	uiClientDir := "../share/htdocs/static/js"
 	if err := os.MkdirAll(uiClientDir, 0755); err != nil {
-		log.Printf("❌ Failed to create UI client directory: %v", err)
+		logging.Error("failed to create UI client directory", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	
 	// Generate JavaScript API Client Library
 	if err := generateJavaScriptAPIClient(uiClientDir, spec, routes); err != nil {
-		log.Printf("❌ Failed to generate JavaScript API client: %v", err)
+		logging.Error("failed to generate JavaScript API client", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	
 	// Generate UI Component Library
 	if err := generateUIComponents(uiClientDir, spec, routes); err != nil {
-		log.Printf("❌ Failed to generate UI components: %v", err)
+		logging.Error("failed to generate UI components", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	
 	// Generate Dynamic Form System
 	if err := generateFormSystem(uiClientDir, spec, routes); err != nil {
-		log.Printf("❌ Failed to generate form system: %v", err)
+		logging.Error("failed to generate form system", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	

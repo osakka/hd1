@@ -2,11 +2,11 @@ package server
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"holodeck/logging"
 )
 
 const (
@@ -68,7 +68,9 @@ func (c *Client) readPump() {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				logging.Error("websocket connection error", map[string]interface{}{
+					"error": err.Error(),
+				})
 			}
 			break
 		}
@@ -98,13 +100,11 @@ func (c *Client) handleClientMessage(message []byte) {
 		serverVersion := GetJSVersion()
 		
 		// Log version info and trigger reloads when versions don't match
-		if c.hub.logger != nil {
-			c.hub.logger.Log("info", "SERVER", "Version check", map[string]interface{}{
-				"client": clientVersion,
-				"server": serverVersion,
-				"match": clientVersion == serverVersion,
-			})
-		}
+		logging.Info("client version check", map[string]interface{}{
+			"client": clientVersion,
+			"server": serverVersion,
+			"match": clientVersion == serverVersion,
+		})
 		
 		// Send version mismatch response to trigger browser refresh
 		if clientVersion != serverVersion {
@@ -123,11 +123,13 @@ func (c *Client) handleClientMessage(message []byte) {
 		}
 		
 	case "client_log":
-		if c.hub.logger != nil {
-			var logMsg LogMessage
-			if err := json.Unmarshal(message, &logMsg); err == nil {
-				c.hub.logger.LogClientMessage(logMsg)
-			}
+		var logMsg LogMessage
+		if err := json.Unmarshal(message, &logMsg); err == nil {
+			logging.Debug("client log message", map[string]interface{}{
+				"level": logMsg.Level,
+				"message": logMsg.Message,
+				"source": "browser",
+			})
 		}
 		
 	case "client_info":
@@ -136,32 +138,26 @@ func (c *Client) handleClientMessage(message []byte) {
 			c.info = &info
 			c.lastSeen = time.Now()
 			
-			if c.hub.logger != nil {
-				c.hub.logger.Log("info", "CLIENT", "Client info updated", map[string]interface{}{
-					"screen": info.Screen,
-					"capabilities": info.Capabilities,
-				})
-			}
+			logging.Info("client info updated", map[string]interface{}{
+				"screen": info.Screen,
+				"capabilities": info.Capabilities,
+			})
 		}
 
 	case "session_associate":
 		// Associate this client with a specific THD session
 		if sessionID, ok := msg["session_id"].(string); ok {
 			c.sessionID = sessionID
-			if c.hub.logger != nil {
-				c.hub.logger.Log("info", "CLIENT", "Session associated", map[string]interface{}{
-					"session_id": sessionID,
-				})
-			}
+			logging.Info("client session associated", map[string]interface{}{
+				"session_id": sessionID,
+			})
 		}
 		
 	case "interaction":
 		c.lastSeen = time.Now()
-		if c.hub.logger != nil {
-			var interaction map[string]interface{}
-			if err := json.Unmarshal(message, &interaction); err == nil {
-				c.hub.logger.Log("info", "CLIENT", "User interaction", interaction)
-			}
+		var interaction map[string]interface{}
+		if err := json.Unmarshal(message, &interaction); err == nil {
+			logging.Debug("user interaction", interaction)
 		}
 		// Broadcast interaction to other systems that might be listening
 		c.hub.broadcast <- message
@@ -204,7 +200,9 @@ func (c *Client) writePump() {
 func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		logging.Error("websocket upgrade failed", map[string]interface{}{
+			"error": err.Error(),
+		})
 		return
 	}
 	

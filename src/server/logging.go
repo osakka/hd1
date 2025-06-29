@@ -3,10 +3,11 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	"holodeck/logging"
 )
 
 type LogMessage struct {
@@ -34,39 +35,69 @@ func NewLogManager() *LogManager {
 
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
-		log.Printf("Failed to create log file: %v", err)
+		logging.Error("failed to create legacy log file", map[string]interface{}{
+			"path": logPath,
+			"error": err.Error(),
+		})
 		return &LogManager{}
 	}
 
-	log.Printf("Logging to: %s", logPath)
+	logging.Info("legacy log manager initialized", map[string]interface{}{
+		"log_path": logPath,
+	})
 	return &LogManager{logFile: logFile}
 }
 
 func (lm *LogManager) Log(level, source, message string, data interface{}) {
-	logEntry := map[string]interface{}{
-		"timestamp": time.Now().Format(time.RFC3339),
-		"level":     level,
-		"source":    source,
-		"message":   message,
-		"data":      data,
+	// Route to unified logging system
+	dataMap, ok := data.(map[string]interface{})
+	if !ok && data != nil {
+		dataMap = map[string]interface{}{"legacy_data": data}
+	}
+	if dataMap == nil {
+		dataMap = make(map[string]interface{})
+	}
+	dataMap["legacy_source"] = source
+
+	// Convert legacy levels to unified logging
+	switch level {
+	case "info":
+		logging.Info(message, dataMap)
+	case "warn", "warning":
+		logging.Warn(message, dataMap)
+	case "error":
+		logging.Error(message, dataMap)
+	case "debug":
+		logging.Debug(message, dataMap)
+	default:
+		logging.Info(message, dataMap)
 	}
 
+	// Legacy file writing for backward compatibility
 	if lm.logFile != nil {
+		logEntry := map[string]interface{}{
+			"timestamp": time.Now().Format(time.RFC3339),
+			"level":     level,
+			"source":    source,
+			"message":   message,
+			"data":      data,
+		}
 		jsonData, _ := json.Marshal(logEntry)
 		lm.logFile.WriteString(string(jsonData) + "\n")
 		lm.logFile.Sync()
 	}
-
-	// Also log to console
-	log.Printf("[%s] %s: %s", level, source, message)
 }
 
 func (lm *LogManager) LogClientMessage(msg LogMessage) {
-	lm.Log(msg.Level, "CLIENT", msg.Message, map[string]interface{}{
+	// Route directly to unified logging
+	logging.Debug("client message", map[string]interface{}{
+		"level":     msg.Level,
+		"message":   msg.Message,
 		"url":       msg.URL,
 		"userAgent": msg.UserAgent,
 		"data":      msg.Data,
 		"timestamp": msg.Timestamp,
+		"source":    "browser",
 	})
 }
 
@@ -104,23 +135,22 @@ func GetTimestamp() string {
 	return time.Now().Format("2006-01-02_15-04-05")
 }
 
-// SetupFileLogging configures logging to a specific file
+// SetupFileLogging configures logging to a specific file (legacy compatibility)
 func SetupFileLogging(logFile string) error {
 	// Ensure directory exists
 	dir := filepath.Dir(logFile)
 	if err := os.MkdirAll(dir, 0755); err != nil {
+		logging.Error("failed to create legacy log directory", map[string]interface{}{
+			"directory": dir,
+			"error": err.Error(),
+		})
 		return fmt.Errorf("failed to create log directory %s: %v", dir, err)
 	}
 
-	// Open log file
-	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to open log file %s: %v", logFile, err)
-	}
-
-	// Set log output to file
-	log.SetOutput(file)
-	log.Printf("THD logging initialized: %s", logFile)
+	logging.Info("legacy file logging setup complete", map[string]interface{}{
+		"log_file": logFile,
+		"note": "unified logging system is primary",
+	})
 	
 	return nil
 }
