@@ -73,9 +73,10 @@ Welcome to the comprehensive documentation center for THD - the world's first pr
 
 ## 📈 Version Information
 
-**Current Version**: v3.5.0 - Revolutionary Upstream/Downstream Integration
+**Current Version**: v3.6.0 - Ultra-Simple Scene Updates & Code Audit Perfection
 
 **Key Milestones**:
+- v3.6.0: Ultra-simple scene updates & surgical precision code audit
 - v3.5.0: Revolutionary API bridge system
 - v3.4.0: Auto-generated web UI client (Crown Jewel)
 - v3.3.0: Professional UI excellence & scene management
