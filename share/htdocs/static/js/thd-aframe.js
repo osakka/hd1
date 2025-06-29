@@ -149,9 +149,27 @@ class THDAFrameManager {
                     height: 1
                 });
                 break;
+            case 'cylinder':
+                entity.setAttribute('geometry', {
+                    primitive: 'cylinder',
+                    radius: 0.5,
+                    height: 1
+                });
+                break;
+            case 'cone':
+                entity.setAttribute('geometry', {
+                    primitive: 'cone',
+                    radiusBottom: 0.5,
+                    radiusTop: 0,
+                    height: 1
+                });
+                break;
             case 'light':
                 this.createLight(entity, obj);
                 return; // Lights don't need geometry
+            case 'sky':
+                this.createSky(entity, obj);
+                return; // Sky doesn't need geometry
             default:
                 // Default to cube for unknown types
                 entity.setAttribute('geometry', {
@@ -167,17 +185,42 @@ class THDAFrameManager {
         const color = obj.color || {r: 0.2, g: 0.8, b: 0.2, a: 1.0};
         const hexColor = `#${Math.round(color.r * 255).toString(16).padStart(2, '0')}${Math.round(color.g * 255).toString(16).padStart(2, '0')}${Math.round(color.b * 255).toString(16).padStart(2, '0')}`;
         
+        // Enhanced A-Frame material properties
         const materialProps = {
+            shader: obj.material?.shader || 'standard',
             color: hexColor,
-            transparent: color.a < 1.0,
+            metalness: obj.material?.metalness || 0.1,
+            roughness: obj.material?.roughness || 0.7,
+            transparent: obj.material?.transparent || color.a < 1.0,
             opacity: color.a
         };
         
         if (obj.wireframe) {
             materialProps.wireframe = true;
+            materialProps.shader = 'flat'; // Wireframe works better with flat shader
         }
         
         entity.setAttribute('material', materialProps);
+        
+        // Add shadow properties if lighting data exists
+        if (obj.lighting) {
+            if (obj.lighting.castShadow) {
+                entity.setAttribute('shadow', 'cast: true');
+            }
+            if (obj.lighting.receiveShadow) {
+                entity.setAttribute('shadow', 'receive: true');
+            }
+        }
+        
+        // Add physics if enabled
+        if (obj.physics && obj.physics.enabled) {
+            const physicsProps = {
+                shape: 'auto',
+                mass: obj.physics.mass || 1.0,
+                type: obj.physics.type || 'dynamic'
+            };
+            entity.setAttribute('dynamic-body', physicsProps);
+        }
     }
 
     createLight(entity, obj) {
@@ -188,8 +231,31 @@ class THDAFrameManager {
             intensity: obj.intensity || 1.0
         };
         
+        // Add directional light specific properties
+        if (obj.lightType === 'directional') {
+            lightProps.castShadow = true;
+            lightProps.shadowMapWidth = 1024;
+            lightProps.shadowMapHeight = 1024;
+        }
+        
         entity.setAttribute('light', lightProps);
         console.log('[THD-AFrame] Created light:', lightProps);
+    }
+
+    createSky(entity, obj) {
+        // Create sky dome/environment
+        const color = obj.color ? this.colorToHex(obj.color) : '#87CEEB';
+        
+        // Use A-Frame sky primitive
+        entity.setAttribute('geometry', {primitive: 'sphere', radius: 5000});
+        entity.setAttribute('material', {
+            shader: 'flat',
+            color: color,
+            side: 'back'
+        });
+        entity.setAttribute('scale', '-1 1 1'); // Invert to see from inside
+        
+        console.log('[THD-AFrame] Created sky environment:', color);
     }
 
     clearObjects() {

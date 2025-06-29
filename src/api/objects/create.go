@@ -89,6 +89,21 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 					"b": 0.2,
 					"a": 1.0,
 				},
+				"material": map[string]interface{}{
+					"shader":     "standard",
+					"metalness":  0.1,
+					"roughness":  0.7,
+					"transparent": false,
+				},
+				"physics": map[string]interface{}{
+					"enabled": false,
+					"mass":    1.0,
+					"type":    "static",
+				},
+				"lighting": map[string]interface{}{
+					"castShadow":    true,
+					"receiveShadow": true,
+				},
 				"visible":   true,
 				"wireframe": false,
 			},
