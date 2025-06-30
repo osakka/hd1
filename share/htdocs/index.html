@@ -60,10 +60,12 @@
     <div id="debug-panel">
         <div id="debug-header">
             <div style="display: flex; align-items: center; gap: 6px;">
-                <span>HD1 Console</span>
+                <span>Holodeck I</span>
+                <span class="version-text" id="api-version">v1.0.0</span>
+                <span class="js-version-text" id="js-version">loading...</span>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <span id="debug-collapse-icon">&#8679;</span>
+                <span id="debug-collapse-icon">&#8681;</span>
             </div>
         </div>
         <div id="debug-content">
@@ -93,6 +95,7 @@
             <div class="status-right">
                 <span id="status-lock-indicator" class="unlocked"></span>
                 <span id="session-id-tag-status" style="display: none;" title="Click to copy session ID">---</span>
+                <span id="status-collapse-arrow">&#8679;</span>
             </div>
         </div>
     </div>

@@ -27,6 +27,44 @@ servers:
 
 paths:
   # ========================================
+  # API INFORMATION
+  # ========================================
+  /version:
+    get:
+      operationId: getVersion
+      tags: [System]
+      summary: Get API and system version information
+      description: |
+        Returns version information for the API specification and system components.
+        Includes API version, JS version hash, and build information.
+      responses:
+        '200':
+          description: Version information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  api_version:
+                    type: string
+                    description: API specification version
+                    example: "1.0.0"
+                  js_version:
+                    type: string  
+                    description: Frontend JS version hash
+                    example: "a1b2c3d4-e5f6g7h8"
+                  build_timestamp:
+                    type: string
+                    format: date-time
+                    description: Build timestamp
+                  title:
+                    type: string
+                    description: API title
+                    example: "HD1 (Holodeck One) API"
+      x-handler: "api/system/version.go"
+      x-function: "GetVersion"
+
+  # ========================================
   # SESSION MANAGEMENT
   # ========================================
   /sessions:

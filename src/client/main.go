@@ -20,62 +20,64 @@ func main() {
 	command := os.Args[1]
 	
 	switch command {
-	case "list-sessions":
-		listSessions()
-	case "create-session":
-		createSession()
+	case "set-log-level":
+		setLogLevel()
+	case "set-canvas":
+		setCanvas()
+	case "set-camera-position":
+		setCameraPosition()
+	case "start-camera-orbit":
+		startCameraOrbit()
+	case "get-version":
+		getVersion()
 	case "load-scene":
 		loadScene()
-	case "fork-scene":
-		forkScene()
-	case "stop-recording":
-		stopRecording()
-	case "play-recording":
-		playRecording()
-	case "get-recording-status":
-		getRecordingStatus()
+	case "save-scene-from-session":
+		saveSceneFromSession()
 	case "list-objects":
 		listObjects()
 	case "create-object":
 		createObject()
-	case "get-object":
-		getObject()
-	case "update-object":
-		updateObject()
-	case "delete-object":
-		deleteObject()
-	case "get-session":
-		getSession()
-	case "delete-session":
-		deleteSession()
-	case "get-logging-config":
-		getLoggingConfig()
-	case "set-logging-config":
-		setLoggingConfig()
-	case "set-log-level":
-		setLogLevel()
-	case "get-logs":
-		getLogs()
-	case "set-canvas":
-		setCanvas()
-	case "start-camera-orbit":
-		startCameraOrbit()
-	case "get-world-spec":
-		getWorldSpec()
-	case "initialize-world":
-		initializeWorld()
-	case "save-scene-from-session":
-		saveSceneFromSession()
-	case "start-recording":
-		startRecording()
 	case "set-trace-modules":
 		setTraceModules()
 	case "force-refresh":
 		forceRefresh()
-	case "set-camera-position":
-		setCameraPosition()
+	case "get-session":
+		getSession()
+	case "delete-session":
+		deleteSession()
 	case "list-scenes":
 		listScenes()
+	case "start-recording":
+		startRecording()
+	case "stop-recording":
+		stopRecording()
+	case "get-recording-status":
+		getRecordingStatus()
+	case "fork-scene":
+		forkScene()
+	case "play-recording":
+		playRecording()
+	case "update-object":
+		updateObject()
+	case "delete-object":
+		deleteObject()
+	case "get-object":
+		getObject()
+	case "get-logs":
+		getLogs()
+	case "list-sessions":
+		listSessions()
+	case "create-session":
+		createSession()
+	case "get-world-spec":
+		getWorldSpec()
+	case "initialize-world":
+		initializeWorld()
+	case "set-logging-config":
+		setLoggingConfig()
+	case "get-logging-config":
+		getLoggingConfig()
 	case "help":
 		showHelp()
 	default:
@@ -88,34 +90,35 @@ func main() {
 func showHelp() {
 	fmt.Println("HD1 Client - Auto-generated from API specification")
 	fmt.Println("Available commands:")
-	fmt.Println("  list-sessions - GET /sessions")
-	fmt.Println("  create-session - POST /sessions")
+	fmt.Println("  set-log-level - POST /admin/logging/level")
+	fmt.Println("  set-canvas - POST /browser/canvas")
+	fmt.Println("  set-camera-position - PUT /sessions/{sessionId}/camera/position")
+	fmt.Println("  start-camera-orbit - POST /sessions/{sessionId}/camera/orbit")
+	fmt.Println("  get-version - GET /version")
 	fmt.Println("  load-scene - POST /scenes/{sceneId}")
-	fmt.Println("  fork-scene - POST /scenes/{sceneId}/fork")
-	fmt.Println("  stop-recording - POST /sessions/{sessionId}/recording/stop")
-	fmt.Println("  play-recording - POST /sessions/{sessionId}/recording/play")
-	fmt.Println("  get-recording-status - GET /sessions/{sessionId}/recording/status")
+	fmt.Println("  save-scene-from-session - POST /sessions/{sessionId}/scenes/save")
 	fmt.Println("  list-objects - GET /sessions/{sessionId}/objects")
 	fmt.Println("  create-object - POST /sessions/{sessionId}/objects")
-	fmt.Println("  get-object - GET /sessions/{sessionId}/objects/{objectName}")
-	fmt.Println("  update-object - PUT /sessions/{sessionId}/objects/{objectName}")
-	fmt.Println("  delete-object - DELETE /sessions/{sessionId}/objects/{objectName}")
-	fmt.Println("  get-session - GET /sessions/{sessionId}")
-	fmt.Println("  delete-session - DELETE /sessions/{sessionId}")
-	fmt.Println("  get-logging-config - GET /admin/logging/config")
-	fmt.Println("  set-logging-config - POST /admin/logging/config")
-	fmt.Println("  set-log-level - POST /admin/logging/level")
-	fmt.Println("  get-logs - GET /admin/logging/logs")
-	fmt.Println("  set-canvas - POST /browser/canvas")
-	fmt.Println("  start-camera-orbit - POST /sessions/{sessionId}/camera/orbit")
-	fmt.Println("  get-world-spec - GET /sessions/{sessionId}/world")
-	fmt.Println("  initialize-world - POST /sessions/{sessionId}/world")
-	fmt.Println("  save-scene-from-session - POST /sessions/{sessionId}/scenes/save")
-	fmt.Println("  start-recording - POST /sessions/{sessionId}/recording/start")
 	fmt.Println("  set-trace-modules - POST /admin/logging/trace")
 	fmt.Println("  force-refresh - POST /browser/refresh")
-	fmt.Println("  set-camera-position - PUT /sessions/{sessionId}/camera/position")
+	fmt.Println("  get-session - GET /sessions/{sessionId}")
+	fmt.Println("  delete-session - DELETE /sessions/{sessionId}")
 	fmt.Println("  list-scenes - GET /scenes")
+	fmt.Println("  start-recording - POST /sessions/{sessionId}/recording/start")
+	fmt.Println("  stop-recording - POST /sessions/{sessionId}/recording/stop")
+	fmt.Println("  get-recording-status - GET /sessions/{sessionId}/recording/status")
+	fmt.Println("  fork-scene - POST /scenes/{sceneId}/fork")
+	fmt.Println("  play-recording - POST /sessions/{sessionId}/recording/play")
+	fmt.Println("  update-object - PUT /sessions/{sessionId}/objects/{objectName}")
+	fmt.Println("  delete-object - DELETE /sessions/{sessionId}/objects/{objectName}")
+	fmt.Println("  get-object - GET /sessions/{sessionId}/objects/{objectName}")
+	fmt.Println("  get-logs - GET /admin/logging/logs")
+	fmt.Println("  list-sessions - GET /sessions")
+	fmt.Println("  create-session - POST /sessions")
+	fmt.Println("  get-world-spec - GET /sessions/{sessionId}/world")
+	fmt.Println("  initialize-world - POST /sessions/{sessionId}/world")
+	fmt.Println("  set-logging-config - POST /admin/logging/config")
+	fmt.Println("  get-logging-config - GET /admin/logging/config")
 
 }
 
@@ -167,11 +170,7 @@ func makeRequest(method, path string, body interface{}) {
 }
 
 
-func listSessions() {
-	makeRequest("GET", "/sessions", nil)
-}
-
-func createSession() {
+func setLogLevel() {
 	var body interface{}
 	if len(os.Args) > 2 {
 		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
@@ -179,7 +178,52 @@ func createSession() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/sessions", body)
+	makeRequest("POST", "/admin/logging/level", body)
+}
+
+func setCanvas() {
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/browser/canvas", body)
+}
+
+func setCameraPosition() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/camera/position", body)
+}
+
+func startCameraOrbit() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/camera/orbit", body)
+}
+
+func getVersion() {
+	makeRequest("GET", "/version", nil)
 }
 
 func loadScene() {
@@ -197,7 +241,7 @@ func loadScene() {
 	makeRequest("POST", "/scenes/" + os.Args[2] + "", body)
 }
 
-func forkScene() {
+func saveSceneFromSession() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
@@ -209,45 +253,7 @@ func forkScene() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/scenes/" + os.Args[2] + "/fork", body)
-}
-
-func stopRecording() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/stop", body)
-}
-
-func playRecording() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/play", body)
-}
-
-func getRecordingStatus() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/recording/status", nil)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/scenes/save", body)
 }
 
 func listObjects() {
@@ -273,12 +279,114 @@ func createObject() {
 	makeRequest("POST", "/sessions/" + os.Args[2] + "/objects", body)
 }
 
-func getObject() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
+func setTraceModules() {
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/admin/logging/trace", body)
+}
+
+func forceRefresh() {
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/browser/refresh", body)
+}
+
+func getSession() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/objects/" + os.Args[3] + "", nil)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "", nil)
+}
+
+func deleteSession() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("DELETE", "/sessions/" + os.Args[2] + "", nil)
+}
+
+func listScenes() {
+	makeRequest("GET", "/scenes", nil)
+}
+
+func startRecording() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/start", body)
+}
+
+func stopRecording() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/stop", body)
+}
+
+func getRecordingStatus() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/recording/status", nil)
+}
+
+func forkScene() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/scenes/" + os.Args[2] + "/fork", body)
+}
+
+func playRecording() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/play", body)
 }
 
 func updateObject() {
@@ -304,53 +412,23 @@ func deleteObject() {
 	makeRequest("DELETE", "/sessions/" + os.Args[2] + "/objects/" + os.Args[3] + "", nil)
 }
 
-func getSession() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
+func getObject() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "", nil)
-}
-
-func deleteSession() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("DELETE", "/sessions/" + os.Args[2] + "", nil)
-}
-
-func getLoggingConfig() {
-	makeRequest("GET", "/admin/logging/config", nil)
-}
-
-func setLoggingConfig() {
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/admin/logging/config", body)
-}
-
-func setLogLevel() {
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/admin/logging/level", body)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/objects/" + os.Args[3] + "", nil)
 }
 
 func getLogs() {
 	makeRequest("GET", "/admin/logging/logs", nil)
 }
 
-func setCanvas() {
+func listSessions() {
+	makeRequest("GET", "/sessions", nil)
+}
+
+func createSession() {
 	var body interface{}
 	if len(os.Args) > 2 {
 		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
@@ -358,22 +436,7 @@ func setCanvas() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/browser/canvas", body)
-}
-
-func startCameraOrbit() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/camera/orbit", body)
+	makeRequest("POST", "/sessions", body)
 }
 
 func getWorldSpec() {
@@ -399,37 +462,7 @@ func initializeWorld() {
 	makeRequest("POST", "/sessions/" + os.Args[2] + "/world", body)
 }
 
-func saveSceneFromSession() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/scenes/save", body)
-}
-
-func startRecording() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/start", body)
-}
-
-func setTraceModules() {
+func setLoggingConfig() {
 	var body interface{}
 	if len(os.Args) > 2 {
 		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
@@ -437,36 +470,10 @@ func setTraceModules() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/admin/logging/trace", body)
+	makeRequest("POST", "/admin/logging/config", body)
 }
 
-func forceRefresh() {
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/browser/refresh", body)
-}
-
-func setCameraPosition() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/camera/position", body)
-}
-
-func listScenes() {
-	makeRequest("GET", "/scenes", nil)
+func getLoggingConfig() {
+	makeRequest("GET", "/admin/logging/config", nil)
 }
 

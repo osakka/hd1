@@ -8,6 +8,8 @@ const statusConnectionIndicator = document.getElementById('status-connection-ind
 const statusConnectionText = document.getElementById('status-connection-text');
 const statusLockIndicator = document.getElementById('status-lock-indicator');
 const sessionIdTagStatus = document.getElementById('session-id-tag-status');
+const statusBar = document.getElementById('debug-status-bar');
+const statusCollapseArrow = document.getElementById('status-collapse-arrow');
 
 let hd1Manager;
 let ws;
@@ -842,9 +844,11 @@ function setDebugState(collapsed, saveToCookie = true) {
     
     if (debugCollapsed) {
         debugCollapseIcon.classList.add('collapsed');
+        if (statusCollapseArrow) statusCollapseArrow.classList.add('collapsed');
         if (debugContent) debugContent.classList.add('collapsed');
     } else {
         debugCollapseIcon.classList.remove('collapsed');
+        if (statusCollapseArrow) statusCollapseArrow.classList.remove('collapsed');
         if (debugContent) debugContent.classList.remove('collapsed');
     }
     if (saveToCookie) {
@@ -882,8 +886,52 @@ sessionIdTagStatus.addEventListener('click', function(e) {
     }
 });
 
+// Status bar click handler for toggle
+statusBar.addEventListener('click', function(e) {
+    // Don't toggle if clicking on session ID tag (it has its own handler)
+    if (e.target !== sessionIdTagStatus) {
+        setDebugState(!debugCollapsed, true);
+    }
+});
+
+// Load version information dynamically
+async function loadVersionInfo() {
+    try {
+        const response = await fetch('/api/version');
+        if (response.ok) {
+            const versionData = await response.json();
+            
+            // Update API version
+            const apiVersionElement = document.getElementById('api-version');
+            if (apiVersionElement) {
+                apiVersionElement.textContent = 'v' + versionData.api_version;
+            }
+            
+            // Update JS version (first 8 characters)
+            const jsVersionElement = document.getElementById('js-version');
+            if (jsVersionElement) {
+                jsVersionElement.textContent = versionData.js_version.substring(0, 8);
+            }
+            
+            addDebug('VERSION_LOADED', {
+                api: versionData.api_version, 
+                js: versionData.js_version.substring(0, 8),
+                title: versionData.title
+            });
+        } else {
+            addDebug('VERSION_ERROR', {status: response.status});
+        }
+    } catch (error) {
+        addDebug('VERSION_FAIL', {error: error.message});
+        // Keep fallback values if version endpoint fails
+    }
+}
+
 // Initialize debug panel state from cookie (don't save back to cookie)
 setDebugState(debugCollapsed, false);
+
+// Load version information
+loadVersionInfo();
 
 // Start connection
 connectWebSocket();
