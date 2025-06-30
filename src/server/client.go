@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"holodeck/logging"
+	"holodeck1/logging"
 )
 
 const (

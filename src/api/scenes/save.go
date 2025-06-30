@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	"holodeck/server"
+	"holodeck1/server"
 )
 
 // SaveSceneFromSessionHandler - POST /sessions/{sessionId}/scenes/save - Save session state as scene
@@ -134,7 +134,7 @@ SCENE_NAME="%s"
 SCENE_DESCRIPTION="%s"
 
 # Get session ID from argument or use active session
-SESSION_ID="${1:-${THD_SESSION:-}}"
+SESSION_ID="${1:-${HD1_SESSION:-}}"
 
 if [[ -z "$SESSION_ID" ]]; then
     echo "Error: Session ID required" >&2
@@ -142,7 +142,7 @@ if [[ -z "$SESSION_ID" ]]; then
 fi
 
 # Path to auto-generated THD client
-THD_CLIENT="/opt/holo-deck/build/bin/thd-client"
+HD1_CLIENT="/opt/holo-deck/build/bin/thd-client"
 
 echo "Creating %s scene..."
 
@@ -170,7 +170,7 @@ echo "Creating %s scene..."
 
 		script += fmt.Sprintf(`
 # %s - %s
-$THD_CLIENT create-object "$SESSION_ID" '%s' > /dev/null
+$HD1_CLIENT create-object "$SESSION_ID" '%s' > /dev/null
 `, strings.Title(strings.ReplaceAll(obj.Name, "_", " ")), obj.Type, objectJSON)
 	}
 

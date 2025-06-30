@@ -3,7 +3,7 @@ package scenes
 import (
 	"encoding/json"
 	"net/http"
-	"holodeck/server"
+	"holodeck1/server"
 	"fmt"
 	"log"
 	"strings"

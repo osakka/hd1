@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"holodeck/logging"
-	"holodeck/server"
+	"holodeck1/logging"
+	"holodeck1/server"
 )
 
 // GetLoggingConfigHandler returns current logging configuration

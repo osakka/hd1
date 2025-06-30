@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 	
-	"holodeck/logging"
+	"holodeck1/logging"
 )
 
 // AFrameSchemaReader extracts component schemas from A-Frame vendor files

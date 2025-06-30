@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"holodeck/logging"
-	"holodeck/server"
+	"holodeck1/logging"
+	"holodeck1/server"
 )
 
 // ListSessionsHandler - GET /sessions

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 	
-	"holodeck/logging"
+	"holodeck1/logging"
 )
 
 // EnhancedCodeGenerator integrates upstream and downstream API generation
@@ -153,7 +153,7 @@ func (g *EnhancedCodeGenerator) generateEnhancedShellFunctions() error {
 # ===================================================================
 
 # Load THD configuration
-source "${THD_ROOT}/lib/thd-functions.sh" 2>/dev/null || {
+source "${HD1_ROOT}/lib/thd-functions.sh" 2>/dev/null || {
     echo "ERROR: THD function library not found"
     exit 1
 }
@@ -179,7 +179,7 @@ source "${THD_ROOT}/lib/thd-functions.sh" 2>/dev/null || {
     {{end}}{{end}}
     
     # Execute API call with enhanced validation
-    ${THD_CLIENT} {{.APIEndpoint}} \
+    ${HD1_CLIENT} {{.APIEndpoint}} \
         --data "{
             {{range $i, $param := .Parameters}}{{if gt $i 0}},{{end}}
             \"{{.Name}}\": {{if eq .AFrameType "string"}}\"${{"$" + .Name}}\"{{else}}${{"$" + .Name}}{{end}}{{end}}
@@ -240,7 +240,7 @@ thd::create_enhanced_object() {
     done
     
     # Enhanced API call with A-Frame schema validation
-    ${THD_CLIENT} POST "/sessions/${THD_SESSION}/objects" \
+    ${HD1_CLIENT} POST "/sessions/${HD1_SESSION}/objects" \
         --data "{
             \"name\": \"${name}\",
             \"type\": \"${type}\",

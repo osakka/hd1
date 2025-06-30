@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"holodeck/logging"
+	"holodeck1/logging"
 )
 
 type Hub struct {

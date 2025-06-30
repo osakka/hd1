@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"holodeck/logging"
-	"holodeck/server"
+	"holodeck1/logging"
+	"holodeck1/server"
 )
 
 // CreateSessionHandler - POST /sessions

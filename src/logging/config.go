@@ -23,18 +23,18 @@ func LoadConfig() *Config {
 	}
 
 	// Load from environment variables
-	if level := os.Getenv("THD_LOG_LEVEL"); level != "" {
+	if level := os.Getenv("HD1_LOG_LEVEL"); level != "" {
 		config.Level = strings.ToUpper(level)
 	}
 
-	if modules := os.Getenv("THD_TRACE_MODULES"); modules != "" {
+	if modules := os.Getenv("HD1_TRACE_MODULES"); modules != "" {
 		config.TraceModules = strings.Split(modules, ",")
 		for i := range config.TraceModules {
 			config.TraceModules[i] = strings.TrimSpace(config.TraceModules[i])
 		}
 	}
 
-	if logDir := os.Getenv("THD_LOG_DIR"); logDir != "" {
+	if logDir := os.Getenv("HD1_LOG_DIR"); logDir != "" {
 		config.LogDir = logDir
 	}
 

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-	"holodeck/server"
+	"holodeck1/server"
 )
 
 // DeleteSessionHandler - DELETE /sessions/{sessionId}

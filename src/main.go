@@ -10,34 +10,34 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"holodeck/logging"
-	"holodeck/server"
+	"holodeck1/logging"
+	"holodeck1/server"
 )
 
-// THD Path Configuration - 100% Absolute Paths
+// HD1 Path Configuration - 100% Absolute Paths
 const (
-	THD_ROOT_DIR      = "/opt/holo-deck"
-	THD_BUILD_DIR     = THD_ROOT_DIR + "/build"
-	THD_BIN_DIR       = THD_BUILD_DIR + "/bin"
-	THD_LOG_DIR       = THD_BUILD_DIR + "/logs"
-	THD_RUNTIME_DIR   = THD_BUILD_DIR + "/runtime"
-	THD_SHARE_DIR     = THD_ROOT_DIR + "/share"
-	THD_HTDOCS_DIR    = THD_SHARE_DIR + "/htdocs"
-	THD_STATIC_DIR    = THD_HTDOCS_DIR + "/static"
-	THD_PID_FILE      = THD_RUNTIME_DIR + "/thd.pid"
-	THD_DEFAULT_HOST  = "0.0.0.0"
-	THD_DEFAULT_PORT  = "8080"
+	HD1_ROOT_DIR      = "/opt/holo-deck"
+	HD1_BUILD_DIR     = HD1_ROOT_DIR + "/build"
+	HD1_BIN_DIR       = HD1_BUILD_DIR + "/bin"
+	HD1_LOG_DIR       = HD1_BUILD_DIR + "/logs"
+	HD1_RUNTIME_DIR   = HD1_BUILD_DIR + "/runtime"
+	HD1_SHARE_DIR     = HD1_ROOT_DIR + "/share"
+	HD1_HTDOCS_DIR    = HD1_SHARE_DIR + "/htdocs"
+	HD1_STATIC_DIR    = HD1_HTDOCS_DIR + "/static"
+	HD1_PID_FILE      = HD1_RUNTIME_DIR + "/hd1.pid"
+	HD1_DEFAULT_HOST  = "0.0.0.0"
+	HD1_DEFAULT_PORT  = "8080"
 )
 
 func main() {
 	// Command line flags - LONG FLAGS ONLY
 	var (
-		daemonize = flag.Bool("daemon", false, "Run THD as daemon")
-		pidFile   = flag.String("pid-file", THD_PID_FILE, "PID file path (absolute)")
+		daemonize = flag.Bool("daemon", false, "Run HD1 as daemon")
+		pidFile   = flag.String("pid-file", HD1_PID_FILE, "PID file path (absolute)")
 		logFile   = flag.String("log-file", "", "Log file path (absolute, defaults to timestamped)")
-		host      = flag.String("host", THD_DEFAULT_HOST, "Host to bind to")
-		port      = flag.String("port", THD_DEFAULT_PORT, "Port to bind to")
-		staticDir = flag.String("static-dir", THD_STATIC_DIR, "Static files directory (absolute)")
+		host      = flag.String("host", HD1_DEFAULT_HOST, "Host to bind to")
+		port      = flag.String("port", HD1_DEFAULT_PORT, "Port to bind to")
+		staticDir = flag.String("static-dir", HD1_STATIC_DIR, "Static files directory (absolute)")
 		help      = flag.Bool("help", false, "Show help message")
 	)
 	flag.Parse()
@@ -83,7 +83,7 @@ func main() {
 		})
 	}
 
-	// Initialize THD
+	// Initialize HD1
 	hub := server.NewHub()
 	go hub.Run()
 
@@ -120,16 +120,16 @@ func main() {
 	}))
 
 	// Standard startup banner
-	logging.Info("THD (The Holo-Deck) daemon starting", map[string]interface{}{
+	logging.Info("HD1 (Holodeck One) daemon starting", map[string]interface{}{
 		"version":     "v3.4.0",
 		"architecture": "spec-driven",
 	})
 	
 	logging.Info("directory configuration", map[string]interface{}{
-		"root_dir":    THD_ROOT_DIR,
+		"root_dir":    HD1_ROOT_DIR,
 		"static_dir":  *staticDir,
-		"log_dir":     THD_LOG_DIR,
-		"runtime_dir": THD_RUNTIME_DIR,
+		"log_dir":     HD1_LOG_DIR,
+		"runtime_dir": HD1_RUNTIME_DIR,
 	})
 	
 	if *daemonize {
@@ -164,14 +164,14 @@ func main() {
 }
 
 func showHelp() {
-	fmt.Println("THD (The Holo-Deck) - Standard 3D Visualization Engine")
+	fmt.Println("HD1 (Holodeck One) - Professional 3D Holodeck Platform")
 	fmt.Println("============================================================")
 	fmt.Println()
 	fmt.Println("USAGE:")
-	fmt.Println("  thd [OPTIONS]")
+	fmt.Println("  hd1 [OPTIONS]")
 	fmt.Println()
 	fmt.Println("OPTIONS:")
-	fmt.Println("  --daemon          Run THD as daemon")
+	fmt.Println("  --daemon          Run HD1 as daemon")
 	fmt.Println("  --pid-file PATH   PID file path (absolute)")
 	fmt.Println("  --log-file PATH   Log file path (absolute)")
 	fmt.Println("  --host HOST       Host to bind to (default: 0.0.0.0)")
@@ -180,19 +180,19 @@ func showHelp() {
 	fmt.Println("  --help            Show this help message")
 	fmt.Println()
 	fmt.Println("EXAMPLES:")
-	fmt.Println("  thd")
-	fmt.Println("  thd --daemon --log-file /opt/holo-deck/build/logs/thd.log")
-	fmt.Println("  thd --host 127.0.0.1 --port 9090")
+	fmt.Println("  hd1")
+	fmt.Println("  hd1 --daemon --log-file /opt/holo-deck/build/logs/hd1.log")
+	fmt.Println("  hd1 --host 127.0.0.1 --port 9090")
 	fmt.Println()
 	fmt.Printf("DEFAULT PATHS:\n")
-	fmt.Printf("  Root: %s\n", THD_ROOT_DIR)
-	fmt.Printf("  Static: %s\n", THD_STATIC_DIR)
-	fmt.Printf("  Logs: %s\n", THD_LOG_DIR)
-	fmt.Printf("  PID: %s\n", THD_PID_FILE)
+	fmt.Printf("  Root: %s\n", HD1_ROOT_DIR)
+	fmt.Printf("  Static: %s\n", HD1_STATIC_DIR)
+	fmt.Printf("  Logs: %s\n", HD1_LOG_DIR)
+	fmt.Printf("  PID: %s\n", HD1_PID_FILE)
 }
 
 func ensureDirectories() error {
-	dirs := []string{THD_BUILD_DIR, THD_BIN_DIR, THD_LOG_DIR, THD_RUNTIME_DIR}
+	dirs := []string{HD1_BUILD_DIR, HD1_BIN_DIR, HD1_LOG_DIR, HD1_RUNTIME_DIR}
 	for _, dir := range dirs {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %v", dir, err)
@@ -204,7 +204,7 @@ func ensureDirectories() error {
 func setupLogging(logFile string) error {
 	if logFile == "" {
 		// Default timestamped log file
-		logFile = filepath.Join(THD_LOG_DIR, fmt.Sprintf("thd_%s.log", 
+		logFile = filepath.Join(HD1_LOG_DIR, fmt.Sprintf("hd1_%s.log", 
 			server.GetTimestamp()))
 	}
 	

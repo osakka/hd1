@@ -96,7 +96,7 @@ func parseSceneScript(sceneID, scriptPath string) *SceneInfo {
 		
 		// Count object creation commands
 		if (strings.Contains(line, "thd::create_object") || 
-		    strings.Contains(line, "$THD_CLIENT create-object")) && 
+		    strings.Contains(line, "$HD1_CLIENT create-object")) && 
 		   !strings.HasPrefix(strings.TrimSpace(line), "#") {
 			objectCount++
 		}

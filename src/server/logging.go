@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"holodeck/logging"
+	"holodeck1/logging"
 )
 
 type LogMessage struct {

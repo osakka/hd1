@@ -3,7 +3,7 @@ package browser
 import (
 	"encoding/json"
 	"net/http"
-	"holodeck/server"
+	"holodeck1/server"
 )
 
 // ForceRefreshHandler - POST /browser/refresh - Force browser refresh and session reset

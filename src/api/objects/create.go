@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"holodeck/logging"
-	"holodeck/server"
+	"holodeck1/logging"
+	"holodeck1/server"
 )
 
 // Color represents RGBA color values

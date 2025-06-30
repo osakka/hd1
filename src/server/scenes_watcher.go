@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"holodeck/logging"
+	"holodeck1/logging"
 )
 
 // ScenesWatcher monitors the scenes directory and broadcasts changes via WebSocket

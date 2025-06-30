@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"holodeck/server"
+	"holodeck1/server"
 )
 
 // GetRecordingStatusHandler - GET /sessions/{sessionId}/recording/status - Get recording status

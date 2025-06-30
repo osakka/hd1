@@ -2,7 +2,7 @@ package server
 
 import (
 	"net/http"
-	"holodeck/logging"
+	"holodeck1/logging"
 )
 
 var templateProcessor *TemplateProcessor
