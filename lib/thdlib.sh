@@ -11,8 +11,8 @@
 # ===================================================================
 
 # Configuration
-THD_API_BASE="http://localhost:8080/api"
-THD_SESSION_ID="${THD_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
+HD1_API_BASE="http://localhost:8080/api"
+HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
 
 # Standard HTTP client with error handling
 thd::api_call() {
@@ -23,11 +23,11 @@ thd::api_call() {
     
     local response
     if [[ -n "$payload" ]]; then
-        response=$(curl -s -X "$method" "$THD_API_BASE$endpoint" \
+        response=$(curl -s -X "$method" "$HD1_API_BASE$endpoint" \
                         -H "Content-Type: $content_type" \
                         -d "$payload")
     else
-        response=$(curl -s -X "$method" "$THD_API_BASE$endpoint")
+        response=$(curl -s -X "$method" "$HD1_API_BASE$endpoint")
     fi
     
     # Standard JSON response parsing
@@ -63,7 +63,7 @@ thd::create_object() {
 EOF
 )
     
-    thd::api_call "POST" "/sessions/$THD_SESSION_ID/objects" "$payload"
+    thd::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
     echo "OBJECT: $name at ($x,$y,$z)"
 }
 
@@ -85,7 +85,7 @@ thd::camera() {
 EOF
 )
     
-    thd::api_call "PUT" "/sessions/$THD_SESSION_ID/camera/position" "$payload"
+    thd::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
     echo "CAMERA: Positioned at ($x,$y,$z)"
 }
 
@@ -119,7 +119,7 @@ thd::clear() {
 
 # Auto-generated from GET /sessions/{sessionId}/objects
 thd::list_objects() {
-    thd::api_call "GET" "/sessions/$THD_SESSION_ID/objects"
+    thd::api_call "GET" "/sessions/$HD1_SESSION_ID/objects"
 }
 
 # Auto-generated from GET /sessions/{sessionId}/objects/{objectName}
@@ -131,7 +131,7 @@ thd::get_object() {
         return 1
     fi
     
-    thd::api_call "GET" "/sessions/$THD_SESSION_ID/objects/$name"
+    thd::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
 }
 
 # Auto-generated from DELETE /sessions/{sessionId}/objects/{objectName}
@@ -143,7 +143,7 @@ thd::delete_object() {
         return 1
     fi
     
-    thd::api_call "DELETE" "/sessions/$THD_SESSION_ID/objects/$name"
+    thd::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
     echo "DELETE: Object $name"
 }
 
@@ -159,13 +159,13 @@ thd::list_sessions() {
 
 # Auto-generated from GET /sessions/{sessionId}
 thd::get_session() {
-    local session_id="${1:-$THD_SESSION_ID}"
+    local session_id="${1:-$HD1_SESSION_ID}"
     thd::api_call "GET" "/sessions/$session_id"
 }
 
 # Auto-generated from POST /sessions/{sessionId}/world
 thd::init_world() {
-    thd::api_call "POST" "/sessions/$THD_SESSION_ID/world"
+    thd::api_call "POST" "/sessions/$HD1_SESSION_ID/world"
     echo "WORLD: Initialized"
 }
 

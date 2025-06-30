@@ -74,15 +74,10 @@ class THDAPIClient {
     }
 
 
-    // POST /admin/logging/level - setLogLevel
-    setLogLevel(data = null) {
-        return this.request('POST', '/admin/logging/level', data);
-    }
-
-    // PUT /sessions/{sessionId}/camera/position - setCameraPosition
-    setCameraPosition(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/camera/position', [param1]);
-        return this.request('PUT', path, data);
+    // POST /sessions/{sessionId}/world - initializeWorld
+    initializeWorld(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
+        return this.request('POST', path, data);
     }
 
     // GET /sessions/{sessionId}/world - getWorldSpec
@@ -91,49 +86,14 @@ class THDAPIClient {
         return this.request('GET', path);
     }
 
-    // POST /sessions/{sessionId}/world - initializeWorld
-    initializeWorld(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/scenes/save - saveSceneFromSession
-    saveSceneFromSession(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scenes/save', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/recording/stop - stopRecording
-    stopRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/stop', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /admin/logging/trace - setTraceModules
-    setTraceModules(data = null) {
-        return this.request('POST', '/admin/logging/trace', data);
-    }
-
-    // POST /scenes/{sceneId} - loadScene
-    loadScene(param1, data = null) {
-        const path = this.extractPathParams('/scenes/{sceneId}', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /browser/canvas - setCanvas
-    setCanvas(data = null) {
-        return this.request('POST', '/browser/canvas', data);
+    // GET /scenes - listScenes
+    listScenes() {
+        return this.request('GET', '/scenes');
     }
 
     // POST /sessions/{sessionId}/recording/start - startRecording
     startRecording(param1, data = null) {
         const path = this.extractPathParams('/sessions/{sessionId}/recording/start', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/recording/play - playRecording
-    playRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/play', [param1]);
         return this.request('POST', path, data);
     }
 
@@ -165,20 +125,36 @@ class THDAPIClient {
         return this.request('POST', '/admin/logging/config', data);
     }
 
-    // GET /admin/logging/logs - getLogs
-    getLogs() {
-        return this.request('GET', '/admin/logging/logs');
-    }
-
     // POST /browser/refresh - forceRefresh
     forceRefresh(data = null) {
         return this.request('POST', '/browser/refresh', data);
     }
 
-    // POST /sessions/{sessionId}/camera/orbit - startCameraOrbit
-    startCameraOrbit(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/camera/orbit', [param1]);
+    // POST /scenes/{sceneId} - loadScene
+    loadScene(param1, data = null) {
+        const path = this.extractPathParams('/scenes/{sceneId}', [param1]);
         return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/recording/play - playRecording
+    playRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/play', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /admin/logging/level - setLogLevel
+    setLogLevel(data = null) {
+        return this.request('POST', '/admin/logging/level', data);
+    }
+
+    // POST /admin/logging/trace - setTraceModules
+    setTraceModules(data = null) {
+        return this.request('POST', '/admin/logging/trace', data);
+    }
+
+    // GET /sessions - listSessions
+    listSessions() {
+        return this.request('GET', '/sessions');
     }
 
     // POST /sessions - createSession
@@ -186,9 +162,33 @@ class THDAPIClient {
         return this.request('POST', '/sessions', data);
     }
 
-    // GET /sessions - listSessions
-    listSessions() {
-        return this.request('GET', '/sessions');
+    // POST /sessions/{sessionId}/recording/stop - stopRecording
+    stopRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/stop', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/objects - listObjects
+    listObjects(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/objects - createObject
+    createObject(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /admin/logging/logs - getLogs
+    getLogs() {
+        return this.request('GET', '/admin/logging/logs');
+    }
+
+    // POST /sessions/{sessionId}/camera/orbit - startCameraOrbit
+    startCameraOrbit(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/camera/orbit', [param1]);
+        return this.request('POST', path, data);
     }
 
     // DELETE /sessions/{sessionId} - deleteSession
@@ -203,9 +203,10 @@ class THDAPIClient {
         return this.request('GET', path);
     }
 
-    // GET /scenes - listScenes
-    listScenes() {
-        return this.request('GET', '/scenes');
+    // POST /sessions/{sessionId}/scenes/save - saveSceneFromSession
+    saveSceneFromSession(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scenes/save', [param1]);
+        return this.request('POST', path, data);
     }
 
     // POST /scenes/{sceneId}/fork - forkScene
@@ -220,16 +221,15 @@ class THDAPIClient {
         return this.request('GET', path);
     }
 
-    // GET /sessions/{sessionId}/objects - listObjects
-    listObjects(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
-        return this.request('GET', path);
+    // POST /browser/canvas - setCanvas
+    setCanvas(data = null) {
+        return this.request('POST', '/browser/canvas', data);
     }
 
-    // POST /sessions/{sessionId}/objects - createObject
-    createObject(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
-        return this.request('POST', path, data);
+    // PUT /sessions/{sessionId}/camera/position - setCameraPosition
+    setCameraPosition(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/camera/position', [param1]);
+        return this.request('PUT', path, data);
     }
 
 }

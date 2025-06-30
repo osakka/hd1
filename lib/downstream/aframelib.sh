@@ -14,7 +14,7 @@
 # ===================================================================
 
 # Load THD upstream core library
-source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+source "${HD1_ROOT}/lib/thdlib.sh" 2>/dev/null || {
     echo "ERROR: THD upstream library not found"
     exit 1
 }
@@ -81,7 +81,7 @@ thd::create_enhanced_object() {
     done
     
     # Enhanced API call with A-Frame schema validation
-    ${THD_CLIENT} POST "/sessions/${THD_SESSION}/objects" \
+    ${HD1_CLIENT} POST "/sessions/${HD1_SESSION}/objects" \
         --data "{
             \"name\": \"${name}\",
             \"type\": \"${type}\",
@@ -117,7 +117,7 @@ thd::create_enhanced_light() {
         return 1
     fi
     
-    ${THD_CLIENT} POST "/sessions/${THD_SESSION}/objects" \
+    ${HD1_CLIENT} POST "/sessions/${HD1_SESSION}/objects" \
         --data "{
             \"name\": \"${name}\",
             \"type\": \"light\",
@@ -151,7 +151,7 @@ thd::update_material() {
         return 1
     }
     
-    ${THD_CLIENT} PUT "/sessions/${THD_SESSION}/objects/${object_name}" \
+    ${HD1_CLIENT} PUT "/sessions/${HD1_SESSION}/objects/${object_name}" \
         --data "{
             \"material\": {
                 \"color\": \"${color}\",
