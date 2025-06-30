@@ -87,11 +87,17 @@ func main() {
 	hub := server.NewHub()
 	go hub.Run()
 
+	// Initialize template processor with static directory
+	server.InitializeTemplateProcessor(*staticDir)
+	
 	// WebSocket and static files
 	http.HandleFunc("/", server.ServeHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		server.ServeWS(hub, w, r)
 	})
+	
+	// Template-processed JavaScript files
+	http.HandleFunc("/static/js/holodeck-console.js", server.ServeConsoleJS)
 	
 	// REVOLUTIONARY: Auto-generated API router from specification
 	apiRouter := NewAPIRouter(hub)

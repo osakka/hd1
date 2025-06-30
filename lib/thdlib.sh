@@ -3,9 +3,9 @@
 # THD Core Shell Function Library - AUTO-GENERATED
 # ===================================================================
 #
-# 🎯 GENERATED FROM: api.yaml specification
-# 🔧 SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
-# 📋 PURPOSE: Standard shell wrapper for THD API endpoints
+# GENERATED FROM: api.yaml specification
+# SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
+# PURPOSE: Standard shell wrapper for THD API endpoints
 # 
 # DO NOT EDIT MANUALLY - Regenerate with: make generate
 # ===================================================================
@@ -64,7 +64,7 @@ EOF
 )
     
     thd::api_call "POST" "/sessions/$THD_SESSION_ID/objects" "$payload"
-    echo "📦 $name at ($x,$y,$z)"
+    echo "OBJECT: $name at ($x,$y,$z)"
 }
 
 # Auto-generated from PUT /sessions/{sessionId}/camera/position
@@ -86,7 +86,7 @@ EOF
 )
     
     thd::api_call "PUT" "/sessions/$THD_SESSION_ID/camera/position" "$payload"
-    echo "📷 Camera positioned at ($x,$y,$z)"
+    echo "CAMERA: Positioned at ($x,$y,$z)"
 }
 
 # Auto-generated from POST /browser/canvas
@@ -113,7 +113,7 @@ EOF
 
 # Clear holodeck (uses canvas control)
 thd::clear() {
-    echo "🧹 Clearing holodeck..."
+    echo "CLEAR: Clearing holodeck..."
     thd::canvas_control "clear"
 }
 
@@ -144,7 +144,7 @@ thd::delete_object() {
     fi
     
     thd::api_call "DELETE" "/sessions/$THD_SESSION_ID/objects/$name"
-    echo "🗑️ Deleted object: $name"
+    echo "DELETE: Object $name"
 }
 
 # Auto-generated from POST /sessions
@@ -166,12 +166,12 @@ thd::get_session() {
 # Auto-generated from POST /sessions/{sessionId}/world
 thd::init_world() {
     thd::api_call "POST" "/sessions/$THD_SESSION_ID/world"
-    echo "🌍 World initialized"
+    echo "WORLD: Initialized"
 }
 
-echo "🎯 THD Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
-echo "📋 Generated from: api.yaml specification"
-echo "🔧 Single source of truth: Zero manual synchronization"
-echo "💡 Functions: create_object, camera, canvas_control, clear, list_objects"
-echo "🌍 Session management: create_session, get_session, init_world"
-echo "🏆 Bar-raising status: ACHIEVED"
+echo "THD: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
+echo "SPEC: Generated from api.yaml specification"
+echo "SYNC: Single source of truth - Zero manual synchronization"
+echo "FUNCS: create_object, camera, canvas_control, clear, list_objects"
+echo "SESSION: create_session, get_session, init_world"
+echo "STATUS: Bar-raising achieved"

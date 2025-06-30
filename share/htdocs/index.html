@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>THD Holodeck - A-Frame VR</title>
+    <script src="/static/js/vendor/aframe.min.js"></script>
+    <script src="/static/js/vendor/aframe-environment-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-teleport-controls.min.js"></script>
+    <script src="/static/js/vendor/aframe-event-set-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-look-at-component.min.js"></script>
+    <script src="/static/js/vendor/aframe-orbit-controls.min.js"></script>
+    <!-- Removed problematic components:
+         - aframe-animation-component.min.js (conflicts with core A-Frame animation)
+         - aframe-particle-system.js (uses Node.js require())
+         - aframe-text-geometry-component.min.js (THREE.FontLoader constructor error)
+         - aframe-state-component.min.js (not essential for core functionality)
+         - aframe-controller-cursor-component.min.js (VR-specific, not needed for holodeck)
+         - aframe-forcegraph-component.min.js (complex, not used yet)
+    -->
+    <script src="/static/js/thd-aframe.js"></script>
+    <link rel="stylesheet" href="/static/css/holodeck-console.css">
+</head>
+<body>
+    <a-scene 
+        id="holodeck-scene" 
+        thd-holodeck
+        embedded
+        style="height: 100vh; width: 100vw;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false">
+        
+        <!-- THD Holodeck Environment -->
+        <a-assets>
+            <!-- Asset preloading will go here -->
+        </a-assets>
+        
+        <!-- Default holodeck setup -->
+        <a-entity id="holodeck-camera" 
+                  camera 
+                  look-controls="enabled: true; pointerLockEnabled: true" 
+                  wasd-controls="acceleration: 20; fly: false; enabled: true"
+                  thd-keyboard-controls=""
+                  thd-sprint-controls=""
+                  holodeck-boundaries=""
+                  position="0 1.7 5">
+        </a-entity>
+        
+        <!-- Default lighting -->
+        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+        <a-light type="directional" position="10 10 5" color="#ffffff" intensity="0.8"></a-light>
+        
+        <!-- Holodeck coordinate system grid -->
+        <a-entity id="holodeck-grid"></a-entity>
+        
+        <!-- Dynamic objects container -->
+        <a-entity id="holodeck-objects"></a-entity>
+    </a-scene>
+    
+    <div id="text-overlay"></div>
+    
+    <div id="debug-panel">
+        <div id="debug-header">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span>THD Console</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span id="debug-collapse-icon">&#8679;</span>
+            </div>
+        </div>
+        <div id="debug-content">
+            <div id="debug-scene-bar">
+                <select id="debug-scene-select">
+                    <option value="">Select Scene...</option>
+                    <option value="empty">Empty Grid</option>
+                    <option value="anime-ui">Anime UI Demo</option>
+                    <option value="ultimate">Ultimate Demo</option>
+                    <option value="basic-shapes">Basic Shapes</option>
+                </select>
+            </div>
+            <div id="debug-controls-bar">
+                <div class="control-buttons-container">
+                    <button id="photo-btn" class="control-btn photo-btn" title="Freeze-Frame Mode: Save current session state as new scene">FREEZE-FRAME</button>
+                    <button id="video-btn" class="control-btn video-btn" title="Temporal Sequence Mode: Start/Stop temporal recording">TEMPORAL SEQUENCE</button>
+                </div>
+                <span id="recording-status" class="recording-status"></span>
+            </div>
+            <div id="debug-log"></div>
+        </div>
+        <div id="debug-status-bar">
+            <div class="status-left">
+                <span id="status-connection-indicator" class="connecting"></span>
+                <span id="status-connection-text">Connecting</span>
+            </div>
+            <div class="status-right">
+                <span id="status-lock-indicator" class="unlocked"></span>
+                <span id="session-id-tag-status" style="display: none;" title="Click to copy session ID">---</span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/holodeck-console.js?v=${JS_VERSION}"></script>
+</body>
+</html>

@@ -19,21 +19,30 @@ func init() {
 }
 
 func updateJSVersion() {
-	// Create version hash based on JS file contents, A-Frame manager, and handlers.go bootstrapping code
+	// Create version hash based on all frontend files
 	rendererPath := "../share/htdocs/static/js/renderer.js"
 	matrixPath := "../share/htdocs/static/js/gl-matrix.js"
 	aframePath := "../share/htdocs/static/js/thd-aframe.js"
+	consoleJSPath := "../share/htdocs/static/js/holodeck-console.js"
+	consoleCSSPath := "../share/htdocs/static/css/holodeck-console.css"
+	indexPath := "../share/htdocs/index.html"
 	handlersPath := "server/handlers.go"
 
 	rendererHash := getFileHash(rendererPath)
 	matrixHash := getFileHash(matrixPath)
 	aframeHash := getFileHash(aframePath)
+	consoleJSHash := getFileHash(consoleJSPath)
+	consoleCSSHash := getFileHash(consoleCSSPath)
+	indexHash := getFileHash(indexPath)
 	handlersHash := getFileHash(handlersPath)
 
-	jsVersion = fmt.Sprintf("%s-%s-%s-%s", 
+	jsVersion = fmt.Sprintf("%s-%s-%s-%s-%s-%s-%s", 
 		rendererHash[:8], 
 		matrixHash[:8],
 		aframeHash[:8],
+		consoleJSHash[:8],
+		consoleCSSHash[:8],
+		indexHash[:8],
 		handlersHash[:8])
 	jsVersionTime = time.Now()
 }

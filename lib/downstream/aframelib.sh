@@ -4,7 +4,7 @@
 # THD Enhanced Shell Function Library with A-Frame Integration
 # ===================================================================
 #
-# 🏆 REVOLUTIONARY FEATURES:
+# REVOLUTIONARY FEATURES:
 # • Complete A-Frame capability exposure through shell functions
 # • Perfect upstream/downstream API integration  
 # • Single source of truth architecture
@@ -163,7 +163,7 @@ thd::update_material() {
 
 # A-Frame capabilities inspection
 thd::aframe_capabilities() {
-    echo "🏆 A-Frame Integration Capabilities:"
+    echo "AFRAME: Integration Capabilities"
     echo ""
     echo "Geometry Types:"
     echo "  - box (width, height, depth)"
@@ -189,7 +189,7 @@ thd::aframe_capabilities() {
     echo "  - static (fixed position)"
     echo "  - kinematic (script-controlled)"
     echo ""
-    echo "🎯 Usage Examples:"
+    echo "EXAMPLES:"
     echo "  thd::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8"
     echo "  thd::create_enhanced_light sun directional 10 10 5 1.2 #ffffff"
     echo "  thd::update_material cube1 #00ff00 0.2 0.9"
@@ -197,15 +197,15 @@ thd::aframe_capabilities() {
 
 # Function signature verification
 thd::verify_integration() {
-    echo "🔍 Enhanced Integration Status:"
-    echo "  ✅ A-Frame schema validation: ACTIVE"
-    echo "  ✅ Enhanced object creation: AVAILABLE" 
-    echo "  ✅ Light system integration: AVAILABLE"
-    echo "  ✅ Material PBR properties: AVAILABLE"
-    echo "  ✅ Physics body support: AVAILABLE"
-    echo "  ✅ Parameter validation: ACTIVE"
+    echo "STATUS: Enhanced Integration Status"
+    echo "  [OK] A-Frame schema validation: ACTIVE"
+    echo "  [OK] Enhanced object creation: AVAILABLE" 
+    echo "  [OK] Light system integration: AVAILABLE"
+    echo "  [OK] Material PBR properties: AVAILABLE"
+    echo "  [OK] Physics body support: AVAILABLE"
+    echo "  [OK] Parameter validation: ACTIVE"
     echo ""
-    echo "🏆 Bar-raising status: ACHIEVED"
+    echo "STATUS: Bar-raising achieved"
 }
 
 logging.Info "enhanced shell function library loaded" \
