@@ -196,8 +196,8 @@ paths:
       tags: [Scenes]
       summary: List available scenes
       description: |
-        Returns all available THD scenes for holodeck environments.
-        Scenes are predefined THD scripts that create specific environments.
+        Returns all available HD1 scenes for holodeck environments.
+        Scenes are predefined HD1 scripts that create specific environments.
       responses:
         '200':
           description: Available scenes
@@ -221,7 +221,7 @@ paths:
       tags: [Scenes]
       summary: Load scene into session
       description: |
-        Loads a predefined scene (THD script) into the specified session.
+        Loads a predefined scene (HD1 script) into the specified session.
         Clears existing objects and applies scene configuration.
       parameters:
         - name: sceneId
@@ -1056,7 +1056,7 @@ paths:
       summary: Force browser refresh and session reset
       description: |-
         Forces all connected browsers to refresh and optionally reset to specific session.
-        Essential for THD session management and debugging.
+        Essential for HD1 session management and debugging.
       requestBody:
         required: true
         content:

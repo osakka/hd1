@@ -45,7 +45,7 @@ type Object struct {
 ### Scene Script Generation
 - Parse session objects into executable bash scripts
 - Include metadata headers for dynamic discovery
-- Use auto-generated thd-client for object creation
+- Use auto-generated hd1-client for object creation
 - Maintain 100% API compatibility
 
 ## Consequences

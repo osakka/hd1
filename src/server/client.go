@@ -48,7 +48,7 @@ type Client struct {
 	send      chan []byte
 	info      *ClientInfo
 	lastSeen  time.Time
-	sessionID string  // THD session isolation
+	sessionID string  // HD1 session isolation
 }
 
 func (c *Client) readPump() {
@@ -145,7 +145,7 @@ func (c *Client) handleClientMessage(message []byte) {
 		}
 
 	case "session_associate":
-		// Associate this client with a specific THD session
+		// Associate this client with a specific HD1 session
 		if sessionID, ok := msg["session_id"].(string); ok {
 			c.sessionID = sessionID
 			logging.Info("client session associated", map[string]interface{}{

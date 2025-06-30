@@ -19,12 +19,12 @@ This directory contains the **upstream core libraries** for HD1 (Holodeck One), 
 source /opt/holodeck-one/lib/hd1lib.sh
 
 # Core functions auto-generated from API spec
-thd::create_object "cube1" "box" 0 1 0
-thd::camera 5 5 5
-thd::canvas_control "clear"
+hd1::create_object "cube1" "box" 0 1 0
+hd1::camera 5 5 5
+hd1::canvas_control "clear"
 ```
 
-### [thdlib.js](../share/htdocs/static/js/thdlib.js)
+### [hd1lib.js](../share/htdocs/static/js/hd1lib.js)
 **Core JavaScript API Client** - Standard web client for all HD1 API endpoints
 
 - **Auto-generated** from `api.yaml` specification  
@@ -35,7 +35,7 @@ thd::canvas_control "clear"
 **Usage:**
 ```javascript
 // Global instance automatically available
-const result = await thdAPI.createObject('session-id', {
+const result = await hd1API.createObject('session-id', {
     name: 'cube1',
     type: 'box', 
     x: 0, y: 1, z: 0
@@ -63,7 +63,7 @@ cd /opt/holodeck-one/src && make generate
 
 This command auto-generates:
 - `lib/hd1lib.sh` - Shell API wrapper
-- `share/htdocs/static/js/thdlib.js` - JavaScript API client
+- `share/htdocs/static/js/hd1lib.js` - JavaScript API client
 - `src/auto_router.go` - Go routing layer
 - Complete UI components and forms
 

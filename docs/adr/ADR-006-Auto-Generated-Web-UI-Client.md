@@ -6,7 +6,7 @@
 ## Context
 HD1 has achieved advanced single source of truth architecture with:
 - Auto-generated Go API routing from OpenAPI specification
-- Auto-generated CLI client (`thd-client`) from specification
+- Auto-generated CLI client (`hd1-client`) from specification
 - Manual JavaScript UI requiring synchronization with API changes
 
 The **complete evolution** is to **auto-generate the complete web UI client** from the OpenAPI specification, achieving **100% single source of truth** where:

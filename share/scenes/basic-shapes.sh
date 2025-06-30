@@ -5,7 +5,7 @@
 # =========================================================================
 #
 # Educational scene showcasing fundamental 3D shapes with various materials
-# Perfect for learning THD object creation and material properties
+# Perfect for learning HD1 object creation and material properties
 #
 # Usage: ./basic-shapes.sh [SESSION_ID]
 # =========================================================================
@@ -24,13 +24,13 @@ if [[ -z "$SESSION_ID" ]]; then
     exit 1
 fi
 
-# Path to auto-generated THD client
-THD_CLIENT="/opt/holo-deck/build/bin/thd-client"
+# Path to auto-generated HD1 client
+HD1_CLIENT="/opt/holo-deck/build/bin/hd1-client"
 
 echo "Creating basic shapes scene..."
 
 # Basic cube - red
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "demo_cube",
     "type": "cube", 
     "x": -3, "y": 1, "z": 0,
@@ -39,7 +39,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
 }' > /dev/null
 
 # Basic sphere - green
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "demo_sphere",
     "type": "sphere",
     "x": 0, "y": 1, "z": 0, 
@@ -48,7 +48,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
 }' > /dev/null
 
 # Basic cylinder - blue
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "demo_cylinder", 
     "type": "cylinder",
     "x": 3, "y": 1, "z": 0,
@@ -57,7 +57,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
 }' > /dev/null
 
 # Basic cone - yellow
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "demo_cone",
     "type": "cone",
     "x": -1.5, "y": 1, "z": -3,
@@ -66,7 +66,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
 }' > /dev/null
 
 # Wireframe cube - white wireframe
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "wireframe_cube",
     "type": "cube",
     "x": 1.5, "y": 1, "z": -3,
@@ -76,7 +76,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
 }' > /dev/null
 
 # Info panel
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "shapes_label",
     "type": "plane", 
     "x": 0, "y": 3, "z": -1,

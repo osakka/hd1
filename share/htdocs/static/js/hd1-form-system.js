@@ -6,7 +6,7 @@
 //
 // ===================================================================
 
-class THDFormSystem {
+class HD1FormSystem {
     constructor() {
         this.formSchemas = new Map();
         this.initializeSchemas();
@@ -15,18 +15,13 @@ class THDFormSystem {
     initializeSchemas() {
         console.log('📝 Initializing auto-generated form schemas...');
 
-        this.formSchemas.set('forceRefreshForm', {
-        "title": "ForceRefresh",
+        this.formSchemas.set('setLoggingConfigForm', {
+        "title": "SetLoggingConfig",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('createObjectForm', {
-        "title": "CreateObject",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('setLoggingConfigForm', {
-        "title": "SetLoggingConfig",
+        this.formSchemas.set('setTraceModulesForm', {
+        "title": "SetTraceModules",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -35,15 +30,35 @@ class THDFormSystem {
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('loadSceneForm', {
-        "title": "LoadScene",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
         this.formSchemas.set('forkSceneForm', {
         "title": "ForkScene",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('stopRecordingForm', {
+        "title": "StopRecording",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('forceRefreshForm', {
+        "title": "ForceRefresh",
+        "submitText": "Execute POST",
+        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('startCameraOrbitForm', {
+        "title": "StartCameraOrbit",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('createObjectForm', {
+        "title": "CreateObject",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('updateObjectForm', {
+        "title": "UpdateObject",
+        "submitText": "Execute PUT",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "param2": {"type": "string", "title": "Parameter 2", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         this.formSchemas.set('setLogLevelForm', {
         "title": "SetLogLevel",
@@ -55,8 +70,13 @@ class THDFormSystem {
         "submitText": "Execute PUT",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('startCameraOrbitForm', {
-        "title": "StartCameraOrbit",
+        this.formSchemas.set('initializeWorldForm', {
+        "title": "InitializeWorld",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('playRecordingForm', {
+        "title": "PlayRecording",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -65,15 +85,10 @@ class THDFormSystem {
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('initializeWorldForm', {
-        "title": "InitializeWorld",
+        this.formSchemas.set('loadSceneForm', {
+        "title": "LoadScene",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('updateObjectForm', {
-        "title": "UpdateObject",
-        "submitText": "Execute PUT",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "param2": {"type": "string", "title": "Parameter 2", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         this.formSchemas.set('saveSceneFromSessionForm', {
         "title": "SaveSceneFromSession",
@@ -84,21 +99,6 @@ class THDFormSystem {
         "title": "StartRecording",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('stopRecordingForm', {
-        "title": "StopRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('playRecordingForm', {
-        "title": "PlayRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('setTraceModulesForm', {
-        "title": "SetTraceModules",
-        "submitText": "Execute POST",
-        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         console.log('✅ Form schemas initialized');
     }
@@ -122,7 +122,7 @@ class THDFormSystem {
 
     createFormFromSchema(schema) {
         const form = document.createElement('form');
-        form.className = 'thd-auto-form';
+        form.className = 'hd1-auto-form';
         
         if (schema.title) {
             const title = document.createElement('h3');
@@ -148,7 +148,7 @@ class THDFormSystem {
         const submitBtn = document.createElement('button');
         submitBtn.type = 'submit';
         submitBtn.textContent = schema.submitText || 'Submit';
-        submitBtn.className = 'thd-submit-btn';
+        submitBtn.className = 'hd1-submit-btn';
         form.appendChild(submitBtn);
         
         return form;
@@ -197,6 +197,6 @@ class THDFormSystem {
 }
 
 // Export for global use
-window.THDFormSystem = THDFormSystem;
+window.HD1FormSystem = HD1FormSystem;
 
-console.log('📝 THD Form System loaded - Auto-generated from specification');
+console.log('📝 HD1 Form System loaded - Auto-generated from specification');

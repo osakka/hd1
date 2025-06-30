@@ -9,7 +9,7 @@ const statusConnectionText = document.getElementById('status-connection-text');
 const statusLockIndicator = document.getElementById('status-lock-indicator');
 const sessionIdTagStatus = document.getElementById('session-id-tag-status');
 
-let thdManager;
+let hd1Manager;
 let ws;
 let lastMessageTime = 0;
 let reconnectAttempts = 0;
@@ -96,9 +96,9 @@ function addDebug(command, data = null) {
     }
 }
 
-// Persistent THD session management
-let currentSessionId = localStorage.getItem('thd_session_id');
-let sessionInitialized = localStorage.getItem('thd_session_initialized') === 'true'; // Persistent flag to prevent multiple scene loads
+// Persistent HD1 session management
+let currentSessionId = localStorage.getItem('hd1_session_id');
+let sessionInitialized = localStorage.getItem('hd1_session_initialized') === 'true'; // Persistent flag to prevent multiple scene loads
 
 async function ensureSession() {
     addDebug('SESSION_ENSURE', 'ensureSession() called - initialized: ' + sessionInitialized);
@@ -113,16 +113,16 @@ async function ensureSession() {
                 
                 // Initialize world grid if it exists (defer if manager not ready)
                 if (sessionData.world) {
-                    if (thdManager && thdManager.initializeWorld) {
-                        thdManager.initializeWorld(sessionData.world);
+                    if (hd1Manager && hd1Manager.initializeWorld) {
+                        hd1Manager.initializeWorld(sessionData.world);
                     } else {
                         // Store world data for later initialization
                         window.pendingWorldData = sessionData.world;
                     }
                 }
                 
-                console.log('THD Session restored:', currentSessionId);
-                setStatus('connected', 'THD session: ' + currentSessionId.slice(-8));
+                console.log('HD1 Session restored:', currentSessionId);
+                setStatus('connected', 'HD1 session: ' + currentSessionId.slice(-8));
                 
                 // Associate WebSocket client with this session
                 associateSession(currentSessionId);
@@ -130,9 +130,9 @@ async function ensureSession() {
                 // Auto-load saved scene after session is restored (ONCE only)
                 if (!sessionInitialized) {
                     sessionInitialized = true;
-                    localStorage.setItem('thd_session_initialized', 'true');
+                    localStorage.setItem('hd1_session_initialized', 'true');
                     setTimeout(() => {
-                        const savedScene = getCookie('thd_scene');
+                        const savedScene = getCookie('hd1_scene');
                         if (savedScene && debugSceneSelect) {
                             debugSceneSelect.value = savedScene;
                             if (savedScene !== '') {
@@ -145,8 +145,8 @@ async function ensureSession() {
                 return;
             } else {
                 // Session expired, clear it and reset initialization flag
-                localStorage.removeItem('thd_session_id');
-                localStorage.removeItem('thd_session_initialized');
+                localStorage.removeItem('hd1_session_id');
+                localStorage.removeItem('hd1_session_initialized');
                 sessionInitialized = false;
                 currentSessionId = null;
             }
@@ -158,21 +158,21 @@ async function ensureSession() {
         
         if (sessionData.success) {
             currentSessionId = sessionData.session_id;
-            localStorage.setItem('thd_session_id', currentSessionId);
+            localStorage.setItem('hd1_session_id', currentSessionId);
             updateDebugSession(currentSessionId);
             
-            // Initialize world grid in THD manager (defer if not ready)
+            // Initialize world grid in HD1 manager (defer if not ready)
             if (sessionData.world) {
-                if (thdManager && thdManager.initializeWorld) {
-                    thdManager.initializeWorld(sessionData.world);
+                if (hd1Manager && hd1Manager.initializeWorld) {
+                    hd1Manager.initializeWorld(sessionData.world);
                 } else {
                     // Store world data for later initialization
                     window.pendingWorldData = sessionData.world;
                 }
             }
             
-            console.log('THD Session created:', currentSessionId);
-            setStatus('connected', 'THD session: ' + currentSessionId.slice(-8));
+            console.log('HD1 Session created:', currentSessionId);
+            setStatus('connected', 'HD1 session: ' + currentSessionId.slice(-8));
             
             // Associate WebSocket client with this session
             associateSession(currentSessionId);
@@ -180,9 +180,9 @@ async function ensureSession() {
             // Auto-load saved scene after session is established (ONCE only)
             if (!sessionInitialized) {
                 sessionInitialized = true;
-                localStorage.setItem('thd_session_initialized', 'true');
+                localStorage.setItem('hd1_session_initialized', 'true');
                 setTimeout(() => {
-                    const savedScene = getCookie('thd_scene');
+                    const savedScene = getCookie('hd1_scene');
                     if (savedScene && debugSceneSelect) {
                         debugSceneSelect.value = savedScene;
                         if (savedScene !== '') {
@@ -260,7 +260,7 @@ function connectWebSocket() {
             
             // Handle scene list changes
             if (message.type === 'scene_list_changed') {
-                console.log('[THD] Scene list changed, refreshing dropdown');
+                console.log('[HD1] Scene list changed, refreshing dropdown');
                 addDebug('SCENE_LIST_CHANGED', 'Refreshing scene dropdown');
                 await refreshSceneDropdown();
                 return;
@@ -268,14 +268,14 @@ function connectWebSocket() {
             
             // Handle browser control messages
             if (message.type === 'force_refresh') {
-                console.log('[THD] Force refresh command received');
+                console.log('[HD1] Force refresh command received');
                 if (message.clear_storage) {
                     localStorage.clear();
                 }
                 if (message.session_id) {
-                    localStorage.setItem('thd_session_id', message.session_id);
+                    localStorage.setItem('hd1_session_id', message.session_id);
                 }
-                setStatus('connecting', 'THD forced refresh...');
+                setStatus('connecting', 'HD1 forced refresh...');
                 window.location.reload(true);
                 return;
             }
@@ -283,13 +283,13 @@ function connectWebSocket() {
             // Handle direct canvas control
             if (message.type === 'canvas_control') {
                 const controlData = message.data || message;
-                console.log('[THD] Canvas control command:', controlData.command, controlData.objects);
+                console.log('[HD1] Canvas control command:', controlData.command, controlData.objects);
                 addDebug('CANVAS_CTRL', {cmd: controlData.command, objs: controlData.objects?.length || 0});
                 if (controlData.clear) {
-                    thdManager.processMessage({type: 'clear'});
+                    hd1Manager.processMessage({type: 'clear'});
                 }
                 if (controlData.command === 'delete' && controlData.object_name) {
-                    thdManager.processMessage({
+                    hd1Manager.processMessage({
                         type: 'delete', 
                         object_name: controlData.object_name
                     });
@@ -320,54 +320,54 @@ function connectWebSocket() {
                             physics: obj.physics,
                             lighting: obj.lighting
                         };
-                        console.log('[THD] Converted object with text:', converted.text, converted);
+                        console.log('[HD1] Converted object with text:', converted.text, converted);
                         return converted;
                     });
-                    if (!thdManager) {
-                        console.error('[THD] THD MANAGER NOT FOUND - This is the root cause!');
-                        addDebug('ERROR', 'THD Manager not initialized');
+                    if (!hd1Manager) {
+                        console.error('[HD1] HD1 MANAGER NOT FOUND - This is the root cause!');
+                        addDebug('ERROR', 'HD1 Manager not initialized');
                         return;
                     }
-                    if (!thdManager.processMessage) {
-                        console.error('[THD] THD_MANAGER.processMessage NOT FOUND - Missing method!');
-                        addDebug('ERROR', 'THD Manager.processMessage missing');
+                    if (!hd1Manager.processMessage) {
+                        console.error('[HD1] HD1_MANAGER.processMessage NOT FOUND - Missing method!');
+                        addDebug('ERROR', 'HD1 Manager.processMessage missing');
                         return;
                     }
-                    console.log('[THD] Calling thdManager.processMessage with:', controlData.command, rendererObjects);
+                    console.log('[HD1] Calling hd1Manager.processMessage with:', controlData.command, rendererObjects);
                     addDebug('RENDER_CALL', {cmd: controlData.command, count: rendererObjects.length});
                     try {
-                        thdManager.processMessage({
+                        hd1Manager.processMessage({
                             type: controlData.command,
                             objects: rendererObjects
                         });
-                        console.log('[THD] THD Manager.processMessage SUCCESS');
-                        addDebug('RENDER_OK', 'Objects sent to THD Manager');
+                        console.log('[HD1] HD1 Manager.processMessage SUCCESS');
+                        addDebug('RENDER_OK', 'Objects sent to HD1 Manager');
                     } catch(e) {
-                        console.error('[THD] THD Manager.processMessage FAILED:', e);
+                        console.error('[HD1] HD1 Manager.processMessage FAILED:', e);
                         addDebug('RENDER_FAIL', {error: e.message});
                     }
                 }
                 if (message.camera) {
-                    thdManager.processMessage({
+                    hd1Manager.processMessage({
                         type: 'camera',
                         ...message.camera
                     });
                 }
-                setStatus('receiving', 'THD canvas control');
+                setStatus('receiving', 'HD1 canvas control');
                 setTimeout(() => {
-                    setStatus('connected', 'THD active • objects: ' + (thdManager?.getObjectCount() || 0));
+                    setStatus('connected', 'HD1 active • objects: ' + (hd1Manager?.getObjectCount() || 0));
                 }, 500);
                 return;
             }
             
             // Regular 3D messages
-            if (thdManager) {
-                thdManager.processMessage(message);
+            if (hd1Manager) {
+                hd1Manager.processMessage(message);
                 
                 setStatus('receiving', 'receiving data');
                 clearTimeout(window.receivingTimeout);
                 window.receivingTimeout = setTimeout(() => {
-                    setStatus('connected', 'connected • objects: ' + (thdManager?.getObjectCount() || 0));
+                    setStatus('connected', 'connected • objects: ' + (hd1Manager?.getObjectCount() || 0));
                 }, 200);
             }
             
@@ -442,29 +442,29 @@ window.addEventListener('error', function(e) {
 try {
     // Initialize A-Frame manager when scene is ready
     scene.addEventListener('loaded', function() {
-        thdManager = new THDAFrameManager(scene);
-        sendLog('info', 'THD A-Frame Manager initialized successfully');
-        console.log('[THD] A-Frame scene loaded and manager ready');
+        hd1Manager = new HD1AFrameManager(scene);
+        sendLog('info', 'HD1 A-Frame Manager initialized successfully');
+        console.log('[HD1] A-Frame scene loaded and manager ready');
         
         // Initialize any pending world data
         if (window.pendingWorldData) {
-            thdManager.initializeWorld(window.pendingWorldData);
+            hd1Manager.initializeWorld(window.pendingWorldData);
             window.pendingWorldData = null;
-            console.log('[THD] Applied pending world data');
+            console.log('[HD1] Applied pending world data');
         }
     });
     
     // Fallback: initialize even if scene doesn't fire loaded event
     setTimeout(function() {
-        if (!thdManager) {
-            thdManager = new THDAFrameManager(scene);
-            console.log('[THD] A-Frame manager initialized via fallback');
+        if (!hd1Manager) {
+            hd1Manager = new HD1AFrameManager(scene);
+            console.log('[HD1] A-Frame manager initialized via fallback');
             
             // Initialize any pending world data
             if (window.pendingWorldData) {
-                thdManager.initializeWorld(window.pendingWorldData);
+                hd1Manager.initializeWorld(window.pendingWorldData);
                 window.pendingWorldData = null;
-                console.log('[THD] Applied pending world data via fallback');
+                console.log('[HD1] Applied pending world data via fallback');
             }
         }
     }, 2000);
@@ -485,7 +485,7 @@ window.addEventListener('resize', resize);
 console.log('A-Frame controls: WASD to move, mouse to look, VR ready');
 
 
-// Associate WebSocket client with THD session for isolation
+// Associate WebSocket client with HD1 session for isolation
 function associateSession(sessionId) {
     if (ws && ws.readyState === WebSocket.OPEN) {
         const associateMsg = {
@@ -494,7 +494,7 @@ function associateSession(sessionId) {
         };
         addDebug('WS_SEND', {type: 'session_associate', session: sessionId});
         ws.send(JSON.stringify(associateMsg));
-        console.log('[THD] WebSocket associated with session:', sessionId);
+        console.log('[HD1] WebSocket associated with session:', sessionId);
     }
 }
 
@@ -514,7 +514,7 @@ function sendClientInfo() {
                 height: window.innerHeight
             },
             capabilities: {
-                webgl: !!thdManager,
+                webgl: !!hd1Manager,
                 aframe: !!scene,
                 vr: AFRAME && AFRAME.utils.device.checkHeadsetConnected(),
                 touch: 'ontouchstart' in window,
@@ -580,7 +580,7 @@ const debugSceneSelect = document.getElementById('debug-scene-select');
 
 // Load saved scene from cookie
 function loadSavedScene() {
-    const savedScene = getCookie('thd_scene');
+    const savedScene = getCookie('hd1_scene');
     if (savedScene) {
         debugSceneSelect.value = savedScene;
     }
@@ -588,7 +588,7 @@ function loadSavedScene() {
 
 // Save scene to cookie
 function saveScene(sceneId) {
-    setCookie('thd_scene', sceneId, 30); // 30 days
+    setCookie('hd1_scene', sceneId, 30); // 30 days
 }
 
 // Cookie utilities
@@ -798,7 +798,7 @@ async function refreshSceneDropdown() {
             }
             
             // Restore selection (saved scene or previous value)
-            const savedScene = getCookie('thd_scene');
+            const savedScene = getCookie('hd1_scene');
             if (savedScene) {
                 select.value = savedScene;
             } else if (currentValue) {
@@ -833,7 +833,7 @@ document.addEventListener('pointerlockerror', function() {
 updatePointerLockStatus();
 
 // Initialize debug panel with cookie persistence (after cookie functions are defined)
-debugCollapsed = getCookie('thd_console_collapsed') === 'true';
+debugCollapsed = getCookie('hd1_console_collapsed') === 'true';
 addDebug('CONSOLE_COOKIE', 'Loaded state: ' + (debugCollapsed ? 'collapsed' : 'expanded'));
 
 function setDebugState(collapsed, saveToCookie = true) {
@@ -848,7 +848,7 @@ function setDebugState(collapsed, saveToCookie = true) {
         if (debugContent) debugContent.classList.remove('collapsed');
     }
     if (saveToCookie) {
-        setCookie('thd_console_collapsed', debugCollapsed.toString(), 30); // 30 days
+        setCookie('hd1_console_collapsed', debugCollapsed.toString(), 30); // 30 days
         addDebug('CONSOLE_SAVE', 'State saved: ' + (debugCollapsed ? 'collapsed' : 'expanded'));
     }
 }

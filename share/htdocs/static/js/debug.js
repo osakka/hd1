@@ -1,8 +1,8 @@
-// THD Debug Helper - Run in browser console to test renderer directly
-// Usage: loadScript('/static/js/debug.js'); then call debugTHD();
+// HD1 Debug Helper - Run in browser console to test renderer directly
+// Usage: loadScript('/static/js/debug.js'); then call debugHD1();
 
-function debugTHD() {
-    console.log('🔍 THD Debug Session Started');
+function debugHD1() {
+    console.log('🔍 HD1 Debug Session Started');
     
     // 1. Check if renderer exists and is initialized
     if (typeof renderer === 'undefined') {
@@ -63,8 +63,8 @@ function debugTHD() {
     renderer.createObject(testSphere);
     console.log('✅ Test sphere created. Objects now:', renderer.objects.size);
     
-    // 4. Force initialize the THD grid
-    console.log('🌐 Initializing THD coordinate grid...');
+    // 4. Force initialize the HD1 grid
+    console.log('🌐 Initializing HD1 coordinate grid...');
     renderer.initializeWorld({
         size: 25,
         transparency: 0.3,
@@ -99,7 +99,7 @@ function debugTHD() {
     console.log('🎨 Forcing manual render...');
     renderer.render(performance.now());
     
-    console.log('🔍 THD Debug Complete! You should now see objects on screen.');
+    console.log('🔍 HD1 Debug Complete! You should now see objects on screen.');
     console.log('📋 Summary:');
     console.log(`   - Total objects: ${renderer.objects.size}`);
     console.log(`   - Camera: [${renderer.camera.position.join(', ')}] → [${renderer.camera.target.join(', ')}]`);
@@ -121,4 +121,4 @@ function loadScript(src) {
     return script;
 }
 
-console.log('🔧 THD Debug Helper loaded. Run debugTHD() to start debugging.');
+console.log('🔧 HD1 Debug Helper loaded. Run debugHD1() to start debugging.');

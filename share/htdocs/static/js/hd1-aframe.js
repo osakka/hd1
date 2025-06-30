@@ -1,7 +1,7 @@
 /**
- * THD A-Frame Holodeck Manager
+ * HD1 A-Frame Holodeck Manager
  * Replaces custom WebGL renderer with A-Frame ECS system
- * Maintains 100% compatibility with existing THD WebSocket protocol
+ * Maintains 100% compatibility with existing HD1 WebSocket protocol
  */
 
 // Register boundary enforcement component
@@ -83,8 +83,8 @@ AFRAME.registerComponent('holodeck-boundaries', {
     }
 });
 
-// Register THD sprint controls for Shift key running
-AFRAME.registerComponent('thd-sprint-controls', {
+// Register HD1 sprint controls for Shift key running
+AFRAME.registerComponent('hd1-sprint-controls', {
     init: function() {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onKeyUp = this.onKeyUp.bind(this);
@@ -96,7 +96,7 @@ AFRAME.registerComponent('thd-sprint-controls', {
         document.addEventListener('keydown', this.onKeyDown, true);
         document.addEventListener('keyup', this.onKeyUp, true);
         
-        console.log('[THD-Sprint] Shift key sprint controls initialized');
+        console.log('[HD1-Sprint] Shift key sprint controls initialized');
     },
     
     onKeyDown: function(event) {
@@ -105,7 +105,7 @@ AFRAME.registerComponent('thd-sprint-controls', {
             this.wasdControls = this.el.components['wasd-controls'];
             if (this.wasdControls) {
                 this.wasdControls.data.acceleration = this.sprintAcceleration;
-                console.log('[THD-Sprint] Sprint mode ON - acceleration:', this.sprintAcceleration);
+                console.log('[HD1-Sprint] Sprint mode ON - acceleration:', this.sprintAcceleration);
             }
         }
     },
@@ -116,7 +116,7 @@ AFRAME.registerComponent('thd-sprint-controls', {
             this.wasdControls = this.el.components['wasd-controls'];
             if (this.wasdControls) {
                 this.wasdControls.data.acceleration = this.originalAcceleration;
-                console.log('[THD-Sprint] Sprint mode OFF - acceleration:', this.originalAcceleration);
+                console.log('[HD1-Sprint] Sprint mode OFF - acceleration:', this.originalAcceleration);
             }
         }
     },
@@ -127,8 +127,8 @@ AFRAME.registerComponent('thd-sprint-controls', {
     }
 });
 
-// Register THD keyboard controls for Q/E turning  
-AFRAME.registerComponent('thd-keyboard-controls', {
+// Register HD1 keyboard controls for Q/E turning  
+AFRAME.registerComponent('hd1-keyboard-controls', {
     init: function () {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onKeyUp = this.onKeyUp.bind(this);
@@ -140,16 +140,16 @@ AFRAME.registerComponent('thd-keyboard-controls', {
         document.addEventListener('keydown', this.onKeyDown, true);
         document.addEventListener('keyup', this.onKeyUp, true);
         
-        console.log('[THD-Controls] Q/E turning controls initialized with look-controls override');
+        console.log('[HD1-Controls] Q/E turning controls initialized with look-controls override');
     },
 
     onKeyDown: function (event) {
-        console.log('[THD-Controls] ANY key pressed:', event.code, 'pointerLock:', !!document.pointerLockElement);
+        console.log('[HD1-Controls] ANY key pressed:', event.code, 'pointerLock:', !!document.pointerLockElement);
         
         // Handle ESC key to exit pointer lock
         if (event.code === 'Escape') {
             document.exitPointerLock();
-            console.log('[THD-Controls] Pointer lock released with ESC');
+            console.log('[HD1-Controls] Pointer lock released with ESC');
             return;
         }
         
@@ -162,10 +162,10 @@ AFRAME.registerComponent('thd-keyboard-controls', {
             // Temporarily disable look-controls to prevent conflict
             if (this.lookControls) {
                 this.lookControls.pause();
-                console.log('[THD-Controls] Look-controls paused for Q/E rotation');
+                console.log('[HD1-Controls] Look-controls paused for Q/E rotation');
             }
             
-            console.log('[THD-Controls] Q/E Key pressed:', event.code, 'keys state:', this.keys);
+            console.log('[HD1-Controls] Q/E Key pressed:', event.code, 'keys state:', this.keys);
         }
     },
 
@@ -183,17 +183,17 @@ AFRAME.registerComponent('thd-keyboard-controls', {
                 this.lookControls.pitchObject.rotation.x = currentRotation.x * Math.PI / 180;
                 
                 this.lookControls.play();
-                console.log('[THD-Controls] Look-controls resumed with synced rotation:', currentRotation.y);
+                console.log('[HD1-Controls] Look-controls resumed with synced rotation:', currentRotation.y);
             }
             
-            console.log('[THD-Controls] Key released:', event.code);
+            console.log('[HD1-Controls] Key released:', event.code);
         }
     },
 
     tick: function () {
         // Debug what's happening each tick
         if (this.keys['KeyQ'] || this.keys['KeyE']) {
-            console.log('[THD-Controls] TICK - Keys active:', this.keys, 'pointerLock:', !!document.pointerLockElement);
+            console.log('[HD1-Controls] TICK - Keys active:', this.keys, 'pointerLock:', !!document.pointerLockElement);
         }
         
         // Rotate regardless of pointer lock for now (debugging)
@@ -208,7 +208,7 @@ AFRAME.registerComponent('thd-keyboard-controls', {
                 y: newY,
                 z: currentRotation.z
             });
-            console.log('[THD-Controls] Turning left, new Y:', newY);
+            console.log('[HD1-Controls] Turning left, new Y:', newY);
         }
         
         if (this.keys['KeyE']) {
@@ -219,7 +219,7 @@ AFRAME.registerComponent('thd-keyboard-controls', {
                 y: newY,
                 z: currentRotation.z
             });
-            console.log('[THD-Controls] Turning right, new Y:', newY);
+            console.log('[HD1-Controls] Turning right, new Y:', newY);
         }
     },
 
@@ -229,8 +229,8 @@ AFRAME.registerComponent('thd-keyboard-controls', {
     }
 });
 
-// Register THD Holodeck component for scene management
-AFRAME.registerComponent('thd-holodeck', {
+// Register HD1 Holodeck component for scene management
+AFRAME.registerComponent('hd1-holodeck', {
     schema: {
         sessionId: {type: 'string', default: ''},
         gridSize: {type: 'number', default: 25},
@@ -238,7 +238,7 @@ AFRAME.registerComponent('thd-holodeck', {
     },
 
     init: function () {
-        console.log('[THD-AFrame] Initializing holodeck scene');
+        console.log('[HD1-AFrame] Initializing holodeck scene');
         this.objects = new Map();
         this.sceneEl = this.el;
         this.objectsContainer = document.getElementById('holodeck-objects');
@@ -249,7 +249,7 @@ AFRAME.registerComponent('thd-holodeck', {
         
         // Ready for WebSocket integration
         this.isReady = true;
-        console.log('[THD-AFrame] Scene ready for holodeck integration');
+        console.log('[HD1-AFrame] Scene ready for holodeck integration');
     },
 
     setupCoordinateSystem: function() {
@@ -257,7 +257,7 @@ AFRAME.registerComponent('thd-holodeck', {
         // Set default grid transparency for holodeck environment
         this.data.gridTransparency = 0.15;
         this.createHolodeckGrid();
-        console.log('[THD-AFrame] Holodeck coordinate system initialized with default grid');
+        console.log('[HD1-AFrame] Holodeck coordinate system initialized with default grid');
     },
     
     createHolodeckGrid: function() {
@@ -434,7 +434,7 @@ AFRAME.registerComponent('thd-holodeck', {
         floor.setAttribute('static-body', '');
         this.gridContainer.appendChild(floor);
         
-        console.log('[THD-AFrame] Solid test barriers with labels and floor created');
+        console.log('[HD1-AFrame] Solid test barriers with labels and floor created');
     },
     
     createGridPlane: function(type, yPos, color, opacity) {
@@ -506,15 +506,15 @@ AFRAME.registerComponent('thd-holodeck', {
     }
 });
 
-// THD Manager class - compatible with existing WebSocket interface
-class THDAFrameManager {
+// HD1 Manager class - compatible with existing WebSocket interface
+class HD1AFrameManager {
     constructor(scene) {
         this.scene = scene;
         this.objects = new Map();
         this.camera = this.setupCamera();
         this.objectsContainer = document.getElementById('holodeck-objects');
         
-        console.log('[THD-AFrame] Manager initialized');
+        console.log('[HD1-AFrame] Manager initialized');
     }
 
     setupCamera() {
@@ -528,7 +528,7 @@ class THDAFrameManager {
 
     // Main interface method - processes WebSocket messages
     processMessage(message) {
-        console.log('[THD-AFrame] Processing message:', message.type, message);
+        console.log('[HD1-AFrame] Processing message:', message.type, message);
         
         switch (message.type) {
             case 'create':
@@ -547,20 +547,20 @@ class THDAFrameManager {
                 this.updateObjects(message.objects);
                 break;
             case 'session_created':
-                console.log('[THD-AFrame] Session created:', message.data);
+                console.log('[HD1-AFrame] Session created:', message.data);
                 break;
             case 'world_initialized':
-                console.log('[THD-AFrame] World initialized:', message.data);
+                console.log('[HD1-AFrame] World initialized:', message.data);
                 if (message.data) {
                     this.initializeWorld(message.data);
                 }
                 break;
             case 'grid_control':
-                console.log('[THD-AFrame] Grid control:', message.data);
+                console.log('[HD1-AFrame] Grid control:', message.data);
                 this.updateHolodeckGrid(message.data);
                 break;
             default:
-                console.warn('[THD-AFrame] Unknown message type:', message.type);
+                console.warn('[HD1-AFrame] Unknown message type:', message.type);
         }
     }
 
@@ -571,7 +571,7 @@ class THDAFrameManager {
             this.createObject(obj);
         });
         
-        console.log('[THD-AFrame] Created', objects.length, 'objects');
+        console.log('[HD1-AFrame] Created', objects.length, 'objects');
     }
 
     createObject(obj) {
@@ -593,11 +593,11 @@ class THDAFrameManager {
         this.setMaterial(entity, obj);
         
         // Store reference
-        entity.setAttribute('id', `thd-${id}`);
+        entity.setAttribute('id', `hd1-${id}`);
         this.objects.set(id, entity);
         this.objectsContainer.appendChild(entity);
         
-        console.log('[THD-AFrame] Created object:', id, 'at', pos);
+        console.log('[HD1-AFrame] Created object:', id, 'at', pos);
     }
 
     setGeometry(entity, obj) {
@@ -646,7 +646,7 @@ class THDAFrameManager {
                 return; // Sky doesn't need geometry
             case 'text':
                 // Text creation disabled - THREE.FontLoader issues
-                console.warn('[THD-AFrame] Text objects temporarily disabled due to FontLoader compatibility');
+                console.warn('[HD1-AFrame] Text objects temporarily disabled due to FontLoader compatibility');
                 entity.setAttribute('geometry', {primitive: 'box', width: 2, height: 0.5, depth: 0.1});
                 break;
             case 'environment':
@@ -654,7 +654,7 @@ class THDAFrameManager {
                 return; // Environment uses special component
             case 'particle':
                 // Particle systems disabled - require() compatibility issues
-                console.warn('[THD-AFrame] Particle systems temporarily disabled due to browser compatibility');
+                console.warn('[HD1-AFrame] Particle systems temporarily disabled due to browser compatibility');
                 entity.setAttribute('geometry', {primitive: 'sphere', radius: 0.5});
                 break;
             default:
@@ -730,7 +730,7 @@ class THDAFrameManager {
         }
         
         entity.setAttribute('light', lightProps);
-        console.log('[THD-AFrame] Created light:', lightProps);
+        console.log('[HD1-AFrame] Created light:', lightProps);
     }
 
     createSky(entity, obj) {
@@ -746,7 +746,7 @@ class THDAFrameManager {
         });
         entity.setAttribute('scale', '-1 1 1'); // Invert to see from inside
         
-        console.log('[THD-AFrame] Created sky environment:', color);
+        console.log('[HD1-AFrame] Created sky environment:', color);
     }
 
     createText(entity, obj) {
@@ -760,7 +760,7 @@ class THDAFrameManager {
         };
         
         entity.setAttribute('text', textProps);
-        console.log('[THD-AFrame] Created 3D text:', obj.text);
+        console.log('[HD1-AFrame] Created 3D text:', obj.text);
     }
 
     createEnvironment(entity, obj) {
@@ -782,7 +782,7 @@ class THDAFrameManager {
         }
         
         entity.setAttribute('environment', envProps);
-        console.log('[THD-AFrame] Created environment:', envType, envProps);
+        console.log('[HD1-AFrame] Created environment:', envType, envProps);
     }
 
     createParticles(entity, obj) {
@@ -820,7 +820,7 @@ class THDAFrameManager {
                 break;
         }
         
-        console.log('[THD-AFrame] Created particle system:', particleType);
+        console.log('[HD1-AFrame] Created particle system:', particleType);
     }
 
     deleteObject(objectName) {
@@ -831,21 +831,21 @@ class THDAFrameManager {
                 entity.parentNode.removeChild(entity);
             }
             this.objects.delete(objectName);
-            console.log('[THD-AFrame] Deleted object:', objectName);
+            console.log('[HD1-AFrame] Deleted object:', objectName);
         } else {
-            console.warn('[THD-AFrame] Object not found for deletion:', objectName);
+            console.warn('[HD1-AFrame] Object not found for deletion:', objectName);
         }
     }
 
     clearObjects() {
-        // Clear all THD objects but preserve grid and environment
+        // Clear all HD1 objects but preserve grid and environment
         this.objects.forEach((entity, id) => {
             if (entity.parentNode) {
                 entity.parentNode.removeChild(entity);
             }
         });
         this.objects.clear();
-        console.log('[THD-AFrame] Cleared all objects');
+        console.log('[HD1-AFrame] Cleared all objects');
     }
 
     updateCamera(cameraData) {
@@ -857,17 +857,17 @@ class THDAFrameManager {
     }
 
     initializeWorld(worldData) {
-        console.log('[THD-AFrame] Initializing world:', worldData);
+        console.log('[HD1-AFrame] Initializing world:', worldData);
         
         if (worldData && worldData.grid_size) {
             // Update grid if needed
-            this.scene.setAttribute('thd-holodeck', {
+            this.scene.setAttribute('hd1-holodeck', {
                 gridSize: worldData.grid_size,
                 gridTransparency: worldData.transparency || 0.01
             });
         }
         
-        console.log('[THD-AFrame] World initialized');
+        console.log('[HD1-AFrame] World initialized');
     }
 
     // Get current object count for status display
@@ -877,7 +877,7 @@ class THDAFrameManager {
 
     updateHolodeckGrid(gridData) {
         const sceneEl = document.getElementById('holodeck-scene');
-        const holodeckComponent = sceneEl.components['thd-holodeck'];
+        const holodeckComponent = sceneEl.components['hd1-holodeck'];
         
         if (holodeckComponent && gridData.transparency !== undefined) {
             holodeckComponent.updateGrid(gridData.transparency);
@@ -893,31 +893,31 @@ class THDAFrameManager {
     }
 }
 
-console.log('[THD-AFrame] THD A-Frame manager loaded');
-console.log('[THD-AFrame] THDAFrameManager class defined:', typeof THDAFrameManager);
-console.log('[THD-AFrame] Registered components:', Object.keys(AFRAME.components));
-console.log('[THD-AFrame] holodeck-boundaries registered:', !!AFRAME.components['holodeck-boundaries']);
+console.log('[HD1-AFrame] HD1 A-Frame manager loaded');
+console.log('[HD1-AFrame] HD1AFrameManager class defined:', typeof HD1AFrameManager);
+console.log('[HD1-AFrame] Registered components:', Object.keys(AFRAME.components));
+console.log('[HD1-AFrame] holodeck-boundaries registered:', !!AFRAME.components['holodeck-boundaries']);
 
 // Check if camera element exists and has the component, if not add it manually
 setTimeout(() => {
     const camera = document.getElementById('holodeck-camera');
-    console.log('[THD-AFrame] Camera element found:', !!camera);
+    console.log('[HD1-AFrame] Camera element found:', !!camera);
     if (camera) {
-        console.log('[THD-AFrame] Camera components:', Object.keys(camera.components || {}));
-        console.log('[THD-AFrame] Has holodeck-boundaries component:', !!camera.components['holodeck-boundaries']);
+        console.log('[HD1-AFrame] Camera components:', Object.keys(camera.components || {}));
+        console.log('[HD1-AFrame] Has holodeck-boundaries component:', !!camera.components['holodeck-boundaries']);
         
         // If component not attached, force attach it
         if (!camera.components['holodeck-boundaries']) {
-            console.log('[THD-AFrame] Manually attaching holodeck-boundaries component...');
+            console.log('[HD1-AFrame] Manually attaching holodeck-boundaries component...');
             camera.setAttribute('holodeck-boundaries', '');
             
             // Check again after 1 second
             setTimeout(() => {
-                console.log('[THD-AFrame] After manual attach - Has holodeck-boundaries:', !!camera.components['holodeck-boundaries']);
+                console.log('[HD1-AFrame] After manual attach - Has holodeck-boundaries:', !!camera.components['holodeck-boundaries']);
             }, 1000);
         }
     }
 }, 2000);
 
 // Global export to ensure it's available
-window.THDAFrameManager = THDAFrameManager;
+window.HD1AFrameManager = HD1AFrameManager;

@@ -1,11 +1,11 @@
 #!/bin/bash
 # ===================================================================
-# THD Core Shell Function Library - AUTO-GENERATED
+# HD1 Core Shell Function Library - AUTO-GENERATED
 # ===================================================================
 #
 # GENERATED FROM: api.yaml specification
 # SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
-# PURPOSE: Standard shell wrapper for THD API endpoints
+# PURPOSE: Standard shell wrapper for HD1 API endpoints
 # 
 # DO NOT EDIT MANUALLY - Regenerate with: make generate
 # ===================================================================
@@ -15,7 +15,7 @@ HD1_API_BASE="http://localhost:8080/api"
 HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
 
 # Standard HTTP client with error handling
-thd::api_call() {
+hd1::api_call() {
     local method="$1"
     local endpoint="$2"
     local payload="$3"
@@ -40,7 +40,7 @@ thd::api_call() {
 }
 
 # Auto-generated from POST /sessions/{sessionId}/objects
-thd::create_object() {
+hd1::create_object() {
     local name="$1"
     local type="$2" 
     local x="$3"
@@ -48,7 +48,7 @@ thd::create_object() {
     local z="$5"
     
     if [[ -z "$name" || -z "$type" || -z "$x" || -z "$y" || -z "$z" ]]; then
-        echo "Usage: thd::create_object <name> <type> <x> <y> <z>"
+        echo "Usage: hd1::create_object <name> <type> <x> <y> <z>"
         return 1
     fi
     
@@ -63,16 +63,16 @@ thd::create_object() {
 EOF
 )
     
-    thd::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
+    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
     echo "OBJECT: $name at ($x,$y,$z)"
 }
 
 # Auto-generated from PUT /sessions/{sessionId}/camera/position
-thd::camera() {
+hd1::camera() {
     local x="$1" y="$2" z="$3"
     
     if [[ -z "$x" || -z "$y" || -z "$z" ]]; then
-        echo "Usage: thd::camera <x> <y> <z>"
+        echo "Usage: hd1::camera <x> <y> <z>"
         return 1
     fi
     
@@ -85,18 +85,18 @@ thd::camera() {
 EOF
 )
     
-    thd::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
+    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
     echo "CAMERA: Positioned at ($x,$y,$z)"
 }
 
 # Auto-generated from POST /browser/canvas
-thd::canvas_control() {
+hd1::canvas_control() {
     local command="$1"
     shift
     local objects="$@"
     
     if [[ -z "$command" ]]; then
-        echo "Usage: thd::canvas_control <command> [objects...]"
+        echo "Usage: hd1::canvas_control <command> [objects...]"
         return 1
     fi
     
@@ -108,68 +108,68 @@ thd::canvas_control() {
 EOF
 )
     
-    thd::api_call "POST" "/browser/canvas" "$payload"
+    hd1::api_call "POST" "/browser/canvas" "$payload"
 }
 
 # Clear holodeck (uses canvas control)
-thd::clear() {
+hd1::clear() {
     echo "CLEAR: Clearing holodeck..."
-    thd::canvas_control "clear"
+    hd1::canvas_control "clear"
 }
 
 # Auto-generated from GET /sessions/{sessionId}/objects
-thd::list_objects() {
-    thd::api_call "GET" "/sessions/$HD1_SESSION_ID/objects"
+hd1::list_objects() {
+    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects"
 }
 
 # Auto-generated from GET /sessions/{sessionId}/objects/{objectName}
-thd::get_object() {
+hd1::get_object() {
     local name="$1"
     
     if [[ -z "$name" ]]; then
-        echo "Usage: thd::get_object <name>"
+        echo "Usage: hd1::get_object <name>"
         return 1
     fi
     
-    thd::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
+    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
 }
 
 # Auto-generated from DELETE /sessions/{sessionId}/objects/{objectName}
-thd::delete_object() {
+hd1::delete_object() {
     local name="$1"
     
     if [[ -z "$name" ]]; then
-        echo "Usage: thd::delete_object <name>"
+        echo "Usage: hd1::delete_object <name>"
         return 1
     fi
     
-    thd::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
+    hd1::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
     echo "DELETE: Object $name"
 }
 
 # Auto-generated from POST /sessions
-thd::create_session() {
-    thd::api_call "POST" "/sessions"
+hd1::create_session() {
+    hd1::api_call "POST" "/sessions"
 }
 
 # Auto-generated from GET /sessions
-thd::list_sessions() {
-    thd::api_call "GET" "/sessions"
+hd1::list_sessions() {
+    hd1::api_call "GET" "/sessions"
 }
 
 # Auto-generated from GET /sessions/{sessionId}
-thd::get_session() {
+hd1::get_session() {
     local session_id="${1:-$HD1_SESSION_ID}"
-    thd::api_call "GET" "/sessions/$session_id"
+    hd1::api_call "GET" "/sessions/$session_id"
 }
 
 # Auto-generated from POST /sessions/{sessionId}/world
-thd::init_world() {
-    thd::api_call "POST" "/sessions/$HD1_SESSION_ID/world"
+hd1::init_world() {
+    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/world"
     echo "WORLD: Initialized"
 }
 
-echo "THD: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
+echo "HD1: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
 echo "SPEC: Generated from api.yaml specification"
 echo "SYNC: Single source of truth - Zero manual synchronization"
 echo "FUNCS: create_object, camera, canvas_control, clear, list_objects"

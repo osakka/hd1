@@ -24,7 +24,7 @@ if [[ -z "$SESSION_ID" ]]; then
     exit 1
 fi
 
-# Set THD_ROOT and source functions
+# Set HD1_ROOT and source functions
 HD1_ROOT="/opt/holo-deck"
 source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
     echo "ERROR: HD1 functions not available"

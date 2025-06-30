@@ -78,8 +78,8 @@ HD1 development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 │   ├── server/                  # Core server components
 │   └── codegen/                 # Code generation tools
 ├── build/                       # Build artifacts (gitignored)
-│   ├── bin/thd                  # Standard daemon binary
-│   ├── bin/thd-client           # API client
+│   ├── bin/hd1                  # Standard daemon binary
+│   ├── bin/hd1-client           # API client
 │   ├── logs/                    # Timestamped logs
 │   └── runtime/                 # PID files, runtime data
 ├── share/                       # Web assets and static files
@@ -198,7 +198,7 @@ make clean      # Clean build artifacts
 ## 🚀 **DEPLOYMENT LAW**
 
 ### **PRODUCTION REQUIREMENTS:**
-- **DAEMON MODE:** `thd --daemon` with proper PID management
+- **DAEMON MODE:** `hd1 --daemon` with proper PID management
 - **ABSOLUTE PATHS:** All paths must be absolute
 - **PROFESSIONAL LOGGING:** Timestamped, structured output
 - **CLEAN SHUTDOWN:** Proper resource cleanup
@@ -208,7 +208,7 @@ make clean      # Clean build artifacts
 - [ ] API specification validates
 - [ ] All handlers implemented
 - [ ] Auto-router generates successfully
-- [ ] Auto-generated client auto-generated files present (thd-api-client.js, thd-ui-components.js, thd-form-system.js)
+- [ ] Auto-generated client auto-generated files present (hd1-api-client.js, hd1-ui-components.js, hd1-form-system.js)
 - [ ] Scene forking system functional (fork/save endpoints)
 - [ ] Recording system operational (start/stop/play/status endpoints)
 - [ ] Tests pass completely

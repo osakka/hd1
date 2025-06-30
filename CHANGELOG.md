@@ -126,9 +126,9 @@ This **advanced milestone** achieves the complete architectural goal: **complete
 #### **🏆 Enhanced Shell Functions with A-Frame Integration**
 - **Complete A-Frame Exposure**: All A-Frame capabilities accessible through standard shell interface
 - **Standard Parameter Validation**: High-quality validation with actionable error messages
-- **Enhanced Object Creation**: `thd::create_enhanced_object` with full A-Frame schema validation
-- **Light System Integration**: `thd::create_enhanced_light` supporting all A-Frame light types
-- **PBR Material System**: `thd::update_material` with metalness/roughness properties
+- **Enhanced Object Creation**: `hd1::create_enhanced_object` with full A-Frame schema validation
+- **Light System Integration**: `hd1::create_enhanced_light` supporting all A-Frame light types
+- **PBR Material System**: `hd1::update_material` with metalness/roughness properties
 - **Physics Body Support**: Dynamic, static, and kinematic physics integration
 - **Generated from Specifications**: Auto-generated from api.yaml + A-Frame schemas
 
@@ -162,8 +162,8 @@ This **advanced milestone** achieves the complete architectural goal: **complete
 - **Standard Examples**: Complete usage documentation with real examples
 
 ### **Files Added/Modified**
-- **Enhanced Libraries**: `/opt/holodeck-one/lib/thd-enhanced-functions.sh`
-- **JavaScript Bridge**: `/opt/holodeck-one/lib/thd-enhanced-bridge.js`
+- **Enhanced Libraries**: `/opt/holodeck-one/lib/hd1-enhanced-functions.sh`
+- **JavaScript Bridge**: `/opt/holodeck-one/lib/hd1-enhanced-bridge.js`
 - **Advanced Generator**: Enhanced `/opt/holodeck-one/src/codegen/generator.go`
 - **Standard ADR**: `/opt/holodeck-one/docs/adr/ADR-007-Advanced-Upstream-Downstream-Integration.md`
 
@@ -443,7 +443,7 @@ type Object struct {
 
 #### **Auto-Generated Client Technical Implementation**
 - **Generator Enhancement**: Extended `/src/codegen/generator.go` with web UI generation capabilities
-- **Generated Files**: `thd-api-client.js`, `thd-ui-components.js`, `thd-form-system.js`
+- **Generated Files**: `hd1-api-client.js`, `hd1-ui-components.js`, `hd1-form-system.js`
 - **Standard Standards**: Generated code follows HD1 standard standards throughout
 - **Template-Based System**: Mustache-style templates for consistent code generation
 - **Complete Integration**: Works seamlessly with existing A-Frame holodeck system
@@ -483,7 +483,7 @@ This milestone release achieves **complete standard UI excellence** with a **com
 #### **Enhanced Movement System**
 - **Sprint Controls**: Shift key modifier for 3x speed boost (20 → 60 acceleration)
 - **Standard FPS Controls**: Standard gaming conventions for holodeck traversal
-- **Component Architecture**: `thd-sprint-controls` A-Frame component with dynamic acceleration
+- **Component Architecture**: `hd1-sprint-controls` A-Frame component with dynamic acceleration
 
 #### **Standard Interface Standards**
 - **Console Status Indicators**: `HD1 Console [ACTIVE]` / `HD1 Console [MINIMIZED]` replacing hacky unicode
@@ -841,14 +841,14 @@ This advanced release transforms HD1 from a standard 3D visualization tool into 
 - **Physics Simulation**: Dynamic, static, and kinematic body physics
 
 #### **Enhanced Shell Function Library**
-- **thd::create_light**: Advanced lighting system creation
-- **thd::create_physics**: Physics-enabled object creation
-- **thd::create_material**: PBR material system integration
-- **thd::create_particles**: Particle effect system management
-- **thd::create_text**: 3D holographic text creation
-- **thd::create_sky**: Environment and atmosphere control
-- **thd::create_enhanced**: Advanced material objects
-- **thd::create_complete**: Complete holodeck object creation
+- **hd1::create_light**: Advanced lighting system creation
+- **hd1::create_physics**: Physics-enabled object creation
+- **hd1::create_material**: PBR material system integration
+- **hd1::create_particles**: Particle effect system management
+- **hd1::create_text**: 3D holographic text creation
+- **hd1::create_sky**: Environment and atmosphere control
+- **hd1::create_enhanced**: Advanced material objects
+- **hd1::create_complete**: Complete holodeck object creation
 
 #### **VR/AR Interaction Features**
 - **WASD Movement**: Standard first-person navigation
@@ -961,7 +961,7 @@ This advanced release transforms HD1 from a standard 3D visualization tool into 
 
 #### **For New VR Development**
 1. **Use Enhanced APIs**: Leverage new color, material, physics parameters
-2. **Shell Function Library**: Utilize comprehensive thd:: function library
+2. **Shell Function Library**: Utilize comprehensive hd1:: function library
 3. **Complete Scenarios**: Run demonstration scenarios for inspiration
 4. **VR Testing**: Test with VR headsets for full immersive experience
 
@@ -1046,8 +1046,8 @@ This major release transforms the Virtual World Synthesizer into **HD1 (Holodeck
 - **Name**: Virtual World Synthesizer → **HD1 (Holodeck One)**
 - **Module**: `visualstream` → `holodeck`
 - **Binary**: `hd1` → `hd1`
-- **Client**: `hd1-client` → `thd-client`
-- **PID File**: `hd1.pid` → `thd.pid`
+- **Client**: `thd-client` → `hd1-client`
+- **PID File**: `thd.pid` → `hd1.pid`
 
 #### **Standard Standards Implementation**
 - **Removed All Emojis**: Standard system output without decorative characters
@@ -1104,8 +1104,8 @@ HD1 Project Structure (Standard):
 │   ├── Makefile             # Standard build system
 │   └── ...                  # All source files updated
 ├── build/                   # Build artifacts (excluded from git)
-│   ├── bin/thd             # Standard daemon binary
-│   ├── bin/thd-client      # Standard API client
+│   ├── bin/hd1             # Standard daemon binary
+│   ├── bin/hd1-client      # Standard API client
 │   ├── logs/               # Standard logging
 │   └── runtime/            # PID files and runtime state
 └── docs/                   # Standard documentation
@@ -1133,15 +1133,15 @@ make status    # Standard status reporting
 
 #### **Binary Names**
 - `hd1` → `hd1` (daemon binary)
-- `hd1-client` → `thd-client` (API client)
+- `thd-client` → `hd1-client` (API client)
 
 #### **Module Import Paths**
 - All Go imports changed from `visualstream/*` to `holodeck/*`
 - Requires `go mod tidy` after update
 
 #### **Configuration Paths**
-- PID file: `hd1.pid` → `thd.pid`
-- Log files: `hd1_*.log` → `thd_*.log`
+- PID file: `thd.pid` → `hd1.pid`
+- Log files: `thd_*.log` → `hd1_*.log`
 - All path constants renamed from `HD1_*` to `HD1_*`
 
 #### **API Responses**

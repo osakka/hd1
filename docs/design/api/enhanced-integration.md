@@ -17,10 +17,10 @@ api.yaml + A-Frame schemas → generator.go → Enhanced clients
 
 ### Integration Components
 
-#### 🏆 Enhanced Shell Functions (`/opt/holodeck-one/lib/thd-enhanced-functions.sh`)
+#### 🏆 Enhanced Shell Functions (`/opt/holodeck-one/lib/hd1-enhanced-functions.sh`)
 Standard shell interface exposing complete A-Frame capabilities with high-quality validation.
 
-#### 🌐 JavaScript Function Bridge (`/opt/holodeck-one/lib/thd-enhanced-bridge.js`)
+#### 🌐 JavaScript Function Bridge (`/opt/holodeck-one/lib/hd1-enhanced-bridge.js`)
 Identical function signatures to shell equivalents, enabling seamless API usage across environments.
 
 #### 📐 Unified Code Generator (`/opt/holodeck-one/src/codegen/generator.go`)
@@ -32,12 +32,12 @@ Single generator producing both standard and enhanced clients from specification
 
 ```bash
 # Enhanced object creation with full A-Frame schema validation
-thd::create_enhanced_object <name> <type> <x> <y> <z> [options]
+hd1::create_enhanced_object <name> <type> <x> <y> <z> [options]
 
 # Examples:
-thd::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8
-thd::create_enhanced_object sphere1 sphere 2 1 0 --color #00ff00 --roughness 0.3
-thd::create_enhanced_object cylinder1 cylinder -2 1 0 --physics dynamic
+hd1::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8
+hd1::create_enhanced_object sphere1 sphere 2 1 0 --color #00ff00 --roughness 0.3
+hd1::create_enhanced_object cylinder1 cylinder -2 1 0 --physics dynamic
 ```
 
 **Supported Geometry Types:**
@@ -57,13 +57,13 @@ thd::create_enhanced_object cylinder1 cylinder -2 1 0 --physics dynamic
 
 ```bash
 # A-Frame light creation with schema validation
-thd::create_enhanced_light <name> <type> <x> <y> <z> [intensity] [color]
+hd1::create_enhanced_light <name> <type> <x> <y> <z> [intensity] [color]
 
 # Examples:
-thd::create_enhanced_light sun directional 10 10 5 1.2 #ffffff
-thd::create_enhanced_light lamp point 0 3 0 0.8 #ffff99
-thd::create_enhanced_light ambient ambient 0 0 0 0.3 #404040
-thd::create_enhanced_light spotlight spot 5 5 5 1.0 #ff8800
+hd1::create_enhanced_light sun directional 10 10 5 1.2 #ffffff
+hd1::create_enhanced_light lamp point 0 3 0 0.8 #ffff99
+hd1::create_enhanced_light ambient ambient 0 0 0 0.3 #404040
+hd1::create_enhanced_light spotlight spot 5 5 5 1.0 #ff8800
 ```
 
 **Supported Light Types:**
@@ -76,21 +76,21 @@ thd::create_enhanced_light spotlight spot 5 5 5 1.0 #ff8800
 
 ```bash
 # PBR material updates with validation
-thd::update_material <object_name> [color] [metalness] [roughness]
+hd1::update_material <object_name> [color] [metalness] [roughness]
 
 # Examples:
-thd::update_material cube1 #00ff00 0.2 0.9
-thd::update_material sphere1 #0066cc 0.8 0.1
+hd1::update_material cube1 #00ff00 0.2 0.9
+hd1::update_material sphere1 #0066cc 0.8 0.1
 ```
 
 ### Capabilities and Verification
 
 ```bash
 # Display complete A-Frame integration capabilities
-thd::aframe_capabilities
+hd1::aframe_capabilities
 
 # Verify integration status
-thd::verify_integration
+hd1::verify_integration
 ```
 
 ## JavaScript Function Bridge
@@ -101,19 +101,19 @@ The JavaScript bridge provides **identical function signatures** to shell equiva
 
 ```javascript
 // Enhanced object creation (identical to shell function)
-thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {
+hd1.createEnhancedObject('cube1', 'box', 0, 1, 0, {
     color: '#ff0000', 
     metalness: 0.8
 });
 
 // Enhanced light creation (identical to shell function)
-thd.createEnhancedLight('sun', 'directional', 10, 10, 5, 1.2, '#ffffff');
+hd1.createEnhancedLight('sun', 'directional', 10, 10, 5, 1.2, '#ffffff');
 
 // Material updates (identical to shell function)
-thd.updateMaterial('cube1', '#00ff00', 0.2, 0.9);
+hd1.updateMaterial('cube1', '#00ff00', 0.2, 0.9);
 
 // Capabilities inspection (identical to shell function)
-thd.aframeCapabilities();
+hd1.aframeCapabilities();
 ```
 
 ### A-Frame Schema Validation
@@ -123,14 +123,14 @@ The JavaScript bridge includes complete A-Frame schema validation:
 ```javascript
 // Automatic validation with actionable error messages
 try {
-    thd.createEnhancedObject('test', 'invalid_type', 0, 0, 0);
+    hd1.createEnhancedObject('test', 'invalid_type', 0, 0, 0);
 } catch (error) {
     console.error(error.message); 
     // "Invalid option: invalid_type. Expected one of: box, sphere, cylinder, cone, plane"
 }
 
 try {
-    thd.updateMaterial('test', '#invalid_color', 0.5, 0.5);
+    hd1.updateMaterial('test', '#invalid_color', 0.5, 0.5);
 } catch (error) {
     console.error(error.message);
     // "Invalid color format: #invalid_color. Expected #rrggbb"
@@ -182,8 +182,8 @@ go run generator.go
 # Output:
 # 🏆 GENERATING REVOLUTIONARY A-FRAME INTEGRATION...
 # 🏆 SUCCESS: Advanced A-Frame integration generated
-# ✨ Enhanced shell functions: /opt/holodeck-one/lib/thd-enhanced-functions.sh
-# ✨ JavaScript bridge: /opt/holodeck-one/lib/thd-enhanced-bridge.js
+# ✨ Enhanced shell functions: /opt/holodeck-one/lib/hd1-enhanced-functions.sh
+# ✨ JavaScript bridge: /opt/holodeck-one/lib/hd1-enhanced-bridge.js
 ```
 
 ### Integration Testing
@@ -192,11 +192,11 @@ go run generator.go
 # Test enhanced shell functions
 cd /opt/holodeck-one
 export HD1_ROOT=/opt/holodeck-one
-source lib/thd-enhanced-functions.sh
-thd::verify_integration
+source lib/hd1-enhanced-functions.sh
+hd1::verify_integration
 
 # Test JavaScript bridge (in browser console)
-thd.verifyIntegration();
+hd1.verifyIntegration();
 ```
 
 ## Usage Examples
@@ -208,19 +208,19 @@ thd.verifyIntegration();
 # Standard holodeck scene creation
 
 # Load enhanced functions
-source /opt/holodeck-one/lib/thd-enhanced-functions.sh
+source /opt/holodeck-one/lib/hd1-enhanced-functions.sh
 
 # Create enhanced objects with A-Frame validation
-thd::create_enhanced_object floor plane 0 -1 0 --color #333333
-thd::create_enhanced_object table box 0 0 0 --color #8B4513 --roughness 0.8
-thd::create_enhanced_object sphere1 sphere 0 1 0 --color #ff0000 --metalness 0.2
+hd1::create_enhanced_object floor plane 0 -1 0 --color #333333
+hd1::create_enhanced_object table box 0 0 0 --color #8B4513 --roughness 0.8
+hd1::create_enhanced_object sphere1 sphere 0 1 0 --color #ff0000 --metalness 0.2
 
 # Create standard lighting
-thd::create_enhanced_light sun directional 10 10 5 1.0 #ffffff
-thd::create_enhanced_light ambient ambient 0 0 0 0.3 #404040
+hd1::create_enhanced_light sun directional 10 10 5 1.0 #ffffff
+hd1::create_enhanced_light ambient ambient 0 0 0 0.3 #404040
 
 # Add physics
-thd::create_enhanced_object ball sphere 0 3 0 --physics dynamic --color #00ff00
+hd1::create_enhanced_object ball sphere 0 3 0 --physics dynamic --color #00ff00
 ```
 
 ### Complete Scene Creation (JavaScript)
@@ -229,16 +229,16 @@ thd::create_enhanced_object ball sphere 0 3 0 --physics dynamic --color #00ff00
 // Standard holodeck scene creation (browser console)
 
 // Create enhanced objects with A-Frame validation
-thd.createEnhancedObject('floor', 'plane', 0, -1, 0, {color: '#333333'});
-thd.createEnhancedObject('table', 'box', 0, 0, 0, {color: '#8B4513', roughness: 0.8});
-thd.createEnhancedObject('sphere1', 'sphere', 0, 1, 0, {color: '#ff0000', metalness: 0.2});
+hd1.createEnhancedObject('floor', 'plane', 0, -1, 0, {color: '#333333'});
+hd1.createEnhancedObject('table', 'box', 0, 0, 0, {color: '#8B4513', roughness: 0.8});
+hd1.createEnhancedObject('sphere1', 'sphere', 0, 1, 0, {color: '#ff0000', metalness: 0.2});
 
 // Create standard lighting
-thd.createEnhancedLight('sun', 'directional', 10, 10, 5, 1.0, '#ffffff');
-thd.createEnhancedLight('ambient', 'ambient', 0, 0, 0, 0.3, '#404040');
+hd1.createEnhancedLight('sun', 'directional', 10, 10, 5, 1.0, '#ffffff');
+hd1.createEnhancedLight('ambient', 'ambient', 0, 0, 0, 0.3, '#404040');
 
 // Add physics
-thd.createEnhancedObject('ball', 'sphere', 0, 3, 0, {physics: 'dynamic', color: '#00ff00'});
+hd1.createEnhancedObject('ball', 'sphere', 0, 3, 0, {physics: 'dynamic', color: '#00ff00'});
 ```
 
 ## Technical Architecture
@@ -256,8 +256,8 @@ thd.createEnhancedObject('ball', 'sphere', 0, 3, 0, {physics: 'dynamic', color: 
 ```
 /opt/holodeck-one/
 ├── lib/
-│   ├── thd-enhanced-functions.sh    # 🏆 Enhanced shell functions
-│   └── thd-enhanced-bridge.js       # 🌐 JavaScript function bridge
+│   ├── hd1-enhanced-functions.sh    # 🏆 Enhanced shell functions
+│   └── hd1-enhanced-bridge.js       # 🌐 JavaScript function bridge
 ├── src/codegen/
 │   └── generator.go                 # 📐 Unified code generator
 └── docs/adr/

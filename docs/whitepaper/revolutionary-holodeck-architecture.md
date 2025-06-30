@@ -42,9 +42,9 @@ HD1 addresses these challenges through a **advanced single source of truth archi
 ```
 api.yaml → generator.go → {
     auto_router.go (Go routing)
-    thd-api-client.js (JavaScript client)
-    thd-ui-components.js (UI components)
-    thd-form-system.js (Dynamic forms)
+    hd1-api-client.js (JavaScript client)
+    hd1-ui-components.js (UI components)
+    hd1-form-system.js (Dynamic forms)
 }
 ```
 
@@ -71,12 +71,12 @@ Shell Functions      JavaScript Bridge     WebXR Components
 **Example - Identical Functions**:
 ```bash
 # Shell Function
-thd::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8
+hd1::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8
 ```
 
 ```javascript
 // JavaScript Function (identical signature)
-thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 0.8});
+hd1.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 0.8});
 ```
 
 ### 3. Auto-Generated Client Web UI Generation

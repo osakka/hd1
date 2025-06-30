@@ -345,7 +345,7 @@ routes = append(routes, Route{
 │      │                                                         │
 │      │ go build                                                │
 │      ▼                                                         │
-│  thd (Binary)                                                  │
+│  hd1 (Binary)                                                  │
 │      │                                                         │
 │      │ make start                                              │
 │      ▼                                                         │
@@ -374,7 +374,7 @@ routes = append(routes, Route{
 
 4. **Standard Binary Creation**
    ```bash
-   make build  # Creates /opt/holodeck-one/build/bin/thd
+   make build  # Creates /opt/holodeck-one/build/bin/hd1
    ```
 
 5. **Daemon Management**
@@ -476,7 +476,7 @@ routes = append(routes, Route{
 │  Directory Structure:                                           │
 │  /opt/holodeck-one/                                               │
 │  ├── src/              # Source code & build system            │
-│  ├── build/bin/thd     # Standard daemon binary            │
+│  ├── build/bin/hd1     # Standard daemon binary            │
 │  ├── build/logs/       # Timestamped, structured logs          │
 │  ├── build/runtime/    # PID files, runtime data              │
 │  └── share/htdocs/     # Static web assets                     │

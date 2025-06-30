@@ -129,7 +129,7 @@ The emergence of WebXR standards and widespread VR adoption created an opportuni
 - **Zero Regressions**: Existing functionality preserved
 
 ### Specification-Driven Development Revolution
-- **🏗️ Auto-Generated Clients**: JavaScript API client (thdlib.js) fully generated from OpenAPI spec
+- **🏗️ Auto-Generated Clients**: JavaScript API client (hd1lib.js) fully generated from OpenAPI spec
 - **🔧 Auto-Generated CLI**: Complete Go command-line client with all endpoints
 - **📝 Auto-Generated Forms**: Dynamic UI form system from OpenAPI schemas
 - **🎯 Auto-Generated Components**: Full UI component library from specification

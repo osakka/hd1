@@ -71,8 +71,8 @@ func parseSceneScript(sceneID, scriptPath string) *SceneInfo {
 		line := strings.TrimSpace(scanner.Text())
 		
 		// Parse scene name from comment header
-		if strings.Contains(line, "THD Scene:") {
-			parts := strings.Split(line, "THD Scene:")
+		if strings.Contains(line, "HD1 Scene:") {
+			parts := strings.Split(line, "HD1 Scene:")
 			if len(parts) > 1 {
 				namePart := strings.TrimSpace(parts[1])
 				// Extract name before the dash
@@ -123,7 +123,7 @@ func parseSceneScript(sceneID, scriptPath string) *SceneInfo {
 		name = strings.Title(strings.ReplaceAll(sceneID, "-", " "))
 	}
 	if description == "" {
-		description = "THD scene: " + name
+		description = "HD1 scene: " + name
 	}
 	
 	return &SceneInfo{

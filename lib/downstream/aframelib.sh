@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # ===================================================================
-# THD Enhanced Shell Function Library with A-Frame Integration
+# HD1 Enhanced Shell Function Library with A-Frame Integration
 # ===================================================================
 #
 # REVOLUTIONARY FEATURES:
@@ -13,14 +13,14 @@
 # Generated from: api.yaml + A-Frame schemas
 # ===================================================================
 
-# Load THD upstream core library
+# Load HD1 upstream core library
 source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
-    echo "ERROR: THD upstream library not found"
+    echo "ERROR: HD1 upstream library not found"
     exit 1
 }
 
 # Enhanced object creation with A-Frame validation
-thd::create_enhanced_object() {
+hd1::create_enhanced_object() {
     local name="$1"
     local type="$2" 
     local x="$3"
@@ -90,7 +90,7 @@ thd::create_enhanced_object() {
 }
 
 # A-Frame light creation with schema validation
-thd::create_enhanced_light() {
+hd1::create_enhanced_light() {
     local name="$1"
     local light_type="$2"
     local x="$3"
@@ -129,7 +129,7 @@ thd::create_enhanced_light() {
 }
 
 # A-Frame material update with PBR properties
-thd::update_material() {
+hd1::update_material() {
     local object_name="$1"
     local color="${2:-#ffffff}"
     local metalness="${3:-0.1}"
@@ -162,7 +162,7 @@ thd::update_material() {
 }
 
 # A-Frame capabilities inspection
-thd::aframe_capabilities() {
+hd1::aframe_capabilities() {
     echo "AFRAME: Integration Capabilities"
     echo ""
     echo "Geometry Types:"
@@ -190,13 +190,13 @@ thd::aframe_capabilities() {
     echo "  - kinematic (script-controlled)"
     echo ""
     echo "EXAMPLES:"
-    echo "  thd::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8"
-    echo "  thd::create_enhanced_light sun directional 10 10 5 1.2 #ffffff"
-    echo "  thd::update_material cube1 #00ff00 0.2 0.9"
+    echo "  hd1::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8"
+    echo "  hd1::create_enhanced_light sun directional 10 10 5 1.2 #ffffff"
+    echo "  hd1::update_material cube1 #00ff00 0.2 0.9"
 }
 
 # Function signature verification
-thd::verify_integration() {
+hd1::verify_integration() {
     echo "STATUS: Enhanced Integration Status"
     echo "  [OK] A-Frame schema validation: ACTIVE"
     echo "  [OK] Enhanced object creation: AVAILABLE" 

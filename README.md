@@ -54,31 +54,31 @@ make start
 ### FREEZE-FRAME Mode (Scene Snapshots)
 ```bash
 # Create a session
-SESSION_ID=$(thd-client create-session | jq -r '.session_id')
+SESSION_ID=$(hd1-client create-session | jq -r '.session_id')
 
 # Fork an existing scene for editing
-thd-client fork-scene basic-shapes "{\"session_id\": \"$SESSION_ID\", \"clear_existing\": true}"
+hd1-client fork-scene basic-shapes "{\"session_id\": \"$SESSION_ID\", \"clear_existing\": true}"
 
 # Make modifications in the UI (add/move/delete objects)
 # Then save as new scene using the FREEZE-FRAME button in console
 # Or via CLI:
-thd-client save-scene-from-session "$SESSION_ID" '{"scene_id": "my-scene", "name": "My Custom Scene"}'
+hd1-client save-scene-from-session "$SESSION_ID" '{"scene_id": "my-scene", "name": "My Custom Scene"}'
 ```
 
 ### TEMPORAL SEQUENCE Mode (Recording)
 ```bash
 # Start recording session interactions
-thd-client start-recording "$SESSION_ID" '{"name": "Demo Recording", "description": "User interaction demo"}'
+hd1-client start-recording "$SESSION_ID" '{"name": "Demo Recording", "description": "User interaction demo"}'
 
 # Perform actions (create/modify objects, move camera, etc.)
 # Recording captures ALL changes with timestamps
 
 # Stop recording
-thd-client stop-recording "$SESSION_ID"
+hd1-client stop-recording "$SESSION_ID"
 
 # Play back recorded session in another session
-NEW_SESSION=$(thd-client create-session | jq -r '.session_id')
-thd-client play-recording "$NEW_SESSION" '{"recording_id": "demo-recording"}'
+NEW_SESSION=$(hd1-client create-session | jq -r '.session_id')
+hd1-client play-recording "$NEW_SESSION" '{"recording_id": "demo-recording"}'
 ```
 
 ### Object Tracking System
@@ -208,15 +208,15 @@ make status      # Status reporting
 ├── share/
 │   └── htdocs/
 │       └── static/js/
-│           └── thd-aframe.js     # A-Frame holodeck integration
+│           └── hd1-aframe.js     # A-Frame holodeck integration
 ├── lib/
-│   └── thd-functions.sh          # Holodeck shell function library
+│   └── hd1-functions.sh          # Holodeck shell function library
 ├── scenarios/
-│   └── complete-holodeck.thd     # Example holodeck scenarios
+│   └── complete-holodeck.hd1     # Example holodeck scenarios
 ├── docs/                         # Architecture Decision Records
 └── build/                        # Build artifacts (excluded from git)
-    ├── bin/thd                   # HD1 daemon binary
-    ├── runtime/thd.pid           # Process management
+    ├── bin/hd1                   # HD1 daemon binary
+    ├── runtime/hd1.pid           # Process management
     └── logs/                     # Logging
 ```
 
@@ -226,18 +226,18 @@ HD1 includes a comprehensive shell function library for rapid holodeck developme
 
 ```bash
 # Load HD1 functions
-source lib/thd-functions.sh
+source lib/hd1lib.sh
 
 # Basic objects
-thd::create_object "my_cube" cube 0 1 0
+hd1::create_object "my_cube" cube 0 1 0
 
 # Advanced A-Frame features
-thd::create_light "sun" directional 10 10 5 1.2 "#ffffff"
-thd::create_physics "bouncing_ball" sphere 0 5 0 2.0 "dynamic"
-thd::create_material "metal_pillar" cylinder 2 1 2 "standard" 0.8 0.1
-thd::create_particles "campfire" fire 0 0 0 1000
-thd::create_text "welcome" "HOLODECK ACTIVE" 0 3 -5 1.0 1.0 0.0
-thd::create_sky "environment" "#1a1a2e"
+hd1::create_light "sun" directional 10 10 5 1.2 "#ffffff"
+hd1::create_physics "bouncing_ball" sphere 0 5 0 2.0 "dynamic"
+hd1::create_material "metal_pillar" cylinder 2 1 2 "standard" 0.8 0.1
+hd1::create_particles "campfire" fire 0 0 0 1000
+hd1::create_text "welcome" "HOLODECK ACTIVE" 0 3 -5 1.0 1.0 0.0
+hd1::create_sky "environment" "#1a1a2e"
 ```
 
 ## World Constraints
@@ -293,7 +293,7 @@ Run the complete holodeck demonstration:
 export HD1_SESSION_ID="your-session-id"
 
 # Run the complete scenario
-./scenarios/complete-holodeck.thd
+./scenarios/complete-holodeck.hd1
 ```
 
 This creates a complete holodeck experience with:

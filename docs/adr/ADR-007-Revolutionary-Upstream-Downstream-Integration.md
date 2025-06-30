@@ -44,18 +44,18 @@ We have implemented a **Advanced Upstream/Downstream API Integration System** th
 
 ### Generated Components
 
-**Enhanced Shell Functions** (`/opt/holodeck-one/lib/thd-enhanced-functions.sh`):
+**Enhanced Shell Functions** (`/opt/holodeck-one/lib/hd1-enhanced-functions.sh`):
 ```bash
-thd::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8
-thd::create_enhanced_light sun directional 10 10 5 1.2 #ffffff
-thd::update_material cube1 #00ff00 0.2 0.9
+hd1::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8
+hd1::create_enhanced_light sun directional 10 10 5 1.2 #ffffff
+hd1::update_material cube1 #00ff00 0.2 0.9
 ```
 
-**JavaScript Function Bridge** (`/opt/holodeck-one/lib/thd-enhanced-bridge.js`):
+**JavaScript Function Bridge** (`/opt/holodeck-one/lib/hd1-enhanced-bridge.js`):
 ```javascript
-thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 0.8});
-thd.createEnhancedLight('sun', 'directional', 10, 10, 5, 1.2, '#ffffff');
-thd.updateMaterial('cube1', '#00ff00', 0.2, 0.9);
+hd1.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 0.8});
+hd1.createEnhancedLight('sun', 'directional', 10, 10, 5, 1.2, '#ffffff');
+hd1.updateMaterial('cube1', '#00ff00', 0.2, 0.9);
 ```
 
 ### Architecture Benefits

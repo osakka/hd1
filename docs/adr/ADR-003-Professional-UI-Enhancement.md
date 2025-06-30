@@ -114,7 +114,7 @@ Session → Scene Flow:
 
 **Component Implementation**:
 ```javascript
-AFRAME.registerComponent('thd-sprint-controls', {
+AFRAME.registerComponent('hd1-sprint-controls', {
   // Dynamic acceleration switching based on Shift key state
   // Fresh component references for reliable operation
 });

@@ -60,7 +60,7 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		"world":            world,
 		"bounds":           map[string]int{"min": -12, "max": 12},
 		"coordinate_system": "fixed_grid",
-		"message":          "Session created with world ready - THD holo-deck activated",
+		"message":          "Session created with world ready - HD1 holodeck activated",
 	})
 }
 

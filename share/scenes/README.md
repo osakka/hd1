@@ -51,14 +51,14 @@ Each scene file follows the standard HD1 pattern:
 # Standard HD1 scene with enhanced capabilities
 
 # Load HD1 enhanced functions
-source "/opt/holodeck-one/lib/thd-enhanced-functions.sh"
+source "/opt/holodeck-one/lib/hd1-enhanced-functions.sh"
 
 # Scene implementation
-thd::create_enhanced_object "example" "cube" 0 1 0 --color "#ff0000"
+hd1::create_enhanced_object "example" "cube" 0 1 0 --color "#ff0000"
 ```
 
 ### Standard Standards
-- **Enhanced Functions**: Use `/opt/holodeck-one/lib/thd-enhanced-functions.sh`
+- **Enhanced Functions**: Use `/opt/holodeck-one/lib/hd1-enhanced-functions.sh`
 - **A-Frame Integration**: Leverage complete A-Frame schema validation
 - **Error Handling**: Standard validation and error reporting
 - **Documentation**: Clear scene purpose and feature descriptions

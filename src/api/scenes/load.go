@@ -124,7 +124,7 @@ func LoadSceneHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 	// Execute scene script with session ID
 	objectsCreated, message = executeSceneScript(sceneScript, req.SessionID)
 
-	log.Printf("[THD] Scene '%s' loaded into session '%s' with %d objects", sceneID, req.SessionID, objectsCreated)
+	log.Printf("[HD1] Scene '%s' loaded into session '%s' with %d objects", sceneID, req.SessionID, objectsCreated)
 
 	response := LoadSceneResponse{
 		Success:        true,
@@ -173,7 +173,7 @@ func getSceneScript(sceneID string) string {
 
 // executeSceneScript runs the scene script and parses the output
 func executeSceneScript(scriptPath string, sessionID string) (int, string) {
-	log.Printf("[THD] Executing scene script: %s with session %s", scriptPath, sessionID)
+	log.Printf("[HD1] Executing scene script: %s with session %s", scriptPath, sessionID)
 	
 	// Execute the scene script with session ID
 	cmd := exec.Command("/bin/bash", scriptPath, sessionID)
@@ -181,12 +181,12 @@ func executeSceneScript(scriptPath string, sessionID string) (int, string) {
 	output, err := cmd.Output()
 	
 	if err != nil {
-		log.Printf("[THD] Scene script execution failed: %v", err)
+		log.Printf("[HD1] Scene script execution failed: %v", err)
 		return 0, fmt.Sprintf("Scene script execution failed: %v", err)
 	}
 	
 	outputStr := string(output)
-	log.Printf("[THD] Scene script output: %s", outputStr)
+	log.Printf("[HD1] Scene script output: %s", outputStr)
 	
 	// Parse object count from script output
 	objectCount := parseObjectCount(outputStr)
@@ -217,7 +217,7 @@ func parseSceneMessage(output string) string {
 	lines := strings.Split(output, "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "THD Scene") && strings.Contains(line, "loaded successfully") {
+		if strings.HasPrefix(line, "HD1 Scene") && strings.Contains(line, "loaded successfully") {
 			return line
 		}
 	}

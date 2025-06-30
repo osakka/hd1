@@ -24,13 +24,13 @@ if [[ -z "$SESSION_ID" ]]; then
     exit 1
 fi
 
-# Path to auto-generated THD client
-THD_CLIENT="/opt/holo-deck/build/bin/thd-client"
+# Path to auto-generated HD1 client
+HD1_CLIENT="/opt/holo-deck/build/bin/hd1-client"
 
 echo "Creating anime UI demo scene..."
 
 # Central anime ring interface - wireframe cyan
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "central_ring",
     "type": "cylinder",
     "x": 0, "y": 2, "z": 0,
@@ -40,7 +40,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
 }' > /dev/null
 
 # Floating UI cubes with anime colors
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "ui_cube_1",
     "type": "cube",
     "x": -4, "y": 3, "z": 2,
@@ -48,7 +48,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
     "color": {"r": 1.0, "g": 0.4, "b": 0.8, "a": 0.8}
 }' > /dev/null
 
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "ui_cube_2", 
     "type": "cube",
     "x": 4, "y": 3.5, "z": -2,
@@ -57,7 +57,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
 }' > /dev/null
 
 # Data visualization spheres
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "data_sphere_1",
     "type": "sphere", 
     "x": -2, "y": 4, "z": -4,
@@ -65,7 +65,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
     "color": {"r": 0.8, "g": 0.2, "b": 1.0, "a": 0.9}
 }' > /dev/null
 
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "data_sphere_2",
     "type": "sphere",
     "x": 3, "y": 2.5, "z": 4,
@@ -74,7 +74,7 @@ $THD_CLIENT create-object "$SESSION_ID" '{
 }' > /dev/null
 
 # Info panel for anime interface
-$THD_CLIENT create-object "$SESSION_ID" '{
+$HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "info_panel",
     "type": "plane",
     "x": 0, "y": 5, "z": -3,

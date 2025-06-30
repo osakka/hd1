@@ -15,7 +15,7 @@ This directory contains **downstream integration libraries** that bridge HD1's u
 
 ### Advanced Bridge System
 ```
-api.yaml (upstream spec) → thdlib.* (core API)
+api.yaml (upstream spec) → hd1lib.* (core API)
          ↓
 aframe-schemas (downstream spec) → aframelib.* (A-Frame integration)
 ```
@@ -35,8 +35,8 @@ aframe-schemas (downstream spec) → aframelib.* (A-Frame integration)
 source /opt/holodeck-one/lib/downstream/aframelib.sh
 
 # Enhanced A-Frame functions (identical to JavaScript signatures)
-thd::create_enhanced_object "crystal" "cone" 0 3 0 --color "#ff0000" --metalness 0.8
-thd::create_enhanced_light "key_light" "directional" 10 10 5 --intensity 1.5
+hd1::create_enhanced_object "crystal" "cone" 0 3 0 --color "#ff0000" --metalness 0.8
+hd1::create_enhanced_light "key_light" "directional" 10 10 5 --intensity 1.5
 ```
 
 ### [aframelib.js](aframelib.js)
@@ -50,12 +50,12 @@ thd::create_enhanced_light "key_light" "directional" 10 10 5 --intensity 1.5
 **Usage:**
 ```javascript
 // Identical signatures to shell functions
-await thd.createEnhancedObject('crystal', 'cone', 0, 3, 0, {
+await hd1.createEnhancedObject('crystal', 'cone', 0, 3, 0, {
     color: '#ff0000', 
     metalness: 0.8
 });
 
-await thd.createEnhancedLight('key_light', 'directional', 10, 10, 5, {
+await hd1.createEnhancedLight('key_light', 'directional', 10, 10, 5, {
     intensity: 1.5
 });
 ```
@@ -67,12 +67,12 @@ await thd.createEnhancedLight('key_light', 'directional', 10, 10, 5, {
 
 ```bash
 # Shell
-thd::create_enhanced_object "name" "type" x y z --option value
+hd1::create_enhanced_object "name" "type" x y z --option value
 ```
 
 ```javascript
 // JavaScript (identical parameters)
-thd.createEnhancedObject('name', 'type', x, y, z, {option: value})
+hd1.createEnhancedObject('name', 'type', x, y, z, {option: value})
 ```
 
 ### A-Frame Schema Validation
@@ -110,7 +110,7 @@ Standard layered architecture maintained
 
 ### Enhanced Object Creation
 ```bash
-thd::create_enhanced_object "name" "geometry" x y z \
+hd1::create_enhanced_object "name" "geometry" x y z \
     --color "#rrggbb" \
     --metalness 0.0-1.0 \
     --roughness 0.0-1.0 \
@@ -119,7 +119,7 @@ thd::create_enhanced_object "name" "geometry" x y z \
 
 ### Standard Lighting
 ```bash
-thd::create_enhanced_light "name" "type" x y z \
+hd1::create_enhanced_light "name" "type" x y z \
     --intensity 0.0-5.0 \
     --color "#rrggbb" \
     --cast-shadow true/false
@@ -127,7 +127,7 @@ thd::create_enhanced_light "name" "type" x y z \
 
 ### Physics Integration
 ```bash
-thd::create_physics_object "name" "geometry" x y z \
+hd1::create_physics_object "name" "geometry" x y z \
     --mass 0.0-100.0 \
     --physics-type dynamic/static/kinematic
 ```
@@ -145,7 +145,7 @@ thd::create_physics_object "name" "geometry" x y z \
 ```bash
 # Test enhanced functions
 source lib/downstream/aframelib.sh
-thd::create_enhanced_object "test" "box" 0 1 0 --color "#ff0000"
+hd1::create_enhanced_object "test" "box" 0 1 0 --color "#ff0000"
 
 # Test scenes using enhanced functions
 HD1_SESSION=test bash share/scenes/complete-demo.sh
