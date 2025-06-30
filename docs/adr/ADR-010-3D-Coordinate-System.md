@@ -5,7 +5,7 @@
 
 ## Context
 
-VWS (Virtual World Synthesizer) requires a consistent, predictable 3D coordinate system for object placement, camera positioning, and world boundaries. The system must be intuitive for developers, efficient for rendering, and provide consistent behavior across different client screen sizes and orientations.
+HD1 (Virtual World Synthesizer) requires a consistent, predictable 3D coordinate system for object placement, camera positioning, and world boundaries. The system must be intuitive for developers, efficient for rendering, and provide consistent behavior across different client screen sizes and orientations.
 
 ## Decision
 
@@ -107,9 +107,9 @@ CameraZ: 15   // Angled perspective
 
 ### WebGL Transformation
 ```javascript
-// Convert VWS coordinates to WebGL normalized coordinates
-function vwsToWebGL(vwsCoord) {
-    return vwsCoord / 12.0;  // Maps [-12, +12] to [-1, +1]
+// Convert HD1 coordinates to WebGL normalized coordinates
+function hd1ToWebGL(hd1Coord) {
+    return hd1Coord / 12.0;  // Maps [-12, +12] to [-1, +1]
 }
 
 // Scaling factor for consistent rendering
@@ -249,7 +249,7 @@ type WorldConfig struct {
 ---
 
 **Decision Date**: 2025-06-28  
-**Decision Makers**: VWS Architecture Team  
+**Decision Makers**: HD1 Architecture Team  
 **Review Date**: 2025-12-28  
 
-*This ADR establishes the spatial foundation that enables precise object placement in VWS virtual worlds.*
+*This ADR establishes the spatial foundation that enables precise object placement in HD1 virtual worlds.*

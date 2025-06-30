@@ -1,8 +1,8 @@
-# THD Holodeck Scenes
+# HD1 Holodeck Scenes
 
-**Standard Scene Collection for THD (The Holo-Deck)**
+**Standard Scene Collection for HD1 (Holodeck One)**
 
-This directory contains the complete collection of holodeck scenes available through THD's standard scene management system.
+This directory contains the complete collection of holodeck scenes available through HD1's standard scene management system.
 
 ## 🎭 Scene Collection
 
@@ -10,13 +10,13 @@ This directory contains the complete collection of holodeck scenes available thr
 Clean holodeck grid foundation - perfect starting point for custom content creation.
 
 ### [basic-shapes.sh](basic-shapes.sh) 
-Fundamental geometric shapes demonstration showcasing THD's primitive object capabilities.
+Fundamental geometric shapes demonstration showcasing HD1's primitive object capabilities.
 
 ### [anime-ui.sh](anime-ui.sh)
 Advanced UI demonstration with anime-inspired visual elements and interactive components.
 
 ### [complete-demo.sh](complete-demo.sh)
-Complete THD capabilities showcase featuring lighting, materials, physics, and A-Frame integration.
+Complete HD1 capabilities showcase featuring lighting, materials, physics, and A-Frame integration.
 
 ### [my-custom-scene.sh](my-custom-scene.sh)
 Template for custom scene development with standard patterns and best practices.
@@ -24,7 +24,7 @@ Template for custom scene development with standard patterns and best practices.
 ## 🎯 Scene Management
 
 ### API Integration
-All scenes are accessible through THD's standard scene management API:
+All scenes are accessible through HD1's standard scene management API:
 
 ```bash
 # List available scenes
@@ -43,22 +43,22 @@ Standard scene dropdown available in the holodeck console:
 ## 📋 Scene Development Standards
 
 ### Scene Structure
-Each scene file follows the standard THD pattern:
+Each scene file follows the standard HD1 pattern:
 
 ```bash
 #!/bin/bash
 # Scene: [NAME] - [DESCRIPTION]
-# Standard THD scene with enhanced capabilities
+# Standard HD1 scene with enhanced capabilities
 
-# Load THD enhanced functions
-source "/opt/holo-deck/lib/thd-enhanced-functions.sh"
+# Load HD1 enhanced functions
+source "/opt/holodeck-one/lib/thd-enhanced-functions.sh"
 
 # Scene implementation
 thd::create_enhanced_object "example" "cube" 0 1 0 --color "#ff0000"
 ```
 
 ### Standard Standards
-- **Enhanced Functions**: Use `/opt/holo-deck/lib/thd-enhanced-functions.sh`
+- **Enhanced Functions**: Use `/opt/holodeck-one/lib/thd-enhanced-functions.sh`
 - **A-Frame Integration**: Leverage complete A-Frame schema validation
 - **Error Handling**: Standard validation and error reporting
 - **Documentation**: Clear scene purpose and feature descriptions
@@ -66,14 +66,14 @@ thd::create_enhanced_object "example" "cube" 0 1 0 --color "#ff0000"
 ## 🔧 Technical Integration
 
 ### Server Integration
-Scenes are served by THD's API endpoint handlers in:
+Scenes are served by HD1's API endpoint handlers in:
 - `src/api/scenes/list.go` - Scene discovery and listing
 - `src/api/scenes/load.go` - Scene execution and loading
 
 ### File Path Resolution
-THD automatically resolves scene paths from this directory:
+HD1 automatically resolves scene paths from this directory:
 ```
-/opt/holo-deck/share/scenes/[scene-name].sh
+/opt/holodeck-one/share/scenes/[scene-name].sh
 ```
 
 ## 🎨 Scene Categories
@@ -91,4 +91,4 @@ THD automatically resolves scene paths from this directory:
 
 ---
 
-**Standard holodeck scenes powered by THD's advanced VR/AR architecture with A-Frame WebXR integration.**
+**Standard holodeck scenes powered by HD1's advanced VR/AR architecture with A-Frame WebXR integration.**

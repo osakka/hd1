@@ -5,7 +5,7 @@
 
 ## Context
 
-VWS (Virtual World Synthesizer) requires persistent storage for virtual world state including sessions, 3D objects, world configurations, and camera settings. Multiple clients may connect simultaneously and modify the same or different sessions concurrently. We need thread-safe, high-performance persistence that integrates seamlessly with real-time WebSocket updates.
+HD1 (Virtual World Synthesizer) requires persistent storage for virtual world state including sessions, 3D objects, world configurations, and camera settings. Multiple clients may connect simultaneously and modify the same or different sessions concurrently. We need thread-safe, high-performance persistence that integrates seamlessly with real-time WebSocket updates.
 
 ## Decision
 
@@ -185,7 +185,7 @@ Current SessionStore interface designed for easy backend replacement without API
 ---
 
 **Decision Date**: 2025-06-28  
-**Decision Makers**: VWS Architecture Team  
+**Decision Makers**: HD1 Architecture Team  
 **Review Date**: 2025-12-28  
 
-*This ADR establishes the persistence foundation that enables VWS virtual worlds.*
+*This ADR establishes the persistence foundation that enables HD1 virtual worlds.*

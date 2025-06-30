@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: THD (The Holo-Deck) API
+  title: HD1 (Holodeck One) API
   description: |
     Revolutionary API-first 3D coordinate system with universal world boundaries.
     Single source of truth for sessions, worlds, objects, and real-time control.

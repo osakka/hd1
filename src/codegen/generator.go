@@ -365,7 +365,7 @@ func main() {
 		fmt.Printf("⚠️  WARNING: Core shell function generation failed: %v\n", err)
 	} else {
 		fmt.Printf("✅ SUCCESS: Core shell functions generated from API specification\n")
-		fmt.Printf("🔧 Generated: /opt/holo-deck/lib/thdlib.sh (upstream core library)\n")
+		fmt.Printf("🔧 Generated: /opt/holo-deck/lib/hd1lib.sh (upstream core library)\n")
 	}
 
 	// Advanced enhanced generation with A-Frame integration
@@ -1440,7 +1440,7 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 # ===================================================================
 
 # Load THD upstream core library
-source "${HD1_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
     echo "ERROR: THD upstream library not found"
     exit 1
 }
@@ -2060,7 +2060,7 @@ echo "SESSION: create_session, get_session, init_world"
 echo "STATUS: Bar-raising achieved"
 `
 
-	outputPath := filepath.Join(outputDir, "thdlib.sh")
+	outputPath := filepath.Join(outputDir, "hd1lib.sh")
 	if err := os.WriteFile(outputPath, []byte(functionsTemplate), 0755); err != nil {
 		return fmt.Errorf("failed to write core shell functions: %w", err)
 	}

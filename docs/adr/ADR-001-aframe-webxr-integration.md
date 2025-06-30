@@ -1,18 +1,18 @@
-# ADR-001: A-Frame WebXR Integration for THD Holodeck Platform
+# ADR-001: A-Frame WebXR Integration for HD1 Holodeck Platform
 
 **Date**: 2025-06-29  
 **Status**: ✅ **ACCEPTED** - Advanced transformation complete  
 **Decision Makers**: Architecture Review Board  
-**Impact**: 🚀 **TRANSFORMATIONAL** - THD evolution from WebGL to VR holodeck  
+**Impact**: 🚀 **TRANSFORMATIONAL** - HD1 evolution from WebGL to VR holodeck  
 
 ## 📋 Summary
 
-Integrate **A-Frame WebXR framework** as THD's primary rendering backend, transforming THD from a basic WebGL visualization tool into a complete VR/AR holodeck platform while maintaining 100% API compatibility.
+Integrate **A-Frame WebXR framework** as HD1's primary rendering backend, transforming HD1 from a basic WebGL visualization tool into a complete VR/AR holodeck platform while maintaining 100% API compatibility.
 
 ## 🎯 Context & Problem Statement
 
 ### Original State
-THD operated as a standard 3D coordinate system with:
+HD1 operated as a standard 3D coordinate system with:
 - Custom WebGL rendering using Three.js
 - Basic cube-based object visualization  
 - Desktop-only interaction (mouse/keyboard)
@@ -20,7 +20,7 @@ THD operated as a standard 3D coordinate system with:
 - No VR/AR capabilities
 
 ### Market Opportunity
-The emergence of WebXR standards and widespread VR adoption created an opportunity to transform THD into a **standard holodeck platform** capable of:
+The emergence of WebXR standards and widespread VR adoption created an opportunity to transform HD1 into a **standard holodeck platform** capable of:
 - Immersive VR/AR experiences
 - Advanced 3D rendering capabilities
 - Cross-platform device compatibility
@@ -28,7 +28,7 @@ The emergence of WebXR standards and widespread VR adoption created an opportuni
 
 ### Technical Requirements
 - **100% Backward Compatibility**: All existing APIs must continue working
-- **Standard Standards**: Maintain THD's engineering quality
+- **Standard Standards**: Maintain HD1's engineering quality
 - **Framework Flexibility**: Enable future backend options
 - **VR/AR Ready**: Full WebXR headset support
 - **Performance**: Real-time rendering with 60+ FPS
@@ -86,7 +86,7 @@ The emergence of WebXR standards and widespread VR adoption created an opportuni
 ### Selected Architecture
 ```
 ┌─────────────────────────────────────────────────┐
-│                THD API Layer                    │
+│                HD1 API Layer                    │
 │          (Universal Interface)                  │
 ├─────────────────────────────────────────────────┤
 │              WebSocket Hub                      │
@@ -133,7 +133,7 @@ The emergence of WebXR standards and widespread VR adoption created an opportuni
 - **🔧 Auto-Generated CLI**: Complete Go command-line client with all endpoints
 - **📝 Auto-Generated Forms**: Dynamic UI form system from OpenAPI schemas
 - **🎯 Auto-Generated Components**: Full UI component library from specification
-- **📚 Auto-Generated Shell Libraries**: Bash function libraries (thdlib.sh, aframelib.sh)
+- **📚 Auto-Generated Shell Libraries**: Bash function libraries (hd1lib.sh, aframelib.sh)
 - **🔄 Auto-Generated Routing**: Complete HTTP routing layer from specification
 - **🎮 Single Source of Truth**: One api.yaml drives all client implementations
 - **⚡ Advanced Code Generation**: `make generate` creates entire client ecosystem
@@ -250,7 +250,7 @@ The emergence of WebXR standards and widespread VR adoption created an opportuni
 
 ## 🎉 Conclusion
 
-The integration of **A-Frame WebXR** represents a **advanced transformation** of THD from a basic WebGL visualization tool into a **standard VR/AR holodeck platform**. 
+The integration of **A-Frame WebXR** represents a **advanced transformation** of HD1 from a basic WebGL visualization tool into a **standard VR/AR holodeck platform**. 
 
 ### Key Achievements
 - ✅ **100% Backward Compatibility**: All existing APIs preserved
@@ -260,14 +260,14 @@ The integration of **A-Frame WebXR** represents a **advanced transformation** of
 - ✅ **Community Ecosystem**: Access to A-Frame's rich plugin system
 
 ### Strategic Impact
-This decision positions THD as a **leader in standard VR development platforms**, combining:
+This decision positions HD1 as a **leader in standard VR development platforms**, combining:
 - **Engineering Excellence**: Standard-grade architecture and standards
 - **Innovation Leadership**: Cutting-edge VR/AR capabilities
 - **Developer Experience**: Intuitive APIs with powerful capabilities
 - **Market Positioning**: Ready for enterprise VR adoption
 - **Technical Foundation**: Scalable, extensible, maintainable
 
-The A-Frame integration demonstrates how **thoughtful open-source integration** can achieve advanced results while maintaining standard engineering standards. THD now stands as a premier example of **API-first VR platform development**.
+The A-Frame integration demonstrates how **thoughtful open-source integration** can achieve advanced results while maintaining standard engineering standards. HD1 now stands as a premier example of **API-first VR platform development**.
 
 ---
 

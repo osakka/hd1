@@ -5,7 +5,7 @@ Accepted (2025-06-30)
 
 ## Context
 
-THD (The Holo-Deck) handlers.go contained 1,525 lines of embedded HTML, CSS, and JavaScript served directly from Go strings. This created several architectural problems:
+HD1 (Holodeck One) handlers.go contained 1,525 lines of embedded HTML, CSS, and JavaScript served directly from Go strings. This created several architectural problems:
 
 - **Poor separation of concerns**: Frontend code mixed with backend handlers
 - **Developer experience issues**: No syntax highlighting or IDE support for embedded web assets
@@ -18,7 +18,7 @@ THD (The Holo-Deck) handlers.go contained 1,525 lines of embedded HTML, CSS, and
 Implement surgical refactoring to extract all embedded static content to proper files with lightweight template processing:
 
 ### 1. Static File Extraction
-- Extract all HTML, CSS, and JavaScript to `/opt/holo-deck/share/htdocs/`
+- Extract all HTML, CSS, and JavaScript to `/opt/holodeck-one/share/htdocs/`
 - Maintain identical functionality with zero regressions
 - Preserve existing cache versioning strategy
 
@@ -36,7 +36,7 @@ Implement surgical refactoring to extract all embedded static content to proper 
 
 ### File Structure
 ```
-/opt/holo-deck/share/htdocs/
+/opt/holodeck-one/share/htdocs/
 ├── index.html                    # Main template with ${JS_VERSION}
 └── static/
     ├── css/
@@ -112,7 +112,7 @@ Fixed reconnection loop where client sent literal `${JS_VERSION}` instead of pro
 
 ## Implementation Quality
 
-This refactoring exemplifies THD's professional engineering standards:
+This refactoring exemplifies HD1's professional engineering standards:
 - **Single source of truth**: Template processing maintains consistent versioning
 - **Bar-raising solution**: Architectural improvement without functional compromise  
 - **Surgical execution**: Precise implementation with immediate verification

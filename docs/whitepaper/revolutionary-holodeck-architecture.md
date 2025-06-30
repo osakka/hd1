@@ -1,17 +1,17 @@
-# THD: Advanced VR/AR Holodeck Platform Architecture
+# HD1: Advanced VR/AR Holodeck Platform Architecture
 
 **A Technical Whitepaper**
 
 **Version**: 3.5.0  
 **Date**: June 29, 2025  
-**Authors**: THD Architecture Team  
+**Authors**: HD1 Architecture Team  
 **Classification**: Public Technical Document  
 
 ---
 
 ## Executive Summary
 
-THD (The Holo-Deck) represents a advanced approach to VR/AR application development, combining **specification-driven architecture** with **standard engineering standards** to create the world's first truly **standard holodeck platform**. This whitepaper presents the technical architecture, advanced innovations, and engineering principles that enable THD to bridge the gap between academic research and production-ready immersive technologies.
+HD1 (Holodeck One) represents a advanced approach to VR/AR application development, combining **specification-driven architecture** with **standard engineering standards** to create the world's first truly **standard holodeck platform**. This whitepaper presents the technical architecture, advanced innovations, and engineering principles that enable HD1 to bridge the gap between academic research and production-ready immersive technologies.
 
 ## Introduction
 
@@ -24,12 +24,12 @@ Traditional VR/AR development suffers from fragmented toolchains, inconsistent A
 3. **Limited Integration**: Poor integration between 3D frameworks and application APIs
 4. **Quality Gaps**: Lack of high-quality standards in immersive technologies
 
-### The THD Solution
+### The HD1 Solution
 
-THD addresses these challenges through a **advanced single source of truth architecture** that:
+HD1 addresses these challenges through a **advanced single source of truth architecture** that:
 
 - **Eliminates Manual Synchronization**: All clients auto-generated from OpenAPI specifications
-- **Achieves Perfect Integration**: Upstream/downstream API bridge between THD and A-Frame
+- **Achieves Perfect Integration**: Upstream/downstream API bridge between HD1 and A-Frame
 - **Maintains Standard Standards**: High-quality engineering throughout
 - **Enables Advanced Capabilities**: Scene forking, temporal recording, and holodeck containment
 
@@ -55,10 +55,10 @@ api.yaml → generator.go → {
 
 ### 2. Upstream/Downstream API Integration
 
-**Innovation**: Advanced bridge system connecting THD API (upstream) with A-Frame capabilities (downstream).
+**Innovation**: Advanced bridge system connecting HD1 API (upstream) with A-Frame capabilities (downstream).
 
 ```
-THD API (Upstream) ←→ Bridge System ←→ A-Frame (Downstream)
+HD1 API (Upstream) ←→ Bridge System ←→ A-Frame (Downstream)
      ↓                      ↓                    ↓
 Shell Functions      JavaScript Bridge     WebXR Components
 ```
@@ -145,7 +145,7 @@ thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    THD REVOLUTIONARY ARCHITECTURE               │
+│                    HD1 REVOLUTIONARY ARCHITECTURE               │
 └─────────────────────────────────────────────────────────────────┘
 
   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
@@ -156,7 +156,7 @@ thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 
          │ HTTP              │ HTTP              │ HTTP
          │                   │                   │
   ┌─────────────────────────────────────────────────────────┐
-  │                THD Core Engine                          │
+  │                HD1 Core Engine                          │
   │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │
   │  │Auto Router  │  │Session Store│  │WebSocket Hub│    │
   │  │(Generated)  │  │(Thread-Safe)│  │(Real-time)  │    │
@@ -180,7 +180,7 @@ thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 
 
 **Problem Solved**: Manual synchronization between API specification and client implementations.
 
-**THD Innovation**: Advanced code generation pipeline that produces:
+**HD1 Innovation**: Advanced code generation pipeline that produces:
 - Go routing layer
 - JavaScript API client
 - UI component library
@@ -194,7 +194,7 @@ thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 
 
 **Problem Solved**: Poor integration between application APIs and 3D frameworks.
 
-**THD Innovation**: Advanced bridge system connecting THD API with A-Frame capabilities through:
+**HD1 Innovation**: Advanced bridge system connecting HD1 API with A-Frame capabilities through:
 - Identical function signatures across environments
 - Complete A-Frame schema validation
 - Standard parameter checking
@@ -206,7 +206,7 @@ thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 
 
 **Problem Solved**: Lack of high-quality standards in immersive technologies.
 
-**THD Innovation**: Standard holodeck platform with:
+**HD1 Innovation**: Standard holodeck platform with:
 - High-quality logging and monitoring
 - Thread-safe session management
 - Standard build system with validation
@@ -275,16 +275,16 @@ thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 
 
 ## Conclusion
 
-THD represents a advanced breakthrough in VR/AR application development, achieving the holy grail of specification-driven architecture while maintaining standard engineering standards. The innovative upstream/downstream API bridge, combined with single source of truth code generation, eliminates traditional pain points and enables developers to focus on creating immersive experiences rather than fighting with toolchain complexity.
+HD1 represents a advanced breakthrough in VR/AR application development, achieving the holy grail of specification-driven architecture while maintaining standard engineering standards. The innovative upstream/downstream API bridge, combined with single source of truth code generation, eliminates traditional pain points and enables developers to focus on creating immersive experiences rather than fighting with toolchain complexity.
 
 Key achievements:
 - **100% Single Source of Truth**: Eliminated manual synchronization
-- **Advanced Integration**: Seamless THD ↔ A-Frame bridge
+- **Advanced Integration**: Seamless HD1 ↔ A-Frame bridge
 - **Standard Standards**: High-quality quality throughout
 - **Zero Regressions**: Backward compatibility maintained
 - **Bar-Raising Quality**: Every decision elevates system capability
 
-THD is not just another VR framework - it's a **advanced standard holodeck platform** that sets new standards for immersive technology development.
+HD1 is not just another VR framework - it's a **advanced standard holodeck platform** that sets new standards for immersive technology development.
 
 ---
 

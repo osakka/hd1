@@ -6,7 +6,7 @@
 
 ## Context
 
-THD has evolved into a comprehensive VR/AR holodeck platform with A-Frame WebXR integration. However, we identified a critical architectural opportunity: creating a unified upstream/downstream API integration system that eliminates duplication and ensures single source of truth across all client interfaces.
+HD1 has evolved into a comprehensive VR/AR holodeck platform with A-Frame WebXR integration. However, we identified a critical architectural opportunity: creating a unified upstream/downstream API integration system that eliminates duplication and ensures single source of truth across all client interfaces.
 
 ### Problem Statement
 
@@ -44,14 +44,14 @@ We have implemented a **Advanced Upstream/Downstream API Integration System** th
 
 ### Generated Components
 
-**Enhanced Shell Functions** (`/opt/holo-deck/lib/thd-enhanced-functions.sh`):
+**Enhanced Shell Functions** (`/opt/holodeck-one/lib/thd-enhanced-functions.sh`):
 ```bash
 thd::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8
 thd::create_enhanced_light sun directional 10 10 5 1.2 #ffffff
 thd::update_material cube1 #00ff00 0.2 0.9
 ```
 
-**JavaScript Function Bridge** (`/opt/holo-deck/lib/thd-enhanced-bridge.js`):
+**JavaScript Function Bridge** (`/opt/holodeck-one/lib/thd-enhanced-bridge.js`):
 ```javascript
 thd.createEnhancedObject('cube1', 'box', 0, 1, 0, {color: '#ff0000', metalness: 0.8});
 thd.createEnhancedLight('sun', 'directional', 10, 10, 5, 1.2, '#ffffff');
@@ -84,7 +84,7 @@ api.yaml + A-Frame schemas → generator.go → Enhanced clients
 ```
 
 ### Integration Points
-- `/opt/holo-deck/src/codegen/generator.go` - Unified generator
+- `/opt/holodeck-one/src/codegen/generator.go` - Unified generator
 - Enhanced generation integrated into standard build pipeline
 - Standard logging throughout generation process
 
@@ -105,7 +105,7 @@ api.yaml + A-Frame schemas → generator.go → Enhanced clients
 ### Considerations
 - Additional complexity in code generator
 - A-Frame schema changes require regeneration
-- Enhanced functions require THD environment setup
+- Enhanced functions require HD1 environment setup
 
 ## Alternatives Considered
 
@@ -133,4 +133,4 @@ api.yaml + A-Frame schemas → generator.go → Enhanced clients
 
 ---
 
-*This ADR represents the culmination of THD's evolution into a standard VR/AR holodeck platform with advanced API integration architecture.*
+*This ADR represents the culmination of HD1's evolution into a standard VR/AR holodeck platform with advanced API integration architecture.*

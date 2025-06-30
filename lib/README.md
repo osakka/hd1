@@ -1,13 +1,13 @@
-# THD Library Architecture
+# HD1 Library Architecture
 
 **Standard Upstream API Libraries - Auto-Generated from Specification**
 
-This directory contains the **upstream core libraries** for THD (The Holo-Deck), providing standard API wrapper functionality auto-generated directly from the OpenAPI specification.
+This directory contains the **upstream core libraries** for HD1 (Holodeck One), providing standard API wrapper functionality auto-generated directly from the OpenAPI specification.
 
 ## 📋 Upstream Libraries
 
-### [thdlib.sh](thdlib.sh)
-**Core Shell API Library** - Standard shell wrapper for all THD API endpoints
+### [hd1lib.sh](hd1lib.sh)
+**Core Shell API Library** - Standard shell wrapper for all HD1 API endpoints
 
 - **Auto-generated** from `api.yaml` specification
 - **Single source of truth** - zero manual synchronization 
@@ -16,7 +16,7 @@ This directory contains the **upstream core libraries** for THD (The Holo-Deck),
 
 **Usage:**
 ```bash
-source /opt/holo-deck/lib/thdlib.sh
+source /opt/holodeck-one/lib/hd1lib.sh
 
 # Core functions auto-generated from API spec
 thd::create_object "cube1" "box" 0 1 0
@@ -25,7 +25,7 @@ thd::canvas_control "clear"
 ```
 
 ### [thdlib.js](../share/htdocs/static/js/thdlib.js)
-**Core JavaScript API Client** - Standard web client for all THD API endpoints
+**Core JavaScript API Client** - Standard web client for all HD1 API endpoints
 
 - **Auto-generated** from `api.yaml` specification  
 - **Identical API coverage** to shell library
@@ -56,13 +56,13 @@ const result = await thdAPI.createObject('session-id', {
 - **Enterprise Quality** - production-ready reliability
 
 ### Advanced Generation
-Generated via THD's advanced code generator:
+Generated via HD1's advanced code generator:
 ```bash
-cd /opt/holo-deck/src && make generate
+cd /opt/holodeck-one/src && make generate
 ```
 
 This command auto-generates:
-- `lib/thdlib.sh` - Shell API wrapper
+- `lib/hd1lib.sh` - Shell API wrapper
 - `share/htdocs/static/js/thdlib.js` - JavaScript API client
 - `src/auto_router.go` - Go routing layer
 - Complete UI components and forms
@@ -73,7 +73,7 @@ The upstream libraries serve as the foundation for **downstream integrations**:
 
 ### Downstream A-Frame Integration
 ```
-lib/thdlib.sh (upstream core)
+lib/hd1lib.sh (upstream core)
     ↓ imported by
 lib/downstream/aframelib.sh (A-Frame integration)
 ```
@@ -121,4 +121,4 @@ Current upstream library coverage:
 
 ---
 
-**The upstream libraries represent the foundation of THD's advanced specification-driven architecture - where changing the API specification automatically updates all client libraries across all environments.**
+**The upstream libraries represent the foundation of HD1's advanced specification-driven architecture - where changing the API specification automatically updates all client libraries across all environments.**

@@ -1,4 +1,4 @@
-# THD Enhanced Integration - Advanced Upstream/Downstream API Bridge
+# HD1 Enhanced Integration - Advanced Upstream/Downstream API Bridge
 
 **Version**: 3.5.0  
 **Status**: Production Ready  
@@ -6,7 +6,7 @@
 
 ## Overview
 
-THD's **Advanced Upstream/Downstream API Integration** represents the pinnacle of standard engineering: a **single source of truth bridge system** that seamlessly connects THD API capabilities with A-Frame WebXR functionality through auto-generated, identical-signature function libraries.
+HD1's **Advanced Upstream/Downstream API Integration** represents the pinnacle of standard engineering: a **single source of truth bridge system** that seamlessly connects HD1 API capabilities with A-Frame WebXR functionality through auto-generated, identical-signature function libraries.
 
 ## Advanced Architecture
 
@@ -17,13 +17,13 @@ api.yaml + A-Frame schemas → generator.go → Enhanced clients
 
 ### Integration Components
 
-#### 🏆 Enhanced Shell Functions (`/opt/holo-deck/lib/thd-enhanced-functions.sh`)
+#### 🏆 Enhanced Shell Functions (`/opt/holodeck-one/lib/thd-enhanced-functions.sh`)
 Standard shell interface exposing complete A-Frame capabilities with high-quality validation.
 
-#### 🌐 JavaScript Function Bridge (`/opt/holo-deck/lib/thd-enhanced-bridge.js`)
+#### 🌐 JavaScript Function Bridge (`/opt/holodeck-one/lib/thd-enhanced-bridge.js`)
 Identical function signatures to shell equivalents, enabling seamless API usage across environments.
 
-#### 📐 Unified Code Generator (`/opt/holo-deck/src/codegen/generator.go`)
+#### 📐 Unified Code Generator (`/opt/holodeck-one/src/codegen/generator.go`)
 Single generator producing both standard and enhanced clients from specifications.
 
 ## Enhanced Shell Functions
@@ -176,22 +176,22 @@ validateEnum('triangle', ['box', 'sphere', 'cylinder'])
 
 ```bash
 # Generate enhanced integration from specifications
-cd /opt/holo-deck/src/codegen
+cd /opt/holodeck-one/src/codegen
 go run generator.go
 
 # Output:
 # 🏆 GENERATING REVOLUTIONARY A-FRAME INTEGRATION...
 # 🏆 SUCCESS: Advanced A-Frame integration generated
-# ✨ Enhanced shell functions: /opt/holo-deck/lib/thd-enhanced-functions.sh
-# ✨ JavaScript bridge: /opt/holo-deck/lib/thd-enhanced-bridge.js
+# ✨ Enhanced shell functions: /opt/holodeck-one/lib/thd-enhanced-functions.sh
+# ✨ JavaScript bridge: /opt/holodeck-one/lib/thd-enhanced-bridge.js
 ```
 
 ### Integration Testing
 
 ```bash
 # Test enhanced shell functions
-cd /opt/holo-deck
-export THD_ROOT=/opt/holo-deck
+cd /opt/holodeck-one
+export HD1_ROOT=/opt/holodeck-one
 source lib/thd-enhanced-functions.sh
 thd::verify_integration
 
@@ -208,7 +208,7 @@ thd.verifyIntegration();
 # Standard holodeck scene creation
 
 # Load enhanced functions
-source /opt/holo-deck/lib/thd-enhanced-functions.sh
+source /opt/holodeck-one/lib/thd-enhanced-functions.sh
 
 # Create enhanced objects with A-Frame validation
 thd::create_enhanced_object floor plane 0 -1 0 --color #333333
@@ -254,7 +254,7 @@ thd.createEnhancedObject('ball', 'sphere', 0, 3, 0, {physics: 'dynamic', color: 
 ### File Structure
 
 ```
-/opt/holo-deck/
+/opt/holodeck-one/
 ├── lib/
 │   ├── thd-enhanced-functions.sh    # 🏆 Enhanced shell functions
 │   └── thd-enhanced-bridge.js       # 🌐 JavaScript function bridge
@@ -286,7 +286,7 @@ thd.createEnhancedObject('ball', 'sphere', 0, 3, 0, {physics: 'dynamic', color: 
 - **Enterprise-Grade**: Standard error handling throughout
 - **Zero Manual Sync**: All clients generated from specifications
 - **Thread-Safe**: Safe for concurrent usage
-- **Standard Logging**: Integrated with THD unified logging system
+- **Standard Logging**: Integrated with HD1 unified logging system
 
 ---
 

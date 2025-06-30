@@ -1,14 +1,14 @@
-# THD Downstream Integrations
+# HD1 Downstream Integrations
 
 **Standard A-Frame WebXR Integration Libraries**
 
-This directory contains **downstream integration libraries** that bridge THD's upstream API capabilities with external frameworks and technologies. Currently focused on A-Frame WebXR integration with identical function signatures across shell and JavaScript environments.
+This directory contains **downstream integration libraries** that bridge HD1's upstream API capabilities with external frameworks and technologies. Currently focused on A-Frame WebXR integration with identical function signatures across shell and JavaScript environments.
 
 ## 🎯 Downstream Architecture
 
 ### Integration Philosophy
 **Downstream libraries extend upstream capabilities** by:
-- **Importing upstream core** - All downstream libraries source `../thdlib.sh`
+- **Importing upstream core** - All downstream libraries source `../hd1lib.sh`
 - **Adding framework-specific features** - A-Frame schema validation, WebXR capabilities
 - **Maintaining identical signatures** - Shell and JavaScript functions have identical parameters
 - **Standard validation** - Complete parameter and schema validation
@@ -25,14 +25,14 @@ aframe-schemas (downstream spec) → aframelib.* (A-Frame integration)
 ### [aframelib.sh](aframelib.sh)
 **A-Frame Shell Integration** - Enhanced shell functions with complete A-Frame WebXR capabilities
 
-- **Imports upstream core** - Sources `../thdlib.sh` for API access
+- **Imports upstream core** - Sources `../hd1lib.sh` for API access
 - **A-Frame schema validation** - Complete validation using A-Frame component schemas
 - **Enhanced object creation** - Materials, lighting, physics, particles
 - **Standard error handling** - Actionable error messages with A-Frame context
 
 **Usage:**
 ```bash
-source /opt/holo-deck/lib/downstream/aframelib.sh
+source /opt/holodeck-one/lib/downstream/aframelib.sh
 
 # Enhanced A-Frame functions (identical to JavaScript signatures)
 thd::create_enhanced_object "crystal" "cone" 0 3 0 --color "#ff0000" --metalness 0.8
@@ -93,7 +93,7 @@ Beyond basic API functions, downstream libraries provide:
 
 ### Dependency Chain
 ```
-aframelib.sh sources ../thdlib.sh
+aframelib.sh sources ../hd1lib.sh
     ↓
 Enhanced functions use core API functions
     ↓
@@ -148,7 +148,7 @@ source lib/downstream/aframelib.sh
 thd::create_enhanced_object "test" "box" 0 1 0 --color "#ff0000"
 
 # Test scenes using enhanced functions
-THD_SESSION=test bash share/scenes/complete-demo.sh
+HD1_SESSION=test bash share/scenes/complete-demo.sh
 ```
 
 ## 📊 A-Frame Integration Coverage
@@ -172,4 +172,4 @@ The downstream architecture supports future integrations:
 
 ---
 
-**The downstream libraries represent THD's advanced capability to provide consistent, standard integration with any 3D framework while maintaining perfect single source of truth architecture.**
+**The downstream libraries represent HD1's advanced capability to provide consistent, standard integration with any 3D framework while maintaining perfect single source of truth architecture.**

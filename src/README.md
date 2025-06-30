@@ -1,8 +1,8 @@
-# 🏆 THD Source Code - Advanced Specification-Driven Architecture
+# 🏆 HD1 Source Code - Advanced Specification-Driven Architecture
 
 **Standard VR/AR Holodeck Platform with Advanced Upstream/Downstream Integration**
 
-This directory contains the core implementation of **THD (The Holo-Deck)** - the world's first **standard holodeck platform** with advanced specification-driven architecture and complete upstream/downstream API integration.
+This directory contains the core implementation of **HD1 (Holodeck One)** - the world's first **standard holodeck platform** with advanced specification-driven architecture and complete upstream/downstream API integration.
 
 ## 🎯 Advanced Architecture Overview
 
@@ -10,7 +10,7 @@ This directory contains the core implementation of **THD (The Holo-Deck)** - the
 ```
 api.yaml (specification) → generator.go → {
     auto_router.go (Go routing)
-    thdlib.sh (shell API client)
+    hd1lib.sh (shell API client)
     thdlib.js (JavaScript API client)
     aframelib.sh (A-Frame shell integration)
     aframelib.js (A-Frame JavaScript bridge)
@@ -28,7 +28,7 @@ api.yaml (specification) → generator.go → {
 - **Build-time validation** - prevents deployment of incomplete implementations
 
 ### **2. Advanced Upstream/Downstream Integration**
-- **Upstream**: Core THD API wrappers (`thdlib.*`)
+- **Upstream**: Core HD1 API wrappers (`thdlib.*`)
 - **Downstream**: A-Frame WebXR integration (`aframelib.*`)
 - **Identical signatures** - shell and JavaScript functions have identical parameters
 - **Perfect layering** - downstream imports upstream maintaining single source of truth
@@ -44,7 +44,7 @@ api.yaml (specification) → generator.go → {
 ```
 src/
 ├── api.yaml                # 🎯 SINGLE SOURCE OF TRUTH - OpenAPI 3.0.3 Specification
-├── main.go                 # Standard THD daemon with holodeck integration
+├── main.go                 # Standard HD1 daemon with holodeck integration
 ├── auto_router.go          # 🤖 AUTO-GENERATED - Advanced routing from spec
 ├── go.mod & go.sum         # Go module dependencies
 ├── Makefile               # Standard build system with validation
@@ -108,7 +108,7 @@ src/
 ### **Core Generator (`codegen/generator.go`)**
 **Advanced unified generator** producing:
 - **Go routing** from OpenAPI specification
-- **Shell API client** (`thdlib.sh`) from API endpoints
+- **Shell API client** (`hd1lib.sh`) from API endpoints
 - **JavaScript API client** (`thdlib.js`) from API endpoints
 - **Web UI components** auto-generated from schemas
 - **A-Frame integration** (`aframelib.*`) with schema validation
@@ -121,7 +121,7 @@ make generate
 **Produces:**
 ```
 ✅ auto_router.go - Go routing (28 routes)
-✅ ../lib/thdlib.sh - Shell API client (upstream)
+✅ ../lib/hd1lib.sh - Shell API client (upstream)
 ✅ ../share/htdocs/static/js/thdlib.js - JavaScript client (upstream)
 ✅ ../lib/downstream/aframelib.sh - A-Frame shell integration
 ✅ ../lib/downstream/aframelib.js - A-Frame JavaScript bridge
@@ -135,7 +135,7 @@ make generate
 **Upstream Libraries** (Auto-generated from `api.yaml`):
 ```bash
 # Shell
-source /opt/holo-deck/lib/thdlib.sh
+source /opt/holodeck-one/lib/hd1lib.sh
 thd::create_object "cube1" "box" 0 1 0
 thd::camera 5 5 5
 ```
@@ -149,7 +149,7 @@ await thdAPI.setCameraPosition('session-id', {x: 5, y: 5, z: 5});
 **Downstream A-Frame Integration** (Identical signatures):
 ```bash
 # Shell A-Frame integration
-source /opt/holo-deck/lib/downstream/aframelib.sh
+source /opt/holodeck-one/lib/downstream/aframelib.sh
 thd::create_enhanced_object "crystal" "cone" 0 3 0 --color "#ff0000" --metalness 0.8
 ```
 
@@ -182,7 +182,7 @@ make generate
 
 # All clients now updated automatically:
 # - Go routing (auto_router.go)
-# - Shell functions (lib/thdlib.sh)  
+# - Shell functions (lib/hd1lib.sh)  
 # - JavaScript client (share/htdocs/static/js/thdlib.js)
 # - A-Frame integration (lib/downstream/aframelib.*)
 ```
@@ -190,7 +190,7 @@ make generate
 ### **2. Build & Deployment**
 ```bash
 make all        # Complete build pipeline with validation
-make start      # Start THD daemon standardly  
+make start      # Start HD1 daemon standardly  
 make status     # Standard status reporting
 make stop       # Clean shutdown with resource cleanup
 ```
@@ -198,7 +198,7 @@ make stop       # Clean shutdown with resource cleanup
 ### **3. Standard Testing**
 ```bash
 # Test scene functionality
-THD_SESSION=test-session bash share/scenes/basic-shapes.sh
+HD1_SESSION=test-session bash share/scenes/basic-shapes.sh
 
 # Test API endpoints
 curl -X POST http://localhost:8080/api/sessions
@@ -247,7 +247,7 @@ type Hub struct {
 ```bash
 make all        # Complete build pipeline with validation
 make generate   # Advanced code generation from spec
-make build      # Compile THD daemon 
+make build      # Compile HD1 daemon 
 make validate   # Validate API specification
 make start      # Standard daemon startup
 make stop       # Clean shutdown with resource cleanup
@@ -307,7 +307,7 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 
 ### **NEVER EDIT (Auto-Generated)**
 - `auto_router.go` - Generated from specification
-- `lib/thdlib.sh` - Generated from API endpoints
+- `lib/hd1lib.sh` - Generated from API endpoints
 - `share/htdocs/static/js/thdlib.js` - Generated JavaScript client
 - `lib/downstream/aframelib.*` - Generated A-Frame integration
 
@@ -340,7 +340,7 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 4. **Update generator**: Add generation logic for new framework
 
 ### **Adding Standard Scenes**
-1. **Create scene script**: In `share/scenes/` using THD functions
+1. **Create scene script**: In `share/scenes/` using HD1 functions
 2. **Update scene handler**: Add to scene mapping in `api/scenes/load.go`
 3. **Test integration**: Verify scene loads via API and web interface
 
@@ -357,6 +357,6 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 
 ---
 
-**THD Source Code represents the pinnacle of specification-driven development with advanced upstream/downstream integration architecture.**
+**HD1 Source Code represents the pinnacle of specification-driven development with advanced upstream/downstream integration architecture.**
 
 *Where API specifications become immersive holodeck experiences through surgical engineering precision.*

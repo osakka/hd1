@@ -4,7 +4,7 @@
 **ACCEPTED** - Implemented 2025-06-29
 
 ## Context
-THD needed a advanced approach to scene management that enables users to:
+HD1 needed a advanced approach to scene management that enables users to:
 - Load existing scenes for modification without affecting originals
 - Save modified sessions as new scenes  
 - Track object lifecycle and provenance
@@ -72,4 +72,4 @@ type Object struct {
 - ADR-003: Standard UI Enhancement
 
 ---
-*THD - Where immersive holodeck technology meets standard engineering*
+*HD1 - Where immersive holodeck technology meets standard engineering*

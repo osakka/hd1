@@ -1,13 +1,13 @@
-# THD Development Guidelines
+# HD1 Development Guidelines
 
-**Standard Standards for THD (The Holo-Deck) Development**
+**Standard Standards for HD1 (Holodeck One) Development**
 
-This directory contains comprehensive development guidelines and standards for maintaining the standard quality and architectural integrity of THD.
+This directory contains comprehensive development guidelines and standards for maintaining the standard quality and architectural integrity of HD1.
 
 ## 📋 Guidelines Overview
 
 ### [Development Standards](development-standards.md)
-Core development principles, coding standards, and standard engineering practices for THD development.
+Core development principles, coding standards, and standard engineering practices for HD1 development.
 
 ### [API Design Guidelines](api-design-guidelines.md)
 Standards for OpenAPI specification design, endpoint naming, and API evolution.
@@ -94,4 +94,4 @@ make lint
 
 ---
 
-*These guidelines ensure THD maintains its position as the advanced standard VR/AR holodeck platform with high-quality engineering standards.*
+*These guidelines ensure HD1 maintains its position as the advanced standard VR/AR holodeck platform with high-quality engineering standards.*

@@ -3,7 +3,7 @@
 
 # Set THD_ROOT and source functions
 HD1_ROOT="/opt/holo-deck"
-source "${HD1_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
     echo "ERROR: HD1 functions not available"
     exit 1
 }

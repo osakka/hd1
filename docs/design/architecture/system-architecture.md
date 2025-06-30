@@ -1,14 +1,14 @@
-# THD (The Holo-Deck) - System Architecture
+# HD1 (Holodeck One) - System Architecture
 
 > **Advanced API-first 3D visualization with specification-driven development**
 
 ## 🏗️ **SYSTEM OVERVIEW**
 
-THD implements a **specification-driven architecture** where the OpenAPI 3.0.3 specification (`api.yaml`) serves as the single source of truth for all routing, validation, and API behavior.
+HD1 implements a **specification-driven architecture** where the OpenAPI 3.0.3 specification (`api.yaml`) serves as the single source of truth for all routing, validation, and API behavior.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     THD SYSTEM ARCHITECTURE                    │
+│                     HD1 SYSTEM ARCHITECTURE                    │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
@@ -19,7 +19,7 @@ THD implements a **specification-driven architecture** where the OpenAPI 3.0.3 s
        │ HTTP              │ HTTP              │ WS                │ HTTP
        │                   │                   │                   │
 ┌─────────────────────────────────────────────────────────────────┐
-│                      THD DAEMON (main.go)                      │
+│                      HD1 DAEMON (main.go)                      │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐│
 │  │   Static    │ │    Home     │ │  WebSocket  │ │ Auto-Router ││
 │  │   Server    │ │   Handler   │ │    Hub      │ │ (Generated) ││
@@ -45,7 +45,7 @@ THD implements a **specification-driven architecture** where the OpenAPI 3.0.3 s
 ### **1. API Request Flow**
 
 ```
-[Client] → [THD Daemon] → [Auto-Router] → [Handler] → [SessionStore] → [Response]
+[Client] → [HD1 Daemon] → [Auto-Router] → [Handler] → [SessionStore] → [Response]
     │           │              │             │            │              │
     │           │              │             │            │              │
     HTTP        │              │             │            │              JSON
@@ -63,7 +63,7 @@ THD implements a **specification-driven architecture** where the OpenAPI 3.0.3 s
    Content-Type: application/json
    ```
 
-2. **THD Daemon Receives** (`main.go:line 83`)
+2. **HD1 Daemon Receives** (`main.go:line 83`)
    ```go
    http.Handle("/api/", apiRouter)
    ```
@@ -104,7 +104,7 @@ THD implements a **specification-driven architecture** where the OpenAPI 3.0.3 s
 
 ### **Specification-Driven Architecture**
 
-THD's advanced approach auto-generates ALL routing from the OpenAPI specification:
+HD1's advanced approach auto-generates ALL routing from the OpenAPI specification:
 
 ```
 api.yaml (Single Source of Truth)
@@ -349,7 +349,7 @@ routes = append(routes, Route{
 │      │                                                         │
 │      │ make start                                              │
 │      ▼                                                         │
-│  🚀 THD Daemon Running                                          │
+│  🚀 HD1 Daemon Running                                          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -374,7 +374,7 @@ routes = append(routes, Route{
 
 4. **Standard Binary Creation**
    ```bash
-   make build  # Creates /opt/holo-deck/build/bin/thd
+   make build  # Creates /opt/holodeck-one/build/bin/thd
    ```
 
 5. **Daemon Management**
@@ -466,7 +466,7 @@ routes = append(routes, Route{
 │                                                                 │
 │  Process Management:                                            │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │  THD Daemon (PID Management)                           │    │
+│  │  HD1 Daemon (PID Management)                           │    │
 │  │  • Absolute Path Configuration                         │    │
 │  │  • Standard Logging                                │    │
 │  │  • Clean Shutdown Procedures                           │    │
@@ -474,7 +474,7 @@ routes = append(routes, Route{
 │  └─────────────────────────────────────────────────────────┘    │
 │                                                                 │
 │  Directory Structure:                                           │
-│  /opt/holo-deck/                                               │
+│  /opt/holodeck-one/                                               │
 │  ├── src/              # Source code & build system            │
 │  ├── build/bin/thd     # Standard daemon binary            │
 │  ├── build/logs/       # Timestamped, structured logs          │
@@ -551,10 +551,10 @@ routes = append(routes, Route{
 
 ---
 
-**THD represents the perfect fusion of innovative 3D visualization capabilities with standard software engineering practices, delivering a reliable, scalable, and maintainable system for real-time collaborative 3D environments.**
+**HD1 represents the perfect fusion of innovative 3D visualization capabilities with standard software engineering practices, delivering a reliable, scalable, and maintainable system for real-time collaborative 3D environments.**
 
 ---
 
 *Architecture Document Version: 1.0*  
-*THD Version: 2.0.0*  
+*HD1 Version: 2.0.0*  
 *Last Updated: 2025-06-28*

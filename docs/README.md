@@ -1,8 +1,8 @@
-# THD Documentation Center
+# HD1 Documentation Center
 
-**Standard Documentation for THD (The Holo-Deck) Advanced VR/AR Platform**
+**Standard Documentation for HD1 (Holodeck One) Advanced VR/AR Platform**
 
-Welcome to the comprehensive documentation center for THD - the world's first standard holodeck platform combining specification-driven architecture with high-quality VR/AR capabilities.
+Welcome to the comprehensive documentation center for HD1 - the world's first standard holodeck platform combining specification-driven architecture with high-quality VR/AR capabilities.
 
 ## 📚 Documentation Structure
 
@@ -62,7 +62,7 @@ Welcome to the comprehensive documentation center for THD - the world's first st
 - **Standard Standards**: High-quality engineering throughout
 
 ### Upstream/Downstream API Integration
-- **Advanced Bridge**: THD API ↔ A-Frame WebXR integration
+- **Advanced Bridge**: HD1 API ↔ A-Frame WebXR integration
 - **Identical Function Signatures**: Shell and JavaScript function parity
 - **A-Frame Schema Validation**: Complete capability validation
 
@@ -86,13 +86,13 @@ Welcome to the comprehensive documentation center for THD - the world's first st
 
 ## 🔗 External Resources
 
-- **Git Repository**: `https://git.uk.home.arpa/itdlabs/holo-deck.git`
+- **Git Repository**: `https://git.uk.home.arpa/itdlabs/holodeck-one.git`
 - **Project Module**: `holodeck` (Go module)
-- **Binary**: `thd` (standard daemon)
-- **Runtime Location**: `/opt/holo-deck/`
+- **Binary**: `hd1` (standard daemon)
+- **Runtime Location**: `/opt/holodeck-one/`
 
 ---
 
-**THD: Where immersive holodeck technology meets standard engineering excellence.**
+**HD1: Where immersive holodeck technology meets standard engineering excellence.**
 
-*This documentation represents the complete technical foundation for the advanced THD platform - the world's first standard VR/AR holodeck with specification-driven architecture.*
+*This documentation represents the complete technical foundation for the advanced HD1 platform - the world's first standard VR/AR holodeck with specification-driven architecture.*

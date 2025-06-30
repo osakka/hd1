@@ -1,16 +1,16 @@
-# THD (The Holo-Deck) - Standard Development Standards
+# HD1 (Holodeck One) - Standard Development Standards
 
 > **"Where 3D visualization meets standard engineering"**
 
 ## 🚨 THE LAW: NON-NEGOTIABLE STANDARDS
 
-This document establishes the **absolute, non-negotiable standards** for THD (The Holo-Deck) development. These are not suggestions - they are **LAW**.
+This document establishes the **absolute, non-negotiable standards** for HD1 (Holodeck One) development. These are not suggestions - they are **LAW**.
 
 ---
 
 ## 🚀 **xVC METHODOLOGY**
 
-THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM collaboration:
+HD1 development follows **xVC (Extreme Vibe Coding)** principles for human-LLM collaboration:
 
 ### **Core xVC Principles**
 - **Pattern Consistency**: Establish repeatable interaction patterns
@@ -35,7 +35,7 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 ## 📋 **CARDINAL RULES**
 
 ### **RULE #1: API-FIRST DEVELOPMENT**
-- **`/opt/holo-deck/src/api.yaml` IS THE SINGLE SOURCE OF TRUTH**
+- **`/opt/holodeck-one/src/api.yaml` IS THE SINGLE SOURCE OF TRUTH**
 - ALL routing is auto-generated from specification
 - NO manual route configuration EVER
 - Change the spec = change the API automatically
@@ -66,11 +66,11 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 
 ### **CORRECT STRUCTURE:**
 ```
-/opt/holo-deck/
+/opt/holodeck-one/
 ├── src/                          # Go source code & module
 │   ├── go.mod                   # CORRECT: module holodeck
 │   ├── go.sum                   # Go dependencies
-│   ├── main.go                  # THD daemon entry point
+│   ├── main.go                  # HD1 daemon entry point
 │   ├── Makefile                 # Standard build system
 │   ├── api.yaml                 # OpenAPI 3.0.3 specification
 │   ├── auto_router.go           # AUTO-GENERATED - DO NOT EDIT
@@ -83,7 +83,7 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 │   ├── logs/                    # Timestamped logs
 │   └── runtime/                 # PID files, runtime data
 ├── share/                       # Web assets and static files
-│   ├── htdocs/                  # Web interface root (THD_HTDOCS_DIR)
+│   ├── htdocs/                  # Web interface root (HD1_HTDOCS_DIR)
 │   │   ├── static/js/           # JavaScript: renderer.js, gl-matrix.js, debug.js
 │   │   ├── debug.html           # Debug interface
 │   │   └── force-session.html   # Session management tools
@@ -101,7 +101,7 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 ### **FORBIDDEN ITEMS:**
 - ❌ **NO go.mod in project root** (belongs in src/)
 - ❌ **NO legacy scripts** (dev-control.sh, etc.)
-- ❌ **NO VWS references** (project is THD)
+- ❌ **NO HD1 references** (project is HD1)
 - ❌ **NO visualstream artifacts** (legacy naming)
 - ❌ **NO relative paths** in production code
 - ❌ **NO manual routing** (auto-generated only)
@@ -123,10 +123,10 @@ THD development follows **xVC (Extreme Vibe Coding)** principles for human-LLM c
 
 ### **PROFESSIONAL COMMANDS:**
 ```bash
-# CORRECT usage - in /opt/holo-deck/src/
+# CORRECT usage - in /opt/holodeck-one/src/
 make all        # Complete build pipeline
-make start      # Start THD daemon
-make stop       # Stop THD daemon
+make start      # Start HD1 daemon
+make stop       # Stop HD1 daemon
 make status     # Standard status reporting
 make test       # Test API endpoints
 make generate   # Generate routing from spec
@@ -134,9 +134,9 @@ make clean      # Clean build artifacts
 ```
 
 ### **FORBIDDEN COMMANDS:**
-- ❌ Legacy path references (all paths must use `/opt/holo-deck`)
+- ❌ Legacy path references (all paths must use `/opt/holodeck-one`)
 - ❌ `./dev-control.sh` (removed)
-- ❌ `vws` commands (legacy)
+- ❌ `hd1` commands (legacy)
 - ❌ Short flags (`-d`, `-h`) (use `--daemon`, `--help`)
 
 ---
@@ -173,7 +173,7 @@ make clean      # Clean build artifacts
 - **TIMESTAMPED:** All log entries have timestamps
 - **STRUCTURED:** JSON format for machine parsing
 - **PROFESSIONAL:** No decorative elements
-- **ABSOLUTE PATHS:** Log files in `/opt/holo-deck/build/logs/`
+- **ABSOLUTE PATHS:** Log files in `/opt/holodeck-one/build/logs/`
 
 ---
 
@@ -223,7 +223,7 @@ make clean      # Clean build artifacts
 
 ### **IF DAEMON FAILS:**
 ```bash
-cd /opt/holo-deck/src
+cd /opt/holodeck-one/src
 make stop           # Clean shutdown
 make force-stop     # Kill all processes
 make clean          # Clear artifacts
@@ -233,7 +233,7 @@ make start          # Restart daemon
 
 ### **IF BUILD FAILS:**
 ```bash
-cd /opt/holo-deck/src
+cd /opt/holodeck-one/src
 make validate       # Check API spec
 make generate       # Regenerate router
 make build          # Build with validation
@@ -353,7 +353,7 @@ git commit -m "Descriptive message explaining the change"
 
 ### **WORKSPACE ORGANIZATION:**
 ```
-/opt/holo-deck/           # Project root - CLEAN
+/opt/holodeck-one/           # Project root - CLEAN
 ├── src/                  # Source code only
 ├── build/                # Build artifacts (gitignored)
 ├── docs/                 # Documentation only
@@ -389,7 +389,7 @@ git status --ignored
 - **Personal configs** ignored
 
 ### **CLEAN DESKTOP POLICY:**
-- **PROJECT FILES** only in `/opt/holo-deck/`
+- **PROJECT FILES** only in `/opt/holodeck-one/`
 - **NO SCATTERED FILES** on desktop or home directory
 - **ORGANIZED DOWNLOADS** - clean up regularly
 - **PROFESSIONAL NAMING** - no spaces, special characters
@@ -420,14 +420,14 @@ Auto-generated files now include comprehensive disclaimers:
 ```
 
 ### **JAVASCRIPT ASSET CONSOLIDATION**
-- **SINGLE SOURCE OF TRUTH**: All JavaScript files consolidated to `/opt/holo-deck/share/htdocs/static/js/`
+- **SINGLE SOURCE OF TRUTH**: All JavaScript files consolidated to `/opt/holodeck-one/share/htdocs/static/js/`
 - **DUPLICATE ELIMINATION**: Removed redundant `src/renderer/static/js/` directory
 - **ENHANCED RENDERER**: Latest version includes 25×25×25 grid system capabilities
 - **PATH STANDARDIZATION**: All references updated to canonical location
 
 ### **PROJECT STRUCTURE CLEANUP**
-- **LEGACY REMOVAL**: Eliminated old VWS artifacts and backup files
-- **PATH MIGRATION**: All hardcoded paths updated from `/home/claude-3/3dv` to `/opt/holo-deck`
+- **LEGACY REMOVAL**: Eliminated old HD1 artifacts and backup files
+- **PATH MIGRATION**: All hardcoded paths updated from `/home/claude-3/3dv` to `/opt/holodeck-one`
 - **PROFESSIONAL ORGANIZATION**: Clean separation of concerns (src/, share/, build/, docs/)
 - **WORKSPACE HYGIENE**: Implemented daily cleanup procedures and violation tracking
 
@@ -458,7 +458,7 @@ Auto-generated files now include comprehensive disclaimers:
 
 ## 🎖️ **EXCELLENCE STANDARDS**
 
-THD represents the evolution from innovative concept to **standard-grade engineering solution**. We maintain advanced capabilities while implementing proper software engineering practices.
+HD1 represents the evolution from innovative concept to **standard-grade engineering solution**. We maintain advanced capabilities while implementing proper software engineering practices.
 
 ### **CORE PHILOSOPHY:**
 > **"Standard engineering excellence with zero compromise on innovation"**
@@ -477,7 +477,7 @@ THD represents the evolution from innovative concept to **standard-grade enginee
 
 ### **DEVELOPMENT ISSUES:**
 1. Check `make status` for daemon health
-2. Review `/opt/holo-deck/build/logs/` for errors
+2. Review `/opt/holodeck-one/build/logs/` for errors
 3. Validate API specification syntax
 4. Verify all handlers implemented
 5. Rebuild with `make all`
@@ -490,10 +490,10 @@ THD represents the evolution from innovative concept to **standard-grade enginee
 
 ---
 
-**REMEMBER: These standards are non-negotiable. They ensure THD remains a standard, reliable, and innovative 3D visualization platform.**
+**REMEMBER: These standards are non-negotiable. They ensure HD1 remains a standard, reliable, and innovative 3D visualization platform.**
 
 ---
 
 *Last Updated: 2025-06-28*  
-*THD Version: 2.0.0*  
+*HD1 Version: 2.0.0*  
 *Authority: Standard Development Standards*

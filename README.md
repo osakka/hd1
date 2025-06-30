@@ -1,4 +1,4 @@
-# THD (The Holo-Deck) - VR/AR Holodeck Platform
+# HD1 (Holodeck One) - VR/AR Holodeck Platform
 
 **API-first 3D/VR visualization engine powered by A-Frame WebXR**
 
@@ -89,7 +89,7 @@ thd-client play-recording "$NEW_SESSION" '{"recording_id": "demo-recording"}'
 ## Architecture
 
 ### Core Engine: A-Frame WebXR
-THD leverages **[A-Frame](https://aframe.io)** (MIT License) as its primary rendering backend:
+HD1 leverages **[A-Frame](https://aframe.io)** (MIT License) as its primary rendering backend:
 
 - **A-Frame Version**: 1.4.0 WebXR
 - **License**: MIT License - [https://github.com/aframevr/aframe/blob/master/LICENSE](https://github.com/aframevr/aframe/blob/master/LICENSE)
@@ -98,11 +98,11 @@ THD leverages **[A-Frame](https://aframe.io)** (MIT License) as its primary rend
 - **Cross-Platform**: Desktop, mobile, and VR devices
 
 ### Multi-Backend Architecture
-THD is designed for framework flexibility:
+HD1 is designed for framework flexibility:
 
 ```
 ┌─────────────────────┐
-│   THD API Layer     │  ← Universal REST/WebSocket interface
+│   HD1 API Layer     │  ← Universal REST/WebSocket interface
 ├─────────────────────┤
 │  Rendering Backends │  ← Pluggable engine architecture
 │                     │
@@ -183,13 +183,13 @@ POST /api/browser/canvas                     # Direct canvas control
 cd src
 make validate    # Validate OpenAPI specification
 make generate    # Generate routing from spec
-make build       # Build THD daemon binary
+make build       # Build HD1 daemon binary
 make test        # Run API endpoint tests
 ```
 
 ### Daemon Management
 ```bash
-make start       # Start THD holodeck daemon
+make start       # Start HD1 holodeck daemon
 make stop        # Stop daemon with clean shutdown
 make restart     # Restart with validation
 make status      # Status reporting
@@ -198,9 +198,9 @@ make status      # Status reporting
 ## File Structure
 
 ```
-/opt/holo-deck/
+/opt/holodeck-one/
 ├── src/                          # Go source code
-│   ├── main.go                   # THD daemon entry point
+│   ├── main.go                   # HD1 daemon entry point
 │   ├── auto_router.go            # Auto-generated API routing
 │   ├── api.yaml                  # OpenAPI specification (single source of truth)
 │   ├── api/                      # API handler packages
@@ -215,17 +215,17 @@ make status      # Status reporting
 │   └── complete-holodeck.thd     # Example holodeck scenarios
 ├── docs/                         # Architecture Decision Records
 └── build/                        # Build artifacts (excluded from git)
-    ├── bin/thd                   # THD daemon binary
+    ├── bin/thd                   # HD1 daemon binary
     ├── runtime/thd.pid           # Process management
     └── logs/                     # Logging
 ```
 
 ## Holodeck Script Library
 
-THD includes a comprehensive shell function library for rapid holodeck development:
+HD1 includes a comprehensive shell function library for rapid holodeck development:
 
 ```bash
-# Load THD functions
+# Load HD1 functions
 source lib/thd-functions.sh
 
 # Basic objects
@@ -251,7 +251,7 @@ thd::create_sky "environment" "#1a1a2e"
 
 ## Licensing & Attribution
 
-### THD (The Holo-Deck)
+### HD1 (Holodeck One)
 - **License**: MIT License
 
 ### A-Frame WebXR Framework
@@ -261,10 +261,10 @@ thd::create_sky "environment" "#1a1a2e"
 - **Repository**: [https://github.com/aframevr/aframe](https://github.com/aframevr/aframe)
 - **Documentation**: [https://aframe.io/docs/](https://aframe.io/docs/)
 
-THD gratefully acknowledges the A-Frame community for creating the world's most accessible WebXR framework. A-Frame's Entity-Component-System architecture and comprehensive WebXR support make THD's holodeck vision possible.
+HD1 gratefully acknowledges the A-Frame community for creating the world's most accessible WebXR framework. A-Frame's Entity-Component-System architecture and comprehensive WebXR support make HD1's holodeck vision possible.
 
 ### Integration Philosophy
-THD demonstrates how easy it is to integrate open-source frameworks:
+HD1 demonstrates how easy it is to integrate open-source frameworks:
 - **Clean API Layer**: Framework-agnostic REST/WebSocket interface
 - **Pluggable Architecture**: Easy to swap rendering backends
 - **Community-Driven**: Leverage the best open-source tools available
@@ -290,7 +290,7 @@ THD demonstrates how easy it is to integrate open-source frameworks:
 Run the complete holodeck demonstration:
 ```bash
 # Set your session ID
-export THD_SESSION_ID="your-session-id"
+export HD1_SESSION_ID="your-session-id"
 
 # Run the complete scenario
 ./scenarios/complete-holodeck.thd
@@ -310,7 +310,7 @@ This creates a complete holodeck experience with:
 
 ## Contributing
 
-THD welcomes contributions to expand holodeck capabilities:
+HD1 welcomes contributions to expand holodeck capabilities:
 - **New Rendering Backends**: Integrate additional 3D engines
 - **API Extensions**: Expand holodeck functionality
 - **VR/AR Features**: Enhance immersive experiences
@@ -319,6 +319,6 @@ THD welcomes contributions to expand holodeck capabilities:
 
 ---
 
-**THD (The Holo-Deck)** - VR/AR holodeck technology
+**HD1 (Holodeck One)** - VR/AR holodeck technology
 
 *Powered by A-Frame WebXR • Engineered for the future • Ready for VR*

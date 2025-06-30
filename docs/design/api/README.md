@@ -1,8 +1,8 @@
-# THD (The Holo-Deck) API Documentation
+# HD1 (Holodeck One) API Documentation
 
 ## Overview
 
-The THD (The Holo-Deck) API enables creating, managing, and interacting with 3D virtual worlds through a RESTful interface. All endpoints are automatically generated from the OpenAPI 3.0.3 specification (`src/api.yaml`).
+The HD1 (Holodeck One) API enables creating, managing, and interacting with 3D virtual worlds through a RESTful interface. All endpoints are automatically generated from the OpenAPI 3.0.3 specification (`src/api.yaml`).
 
 ## Base URL
 ```
@@ -10,7 +10,7 @@ http://localhost:8080/api
 ```
 
 ## Authentication
-*Currently, THD operates without authentication. All endpoints are publicly accessible.*
+*Currently, HD1 operates without authentication. All endpoints are publicly accessible.*
 
 ---
 
@@ -44,7 +44,7 @@ POST /sessions
         "max": 12
     },
     "coordinate_system": "fixed_grid",
-    "message": "Session created with world ready - THD holo-deck activated"
+    "message": "Session created with world ready - HD1 holodeck-one activated"
 }
 ```
 
@@ -521,7 +521,7 @@ POST /sessions/{sessionId}/camera/orbit
 
 ## WebSocket Real-time Events
 
-THD provides real-time updates via WebSocket connection at:
+HD1 provides real-time updates via WebSocket connection at:
 ```
 ws://localhost:8080/ws
 ```
@@ -750,4 +750,4 @@ curl -X POST http://localhost:8080/api/sessions/$SESSION_ID/camera/orbit \
 
 ---
 
-*This documentation is automatically maintained in sync with the OpenAPI specification through THD's specification-driven development approach.*
+*This documentation is automatically maintained in sync with the OpenAPI specification through HD1's specification-driven development approach.*

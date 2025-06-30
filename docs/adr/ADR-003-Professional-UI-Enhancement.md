@@ -7,7 +7,7 @@
 
 ## Context
 
-The THD holodeck interface required significant enhancement to meet standard standards while providing intuitive scene management capabilities. The existing interface had several issues that detracted from the quality experience:
+The HD1 holodeck interface required significant enhancement to meet standard standards while providing intuitive scene management capabilities. The existing interface had several issues that detracted from the quality experience:
 
 1. **Cache Management**: Hacky query string versioning (`?v=timestamp`) for cache busting
 2. **Interface Elements**: Unstandard console arrows (unicode characters causing encoding issues)
@@ -89,7 +89,7 @@ Session → Scene Flow:
 
 ### 3. Standard UI Component Decisions
 
-**Console Header**: `THD Console [ACTIVE]` / `THD Console [MINIMIZED]`
+**Console Header**: `HD1 Console [ACTIVE]` / `HD1 Console [MINIMIZED]`
 - Eliminates hacky unicode characters (▾/▸) causing encoding issues
 - Standard status indicators worthy of enterprise holodeck operations
 - Clear semantic meaning for operational status
@@ -260,6 +260,6 @@ http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 ## Conclusion
 
-This ADR documents the complete transformation of THD's user interface from functional to standard-grade. Every decision prioritizes technical excellence while maintaining operational simplicity. The scene management system provides a foundation for future holodeck environment capabilities while current enhancements eliminate all substandard interface elements.
+This ADR documents the complete transformation of HD1's user interface from functional to standard-grade. Every decision prioritizes technical excellence while maintaining operational simplicity. The scene management system provides a foundation for future holodeck environment capabilities while current enhancements eliminate all substandard interface elements.
 
 The implementation successfully achieves "bar raising solutions only" by replacing every hacky workaround with proper, standards-compliant implementations that enhance rather than detract from the holodeck experience.

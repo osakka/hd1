@@ -5,7 +5,7 @@
 
 ## Context
 
-Traditional API development suffers from inconsistency between API documentation and implementation. Manual routing configuration leads to errors, regressions, and maintenance overhead. For VWS (Virtual World Synthesizer), we needed a advanced approach that ensures the API specification IS the system architecture.
+Traditional API development suffers from inconsistency between API documentation and implementation. Manual routing configuration leads to errors, regressions, and maintenance overhead. For HD1 (Virtual World Synthesizer), we needed a advanced approach that ensures the API specification IS the system architecture.
 
 ## Decision
 
@@ -122,13 +122,13 @@ make build  # Validates handler exists, builds binary
 
 ## References
 - [OpenAPI 3.0.3 Specification](https://spec.openapis.org/oas/v3.0.3)
-- [VWS API Specification](../../src/api.yaml)
+- [HD1 API Specification](../../src/api.yaml)
 - [Code Generator Implementation](../../src/codegen/generator.go)
 
 ---
 
 **Decision Date**: 2025-06-28  
-**Decision Makers**: VWS Architecture Team  
+**Decision Makers**: HD1 Architecture Team  
 **Review Date**: 2025-12-28  
 
-*This ADR represents the foundational architectural decision that makes VWS possible.*
+*This ADR represents the foundational architectural decision that makes HD1 possible.*

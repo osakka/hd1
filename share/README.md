@@ -1,8 +1,8 @@
-# THD Share Directory - Asset Organization & Library Systems
+# HD1 Share Directory - Asset Organization & Library Systems
 
 ## Overview
 
-The `/opt/holo-deck/share/` directory contains **all shared assets, libraries, and resources** for THD (The Holo-Deck). This follows standard separation of concerns with **precise**.
+The `/opt/holodeck-one/share/` directory contains **all shared assets, libraries, and resources** for HD1 (Holodeck One). This follows standard separation of concerns with **precise**.
 
 ---
 
@@ -16,7 +16,7 @@ htdocs/
 ├── force-session.html  # Session management utilities
 └── assets/             # Static web resources
 ```
-**Purpose**: Web-based 3D visualization client served by THD daemon
+**Purpose**: Web-based 3D visualization client served by HD1 daemon
 
 ### **`scenes/`** - Standard Scene Collection
 ```
@@ -66,7 +66,7 @@ templates/
 
 ## 🔗 **Integration Points**
 
-### **Scene → THD Integration**
+### **Scene → HD1 Integration**
 ```bash
 # List available scenes
 curl http://localhost:8080/api/scenes
@@ -74,18 +74,18 @@ curl http://localhost:8080/api/scenes
 # Load scene via API
 curl -X POST http://localhost:8080/api/scenes/complete-demo
 # ↓  
-# THD Server executes scene script
+# HD1 Server executes scene script
 # ↓
 # Real-time 3D visualization in browser
 ```
 
-### **Web Interface → THD Integration**
+### **Web Interface → HD1 Integration**
 ```
 htdocs/static/js/renderer.js (HolodeckRenderer)
 # ↓
 # WebSocket connection (/ws)
 # ↓
-# THD Server Hub (real-time updates)
+# HD1 Server Hub (real-time updates)
 # ↓
 # Session store & object management
 ```
@@ -118,7 +118,7 @@ htdocs/static/js/renderer.js (HolodeckRenderer)
 ### **For Web Development**
 ```bash
 # Serve web interface
-cd /opt/holo-deck/src && make start
+cd /opt/holodeck-one/src && make start
 # Access: http://localhost:8080/
 ```
 
@@ -133,7 +133,7 @@ curl -X POST http://localhost:8080/api/scenes/complete   # Load scene
 ### **For Development**
 ```bash
 # Standard build with asset validation
-cd /opt/holo-deck/src && make all
+cd /opt/holodeck-one/src && make all
 # Assets automatically referenced from share/
 ```
 
@@ -141,7 +141,7 @@ cd /opt/holo-deck/src && make all
 
 ## 🎖️ **Excellence Standards**
 
-THD Share directory represents **standard asset organization** with:
+HD1 Share directory represents **standard asset organization** with:
 
 ✅ **Clear separation of concerns**  
 ✅ **Single entry point systems**  
@@ -154,5 +154,5 @@ THD Share directory represents **standard asset organization** with:
 ---
 
 *Last Updated: 2025-06-28*  
-*THD Version: 2.0.0*  
+*HD1 Version: 2.0.0*  
 *Authority: Standard Asset Organization Standards*

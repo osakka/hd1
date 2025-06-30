@@ -12,7 +12,7 @@ Implement simple scene dropdown updates using API calls on page load instead of 
 ## 🎯 Context & Problem Statement
 
 ### Original Challenge
-Scene dropdown in THD holodeck interface showed only 4 hardcoded scenes despite API correctly returning 11+ dynamic scenes from filesystem. Users needed automatic scene dropdown refresh when new scene scripts were added.
+Scene dropdown in HD1 holodeck interface showed only 4 hardcoded scenes despite API correctly returning 11+ dynamic scenes from filesystem. Users needed automatic scene dropdown refresh when new scene scripts were added.
 
 ### Initial Complex Approach
 - **File System Watcher**: Implemented fsnotify-based ScenesWatcher
@@ -200,7 +200,7 @@ The **Simple Scene Update System** demonstrates that **engineering excellence** 
 - ✅ **User Experience Optimized**: Natural workflow with perfect functionality
 
 ### Strategic Impact
-This decision reinforces THD's **standard engineering principles**:
+This decision reinforces HD1's **standard engineering principles**:
 - **Pragmatic Solutions**: Choose simplicity over sophistication when appropriate
 - **User-Focused**: Design around actual usage patterns
 - **Reliable Systems**: Prioritize dependability over theoretical perfection

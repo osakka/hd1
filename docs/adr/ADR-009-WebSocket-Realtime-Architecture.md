@@ -5,7 +5,7 @@
 
 ## Context
 
-VWS (Virtual World Synthesizer) must provide real-time collaboration capabilities where multiple clients can simultaneously interact with virtual worlds. Changes made by one client (object creation, movement, world modifications) must be instantly visible to all other connected clients. Traditional HTTP polling is insufficient for responsive virtual reality experiences.
+HD1 (Virtual World Synthesizer) must provide real-time collaboration capabilities where multiple clients can simultaneously interact with virtual worlds. Changes made by one client (object creation, movement, world modifications) must be instantly visible to all other connected clients. Traditional HTTP polling is insufficient for responsive virtual reality experiences.
 
 ## Decision
 
@@ -298,7 +298,7 @@ Send updates only to relevant session participants
 ---
 
 **Decision Date**: 2025-06-28  
-**Decision Makers**: VWS Architecture Team  
+**Decision Makers**: HD1 Architecture Team  
 **Review Date**: 2025-12-28  
 
-*This ADR enables the real-time collaboration that makes VWS virtual worlds truly interactive.*
+*This ADR enables the real-time collaboration that makes HD1 virtual worlds truly interactive.*

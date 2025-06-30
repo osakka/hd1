@@ -5,7 +5,7 @@
 
 ## Context
 
-VWS (Virtual World Synthesizer) employs specification-driven development where `api.yaml` defines endpoints and their corresponding handler files. We need a build system that ensures consistency between specification and implementation, preventing deployment of incomplete or broken API endpoints.
+HD1 (Virtual World Synthesizer) employs specification-driven development where `api.yaml` defines endpoints and their corresponding handler files. We need a build system that ensures consistency between specification and implementation, preventing deployment of incomplete or broken API endpoints.
 
 ## Decision
 
@@ -34,7 +34,7 @@ generate:
 
 # Build with comprehensive validation
 build: generate
-    go build -o ../build/bin/vws .
+    go build -o ../build/bin/hd1 .
 ```
 
 ### Code Generator Validation
@@ -111,8 +111,8 @@ func generateAutoRouter(spec OpenAPISpec) error {
 ```bash
 # Ensure Go code compiles successfully
 build: generate
-    go build -o ../build/bin/vws .
-    @if [ -f ../build/bin/vws ]; then echo "✅ Server built"; else echo "❌ Build failed"; exit 1; fi
+    go build -o ../build/bin/hd1 .
+    @if [ -f ../build/bin/hd1 ]; then echo "✅ Server built"; else echo "❌ Build failed"; exit 1; fi
 ```
 
 ## Development Control System
@@ -149,7 +149,7 @@ build_server() {
 ### Artifact Management
 ```bash
 # Standard directory structure
-PROJECT_ROOT="/opt/holo-deck"
+PROJECT_ROOT="/opt/holodeck-one"
 BUILD_DIR="$PROJECT_ROOT/build"
 BIN_DIR="$BUILD_DIR/bin"
 LOG_DIR="$BUILD_DIR/logs"
@@ -325,7 +325,7 @@ dev_cycle() {
 ---
 
 **Decision Date**: 2025-06-28  
-**Decision Makers**: VWS Architecture Team  
+**Decision Makers**: HD1 Architecture Team  
 **Review Date**: 2025-12-28  
 
-*This ADR ensures the build system maintains the integrity of VWS specification-driven architecture.*
+*This ADR ensures the build system maintains the integrity of HD1 specification-driven architecture.*

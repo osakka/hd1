@@ -4,7 +4,7 @@
 **ACCEPTED** - Implementation in progress 2025-06-29
 
 ## Context
-THD has achieved advanced single source of truth architecture with:
+HD1 has achieved advanced single source of truth architecture with:
 - Auto-generated Go API routing from OpenAPI specification
 - Auto-generated CLI client (`thd-client`) from specification
 - Manual JavaScript UI requiring synchronization with API changes
@@ -148,7 +148,7 @@ class SaveSceneComponent {
 
 ## Implementation Notes
 - Generator integrates with existing code generation pipeline
-- Templates maintain THD's standard holodeck aesthetic
+- Templates maintain HD1's standard holodeck aesthetic
 - Generated components work seamlessly with existing A-Frame integration
 - Maintains backward compatibility during transition
 
@@ -158,4 +158,4 @@ class SaveSceneComponent {
 - ADR-003: Standard UI Enhancement
 
 ---
-*THD - The complete single source of truth in holodeck engineering*
+*HD1 - The complete single source of truth in holodeck engineering*

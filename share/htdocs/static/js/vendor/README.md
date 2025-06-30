@@ -1,6 +1,6 @@
 # A-Frame Component Library
 
-This directory contains the complete A-Frame ecosystem for the THD Holodeck platform.
+This directory contains the complete A-Frame ecosystem for the HD1 Holodeck platform.
 
 ## Core A-Frame
 - `aframe.min.js` - A-Frame 1.4.0 core framework

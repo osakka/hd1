@@ -4,7 +4,7 @@
 ACCEPTED (2025-06-30)
 
 ## Context
-The THD holodeck console required a professional status indication system to provide clear visual feedback about connection health, session state, and user interaction modes. The previous implementation mixed different status types in confusing ways, leading to user uncertainty about system state.
+The HD1 holodeck console required a professional status indication system to provide clear visual feedback about connection health, session state, and user interaction modes. The previous implementation mixed different status types in confusing ways, leading to user uncertainty about system state.
 
 ## Problem Statement
 1. **Status Confusion**: Single status LED mixed connection health with pointer lock state

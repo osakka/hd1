@@ -1,6 +1,6 @@
-# THD (The Holo-Deck) - CHANGELOG
+# HD1 (Holodeck One) - CHANGELOG
 
-All notable changes to the THD project are documented in this file.
+All notable changes to the HD1 project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -119,7 +119,7 @@ async function refreshSceneDropdown() {
 
 ### **REVOLUTIONARY SINGLE SOURCE OF TRUTH BRIDGE SYSTEM**
 
-This **advanced milestone** achieves the complete architectural goal: **complete upstream/downstream API integration** with **single source of truth bridge system** between THD API and A-Frame capabilities. No more manual synchronization, no more duplicate implementations - just **advanced engineering excellence**.
+This **advanced milestone** achieves the complete architectural goal: **complete upstream/downstream API integration** with **single source of truth bridge system** between HD1 API and A-Frame capabilities. No more manual synchronization, no more duplicate implementations - just **advanced engineering excellence**.
 
 ### **Added - Advanced Integration Architecture**
 
@@ -136,7 +136,7 @@ This **advanced milestone** achieves the complete architectural goal: **complete
 - **Identical Function Signatures**: Perfect 1:1 mapping with shell function equivalents
 - **A-Frame Schema Validation**: Complete validation in browser environment
 - **Standard Error Handling**: Consistent error reporting across shell/JavaScript
-- **Seamless API Integration**: Direct integration with existing THD API client
+- **Seamless API Integration**: Direct integration with existing HD1 API client
 - **Auto-Generated Bridge**: Generated from same specifications as shell functions
 
 #### **📐 Advanced Code Generation Pipeline**
@@ -149,7 +149,7 @@ This **advanced milestone** achieves the complete architectural goal: **complete
 ### **Enhanced - Architectural Evolution**
 
 #### **Complete Upstream/Downstream Bridge**
-- **Upstream APIs**: THD shell functions, JavaScript client, CLI tools
+- **Upstream APIs**: HD1 shell functions, JavaScript client, CLI tools
 - **Downstream APIs**: A-Frame components, WebXR capabilities, 3D rendering
 - **Advanced Integration**: Seamless bridge maintaining single source of truth
 - **Standard Validation**: High-quality parameter checking across all layers
@@ -162,10 +162,10 @@ This **advanced milestone** achieves the complete architectural goal: **complete
 - **Standard Examples**: Complete usage documentation with real examples
 
 ### **Files Added/Modified**
-- **Enhanced Libraries**: `/opt/holo-deck/lib/thd-enhanced-functions.sh`
-- **JavaScript Bridge**: `/opt/holo-deck/lib/thd-enhanced-bridge.js`
-- **Advanced Generator**: Enhanced `/opt/holo-deck/src/codegen/generator.go`
-- **Standard ADR**: `/opt/holo-deck/docs/adr/ADR-007-Advanced-Upstream-Downstream-Integration.md`
+- **Enhanced Libraries**: `/opt/holodeck-one/lib/thd-enhanced-functions.sh`
+- **JavaScript Bridge**: `/opt/holodeck-one/lib/thd-enhanced-bridge.js`
+- **Advanced Generator**: Enhanced `/opt/holodeck-one/src/codegen/generator.go`
+- **Standard ADR**: `/opt/holodeck-one/docs/adr/ADR-007-Advanced-Upstream-Downstream-Integration.md`
 
 ### **Advanced Status: ACHIEVED**
 - ✅ **Single Source of Truth**: Perfect synchronization between all API clients
@@ -180,7 +180,7 @@ This **advanced milestone** achieves the complete architectural goal: **complete
 
 ### **REVOLUTIONARY AUDIT-QUALITY LOGGING TRANSFORMATION**
 
-This **auto-generated client milestone** establishes THD as the **gold standard for standard VR/AR holodeck platforms** with **high-quality unified logging** that meets the highest audit and compliance standards.
+This **auto-generated client milestone** establishes HD1 as the **gold standard for standard VR/AR holodeck platforms** with **high-quality unified logging** that meets the highest audit and compliance standards.
 
 ### **Added - Standard Logging Excellence**
 
@@ -199,7 +199,7 @@ This **auto-generated client milestone** establishes THD as the **gold standard 
 - **Configuration Query**: `GET /admin/logging/config` - Current logging status
 
 #### **Multi-Source Configuration Support**
-- **Environment Variables**: `THD_LOG_LEVEL`, `THD_LOG_DIR`, `THD_TRACE_MODULES`
+- **Environment Variables**: `HD1_LOG_LEVEL`, `HD1_LOG_DIR`, `HD1_TRACE_MODULES`
 - **Command Line Flags**: `--log-level`, `--log-dir`, `--trace-modules`
 - **API Control**: Dynamic runtime configuration via REST endpoints
 - **Standard Defaults**: Sensible production-ready default settings
@@ -314,7 +314,7 @@ curl -X POST http://localhost:8080/api/admin/logging/level \
 ### **👑 ENTERPRISE ARCHITECTURE ACHIEVEMENT**
 
 #### **Standard Platform Capabilities**
-This release establishes THD as a **standard enterprise platform** with:
+This release establishes HD1 as a **standard enterprise platform** with:
 - **Audit-Quality Logging**: Meets enterprise compliance and security standards
 - **Operational Excellence**: SRE-ready with proper monitoring and troubleshooting
 - **Developer Experience**: Comprehensive debugging with targeted tracing capabilities
@@ -444,7 +444,7 @@ type Object struct {
 #### **Auto-Generated Client Technical Implementation**
 - **Generator Enhancement**: Extended `/src/codegen/generator.go` with web UI generation capabilities
 - **Generated Files**: `thd-api-client.js`, `thd-ui-components.js`, `thd-form-system.js`
-- **Standard Standards**: Generated code follows THD standard standards throughout
+- **Standard Standards**: Generated code follows HD1 standard standards throughout
 - **Template-Based System**: Mustache-style templates for consistent code generation
 - **Complete Integration**: Works seamlessly with existing A-Frame holodeck system
 
@@ -486,7 +486,7 @@ This milestone release achieves **complete standard UI excellence** with a **com
 - **Component Architecture**: `thd-sprint-controls` A-Frame component with dynamic acceleration
 
 #### **Standard Interface Standards**
-- **Console Status Indicators**: `THD Console [ACTIVE]` / `THD Console [MINIMIZED]` replacing hacky unicode
+- **Console Status Indicators**: `HD1 Console [ACTIVE]` / `HD1 Console [MINIMIZED]` replacing hacky unicode
 - **Smaller Status LED**: 50% size reduction (12px → 6px) with hover tooltips
 - **Clean Scene Selection**: Self-explanatory dropdown without redundant "Scene:" label
 - **VR Button Removal**: Eliminated empty rectangle (`vr-mode-ui="enabled: false"`)
@@ -800,7 +800,7 @@ This critical release implements **standard-grade session isolation** and **comp
 - **Safe Shell Function Parsing**: Eliminated all jq parsing errors with robust error handling
 
 ### **Technical Architecture**
-- **Client Session Association**: WebSocket clients automatically associate with THD sessions
+- **Client Session Association**: WebSocket clients automatically associate with HD1 sessions
 - **Session-Specific Broadcasting**: `BroadcastToSession` method with proper client filtering
 - **Enhanced Object Creation**: Full support for all A-Frame object properties in API
 - **Standard Error Handling**: Consistent JSON error responses across all endpoints
@@ -819,9 +819,9 @@ This critical release implements **standard-grade session isolation** and **comp
 
 ## [3.0.0] - 2025-06-29 - **🚀 VR HOLODECK REVOLUTION**
 
-### **A-FRAME WEBXR TRANSFORMATION: THD → VR/AR HOLODECK PLATFORM**
+### **A-FRAME WEBXR TRANSFORMATION: HD1 → VR/AR HOLODECK PLATFORM**
 
-This advanced release transforms THD from a standard 3D visualization tool into a **complete VR/AR holodeck platform** powered by A-Frame WebXR, while maintaining 100% API compatibility and standard engineering standards.
+This advanced release transforms HD1 from a standard 3D visualization tool into a **complete VR/AR holodeck platform** powered by A-Frame WebXR, while maintaining 100% API compatibility and standard engineering standards.
 
 ### **Added - Advanced VR/AR Capabilities**
 
@@ -877,7 +877,7 @@ This advanced release transforms THD from a standard 3D visualization tool into 
 #### **Framework-Agnostic Design**
 ```
 ┌─────────────────────────────────────────────────┐
-│                THD API Layer                    │  ← Universal Interface
+│                HD1 API Layer                    │  ← Universal Interface
 │          (Framework Independent)               │
 ├─────────────────────────────────────────────────┤
 │              Rendering Backends                 │  ← Pluggable Architecture
@@ -890,7 +890,7 @@ This advanced release transforms THD from a standard 3D visualization tool into 
 ```
 
 #### **A-Frame Integration Architecture**
-- **THDAFrameManager**: Standard A-Frame entity management class
+- **HD1AFrameManager**: Standard A-Frame entity management class
 - **Entity-Component-System**: Clean ECS architecture with A-Frame
 - **WebSocket Integration**: Real-time synchronization between API and A-Frame
 - **Standard Standards**: Maintained logging, error handling, and process control
@@ -1015,9 +1015,9 @@ This advanced release transforms THD from a standard 3D visualization tool into 
 
 ## [2.0.0] - 2025-06-28 - **PROFESSIONAL TRANSFORMATION**
 
-### **PROJECT RENAME: VWS → THD (The Holo-Deck)**
+### **PROJECT RENAME: HD1 → HD1 (Holodeck One)**
 
-This major release transforms the Virtual World Synthesizer into **THD (The Holo-Deck)**, implementing standard engineering standards and establishing the project's true identity as a standard 3D visualization platform.
+This major release transforms the Virtual World Synthesizer into **HD1 (Holodeck One)**, implementing standard engineering standards and establishing the project's true identity as a standard 3D visualization platform.
 
 ### **Added - Standard Standards**
 
@@ -1038,16 +1038,16 @@ This major release transforms the Virtual World Synthesizer into **THD (The Holo
 - **Standard .gitignore**: Excludes all runtime artifacts, binaries, logs, PID files
 - **Clean Repository**: No build artifacts or temporary files in version control
 - **Proper Commit Messages**: Standard commit format with co-authorship
-- **Remote Repository**: Established at `https://git.uk.home.arpa/itdlabs/holo-deck.git`
+- **Remote Repository**: Established at `https://git.uk.home.arpa/itdlabs/holodeck-one.git`
 
 ### **Changed - Complete Project Transformation**
 
 #### **Project Identity**
-- **Name**: Virtual World Synthesizer → **THD (The Holo-Deck)**
+- **Name**: Virtual World Synthesizer → **HD1 (Holodeck One)**
 - **Module**: `visualstream` → `holodeck`
-- **Binary**: `vws` → `thd`
-- **Client**: `vws-client` → `thd-client`
-- **PID File**: `vws.pid` → `thd.pid`
+- **Binary**: `hd1` → `hd1`
+- **Client**: `hd1-client` → `thd-client`
+- **PID File**: `hd1.pid` → `thd.pid`
 
 #### **Standard Standards Implementation**
 - **Removed All Emojis**: Standard system output without decorative characters
@@ -1057,7 +1057,7 @@ This major release transforms the Virtual World Synthesizer into **THD (The Holo
 
 #### **Documentation Updates**
 - **README.md**: Complete rewrite focusing on standard capabilities
-- **API Documentation**: Updated to reflect THD branding and standard standards
+- **API Documentation**: Updated to reflect HD1 branding and standard standards
 - **Code Comments**: Standard inline documentation
 
 #### **Source Code Transformation**
@@ -1066,8 +1066,8 @@ All Go imports updated:
 - "visualstream/*" → "holodeck/*"
 
 All binary references updated:
-- VWS_* constants → THD_* constants
-- All paths use THD naming
+- HD1_* constants → HD1_* constants
+- All paths use HD1 naming
 
 All logging updated:
 - Standard output format
@@ -1091,16 +1091,16 @@ All logging updated:
 ### **File Structure Updates**
 
 ```
-THD Project Structure (Standard):
-/opt/holo-deck/
+HD1 Project Structure (Standard):
+/opt/holodeck-one/
 ├── .gitignore                 # Standard artifact exclusion
 ├── README.md                  # Standard project overview
 ├── CHANGELOG.md              # This file - project history
 ├── CLAUDE.md                 # Development context preservation
 ├── src/                      # Go source code
-│   ├── main.go              # THD daemon with standard standards
+│   ├── main.go              # HD1 daemon with standard standards
 │   ├── go.mod               # Module: holodeck
-│   ├── api.yaml             # THD API specification
+│   ├── api.yaml             # HD1 API specification
 │   ├── Makefile             # Standard build system
 │   └── ...                  # All source files updated
 ├── build/                   # Build artifacts (excluded from git)
@@ -1116,15 +1116,15 @@ THD Project Structure (Standard):
 
 #### **Git Repository Establishment**
 - **Clean Initial Commit**: Standard project history established
-- **Remote Repository**: Connected to `https://git.uk.home.arpa/itdlabs/holo-deck.git`
+- **Remote Repository**: Connected to `https://git.uk.home.arpa/itdlabs/holodeck-one.git`
 - **Standard .gitignore**: Comprehensive exclusion of runtime artifacts
 - **Proper Credentials**: Git configured with `claude-3/claude-password`
 
 #### **Standard Daemon Configuration**
 ```bash
 # Standard daemon control
-make start     # Start THD daemon standardly
-make stop      # Stop THD daemon with proper cleanup
+make start     # Start HD1 daemon standardly
+make stop      # Stop HD1 daemon with proper cleanup
 make restart   # Restart with validation
 make status    # Standard status reporting
 ```
@@ -1132,35 +1132,35 @@ make status    # Standard status reporting
 ### **Breaking Changes**
 
 #### **Binary Names**
-- `vws` → `thd` (daemon binary)
-- `vws-client` → `thd-client` (API client)
+- `hd1` → `hd1` (daemon binary)
+- `hd1-client` → `thd-client` (API client)
 
 #### **Module Import Paths**
 - All Go imports changed from `visualstream/*` to `holodeck/*`
 - Requires `go mod tidy` after update
 
 #### **Configuration Paths**
-- PID file: `vws.pid` → `thd.pid`
-- Log files: `vws_*.log` → `thd_*.log`
-- All path constants renamed from `VWS_*` to `THD_*`
+- PID file: `hd1.pid` → `thd.pid`
+- Log files: `hd1_*.log` → `thd_*.log`
+- All path constants renamed from `HD1_*` to `HD1_*`
 
 #### **API Responses**
-- All message text updated to reference "THD" instead of "VWS"
+- All message text updated to reference "HD1" instead of "HD1"
 - Standard error messages without emojis
 
 ### **Migration Guide**
 
 #### **For Developers**
 1. Update all imports from `visualstream` to `holodeck`
-2. Use new binary names (`thd` instead of `vws`)
+2. Use new binary names (`hd1` instead of `hd1`)
 3. Update any hardcoded path references
 4. Rebuild with `make all` to generate new binaries
 
 #### **For Deployment**
-1. Stop old VWS daemon: `make stop`
+1. Stop old HD1 daemon: `make stop`
 2. Pull latest changes: `git pull origin master`
 3. Rebuild: `make all`
-4. Start new THD daemon: `make start`
+4. Start new HD1 daemon: `make start`
 
 ### **Quality Assurance**
 
@@ -1184,7 +1184,7 @@ make status    # Standard status reporting
 
 ### **THE VIRTUAL WORLD SYNTHESIZER IS BORN**
 
-The inaugural release that established the specification-driven development architecture and virtual world capabilities. This release created the foundation that enabled the standard transformation to THD.
+The inaugural release that established the specification-driven development architecture and virtual world capabilities. This release created the foundation that enabled the standard transformation to HD1.
 
 #### **Core Advanced Features Established**
 - **Specification-Driven Architecture** with OpenAPI 3.0.3 as single source of truth
@@ -1210,14 +1210,14 @@ The inaugural release that established the specification-driven development arch
 2. **Modular Discovery**: Shell-based wireframe generation systems
 3. **Coordinate Breakthrough**: Discovery of coordinate system and scaling
 4. **Specification Revolution**: Transition to 100% API-driven development
-5. **Standard Maturity**: Complete transformation to THD standard standards
+5. **Standard Maturity**: Complete transformation to HD1 standard standards
 
 ### **Key Transformation Moments**
 - **Standard Standards Demand**: "I want a standard 100% up there"
 - **Emoji Elimination**: "emojis would be bar lowering right?"
 - **Absolute Path Requirement**: "use 100% absolute paths for now everywhere"
 - **Long Flags Only**: "We only use long flags for our binaries"
-- **Project Rename**: "this project will be renamed to holo-deck"
+- **Project Rename**: "this project will be renamed to holodeck-one"
 
 ### **Development Philosophy**
 > **"Standard daemon control for the server"**  
@@ -1229,7 +1229,7 @@ The inaugural release that established the specification-driven development arch
 
 ## Contributing
 
-THD follows standard engineering standards:
+HD1 follows standard engineering standards:
 
 1. **Modify api.yaml** to define new functionality
 2. **Run standard build** with `make all`
@@ -1241,11 +1241,11 @@ THD follows standard engineering standards:
 
 ## License
 
-THD (The Holo-Deck)  
+HD1 (Holodeck One)  
 Standard 3D Visualization Engine with specification-driven architecture.
 
 ---
 
 **"Where 3D visualization meets standard engineering."**
 
-*THD represents the evolution from innovative concept to standard-grade engineering solution.*
+*HD1 represents the evolution from innovative concept to standard-grade engineering solution.*

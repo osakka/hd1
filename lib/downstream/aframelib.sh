@@ -14,7 +14,7 @@
 # ===================================================================
 
 # Load THD upstream core library
-source "${HD1_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
     echo "ERROR: THD upstream library not found"
     exit 1
 }

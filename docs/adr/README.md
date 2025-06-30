@@ -1,8 +1,8 @@
 # ADR TIMELINE AND INDEX
 
-**Architecture Decision Records for THD (The Holo-Deck)**
+**Architecture Decision Records for HD1 (Holodeck One)**
 
-This directory contains all architectural decision records (ADRs) documenting the evolution of THD from a basic visualization tool to a advanced VR/AR holodeck platform with standard engineering standards.
+This directory contains all architectural decision records (ADRs) documenting the evolution of HD1 from a basic visualization tool to a advanced VR/AR holodeck platform with standard engineering standards.
 
 ## 📋 ADR Timeline
 
@@ -11,7 +11,7 @@ This directory contains all architectural decision records (ADRs) documenting th
 **[ADR-001: A-Frame WebXR Integration](ADR-001-aframe-webxr-integration.md)**
 - **Status**: ✅ Accepted | **Impact**: 🚀 Transformational
 - **Decision**: Integrate A-Frame WebXR framework as primary rendering backend
-- **Result**: THD evolution from WebGL to complete VR/AR holodeck platform
+- **Result**: HD1 evolution from WebGL to complete VR/AR holodeck platform
 - **Key Achievement**: 100% API compatibility maintained during transformation
 
 **[ADR-002: Specification-Driven Development](ADR-002-Specification-Driven-Development.md)**
@@ -52,7 +52,7 @@ This directory contains all architectural decision records (ADRs) documenting th
 - **Status**: ✅ Accepted | **Impact**: 🏆 Advanced Architecture
 - **Decision**: Complete upstream/downstream API bridge system
 - **Result**: Identical shell/JavaScript function signatures with A-Frame integration
-- **Key Achievement**: Single source of truth bridge between THD API and A-Frame
+- **Key Achievement**: Single source of truth bridge between HD1 API and A-Frame
 
 ### Phase 4: Core System Architecture (Historical)
 
@@ -161,4 +161,4 @@ This directory contains all architectural decision records (ADRs) documenting th
 
 ---
 
-*This ADR collection represents the complete architectural evolution of THD from basic visualization tool to advanced VR/AR holodeck platform with standard engineering excellence.*
+*This ADR collection represents the complete architectural evolution of HD1 from basic visualization tool to advanced VR/AR holodeck platform with standard engineering excellence.*
