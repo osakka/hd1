@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =========================================================================
-# THD Scene: My Custom Scene - A customized version of basic shapes scene
+# HD1 Scene: My Custom Scene - A customized version of basic shapes scene
 # =========================================================================
 #
 # A customized version of basic shapes scene
@@ -17,7 +17,7 @@ SCENE_NAME="My Custom Scene"
 SCENE_DESCRIPTION="A customized version of basic shapes scene"
 
 # Get session ID from argument or use active session
-SESSION_ID="${1:-${THD_SESSION:-}}"
+SESSION_ID="${1:-${HD1_SESSION:-}}"
 
 if [[ -z "$SESSION_ID" ]]; then
     echo "Error: Session ID required" >&2
@@ -78,6 +78,6 @@ $THD_CLIENT create-object "$SESSION_ID" '{
     "scale": 1
 }' > /dev/null
 
-echo "THD Scene '$SCENE_NAME' loaded successfully"
+echo "HD1 Scene '$SCENE_NAME' loaded successfully"
 echo "Objects created: 6"
 echo "Session: $SESSION_ID"

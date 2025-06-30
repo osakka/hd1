@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =========================================================================
-# THD Scene: Empty Grid - Clean Holodeck Environment
+# HD1 Scene: Empty Grid - Clean Holodeck Environment
 # =========================================================================
 #
 # Standard minimal scene with just the coordinate grid system
@@ -17,7 +17,7 @@ SCENE_NAME="Empty Grid"
 SCENE_DESCRIPTION="Clean holodeck with just the coordinate grid system"
 
 # Get session ID from argument or use active session
-SESSION_ID="${1:-${THD_SESSION:-}}"
+SESSION_ID="${1:-${HD1_SESSION:-}}"
 
 if [[ -z "$SESSION_ID" ]]; then
     echo "Error: Session ID required" >&2
@@ -25,14 +25,14 @@ if [[ -z "$SESSION_ID" ]]; then
 fi
 
 # Set THD_ROOT and source functions
-THD_ROOT="/opt/holo-deck"
-source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
-    echo "ERROR: THD functions not available"
+HD1_ROOT="/opt/holo-deck"
+source "${HD1_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+    echo "ERROR: HD1 functions not available"
     exit 1
 }
 
 # Set session ID for THD functions
-THD_SESSION_ID="$SESSION_ID"
+HD1_SESSION_ID="$SESSION_ID"
 
 echo "Creating $SCENE_NAME scene..."
 
@@ -41,6 +41,6 @@ thd::clear
 
 # The grid system is automatically present in every holodeck session
 
-echo "THD Scene '$SCENE_NAME' loaded successfully"
+echo "HD1 Scene '$SCENE_NAME' loaded successfully"
 echo "Objects created: 0"
 echo "Session: $SESSION_ID"

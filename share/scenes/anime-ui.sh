@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =========================================================================
-# THD Scene: Anime UI Demo - Interactive Holographic Interface
+# HD1 Scene: Anime UI Demo - Interactive Holographic Interface
 # =========================================================================
 #
 # Interactive anime-style holodeck with floating UI elements, dynamic lighting,
@@ -17,7 +17,7 @@ SCENE_NAME="Anime UI Demo"
 SCENE_DESCRIPTION="Interactive anime-style holodeck with floating UI elements, blue lighting, and data visualization cubes"
 
 # Get session ID from argument or use active session
-SESSION_ID="${1:-${THD_SESSION:-}}"
+SESSION_ID="${1:-${HD1_SESSION:-}}"
 
 if [[ -z "$SESSION_ID" ]]; then
     echo "Error: Session ID required" >&2
@@ -82,6 +82,6 @@ $THD_CLIENT create-object "$SESSION_ID" '{
     "color": {"r": 0.2, "g": 1.0, "b": 1.0, "a": 0.3}
 }' > /dev/null
 
-echo "THD Scene '$SCENE_NAME' loaded successfully"
+echo "HD1 Scene '$SCENE_NAME' loaded successfully"
 echo "Objects created: 6"
 echo "Session: $SESSION_ID"

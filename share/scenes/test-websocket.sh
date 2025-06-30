@@ -3,9 +3,9 @@
 SCENE_NAME="Test WebSocket Updates"
 
 # Set THD_ROOT and source functions
-THD_ROOT="/opt/holo-deck"
-source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
-    echo "ERROR: THD functions not available"
+HD1_ROOT="/opt/holo-deck"
+source "${HD1_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+    echo "ERROR: HD1 functions not available"
     exit 1
 }
 

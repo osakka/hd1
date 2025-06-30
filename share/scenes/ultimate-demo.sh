@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # =========================================================================
-# THD Scene: Ultimate Demo - Complete Holodeck Showcase
+# HD1 Scene: Ultimate Demo - Complete Holodeck Showcase
 # =========================================================================
 #
 # Standard holodeck demonstration with advanced materials, lighting,
-# and complex 3D structures showcasing THD capabilities
+# and complex 3D structures showcasing HD1 capabilities
 #
 # Usage: ./ultimate-demo.sh [SESSION_ID]
 # =========================================================================
@@ -17,7 +17,7 @@ SCENE_NAME="Ultimate Demo"
 SCENE_DESCRIPTION="Complete holodeck showcase with metallic platforms, crystal formations, and cinematic lighting"
 
 # Get session ID from argument or use active session
-SESSION_ID="${1:-${THD_SESSION:-}}"
+SESSION_ID="${1:-${HD1_SESSION:-}}"
 
 if [[ -z "$SESSION_ID" ]]; then
     echo "Error: Session ID required" >&2
@@ -25,14 +25,14 @@ if [[ -z "$SESSION_ID" ]]; then
 fi
 
 # Set THD_ROOT and source functions
-THD_ROOT="/opt/holo-deck"
-source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
-    echo "ERROR: THD functions not available"
+HD1_ROOT="/opt/holo-deck"
+source "${HD1_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+    echo "ERROR: HD1 functions not available"
     exit 1
 }
 
 # Set session ID for THD functions
-THD_SESSION_ID="$SESSION_ID"
+HD1_SESSION_ID="$SESSION_ID"
 
 echo "Creating $SCENE_NAME scene..."
 
@@ -54,6 +54,6 @@ thd::create_object "accent_light" "light" -3 6 -3
 # Status display panel
 thd::create_object "status_display" "plane" 0 6 -5
 
-echo "THD Scene '$SCENE_NAME' loaded successfully"
+echo "HD1 Scene '$SCENE_NAME' loaded successfully"
 echo "Objects created: 7"
 echo "Session: $SESSION_ID"

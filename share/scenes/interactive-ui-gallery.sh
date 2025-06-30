@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =========================================================================
-# THD Scene: Interactive UI Gallery - A-Frame Style Interface
+# HD1 Scene: Interactive UI Gallery - A-Frame Style Interface
 # =========================================================================
 #
 # Recreates an A-Frame laser input UI with gallery-style poster frames
@@ -17,17 +17,17 @@ SCENE_NAME="Interactive UI Gallery"
 SCENE_DESCRIPTION="Gallery-style interface with poster frames and info panel, based on A-Frame laser input UI"
 
 # Get session ID from argument or use active session
-SESSION_ID="${1:-${THD_SESSION:-}}"
+SESSION_ID="${1:-${HD1_SESSION:-}}"
 
 if [[ -z "$SESSION_ID" ]]; then
-    echo "ERROR: No session ID provided and THD_SESSION not set"
+    echo "ERROR: No session ID provided and HD1_SESSION not set"
     exit 1
 fi
 
 # Set THD_ROOT and source functions
-THD_ROOT="/opt/holo-deck"
-source "${THD_ROOT}/lib/thdlib.sh" 2>/dev/null || {
-    echo "ERROR: THD functions not available"
+HD1_ROOT="/opt/holo-deck"
+source "${HD1_ROOT}/lib/thdlib.sh" 2>/dev/null || {
+    echo "ERROR: HD1 functions not available"
     exit 1
 }
 
@@ -78,6 +78,6 @@ curl -X POST "http://localhost:8080/api/sessions/$SESSION_ID/objects" \
   -d '{"name":"directional_light","type":"light","x":1,"y":4,"z":1,"lightType":"directional","intensity":0.8,"color":{"r":1.0,"g":0.95,"b":0.8,"a":1.0}}' \
   -s > /dev/null
 
-echo "THD Scene '$SCENE_NAME' loaded successfully"
+echo "HD1 Scene '$SCENE_NAME' loaded successfully"
 echo "Objects created: 8"
 echo "Session: $SESSION_ID"
