@@ -19,7 +19,7 @@ info:
     
   version: 1.0.0
   contact:
-    name: The Holo-Deck 3D Engine
+    name: Holodeck One 3D Engine
     
 servers:
   - url: http://localhost:8080/api

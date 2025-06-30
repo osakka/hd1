@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>THD Holodeck - A-Frame VR</title>
+    <title>HD1 Holodeck - A-Frame VR</title>
     <script src="/static/js/vendor/aframe.min.js"></script>
     <script src="/static/js/vendor/aframe-environment-component.min.js"></script>
     <script src="/static/js/vendor/aframe-teleport-controls.min.js"></script>
@@ -16,19 +16,19 @@
          - aframe-controller-cursor-component.min.js (VR-specific, not needed for holodeck)
          - aframe-forcegraph-component.min.js (complex, not used yet)
     -->
-    <script src="/static/js/thd-aframe.js"></script>
+    <script src="/static/js/hd1-aframe.js"></script>
     <link rel="stylesheet" href="/static/css/holodeck-console.css">
 </head>
 <body>
     <a-scene 
         id="holodeck-scene" 
-        thd-holodeck
+        hd1-holodeck
         embedded
         style="height: 100vh; width: 100vw;"
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false">
         
-        <!-- THD Holodeck Environment -->
+        <!-- HD1 Holodeck Environment -->
         <a-assets>
             <!-- Asset preloading will go here -->
         </a-assets>
@@ -38,8 +38,8 @@
                   camera 
                   look-controls="enabled: true; pointerLockEnabled: true" 
                   wasd-controls="acceleration: 20; fly: false; enabled: true"
-                  thd-keyboard-controls=""
-                  thd-sprint-controls=""
+                  hd1-keyboard-controls=""
+                  hd1-sprint-controls=""
                   holodeck-boundaries=""
                   position="0 1.7 5">
         </a-entity>
@@ -60,7 +60,7 @@
     <div id="debug-panel">
         <div id="debug-header">
             <div style="display: flex; align-items: center; gap: 6px;">
-                <span>THD Console</span>
+                <span>HD1 Console</span>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
                 <span id="debug-collapse-icon">&#8679;</span>

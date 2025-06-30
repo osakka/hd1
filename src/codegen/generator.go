@@ -348,9 +348,9 @@ func main() {
 		fmt.Printf("⚠️  WARNING: %d handlers missing (build will continue)\n", len(missingHandlers))
 	}
 
-	// Generate THD Client from same spec
-	fmt.Println("\n🔧 GENERATING THD CLIENT...")
-	generateTHDClient(spec, routes)
+	// Generate HD1 Client from same spec
+	fmt.Println("\n🔧 GENERATING HD1 CLIENT...")
+	generateHD1Client(spec, routes)
 
 	// Generate Web UI Client - THE CROWN JEWEL
 	fmt.Println("\n👑 GENERATING WEB UI CLIENT - THE CROWN JEWEL...")
@@ -419,10 +419,10 @@ func contains(slice []string, item string) bool {
 	return false
 }
 
-// generateTHDClient creates complete auto-generated Go THD client
-func generateTHDClient(spec OpenAPISpec, routes []RouteInfo) {
+// generateHD1Client creates complete auto-generated Go HD1 client
+func generateHD1Client(spec OpenAPISpec, routes []RouteInfo) {
 	clientGoPath := "client/main.go"
-	clientBinPath := "../build/bin/thd-client"
+	clientBinPath := "../build/bin/hd1-client"
 	
 	// Ensure directory exists
 	if err := os.MkdirAll("client", 0755); err != nil {
@@ -455,7 +455,7 @@ func generateTHDClient(spec OpenAPISpec, routes []RouteInfo) {
 		return
 	}
 	
-	fmt.Printf("✅ SUCCESS: thd-client Go binary generated with %d commands\n", len(routes))
+	fmt.Printf("✅ SUCCESS: hd1-client Go binary generated with %d commands\n", len(routes))
 }
 
 // generateGoClient creates the Go source code for THD client
@@ -494,7 +494,7 @@ func main() {
 }
 
 func showHelp() {
-	fmt.Println("THD Client - Auto-generated from API specification")
+	fmt.Println("HD1 Client - Auto-generated from API specification")
 	fmt.Println("Available commands:")
 {{range .Routes}}	fmt.Println("  {{.CommandName}} - {{.Method}} {{.Path}}")
 {{end}}

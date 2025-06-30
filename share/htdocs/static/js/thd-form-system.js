@@ -15,43 +15,23 @@ class THDFormSystem {
     initializeSchemas() {
         console.log('📝 Initializing auto-generated form schemas...');
 
-        this.formSchemas.set('initializeWorldForm', {
-        "title": "InitializeWorld",
+        this.formSchemas.set('playRecordingForm', {
+        "title": "PlayRecording",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('saveSceneFromSessionForm', {
-        "title": "SaveSceneFromSession",
+        this.formSchemas.set('setTraceModulesForm', {
+        "title": "SetTraceModules",
         "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('startRecordingForm', {
-        "title": "StartRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('stopRecordingForm', {
-        "title": "StopRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         this.formSchemas.set('setCameraPositionForm', {
         "title": "SetCameraPosition",
         "submitText": "Execute PUT",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('playRecordingForm', {
-        "title": "PlayRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('startCameraOrbitForm', {
-        "title": "StartCameraOrbit",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('loadSceneForm', {
-        "title": "LoadScene",
+        this.formSchemas.set('forkSceneForm', {
+        "title": "ForkScene",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -65,28 +45,28 @@ class THDFormSystem {
         "submitText": "Execute PUT",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "param2": {"type": "string", "title": "Parameter 2", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('setLogLevelForm', {
-        "title": "SetLogLevel",
-        "submitText": "Execute POST",
-        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
         this.formSchemas.set('setCanvasForm', {
         "title": "SetCanvas",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('forkSceneForm', {
-        "title": "ForkScene",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         this.formSchemas.set('setLoggingConfigForm', {
         "title": "SetLoggingConfig",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('setTraceModulesForm', {
-        "title": "SetTraceModules",
+        this.formSchemas.set('createSessionForm', {
+        "title": "CreateSession",
+        "submitText": "Execute POST",
+        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('saveSceneFromSessionForm', {
+        "title": "SaveSceneFromSession",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('setLogLevelForm', {
+        "title": "SetLogLevel",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -95,10 +75,30 @@ class THDFormSystem {
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('createSessionForm', {
-        "title": "CreateSession",
+        this.formSchemas.set('loadSceneForm', {
+        "title": "LoadScene",
         "submitText": "Execute POST",
-        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('stopRecordingForm', {
+        "title": "StopRecording",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('startCameraOrbitForm', {
+        "title": "StartCameraOrbit",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('initializeWorldForm', {
+        "title": "InitializeWorld",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('startRecordingForm', {
+        "title": "StartRecording",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         console.log('✅ Form schemas initialized');
     }
