@@ -477,7 +477,7 @@ paths:
       summary: Stop session recording
       description: |
         End temporal recording and generate playback script.
-        Creates .thd recording file with temporal sequence.
+        Creates .hd1 recording file with temporal sequence.
       parameters:
         - name: sessionId
           in: path
