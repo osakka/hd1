@@ -474,8 +474,9 @@ function connectWebSocket() {
         // Send client capabilities
         setTimeout(sendClientInfo, 500);
         
-        // Load scenes on initial connection
+        // Load scenes and environments on initial connection
         setTimeout(refreshSceneDropdown, 1000);
+        setTimeout(refreshEnvironmentDropdown, 1000);
         
         // Initialize session connection without object restoration
         setTimeout(ensureSession, 2000);
@@ -509,6 +510,14 @@ function connectWebSocket() {
                 console.log('[HD1] Scene list changed, refreshing dropdown');
                 addDebug('SCENE_LIST_CHANGED', 'Refreshing scene dropdown');
                 await refreshSceneDropdown();
+                return;
+            }
+            
+            // Handle environment changes
+            if (message.type === 'environment_changed') {
+                console.log('[HD1] Environment changed for session', message.session_id);
+                addDebug('ENV_CHANGED', {session: message.session_id, applied: message.environment_applied});
+                setStatus('receiving', 'Environment updated');
                 return;
             }
             
@@ -922,6 +931,154 @@ async function loadScene(sceneId) {
         addDebug('SCENE_FAIL', {scene: sceneId, error: error.message});
         setStatus('error', 'Scene load failed');
     }
+}
+
+// Environment selection management
+const debugEnvironmentSelect = document.getElementById('debug-environment-select');
+
+// Handle environment selection
+debugEnvironmentSelect.addEventListener('change', function() {
+    const selectedEnvironment = this.value;
+    if (selectedEnvironment && currentSessionId) {
+        addDebug('ENV_SELECT', {environment: selectedEnvironment, session: currentSessionId, manual: true});
+        applyEnvironment(selectedEnvironment);
+    }
+});
+
+// Apply environment via API call
+async function applyEnvironment(environmentId) {
+    try {
+        const response = await fetch('/api/environments/' + environmentId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                session_id: currentSessionId
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            addDebug('ENV_APPLIED', {environment: environmentId, session: result.session_id});
+            setStatus('receiving', 'Environment applied: ' + environmentId);
+            
+            // Update environment display and A-Frame physics
+            updateEnvironmentDisplay(environmentId);
+            updateAFrameEnvironment(environmentId);
+        } else {
+            addDebug('ENV_ERROR', {environment: environmentId, status: response.status});
+            setStatus('error', 'Failed to apply environment');
+        }
+    } catch (error) {
+        console.error('Failed to apply environment:', error);
+        addDebug('ENV_FAIL', {environment: environmentId, error: error.message});
+        setStatus('error', 'Environment application failed');
+    }
+}
+
+// Refresh environment dropdown from API
+async function refreshEnvironmentDropdown() {
+    try {
+        const response = await fetch('/api/environments');
+        if (response.ok) {
+            const data = await response.json();
+            const select = document.getElementById('debug-environment-select');
+            
+            // Save current selection
+            const currentValue = select.value;
+            
+            // Clear existing options except first
+            while (select.children.length > 1) {
+                select.removeChild(select.lastChild);
+            }
+            
+            // Add updated environments
+            if (data.environments) {
+                data.environments.forEach(env => {
+                    const option = document.createElement('option');
+                    option.value = env.id;
+                    option.textContent = `${env.name} (${env.scale_unit})`;
+                    select.appendChild(option);
+                });
+            }
+            
+            // Restore selection
+            if (currentValue) {
+                select.value = currentValue;
+            }
+            
+            addDebug('ENV_REFRESH', {count: data.environments?.length || 0});
+        } else {
+            addDebug('ENV_FETCH_ERROR', {status: response.status});
+        }
+    } catch (error) {
+        console.error('Failed to fetch environments:', error);
+        addDebug('ENV_FETCH_FAIL', {error: error.message});
+    }
+}
+
+// Update environment display panel
+function updateEnvironmentDisplay(environmentId) {
+    if (!environmentId) return;
+    
+    // Find environment data
+    fetch('/api/environments')
+        .then(response => response.json())
+        .then(data => {
+            const env = data.environments?.find(e => e.id === environmentId);
+            if (env) {
+                // Update environment panel
+                const scaleDisplay = document.getElementById('environment-scale');
+                const gravityDisplay = document.getElementById('environment-gravity');
+                const atmosphereDisplay = document.getElementById('environment-atmosphere');
+                
+                if (scaleDisplay) scaleDisplay.textContent = `${env.name} (${env.scale_unit})`;
+                if (gravityDisplay) gravityDisplay.textContent = `${env.gravity} m/s²`;
+                if (atmosphereDisplay) atmosphereDisplay.textContent = env.atmosphere;
+                
+                addDebug('ENV_DISPLAY_UPDATED', {name: env.name, scale: env.scale_unit, gravity: env.gravity});
+            }
+        })
+        .catch(error => {
+            console.error('Failed to update environment display:', error);
+            addDebug('ENV_DISPLAY_FAIL', {error: error.message});
+        });
+}
+
+// Update A-Frame environment component
+function updateAFrameEnvironment(environmentId) {
+    if (!environmentId) return;
+    
+    // Find environment data and update A-Frame component
+    fetch('/api/environments')
+        .then(response => response.json())
+        .then(data => {
+            const env = data.environments?.find(e => e.id === environmentId);
+            if (env) {
+                const scene = document.getElementById('holodeck-scene');
+                if (scene) {
+                    // Update the holodeck-environment component
+                    scene.setAttribute('holodeck-environment', {
+                        scaleUnit: env.scale_unit,
+                        gravity: env.gravity,
+                        atmosphere: env.atmosphere
+                    });
+                    
+                    addDebug('AFRAME_ENV_UPDATED', {
+                        scale: env.scale_unit, 
+                        gravity: env.gravity, 
+                        atmosphere: env.atmosphere
+                    });
+                    
+                    console.log('[HD1] A-Frame environment updated:', env.name);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Failed to update A-Frame environment:', error);
+            addDebug('AFRAME_ENV_FAIL', {error: error.message});
+        });
 }
 
 // Load saved scene on page load

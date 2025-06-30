@@ -128,9 +128,10 @@ type SessionStore struct {
 
 // Session represents a 3D visualization session
 type Session struct {
-	ID        string    `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	Status    string    `json:"status"`
+	ID            string    `json:"id"`
+	CreatedAt     time.Time `json:"created_at"`
+	Status        string    `json:"status"`
+	EnvironmentID string    `json:"environment_id,omitempty"` // Current environment applied to session
 }
 
 // Object represents a 3D object in the world
@@ -220,6 +221,20 @@ func (s *SessionStore) DeleteSession(sessionID string) bool {
 	delete(s.worlds, sessionID)
 	
 	return true
+}
+
+// UpdateSessionEnvironment updates the environment ID for a session
+func (s *SessionStore) UpdateSessionEnvironment(sessionID, environmentID string) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	session, exists := s.sessions[sessionID]
+	if !exists {
+		return &SessionError{Message: "Session not found"}
+	}
+
+	session.EnvironmentID = environmentID
+	return nil
 }
 
 // CreateObject creates a new object in a session

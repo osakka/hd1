@@ -88,6 +88,14 @@ This directory contains all architectural decision records (ADRs) documenting th
 - **Result**: Objects maintain colors across WebSocket reconnections and session restoration
 - **Key Achievement**: Single source of truth for color data flow from creation to restoration
 
+### Phase 6: Three-Layer Architecture System (2025-06-30)
+
+**[ADR-014: Three-Layer Architecture - Environment + Props System](ADR-014-Three-Layer-Architecture-Environment-Props-System.md)**
+- **Status**: ✅ Accepted | **Impact**: 🎮 Game Engine Parity
+- **Decision**: Game engine-grade three-layer architecture (Environment + Props + Scenes)
+- **Result**: Realistic physics cohesion with environment-specific prop behavior
+- **Key Achievement**: Unity/Unreal-level object management with API-driven development
+
 ## 🏗️ Architectural Evolution Summary
 
 ### Advanced Milestones

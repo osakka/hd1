@@ -15,13 +15,8 @@ class HD1FormSystem {
     initializeSchemas() {
         console.log('📝 Initializing auto-generated form schemas...');
 
-        this.formSchemas.set('startRecordingForm', {
-        "title": "StartRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('forceRefreshForm', {
-        "title": "ForceRefresh",
+        this.formSchemas.set('setLogLevelForm', {
+        "title": "SetLogLevel",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -30,18 +25,18 @@ class HD1FormSystem {
         "submitText": "Execute PUT",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('startCameraOrbitForm', {
-        "title": "StartCameraOrbit",
+        this.formSchemas.set('instantiatePropForm', {
+        "title": "InstantiateProp",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "param2": {"type": "string", "title": "Parameter 2", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('playRecordingForm', {
+        "title": "PlayRecording",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('createObjectForm', {
-        "title": "CreateObject",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('setLogLevelForm', {
-        "title": "SetLogLevel",
+        this.formSchemas.set('setLoggingConfigForm', {
+        "title": "SetLoggingConfig",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -50,13 +45,33 @@ class HD1FormSystem {
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
+        this.formSchemas.set('startCameraOrbitForm', {
+        "title": "StartCameraOrbit",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('startRecordingForm', {
+        "title": "StartRecording",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('stopRecordingForm', {
+        "title": "StopRecording",
+        "submitText": "Execute POST",
+        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
+        this.formSchemas.set('forceRefreshForm', {
+        "title": "ForceRefresh",
+        "submitText": "Execute POST",
+        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
         this.formSchemas.set('setCanvasForm', {
         "title": "SetCanvas",
         "submitText": "Execute POST",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('initializeWorldForm', {
-        "title": "InitializeWorld",
+        this.formSchemas.set('applyEnvironmentForm', {
+        "title": "ApplyEnvironment",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -70,8 +85,8 @@ class HD1FormSystem {
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('playRecordingForm', {
-        "title": "PlayRecording",
+        this.formSchemas.set('createObjectForm', {
+        "title": "CreateObject",
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
@@ -85,20 +100,10 @@ class HD1FormSystem {
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
-        this.formSchemas.set('stopRecordingForm', {
-        "title": "StopRecording",
-        "submitText": "Execute POST",
-        "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
         this.formSchemas.set('updateObjectForm', {
         "title": "UpdateObject",
         "submitText": "Execute PUT",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "param2": {"type": "string", "title": "Parameter 2", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('setLoggingConfigForm', {
-        "title": "SetLoggingConfig",
-        "submitText": "Execute POST",
-        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         console.log('✅ Form schemas initialized');
     }

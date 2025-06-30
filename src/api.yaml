@@ -278,6 +278,131 @@ paths:
       x-function: "ApplyEnvironment"
 
   # ========================================
+  # PROPS MANAGEMENT
+  # ========================================
+  /props:
+    get:
+      operationId: listProps
+      tags: [Props]
+      summary: List available props
+      description: |
+        Returns all available props in the system. Props are reusable objects
+        with predefined physics properties, materials, and behavior.
+        
+        Props automatically adapt to the current environment's scale and physics.
+      responses:
+        '200':
+          description: List of available props
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  props:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PropInfo'
+                    example:
+                      - id: "wooden-chair"
+                        name: "Wooden Chair"
+                        description: "Standard wooden chair with realistic physics"
+                        category: "furniture"
+                        scale_compatible: ["mm", "cm", "m"]
+                        mass: 5.5
+                        material: "wood"
+                        dimensions: {width: 0.6, height: 0.8, depth: 0.6}
+      x-handler: "api/props/list.go"
+      x-function: "ListProps"
+
+  /sessions/{sessionId}/props/{propId}:
+    post:
+      operationId: instantiateProp
+      tags: [Props]
+      summary: Instantiate prop in session
+      description: |
+        Creates an instance of a prop in the specified session. The prop
+        will be automatically scaled and physics-adjusted to match the 
+        current environment.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "session-abc123"
+        - name: propId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "wooden-chair"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [position]
+              properties:
+                position:
+                  $ref: '#/components/schemas/Position'
+                rotation:
+                  $ref: '#/components/schemas/Rotation'
+                scale:
+                  type: number
+                  minimum: 0.1
+                  maximum: 10.0
+                  default: 1.0
+                  description: "Scale multiplier relative to prop's base size"
+                instance_name:
+                  type: string
+                  description: "Custom name for this prop instance"
+                  example: "chair-01"
+      responses:
+        '200':
+          description: Prop instantiated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  prop_id:
+                    type: string
+                    example: "wooden-chair"
+                  instance_name:
+                    type: string
+                    example: "chair-01"
+                  session_id:
+                    type: string
+                    example: "session-abc123"
+                  objects_created:
+                    type: integer
+                    example: 5
+                  message:
+                    type: string
+                    example: "Prop 'Wooden Chair' instantiated as 'chair-01'"
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Session or prop not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/props/instantiate.go"
+      x-function: "InstantiateProp"
+
+  # ========================================
   # SCENE MANAGEMENT
   # ========================================
   /scenes:
@@ -1402,6 +1527,110 @@ components:
             type: string
           example: ["terrestrial", "standard"]
           description: "Environment categorization tags"
+
+    # Props Schemas
+    PropInfo:
+      type: object
+      required: [id, name, description, category, scale_compatible, mass, material, dimensions]
+      properties:
+        id:
+          type: string
+          pattern: '^[a-z][a-z0-9\-]*[a-z0-9]$'
+          example: "wooden-chair"
+          description: "Prop identifier"
+        name:
+          type: string
+          example: "Wooden Chair"
+          description: "Human-readable prop name"
+        description:
+          type: string
+          example: "Standard wooden chair with realistic physics"
+          description: "Prop description"
+        category:
+          type: string
+          enum: ["furniture", "tools", "decorative", "structural", "electronic", "organic"]
+          example: "furniture"
+          description: "Prop category for organization"
+        scale_compatible:
+          type: array
+          items:
+            type: string
+            enum: ["nm", "μm", "mm", "cm", "m", "km", "Mm", "Gm"]
+          example: ["mm", "cm", "m"]
+          description: "Scale units this prop works well in"
+        mass:
+          type: number
+          minimum: 0.001
+          maximum: 10000.0
+          example: 5.5
+          description: "Mass in kilograms (at meter scale)"
+        material:
+          type: string
+          enum: ["wood", "metal", "plastic", "glass", "fabric", "stone", "ceramic", "organic"]
+          example: "wood"
+          description: "Primary material for physics calculation"
+        dimensions:
+          type: object
+          required: [width, height, depth]
+          properties:
+            width:
+              type: number
+              minimum: 0.001
+              maximum: 100.0
+              example: 0.6
+              description: "Width in meters"
+            height:
+              type: number
+              minimum: 0.001
+              maximum: 100.0
+              example: 0.8
+              description: "Height in meters"
+            depth:
+              type: number
+              minimum: 0.001
+              maximum: 100.0
+              example: 0.6
+              description: "Depth in meters"
+          description: "Physical dimensions at meter scale"
+        physics_properties:
+          type: object
+          properties:
+            friction:
+              type: number
+              minimum: 0.0
+              maximum: 2.0
+              example: 0.7
+              description: "Surface friction coefficient"
+            restitution:
+              type: number
+              minimum: 0.0
+              maximum: 1.0
+              example: 0.3
+              description: "Bounce/elasticity coefficient"
+            density:
+              type: number
+              minimum: 0.1
+              maximum: 20000.0
+              example: 600.0
+              description: "Material density (kg/m³)"
+          description: "Physics simulation properties"
+        complexity:
+          type: string
+          enum: ["simple", "moderate", "complex"]
+          example: "moderate"
+          description: "Geometric complexity level"
+        components:
+          type: array
+          items:
+            type: string
+          example: ["seat", "backrest", "legs", "armrests"]
+          description: "Named components within this prop"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["seating", "wooden", "indoor"]
+          description: "Categorization and search tags"
 
     # Object Schemas
     ObjectCreate:

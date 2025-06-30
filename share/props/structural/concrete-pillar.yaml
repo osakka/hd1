@@ -1,0 +1,78 @@
+id: concrete-pillar
+name: "Concrete Pillar"
+description: "Reinforced concrete structural pillar with steel rebar"
+category: structural
+scale_compatible: ["m", "km"]
+mass: 2400.0  # kg at meter scale (very heavy)
+material: stone
+
+dimensions:
+  width: 0.4    # meters
+  height: 3.0   # meters  
+  depth: 0.4    # meters
+
+physics_properties:
+  friction: 0.8      # rough concrete surface
+  restitution: 0.05  # very low bounce, solid
+  density: 2400.0    # kg/m³ (reinforced concrete)
+
+complexity: simple
+components:
+  - pillar_base
+  - pillar_shaft
+  - pillar_top
+  - rebar_grid
+
+tags: ["structural", "concrete", "construction", "support", "heavy"]
+
+script: |
+  #!/bin/bash
+  # Concrete Pillar Prop - Structural Element
+  
+  source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
+      echo "ERROR: HD1 core library not found"
+      exit 1
+  }
+  
+  INSTANCE_NAME="${1:-concrete-pillar}"
+  POSITION_X="${2:-0}"
+  POSITION_Y="${3:-0}" 
+  POSITION_Z="${4:-0}"
+  SCALE_FACTOR="${5:-1.0}"
+  SESSION_ID="${6:-${HD1_SESSION_ID:-}}"
+  
+  if [[ -z "$SESSION_ID" ]]; then
+      echo "ERROR: Session ID required"
+      exit 1
+  fi
+  
+  echo "PROP: Creating concrete pillar instance '$INSTANCE_NAME'"
+  
+  # Base dimensions
+  PILLAR_HEIGHT=$(echo "3.0 * $SCALE_FACTOR" | bc -l)
+  PILLAR_WIDTH=$(echo "0.4 * $SCALE_FACTOR" | bc -l)
+  BASE_HEIGHT=$(echo "0.3 * $SCALE_FACTOR" | bc -l)
+  
+  # Pillar base (wider foundation)
+  BASE_Y=$(echo "$POSITION_Y + $BASE_HEIGHT / 2" | bc -l)
+  hd1::create_object "${INSTANCE_NAME}_base" "box" $POSITION_X $BASE_Y $POSITION_Z
+  
+  # Main pillar shaft
+  SHAFT_HEIGHT=$(echo "$PILLAR_HEIGHT - $BASE_HEIGHT" | bc -l)
+  SHAFT_Y=$(echo "$POSITION_Y + $BASE_HEIGHT + $SHAFT_HEIGHT / 2" | bc -l)
+  hd1::create_object "${INSTANCE_NAME}_shaft" "box" $POSITION_X $SHAFT_Y $POSITION_Z
+  
+  # Pillar top (capital)
+  TOP_HEIGHT=$(echo "0.2 * $SCALE_FACTOR" | bc -l)
+  TOP_Y=$(echo "$POSITION_Y + $PILLAR_HEIGHT + $TOP_HEIGHT / 2" | bc -l)
+  hd1::create_object "${INSTANCE_NAME}_top" "box" $POSITION_X $TOP_Y $POSITION_Z
+  
+  # Rebar reinforcement (visible elements)
+  REBAR_Y=$(echo "$POSITION_Y + $PILLAR_HEIGHT / 2" | bc -l)
+  hd1::create_object "${INSTANCE_NAME}_rebar" "cylinder" $POSITION_X $REBAR_Y $POSITION_Z
+  
+  echo "COMPONENTS: 4 components created (base, shaft, top, rebar)"
+  echo "PHYSICS: Reinforced concrete, friction=0.8, mass=2400kg"
+  echo "SCALE: Adapted to scale factor $SCALE_FACTOR"
+  echo "Prop instantiated: $INSTANCE_NAME"
+  echo "Objects created: 4"

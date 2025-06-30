@@ -30,14 +30,15 @@ Converting HD1 from monolithic scenes to industry-standard three-layer architect
 - [x] Clean up remaining world handler files and references
 - [x] Remove `src/api/world/` directory and handler files
 - [x] Remove world commands from client (`get-world-spec`, `initialize-world`)
-- [ ] Regenerate API handlers with `make generate`
+- [x] Regenerate API handlers with `make generate` - SUCCESS!
 
 #### 1.2 Environment API Implementation  
-- [ ] Create `src/api/environments/` directory
-- [ ] Implement `list.go` (GET /environments)
-- [ ] Implement `apply.go` (POST /environments/{id})  
-- [ ] Create `types.go` (Environment data structures)
-- [ ] Add environment validation logic
+- [x] Create `src/api/environments/` directory
+- [x] Implement `list.go` (GET /environments) - ListEnvironmentsHandler
+- [x] Implement `apply.go` (POST /environments/{id}) - ApplyEnvironmentHandler
+- [x] Create environment data structures (EnvironmentInfo, Boundaries) 
+- [x] Add environment script parsing and validation logic
+- [x] Build system validates - API handlers match OpenAPI spec 100%
 
 #### 1.3 Environment Scripts Creation
 - [ ] Create `share/environments/` directory

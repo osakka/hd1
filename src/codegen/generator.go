@@ -630,13 +630,14 @@ func getFunctionName(route RouteInfo) string {
 	return strings.ToLower(string(name[0])) + name[1:]
 }
 
-// generateGoImplementation creates Go code for each route
+// generateGoImplementation creates Go code for each route with dynamic parameter handling
 func generateGoImplementation(route RouteInfo) string {
 	method := strings.ToUpper(route.Method)
 	path := route.Path
 	
-	// Count path parameters
-	paramCount := strings.Count(path, "{")
+	// Extract all path parameters dynamically
+	params := extractPathParameters(path)
+	paramCount := len(params)
 	
 	if paramCount == 0 {
 		// No path parameters
@@ -653,60 +654,76 @@ func generateGoImplementation(route RouteInfo) string {
 	}
 	makeRequest("%s", "%s", body)`, method, path)
 		}
-	} else if paramCount == 1 {
-		// One path parameter
-		pathTemplate := strings.Replace(path, "{sessionId}", `" + os.Args[2] + "`, 1)
-		pathTemplate = strings.Replace(pathTemplate, "{sceneId}", `" + os.Args[2] + "`, 1)
-		pathTemplate = strings.Replace(pathTemplate, "{objectName}", `" + os.Args[2] + "`, 1)
-		pathTemplate = `"` + pathTemplate + `"`
-		
-		if method == "GET" || method == "DELETE" {
-			return fmt.Sprintf(`if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("%s", %s, nil)`, method, pathTemplate)
-		} else {
-			return fmt.Sprintf(`if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %%v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("%s", %s, body)`, method, pathTemplate)
-		}
 	} else {
-		// Two path parameters
-		pathTemplate := strings.Replace(path, "{sessionId}", `" + os.Args[2] + "`, 1)
-		pathTemplate = strings.Replace(pathTemplate, "{objectName}", `" + os.Args[3] + "`, 1)
-		pathTemplate = `"` + pathTemplate + `"`
+		// Dynamic path parameter substitution
+		pathTemplate := buildPathTemplate(path, params)
+		minArgsRequired := 1 + paramCount + 1 // program + command + params
+		bodyArgIndex := minArgsRequired // body is after all required args
+		
+		argCheckStr := fmt.Sprintf("len(os.Args) < %d", minArgsRequired)
+		errorMsg := "Missing required parameter"
+		if paramCount > 1 {
+			errorMsg = "Missing required parameters"
+		}
 		
 		if method == "GET" || method == "DELETE" {
-			return fmt.Sprintf(`if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
+			return fmt.Sprintf(`if %s {
+		fmt.Println("Error: %s")
 		os.Exit(1)
 	}
-	makeRequest("%s", %s, nil)`, method, pathTemplate)
+	makeRequest("%s", %s, nil)`, argCheckStr, errorMsg, method, pathTemplate)
 		} else {
-			return fmt.Sprintf(`if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
+			return fmt.Sprintf(`if %s {
+		fmt.Println("Error: %s")
 		os.Exit(1)
 	}
 	var body interface{}
-	if len(os.Args) > 4 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+	if len(os.Args) > %d {
+		if err := json.Unmarshal([]byte(os.Args[%d]), &body); err != nil {
 			fmt.Printf("Error parsing JSON: %%v\n", err)
 			os.Exit(1)
 		}
 	}
-	makeRequest("%s", %s, body)`, method, pathTemplate)
+	makeRequest("%s", %s, body)`, argCheckStr, errorMsg, minArgsRequired-1, bodyArgIndex, method, pathTemplate)
 		}
 	}
+}
+
+// extractPathParameters extracts all path parameters from a URL path
+func extractPathParameters(path string) []string {
+	var params []string
+	start := 0
+	for {
+		openIndex := strings.Index(path[start:], "{")
+		if openIndex == -1 {
+			break
+		}
+		openIndex += start
+		closeIndex := strings.Index(path[openIndex:], "}")
+		if closeIndex == -1 {
+			break
+		}
+		closeIndex += openIndex
+		param := path[openIndex+1 : closeIndex]
+		params = append(params, param)
+		start = closeIndex + 1
+	}
+	return params
+}
+
+// buildPathTemplate creates Go string concatenation for dynamic path building
+func buildPathTemplate(path string, params []string) string {
+	template := `"` + path + `"`
+	
+	// Replace each parameter with os.Args substitution
+	for i, param := range params {
+		argIndex := 2 + i // os.Args[0] = program, os.Args[1] = command, os.Args[2+] = params
+		placeholder := "{" + param + "}"
+		replacement := `" + os.Args[` + fmt.Sprintf("%d", argIndex) + `] + "`
+		template = strings.Replace(template, placeholder, replacement, 1)
+	}
+	
+	return template
 }
 
 // generateWebUIClient creates the advanced auto-generated web UI client

@@ -4,6 +4,103 @@
  * Maintains 100% compatibility with existing HD1 WebSocket protocol
  */
 
+// Register environment physics component
+AFRAME.registerComponent('holodeck-environment', {
+    schema: {
+        scaleUnit: {type: 'string', default: 'm'},
+        gravity: {type: 'number', default: 9.8},
+        atmosphere: {type: 'string', default: 'air'},
+        scaleFactor: {type: 'number', default: 1.0}
+    },
+    
+    init: function() {
+        console.log('[Holodeck-Environment] COMPONENT INITIALIZED with:', this.data);
+        this.applyEnvironmentPhysics();
+    },
+    
+    update: function() {
+        console.log('[Holodeck-Environment] COMPONENT UPDATED with:', this.data);
+        this.applyEnvironmentPhysics();
+    },
+    
+    applyEnvironmentPhysics: function() {
+        const scene = this.el.sceneEl;
+        
+        // Apply scale-aware physics based on scale unit
+        const scaleFactors = {
+            'nm': 0.000000001,  // nanometer
+            'μm': 0.000001,     // micrometer
+            'mm': 0.001,        // millimeter
+            'cm': 0.01,         // centimeter
+            'm': 1.0,           // meter (base)
+            'km': 1000.0,       // kilometer
+            'Mm': 1000000.0,    // megameter
+            'Gm': 1000000000.0  // gigameter
+        };
+        
+        this.data.scaleFactor = scaleFactors[this.data.scaleUnit] || 1.0;
+        
+        // Adjust camera movement speed based on scale
+        const camera = scene.querySelector('#holodeck-camera');
+        if (camera) {
+            const wasdControls = camera.getAttribute('wasd-controls');
+            if (wasdControls) {
+                const baseAcceleration = 20;
+                const scaledAcceleration = baseAcceleration * this.data.scaleFactor;
+                camera.setAttribute('wasd-controls', 'acceleration', scaledAcceleration);
+                console.log('[Holodeck-Environment] Adjusted camera acceleration:', scaledAcceleration);
+            }
+        }
+        
+        // Update boundary component with scale-aware boundaries
+        const boundaries = camera && camera.getAttribute('holodeck-boundaries');
+        if (boundaries && camera) {
+            const baseBoundary = 11;
+            const scaledBoundary = baseBoundary * this.data.scaleFactor;
+            camera.setAttribute('holodeck-boundaries', {
+                xMin: -scaledBoundary,
+                xMax: scaledBoundary,
+                zMin: -scaledBoundary,
+                zMax: scaledBoundary,
+                yMin: 0.5 * this.data.scaleFactor,
+                yMax: 7 * this.data.scaleFactor
+            });
+            console.log('[Holodeck-Environment] Updated boundaries for scale:', this.data.scaleUnit);
+        }
+        
+        // Apply atmosphere effects
+        this.applyAtmosphereEffects();
+        
+        console.log('[Holodeck-Environment] Physics applied - Scale:', this.data.scaleUnit, 'Gravity:', this.data.gravity, 'Factor:', this.data.scaleFactor);
+    },
+    
+    applyAtmosphereEffects: function() {
+        const scene = this.el.sceneEl;
+        
+        // Adjust fog and lighting based on atmosphere
+        switch(this.data.atmosphere) {
+            case 'vacuum':
+                // No fog, harsh lighting
+                scene.setAttribute('fog', 'type: linear; near: 1000; far: 2000; color: #000000');
+                break;
+            case 'air':
+                // Light atmospheric fog
+                scene.setAttribute('fog', 'type: linear; near: 50; far: 200; color: #cccccc');
+                break;
+            case 'liquid':
+                // Dense fog for underwater effect
+                scene.setAttribute('fog', 'type: linear; near: 10; far: 30; color: #004080');
+                break;
+            case 'thin_air':
+                // Minimal fog
+                scene.setAttribute('fog', 'type: linear; near: 100; far: 300; color: #e6e6e6');
+                break;
+        }
+        
+        console.log('[Holodeck-Environment] Applied atmosphere:', this.data.atmosphere);
+    }
+});
+
 // Register boundary enforcement component
 AFRAME.registerComponent('holodeck-boundaries', {
     schema: {

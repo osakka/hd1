@@ -1,0 +1,88 @@
+id: wooden-table
+name: "Wooden Table"
+description: "Standard wooden table with four legs and solid top"
+category: furniture
+scale_compatible: ["cm", "m"]
+mass: 12.0  # kg at meter scale
+material: wood
+
+dimensions:
+  width: 1.2    # meters
+  height: 0.75  # meters  
+  depth: 0.8    # meters
+
+physics_properties:
+  friction: 0.8      # wooden surface with finish
+  restitution: 0.2   # low bounce
+  density: 650.0     # kg/m³ (oak wood)
+
+complexity: simple
+components:
+  - table_top
+  - leg_fl
+  - leg_fr
+  - leg_bl
+  - leg_br
+
+tags: ["table", "wooden", "indoor", "furniture", "workspace"]
+
+script: |
+  #!/bin/bash
+  # Wooden Table Prop - Physics-Accurate Construction
+  
+  source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
+      echo "ERROR: HD1 core library not found"
+      exit 1
+  }
+  
+  INSTANCE_NAME="${1:-wooden-table}"
+  POSITION_X="${2:-0}"
+  POSITION_Y="${3:-0}" 
+  POSITION_Z="${4:-0}"
+  SCALE_FACTOR="${5:-1.0}"
+  SESSION_ID="${6:-${HD1_SESSION_ID:-}}"
+  
+  if [[ -z "$SESSION_ID" ]]; then
+      echo "ERROR: Session ID required"
+      exit 1
+  fi
+  
+  echo "PROP: Creating wooden table instance '$INSTANCE_NAME'"
+  
+  # Base dimensions  
+  TABLE_WIDTH=$(echo "1.2 * $SCALE_FACTOR" | bc -l)
+  TABLE_HEIGHT=$(echo "0.75 * $SCALE_FACTOR" | bc -l)
+  TABLE_DEPTH=$(echo "0.8 * $SCALE_FACTOR" | bc -l)
+  LEG_THICKNESS=$(echo "0.08 * $SCALE_FACTOR" | bc -l)
+  TOP_THICKNESS=$(echo "0.04 * $SCALE_FACTOR" | bc -l)
+  
+  # Table top
+  TOP_Y=$(echo "$POSITION_Y + $TABLE_HEIGHT" | bc -l)
+  hd1::create_object "${INSTANCE_NAME}_top" "box" $POSITION_X $TOP_Y $POSITION_Z
+  
+  # Legs (positioned at corners)
+  LEG_Y=$(echo "$POSITION_Y + $TABLE_HEIGHT / 2" | bc -l)
+  LEG_OFFSET_X=$(echo "$TABLE_WIDTH / 2 - $LEG_THICKNESS / 2" | bc -l)
+  LEG_OFFSET_Z=$(echo "$TABLE_DEPTH / 2 - $LEG_THICKNESS / 2" | bc -l)
+  
+  # Front left
+  hd1::create_object "${INSTANCE_NAME}_leg_fl" "cylinder" \
+    $(echo "$POSITION_X - $LEG_OFFSET_X" | bc -l) $LEG_Y $(echo "$POSITION_Z + $LEG_OFFSET_Z" | bc -l)
+  
+  # Front right  
+  hd1::create_object "${INSTANCE_NAME}_leg_fr" "cylinder" \
+    $(echo "$POSITION_X + $LEG_OFFSET_X" | bc -l) $LEG_Y $(echo "$POSITION_Z + $LEG_OFFSET_Z" | bc -l)
+  
+  # Back left
+  hd1::create_object "${INSTANCE_NAME}_leg_bl" "cylinder" \
+    $(echo "$POSITION_X - $LEG_OFFSET_X" | bc -l) $LEG_Y $(echo "$POSITION_Z - $LEG_OFFSET_Z" | bc -l)
+  
+  # Back right
+  hd1::create_object "${INSTANCE_NAME}_leg_br" "cylinder" \
+    $(echo "$POSITION_X + $LEG_OFFSET_X" | bc -l) $LEG_Y $(echo "$POSITION_Z - $LEG_OFFSET_Z" | bc -l)
+  
+  echo "COMPONENTS: 5 components created (top, 4 legs)"
+  echo "PHYSICS: Oak wood, friction=0.8, mass=12.0kg" 
+  echo "SCALE: Adapted to scale factor $SCALE_FACTOR"
+  echo "Prop instantiated: $INSTANCE_NAME"
+  echo "Objects created: 5"

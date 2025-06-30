@@ -23,6 +23,7 @@
     <a-scene 
         id="holodeck-scene" 
         hd1-holodeck
+        holodeck-environment="scaleUnit: m; gravity: 9.8; atmosphere: air"
         embedded
         style="height: 100vh; width: 100vw;"
         vr-mode-ui="enabled: false"
@@ -76,6 +77,9 @@
                     <option value="anime-ui">Anime UI Demo</option>
                     <option value="ultimate">Ultimate Demo</option>
                     <option value="basic-shapes">Basic Shapes</option>
+                </select>
+                <select id="debug-environment-select">
+                    <option value="">Select Environment...</option>
                 </select>
             </div>
             <div id="debug-info-panels">

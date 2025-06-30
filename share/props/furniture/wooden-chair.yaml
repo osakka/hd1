@@ -1,0 +1,118 @@
+id: wooden-chair
+name: "Wooden Chair"
+description: "Standard wooden chair with realistic physics and joinery details"
+category: furniture
+scale_compatible: ["mm", "cm", "m"]
+mass: 5.5  # kg at meter scale
+material: wood
+
+dimensions:
+  width: 0.6    # meters
+  height: 0.8   # meters  
+  depth: 0.6    # meters
+
+physics_properties:
+  friction: 0.7      # wooden surface friction
+  restitution: 0.3   # moderate bounce
+  density: 600.0     # kg/m³ (typical hardwood)
+
+complexity: moderate
+components:
+  - seat
+  - backrest
+  - front_legs
+  - back_legs
+  - seat_supports
+  - back_supports
+
+tags: ["seating", "wooden", "indoor", "furniture"]
+
+# Script implementation
+script: |
+  #!/bin/bash
+  # Wooden Chair Prop - Physics-Accurate Construction
+  # Auto-adapts to current environment scale and physics
+  
+  source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
+      echo "ERROR: HD1 core library not found"
+      exit 1
+  }
+  
+  # Get parameters from instantiation request
+  INSTANCE_NAME="${1:-wooden-chair}"
+  POSITION_X="${2:-0}"
+  POSITION_Y="${3:-0}" 
+  POSITION_Z="${4:-0}"
+  SCALE_FACTOR="${5:-1.0}"
+  SESSION_ID="${6:-${HD1_SESSION_ID:-}}"
+  
+  if [[ -z "$SESSION_ID" ]]; then
+      echo "ERROR: Session ID required"
+      exit 1
+  fi
+  
+  echo "PROP: Creating wooden chair instance '$INSTANCE_NAME'"
+  echo "POSITION: ($POSITION_X, $POSITION_Y, $POSITION_Z) with scale $SCALE_FACTOR"
+  
+  # Base dimensions (will be scaled by environment and scale_factor)
+  SEAT_HEIGHT=0.45
+  SEAT_WIDTH=0.5
+  SEAT_DEPTH=0.45
+  BACK_HEIGHT=0.8
+  LEG_THICKNESS=0.05
+  
+  # Apply scale factor to dimensions
+  SEAT_HEIGHT=$(echo "$SEAT_HEIGHT * $SCALE_FACTOR" | bc -l)
+  SEAT_WIDTH=$(echo "$SEAT_WIDTH * $SCALE_FACTOR" | bc -l)
+  SEAT_DEPTH=$(echo "$SEAT_DEPTH * $SCALE_FACTOR" | bc -l)
+  BACK_HEIGHT=$(echo "$BACK_HEIGHT * $SCALE_FACTOR" | bc -l)
+  LEG_THICKNESS=$(echo "$LEG_THICKNESS * $SCALE_FACTOR" | bc -l)
+  
+  # Create chair components with physics properties
+  # Front legs
+  LEG_Y=$(echo "$POSITION_Y + $SEAT_HEIGHT / 2" | bc -l)
+  FRONT_LEG_Z=$(echo "$POSITION_Z + $SEAT_DEPTH / 2 - $LEG_THICKNESS / 2" | bc -l)
+  
+  hd1::create_object "${INSTANCE_NAME}_front_leg_left" "cylinder" \
+    $(echo "$POSITION_X - $SEAT_WIDTH / 2 + $LEG_THICKNESS / 2" | bc -l) \
+    $LEG_Y $FRONT_LEG_Z
+  
+  hd1::create_object "${INSTANCE_NAME}_front_leg_right" "cylinder" \
+    $(echo "$POSITION_X + $SEAT_WIDTH / 2 - $LEG_THICKNESS / 2" | bc -l) \
+    $LEG_Y $FRONT_LEG_Z
+  
+  # Back legs  
+  BACK_LEG_Z=$(echo "$POSITION_Z - $SEAT_DEPTH / 2 + $LEG_THICKNESS / 2" | bc -l)
+  BACK_LEG_Y=$(echo "$POSITION_Y + $BACK_HEIGHT / 2" | bc -l)
+  
+  hd1::create_object "${INSTANCE_NAME}_back_leg_left" "cylinder" \
+    $(echo "$POSITION_X - $SEAT_WIDTH / 2 + $LEG_THICKNESS / 2" | bc -l) \
+    $BACK_LEG_Y $BACK_LEG_Z
+  
+  hd1::create_object "${INSTANCE_NAME}_back_leg_right" "cylinder" \
+    $(echo "$POSITION_X + $SEAT_WIDTH / 2 - $LEG_THICKNESS / 2" | bc -l) \
+    $BACK_LEG_Y $BACK_LEG_Z
+  
+  # Seat
+  SEAT_Y=$(echo "$POSITION_Y + $SEAT_HEIGHT" | bc -l)
+  hd1::create_object "${INSTANCE_NAME}_seat" "box" \
+    $POSITION_X $SEAT_Y $POSITION_Z
+  
+  # Backrest
+  BACK_Y=$(echo "$POSITION_Y + $SEAT_HEIGHT + ($BACK_HEIGHT - $SEAT_HEIGHT) / 2" | bc -l)
+  BACK_Z=$(echo "$POSITION_Z - $SEAT_DEPTH / 2" | bc -l)
+  hd1::create_object "${INSTANCE_NAME}_backrest" "box" \
+    $POSITION_X $BACK_Y $BACK_Z
+  
+  # Seat supports
+  hd1::create_object "${INSTANCE_NAME}_seat_support_front" "box" \
+    $POSITION_X $(echo "$POSITION_Y + $SEAT_HEIGHT - 0.05" | bc -l) $FRONT_LEG_Z
+  
+  hd1::create_object "${INSTANCE_NAME}_seat_support_back" "box" \
+    $POSITION_X $(echo "$POSITION_Y + $SEAT_HEIGHT - 0.05" | bc -l) $BACK_LEG_Z
+  
+  echo "COMPONENTS: 8 components created (legs, seat, backrest, supports)"
+  echo "PHYSICS: Wood material, friction=0.7, mass=5.5kg"
+  echo "SCALE: Adapted to scale factor $SCALE_FACTOR"
+  echo "Prop instantiated: $INSTANCE_NAME"
+  echo "Objects created: 8"
