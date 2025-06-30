@@ -1516,7 +1516,7 @@ hd1::create_enhanced_object() {
 }
 
 # A-Frame light creation with schema validation
-thd::create_enhanced_light() {
+hd1::create_enhanced_light() {
     local name="$1"
     local light_type="$2"
     local x="$3"
@@ -1555,7 +1555,7 @@ thd::create_enhanced_light() {
 }
 
 # A-Frame material update with PBR properties
-thd::update_material() {
+hd1::update_material() {
     local object_name="$1"
     local color="${2:-#ffffff}"
     local metalness="${3:-0.1}"
@@ -1588,7 +1588,7 @@ thd::update_material() {
 }
 
 # A-Frame capabilities inspection
-thd::aframe_capabilities() {
+hd1::aframe_capabilities() {
     echo "AFRAME: Integration Capabilities"
     echo ""
     echo "Geometry Types:"
@@ -1616,13 +1616,13 @@ thd::aframe_capabilities() {
     echo "  - kinematic (script-controlled)"
     echo ""
     echo "EXAMPLES:"
-    echo "  thd::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8"
-    echo "  thd::create_enhanced_light sun directional 10 10 5 1.2 #ffffff"
-    echo "  thd::update_material cube1 #00ff00 0.2 0.9"
+    echo "  hd1::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8"
+    echo "  hd1::create_enhanced_light sun directional 10 10 5 1.2 #ffffff"
+    echo "  hd1::update_material cube1 #00ff00 0.2 0.9"
 }
 
 # Function signature verification
-thd::verify_integration() {
+hd1::verify_integration() {
     echo "STATUS: Enhanced Integration Status"
     echo "  [OK] A-Frame schema validation: ACTIVE"
     echo "  [OK] Enhanced object creation: AVAILABLE" 
@@ -1659,7 +1659,7 @@ func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
 	
 	bridgeTemplate := `/**
  * ===================================================================
- * THD JavaScript Function Bridge with A-Frame Integration
+ * HD1 JavaScript Function Bridge with A-Frame Integration
  * ===================================================================
  *
  * REVOLUTIONARY FEATURES:
@@ -1672,8 +1672,8 @@ func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
  * ===================================================================
  */
 
-// Enhanced THD JavaScript API Bridge
-window.thd = window.thd || {};
+// Enhanced HD1 JavaScript API Bridge
+window.hd1 = window.hd1 || {};
 
 // Core session management
 function getCurrentSessionId() {
@@ -1707,9 +1707,9 @@ const aframeValidation = {
 
 /**
  * Enhanced object creation with A-Frame validation
- * Shell equivalent: thd::create_enhanced_object
+ * Shell equivalent: hd1::create_enhanced_object
  */
-thd.createEnhancedObject = function(name, type, x, y, z, options = {}) {
+hd1.createEnhancedObject = function(name, type, x, y, z, options = {}) {
     try {
         // A-Frame geometry validation
         const validTypes = ['box', 'sphere', 'cylinder', 'cone', 'plane'];
@@ -1745,19 +1745,19 @@ thd.createEnhancedObject = function(name, type, x, y, z, options = {}) {
             payload.physics = options.physics;
         }
         
-        return thdApiClient.createObject(getCurrentSessionId(), payload);
+        return hd1ApiClient.createObject(getCurrentSessionId(), payload);
         
     } catch (error) {
-        console.error('[THD] createEnhancedObject validation error:', error);
+        console.error('[HD1] createEnhancedObject validation error:', error);
         throw error;
     }
 };
 
 /**
  * Enhanced light creation with A-Frame validation
- * Shell equivalent: thd::create_enhanced_light
+ * Shell equivalent: hd1::create_enhanced_light
  */
-thd.createEnhancedLight = function(name, lightType, x, y, z, intensity = 1.0, color = '#ffffff') {
+hd1.createEnhancedLight = function(name, lightType, x, y, z, intensity = 1.0, color = '#ffffff') {
     try {
         // A-Frame light validation
         const validLightTypes = ['directional', 'point', 'ambient', 'spot'];
@@ -1779,19 +1779,19 @@ thd.createEnhancedLight = function(name, lightType, x, y, z, intensity = 1.0, co
             color: color
         };
         
-        return thdApiClient.createObject(getCurrentSessionId(), payload);
+        return hd1ApiClient.createObject(getCurrentSessionId(), payload);
         
     } catch (error) {
-        console.error('[THD] createEnhancedLight validation error:', error);
+        console.error('[HD1] createEnhancedLight validation error:', error);
         throw error;
     }
 };
 
 /**
  * Material update with PBR properties
- * Shell equivalent: thd::update_material
+ * Shell equivalent: hd1::update_material
  */
-thd.updateMaterial = function(objectName, color = '#ffffff', metalness = 0.1, roughness = 0.7) {
+hd1.updateMaterial = function(objectName, color = '#ffffff', metalness = 0.1, roughness = 0.7) {
     try {
         // A-Frame material validation
         color = aframeValidation.validateColor(color);
@@ -1806,19 +1806,19 @@ thd.updateMaterial = function(objectName, color = '#ffffff', metalness = 0.1, ro
             }
         };
         
-        return thdApiClient.updateObject(getCurrentSessionId(), objectName, payload);
+        return hd1ApiClient.updateObject(getCurrentSessionId(), objectName, payload);
         
     } catch (error) {
-        console.error('[THD] updateMaterial validation error:', error);
+        console.error('[HD1] updateMaterial validation error:', error);
         throw error;
     }
 };
 
 /**
  * A-Frame capabilities inspection
- * Shell equivalent: thd::aframe_capabilities
+ * Shell equivalent: hd1::aframe_capabilities
  */
-thd.aframeCapabilities = function() {
+hd1.aframeCapabilities = function() {
     const capabilities = {
         geometryTypes: ['box', 'sphere', 'cylinder', 'cone', 'plane'],
         lightTypes: ['directional', 'point', 'ambient', 'spot'],
@@ -1826,35 +1826,35 @@ thd.aframeCapabilities = function() {
         physicsBodies: ['dynamic', 'static', 'kinematic']
     };
     
-    console.log('[THD] A-Frame Integration Capabilities:', capabilities);
+    console.log('[HD1] A-Frame Integration Capabilities:', capabilities);
     return capabilities;
 };
 
 /**
  * Function signature verification
- * Shell equivalent: thd::verify_integration
+ * Shell equivalent: hd1::verify_integration
  */
-thd.verifyIntegration = function() {
+hd1.verifyIntegration = function() {
     const status = {
         aframeSchemaValidation: true,
-        enhancedObjectCreation: typeof thd.createEnhancedObject === 'function',
-        lightSystemIntegration: typeof thd.createEnhancedLight === 'function',
-        materialPBRProperties: typeof thd.updateMaterial === 'function',
+        enhancedObjectCreation: typeof hd1.createEnhancedObject === 'function',
+        lightSystemIntegration: typeof hd1.createEnhancedLight === 'function',
+        materialPBRProperties: typeof hd1.updateMaterial === 'function',
         physicsBodySupport: true,
         parameterValidation: true,
         barRaisingStatus: 'ACHIEVED'
     };
     
-    console.log('[THD] Enhanced Integration Status:', status);
+    console.log('[HD1] Enhanced Integration Status:', status);
     return status;
 };
 
 // Console integration
 if (typeof console !== 'undefined') {
-    console.log('[THD] Enhanced JavaScript bridge loaded');
-    console.log('[THD] A-Frame integration: ACTIVE');
-    console.log('[THD] Identical signatures to shell functions: ACTIVE');
-    console.log('[THD] Bar-raising status: ACHIEVED');
+    console.log('[HD1] Enhanced JavaScript bridge loaded');
+    console.log('[HD1] A-Frame integration: ACTIVE');
+    console.log('[HD1] Identical signatures to shell functions: ACTIVE');
+    console.log('[HD1] Bar-raising status: ACHIEVED');
 }
 `
 
@@ -1871,7 +1871,7 @@ if (typeof console !== 'undefined') {
 	return nil
 }
 
-// generateCoreShellFunctions creates thd-functions.sh from API specification
+// generateCoreShellFunctions creates hd1-functions.sh from API specification
 func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 	outputDir := "/opt/holo-deck/lib"
 	
@@ -1883,12 +1883,12 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 	// Generate core shell function library
 	functionsTemplate := `#!/bin/bash
 # ===================================================================
-# THD Core Shell Function Library - AUTO-GENERATED
+# HD1 Core Shell Function Library - AUTO-GENERATED
 # ===================================================================
 #
 # GENERATED FROM: api.yaml specification
 # SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
-# PURPOSE: Standard shell wrapper for THD API endpoints
+# PURPOSE: Standard shell wrapper for HD1 API endpoints
 # 
 # DO NOT EDIT MANUALLY - Regenerate with: make generate
 # ===================================================================
@@ -1898,7 +1898,7 @@ HD1_API_BASE="http://localhost:8080/api"
 HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
 
 # Standard HTTP client with error handling
-thd::api_call() {
+hd1::api_call() {
     local method="$1"
     local endpoint="$2"
     local payload="$3"
@@ -1923,7 +1923,7 @@ thd::api_call() {
 }
 
 # Auto-generated from POST /sessions/{sessionId}/objects
-thd::create_object() {
+hd1::create_object() {
     local name="$1"
     local type="$2" 
     local x="$3"
@@ -1931,7 +1931,7 @@ thd::create_object() {
     local z="$5"
     
     if [[ -z "$name" || -z "$type" || -z "$x" || -z "$y" || -z "$z" ]]; then
-        echo "Usage: thd::create_object <name> <type> <x> <y> <z>"
+        echo "Usage: hd1::create_object <name> <type> <x> <y> <z>"
         return 1
     fi
     
@@ -1946,16 +1946,16 @@ thd::create_object() {
 EOF
 )
     
-    thd::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
+    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
     echo "OBJECT: $name at ($x,$y,$z)"
 }
 
 # Auto-generated from PUT /sessions/{sessionId}/camera/position
-thd::camera() {
+hd1::camera() {
     local x="$1" y="$2" z="$3"
     
     if [[ -z "$x" || -z "$y" || -z "$z" ]]; then
-        echo "Usage: thd::camera <x> <y> <z>"
+        echo "Usage: hd1::camera <x> <y> <z>"
         return 1
     fi
     
@@ -1968,18 +1968,18 @@ thd::camera() {
 EOF
 )
     
-    thd::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
+    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
     echo "CAMERA: Positioned at ($x,$y,$z)"
 }
 
 # Auto-generated from POST /browser/canvas
-thd::canvas_control() {
+hd1::canvas_control() {
     local command="$1"
     shift
     local objects="$@"
     
     if [[ -z "$command" ]]; then
-        echo "Usage: thd::canvas_control <command> [objects...]"
+        echo "Usage: hd1::canvas_control <command> [objects...]"
         return 1
     fi
     
@@ -1991,68 +1991,68 @@ thd::canvas_control() {
 EOF
 )
     
-    thd::api_call "POST" "/browser/canvas" "$payload"
+    hd1::api_call "POST" "/browser/canvas" "$payload"
 }
 
 # Clear holodeck (uses canvas control)
-thd::clear() {
+hd1::clear() {
     echo "CLEAR: Clearing holodeck..."
-    thd::canvas_control "clear"
+    hd1::canvas_control "clear"
 }
 
 # Auto-generated from GET /sessions/{sessionId}/objects
-thd::list_objects() {
-    thd::api_call "GET" "/sessions/$HD1_SESSION_ID/objects"
+hd1::list_objects() {
+    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects"
 }
 
 # Auto-generated from GET /sessions/{sessionId}/objects/{objectName}
-thd::get_object() {
+hd1::get_object() {
     local name="$1"
     
     if [[ -z "$name" ]]; then
-        echo "Usage: thd::get_object <name>"
+        echo "Usage: hd1::get_object <name>"
         return 1
     fi
     
-    thd::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
+    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
 }
 
 # Auto-generated from DELETE /sessions/{sessionId}/objects/{objectName}
-thd::delete_object() {
+hd1::delete_object() {
     local name="$1"
     
     if [[ -z "$name" ]]; then
-        echo "Usage: thd::delete_object <name>"
+        echo "Usage: hd1::delete_object <name>"
         return 1
     fi
     
-    thd::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
+    hd1::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
     echo "DELETE: Object $name"
 }
 
 # Auto-generated from POST /sessions
-thd::create_session() {
-    thd::api_call "POST" "/sessions"
+hd1::create_session() {
+    hd1::api_call "POST" "/sessions"
 }
 
 # Auto-generated from GET /sessions
-thd::list_sessions() {
-    thd::api_call "GET" "/sessions"
+hd1::list_sessions() {
+    hd1::api_call "GET" "/sessions"
 }
 
 # Auto-generated from GET /sessions/{sessionId}
-thd::get_session() {
+hd1::get_session() {
     local session_id="${1:-$HD1_SESSION_ID}"
-    thd::api_call "GET" "/sessions/$session_id"
+    hd1::api_call "GET" "/sessions/$session_id"
 }
 
 # Auto-generated from POST /sessions/{sessionId}/world
-thd::init_world() {
-    thd::api_call "POST" "/sessions/$HD1_SESSION_ID/world"
+hd1::init_world() {
+    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/world"
     echo "WORLD: Initialized"
 }
 
-echo "THD: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
+echo "HD1: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
 echo "SPEC: Generated from api.yaml specification"
 echo "SYNC: Single source of truth - Zero manual synchronization"
 echo "FUNCS: create_object, camera, canvas_control, clear, list_objects"
