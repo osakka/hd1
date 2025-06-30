@@ -79,8 +79,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             top: 20px;
             right: 20px;
             width: 450px;
-            min-height: 60px;
-            max-height: 400px;
             background: rgba(0, 0, 0, 0.7);
             border: 1px solid rgba(0, 255, 255, 0.3);
             border-radius: 6px;
@@ -89,23 +87,21 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             color: #00ffff;
             z-index: 100;
             overflow: hidden;
-            transition: min-height 0.3s ease;
-        }
-        
-        #debug-panel.collapsed {
-            min-height: 32px;
-            max-height: 32px;
+            display: flex;
+            flex-direction: column;
         }
         
         #debug-header {
             background: rgba(0, 255, 255, 0.1);
-            padding: 4px 8px;
+            padding: 6px 8px;
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
             font-weight: bold;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
+            min-height: 20px;
         }
         
         #debug-session-bar {
@@ -119,10 +115,23 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         #debug-scene-bar {
-            background: rgba(0, 255, 255, 0.03);
-            padding: 4px 8px;
+            background: rgba(0, 255, 255, 0.08);
+            padding: 6px 8px;
             border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            display: flex;
+            gap: 4px;
+            align-items: center;
             font-size: 9px;
+            transition: height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+            overflow: hidden;
+            min-height: 20px;
+        }
+        
+        #debug-scene-bar.collapsed {
+            height: 0;
+            padding: 0 8px;
+            opacity: 0;
+            min-height: 0;
         }
         
         #debug-scene-select {
@@ -143,13 +152,29 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         #debug-controls-bar {
-            background: rgba(0, 255, 255, 0.03);
-            padding: 4px 8px;
+            background: rgba(0, 255, 255, 0.05);
+            padding: 6px 8px;
             border-bottom: 1px solid rgba(0, 255, 255, 0.1);
             display: flex;
             gap: 4px;
             align-items: center;
             font-size: 9px;
+            transition: height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+            overflow: hidden;
+            min-height: 20px;
+        }
+        
+        #debug-controls-bar.collapsed {
+            height: 0;
+            padding: 0 8px;
+            opacity: 0;
+            min-height: 0;
+        }
+        
+        .control-buttons-container {
+            display: flex;
+            gap: 4px;
+            flex: 1;
         }
         
         .control-btn {
@@ -185,6 +210,133 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             font-weight: bold;
             font-size: 8px;
             margin-left: 4px;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        
+        .recording-status:empty {
+            display: none;
+        }
+        
+        #debug-status-bar {
+            background: rgba(0, 255, 255, 0.1);
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 6px 8px;
+            font-size: 9px;
+            font-weight: normal;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+            min-height: 20px;
+        }
+        
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .status-right {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        #status-connection-indicator {
+            width: 2.6px;
+            height: 2.6px;
+            border-radius: 50%;
+            background: #666;
+            border: 1px solid rgba(102, 102, 102, 0.3);
+            box-shadow: 0 0 3px rgba(102, 102, 102, 0.5);
+            transition: all 0.3s ease;
+            cursor: help;
+            position: relative;
+            display: inline-block;
+            margin-top: -1px;
+        }
+        
+        #status-connection-indicator.connecting {
+            background: #ff9500;
+            border-color: rgba(255, 149, 0, 0.5);
+            box-shadow: 0 0 6px rgba(255, 149, 0, 0.8);
+            animation: pulse 1.5s infinite;
+        }
+        
+        #status-connection-indicator.connected {
+            background: #00ff00;
+            border-color: rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
+        }
+        
+        #status-connection-indicator.receiving {
+            background: #00ffff;
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 8px rgba(0, 255, 255, 1);
+            animation: flicker 0.2s;
+        }
+        
+        #status-connection-indicator.error {
+            background: #ff0000;
+            border-color: rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 6px rgba(255, 0, 0, 0.8);
+            animation: pulse 0.8s infinite;
+        }
+        
+        #status-connection-indicator.disconnected {
+            background: #ff0000;
+            border-color: rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 6px rgba(255, 0, 0, 0.8);
+            animation: pulse 0.8s infinite;
+        }
+        
+        #status-lock-indicator {
+            font-size: 8px;
+            transition: all 0.3s ease;
+            line-height: 1;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        #status-lock-indicator.unlocked {
+            color: rgba(255, 149, 0, 0.4);
+        }
+        
+        #status-lock-indicator.locked {
+            color: rgba(255, 149, 0, 1.0);
+            text-shadow: 0 0 6px rgba(255, 149, 0, 0.8);
+        }
+        
+        #session-id-tag-status {
+            background: rgba(0, 255, 255, 0.02);
+            color: rgba(0, 255, 255, 0.3);
+            border: 1px solid transparent;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: normal;
+            cursor: pointer;
+            margin-left: 6px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        #session-id-tag-status:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+        
+        #session-id-tag-status.copied {
+            background: rgba(0, 255, 0, 0.3);
+            border-color: rgba(0, 255, 0, 0.6);
+            color: #00ff00;
+            transform: scale(1.1);
         }
         
         #debug-session-id {
@@ -263,6 +415,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         #debug-collapse-icon {
             font-size: 10px;
+            font-weight: bold;
             transition: all 0.3s ease;
             cursor: pointer;
             opacity: 0.7;
@@ -274,13 +427,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         #session-id-tag {
-            background: rgba(0, 255, 255, 0.2);
-            color: #00ffff;
-            border: 1px solid rgba(0, 255, 255, 0.4);
+            background: rgba(0, 255, 255, 0.08);
+            color: rgba(0, 255, 255, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.15);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 8px;
-            font-weight: bold;
+            font-weight: normal;
             cursor: pointer;
             margin-left: 6px;
             transition: all 0.2s ease;
@@ -329,6 +482,18 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
             padding: 4px 8px;
             line-height: 1.2;
             transition: height 0.3s ease;
+        }
+        
+        #debug-content {
+            flex: 1;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 400px;
+        }
+        
+        #debug-content.collapsed {
+            max-height: 0;
+            opacity: 0;
         }
         
         #debug-log.collapsed {
@@ -422,18 +587,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
     <div id="debug-panel">
         <div id="debug-header">
             <div style="display: flex; align-items: center; gap: 6px;">
-                <div id="debug-status-led" class="connecting" data-status="Connecting..."></div>
                 <span>THD Console</span>
-                <span id="session-id-tag" style="display: none;" title="Click to copy session ID">---</span>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <span id="debug-lock-icon" class="unlocked" data-status="Mouse look available">&#128274;</span>
                 <span id="debug-collapse-icon">&#8679;</span>
             </div>
         </div>
-        <div id="debug-scene-bar">
-            <div style="display: flex; align-items: center; gap: 4px;">
-                <span style="background: transparent; padding: 4px 6px; font-size: 9px; display: inline-block; height: 18px; line-height: 18px;">Scene</span>
+        <div id="debug-content">
+            <div id="debug-scene-bar">
                 <select id="debug-scene-select">
                     <option value="">Select Scene...</option>
                     <option value="empty">Empty Grid</option>
@@ -442,23 +603,38 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
                     <option value="basic-shapes">Basic Shapes</option>
                 </select>
             </div>
+            <div id="debug-controls-bar">
+                <div class="control-buttons-container">
+                    <button id="photo-btn" class="control-btn photo-btn" title="Freeze-Frame Mode: Save current session state as new scene">FREEZE-FRAME</button>
+                    <button id="video-btn" class="control-btn video-btn" title="Temporal Sequence Mode: Start/Stop temporal recording">TEMPORAL SEQUENCE</button>
+                </div>
+                <span id="recording-status" class="recording-status"></span>
+            </div>
+            <div id="debug-log"></div>
         </div>
-        <div id="debug-controls-bar">
-            <button id="photo-btn" class="control-btn photo-btn" title="Freeze-Frame Mode: Save current session state as new scene">FREEZE-FRAME</button>
-            <button id="video-btn" class="control-btn video-btn" title="Temporal Sequence Mode: Start/Stop temporal recording">TEMPORAL SEQUENCE</button>
-            <span id="recording-status" class="recording-status"></span>
+        <div id="debug-status-bar">
+            <div class="status-left">
+                <span id="status-connection-indicator" class="connecting"></span>
+                <span id="status-connection-text">Connecting</span>
+            </div>
+            <div class="status-right">
+                <span id="status-lock-indicator" class="unlocked"></span>
+                <span id="session-id-tag-status" style="display: none;" title="Click to copy session ID">---</span>
+            </div>
         </div>
-        <div id="debug-log"></div>
     </div>
     
     <script>
         const scene = document.getElementById('holodeck-scene');
         const debugLog = document.getElementById('debug-log');
-        const debugStatusLed = document.getElementById('debug-status-led');
-        const debugLockIcon = document.getElementById('debug-lock-icon');
         const debugHeader = document.getElementById('debug-header');
         const debugCollapseIcon = document.getElementById('debug-collapse-icon');
-        const sessionIdTag = document.getElementById('session-id-tag');
+        
+        // Status bar elements
+        const statusConnectionIndicator = document.getElementById('status-connection-indicator');
+        const statusConnectionText = document.getElementById('status-connection-text');
+        const statusLockIndicator = document.getElementById('status-lock-indicator');
+        const sessionIdTagStatus = document.getElementById('session-id-tag-status');
         
         let thdManager;
         let ws;
@@ -470,27 +646,47 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         // Status management
         function setStatus(status, message) {
-            // Update debug panel status LED
-            debugStatusLed.className = status;
-            debugStatusLed.setAttribute('data-status', message || status);
+            // Update status bar connection indicator
+            statusConnectionIndicator.className = status;
+            statusConnectionIndicator.setAttribute('data-status', message || status);
+            
+            switch(status) {
+                case 'connecting':
+                    statusConnectionText.textContent = 'Connecting';
+                    break;
+                case 'connected':
+                    statusConnectionText.textContent = 'Connected';
+                    break;
+                case 'disconnected':
+                    statusConnectionText.textContent = 'Disconnected';
+                    break;
+                case 'error':
+                    statusConnectionText.textContent = 'Error';
+                    break;
+                case 'receiving':
+                    statusConnectionText.textContent = 'Receiving';
+                    break;
+                default:
+                    statusConnectionText.textContent = 'Unknown';
+            }
         }
         
         // Lock status management
         function setLockStatus(status, message) {
-            // Update debug panel lock icon
-            debugLockIcon.className = status;
-            debugLockIcon.setAttribute('data-status', message || status);
+            // Update status bar lock indicator
+            statusLockIndicator.className = status;
+            statusLockIndicator.setAttribute('data-status', message || status);
+            statusLockIndicator.textContent = status === 'locked' ? 'ESC' : '';
         }
         
         // Update debug session ID when session changes
         function updateDebugSession(sessionId) {
-            // Update session ID tag
+            // Update status bar session ID tag
             if (sessionId && sessionId !== 'No Session') {
-                const shortId = sessionId.replace('session-', '');
-                sessionIdTag.textContent = shortId;
-                sessionIdTag.style.display = 'inline';
+                sessionIdTagStatus.textContent = sessionId;
+                sessionIdTagStatus.style.display = 'inline';
             } else {
-                sessionIdTag.style.display = 'none';
+                sessionIdTagStatus.style.display = 'none';
             }
         }
         
@@ -1269,22 +1465,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         
         function setDebugState(collapsed, saveToCookie = true) {
             debugCollapsed = collapsed;
-            const debugPanel = document.getElementById('debug-panel');
-            const debugSceneBar = document.getElementById('debug-scene-bar');
-            const debugControlsBar = document.getElementById('debug-controls-bar');
+            const debugContent = document.getElementById('debug-content');
             
             if (debugCollapsed) {
-                debugLog.classList.add('collapsed');
-                debugPanel.classList.add('collapsed');
                 debugCollapseIcon.classList.add('collapsed');
-                if (debugSceneBar) debugSceneBar.style.display = 'none';
-                if (debugControlsBar) debugControlsBar.style.display = 'none';
+                if (debugContent) debugContent.classList.add('collapsed');
             } else {
-                debugLog.classList.remove('collapsed');
-                debugPanel.classList.remove('collapsed');
                 debugCollapseIcon.classList.remove('collapsed');
-                if (debugSceneBar) debugSceneBar.style.display = 'block';
-                if (debugControlsBar) debugControlsBar.style.display = 'flex';
+                if (debugContent) debugContent.classList.remove('collapsed');
             }
             if (saveToCookie) {
                 setCookie('thd_console_collapsed', debugCollapsed.toString(), 30); // 30 days
@@ -1293,33 +1481,30 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
         }
         
         debugHeader.addEventListener('click', function(e) {
-            // Don't toggle if clicking on session ID tag
-            if (e.target === sessionIdTag) return;
             setDebugState(!debugCollapsed, true);
         });
         
-        // Session ID tag click handler for copying
-        sessionIdTag.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent header click
+        // Status bar session ID tag click handler for copying
+        sessionIdTagStatus.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent any propagation
             const sessionId = currentSessionId;
             if (sessionId) {
-                const shortId = sessionId.replace('session-', '');
-                navigator.clipboard.writeText(shortId).then(() => {
+                navigator.clipboard.writeText(sessionId).then(() => {
                     // Visual feedback
-                    sessionIdTag.classList.add('copied');
+                    sessionIdTagStatus.classList.add('copied');
                     setTimeout(() => {
-                        sessionIdTag.classList.remove('copied');
+                        sessionIdTagStatus.classList.remove('copied');
                     }, 500);
-                    addDebug('COPY_SESSION', {id: shortId});
+                    addDebug('COPY_SESSION', {id: sessionId});
                 }).catch(err => {
                     // Fallback for older browsers
                     const textArea = document.createElement('textarea');
-                    textArea.value = shortId;
+                    textArea.value = sessionId;
                     document.body.appendChild(textArea);
                     textArea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
-                    addDebug('COPY_SESSION_FALLBACK', {id: shortId});
+                    addDebug('COPY_SESSION_FALLBACK', {id: sessionId});
                 });
             }
         });

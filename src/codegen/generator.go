@@ -259,7 +259,7 @@ func main() {
 				continue
 			}
 
-			fmt.Printf("🔍 Processing: %s %s -> %s\n", method, path, op.OperationID)
+			fmt.Printf("PROC: %s %s -> %s\n", method, path, op.OperationID)
 
 			// Validate handler file exists
 			if op.XHandler != "" {
@@ -377,8 +377,8 @@ func main() {
 		fmt.Printf("⚠️  WARNING: Enhanced generation failed: %v\n", err)
 	} else {
 		fmt.Printf("🏆 SUCCESS: Advanced A-Frame integration generated\n")
-		fmt.Printf("✨ A-Frame shell integration: /opt/holo-deck/lib/downstream/aframelib.sh\n")
-		fmt.Printf("✨ A-Frame JavaScript bridge: /opt/holo-deck/lib/downstream/aframelib.js\n")
+		fmt.Printf("SHELL: A-Frame shell integration: /opt/holo-deck/lib/downstream/aframelib.sh\n")
+		fmt.Printf("JS: A-Frame JavaScript bridge: /opt/holo-deck/lib/downstream/aframelib.js\n")
 	}
 
 	fmt.Println("\n🚀 REVOLUTIONARY CODE GENERATION COMPLETE!")
@@ -1430,7 +1430,7 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 # THD Enhanced Shell Function Library with A-Frame Integration
 # ===================================================================
 #
-# 🏆 REVOLUTIONARY FEATURES:
+# REVOLUTIONARY FEATURES:
 # • Complete A-Frame capability exposure through shell functions
 # • Perfect upstream/downstream API integration  
 # • Single source of truth architecture
@@ -1589,7 +1589,7 @@ thd::update_material() {
 
 # A-Frame capabilities inspection
 thd::aframe_capabilities() {
-    echo "🏆 A-Frame Integration Capabilities:"
+    echo "AFRAME: Integration Capabilities"
     echo ""
     echo "Geometry Types:"
     echo "  - box (width, height, depth)"
@@ -1615,7 +1615,7 @@ thd::aframe_capabilities() {
     echo "  - static (fixed position)"
     echo "  - kinematic (script-controlled)"
     echo ""
-    echo "🎯 Usage Examples:"
+    echo "EXAMPLES:"
     echo "  thd::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8"
     echo "  thd::create_enhanced_light sun directional 10 10 5 1.2 #ffffff"
     echo "  thd::update_material cube1 #00ff00 0.2 0.9"
@@ -1623,15 +1623,15 @@ thd::aframe_capabilities() {
 
 # Function signature verification
 thd::verify_integration() {
-    echo "🔍 Enhanced Integration Status:"
-    echo "  ✅ A-Frame schema validation: ACTIVE"
-    echo "  ✅ Enhanced object creation: AVAILABLE" 
-    echo "  ✅ Light system integration: AVAILABLE"
-    echo "  ✅ Material PBR properties: AVAILABLE"
-    echo "  ✅ Physics body support: AVAILABLE"
-    echo "  ✅ Parameter validation: ACTIVE"
+    echo "STATUS: Enhanced Integration Status"
+    echo "  [OK] A-Frame schema validation: ACTIVE"
+    echo "  [OK] Enhanced object creation: AVAILABLE" 
+    echo "  [OK] Light system integration: AVAILABLE"
+    echo "  [OK] Material PBR properties: AVAILABLE"
+    echo "  [OK] Physics body support: AVAILABLE"
+    echo "  [OK] Parameter validation: ACTIVE"
     echo ""
-    echo "🏆 Bar-raising status: ACHIEVED"
+    echo "STATUS: Bar-raising achieved"
 }
 
 logging.Info "enhanced shell function library loaded" \
@@ -1662,7 +1662,7 @@ func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
  * THD JavaScript Function Bridge with A-Frame Integration
  * ===================================================================
  *
- * 🏆 REVOLUTIONARY FEATURES:
+ * REVOLUTIONARY FEATURES:
  * • Identical function signatures to shell functions
  * • Complete A-Frame capability exposure through JavaScript
  * • Standard upstream API integration
@@ -1826,7 +1826,7 @@ thd.aframeCapabilities = function() {
         physicsBodies: ['dynamic', 'static', 'kinematic']
     };
     
-    console.log('🏆 A-Frame Integration Capabilities:', capabilities);
+    console.log('[THD] A-Frame Integration Capabilities:', capabilities);
     return capabilities;
 };
 
@@ -1845,16 +1845,16 @@ thd.verifyIntegration = function() {
         barRaisingStatus: 'ACHIEVED'
     };
     
-    console.log('🔍 Enhanced Integration Status:', status);
+    console.log('[THD] Enhanced Integration Status:', status);
     return status;
 };
 
 // Console integration
 if (typeof console !== 'undefined') {
     console.log('[THD] Enhanced JavaScript bridge loaded');
-    console.log('[THD] A-Frame integration: ✅');
-    console.log('[THD] Identical signatures to shell functions: ✅');
-    console.log('[THD] Bar-raising status: 🏆 ACHIEVED');
+    console.log('[THD] A-Frame integration: ACTIVE');
+    console.log('[THD] Identical signatures to shell functions: ACTIVE');
+    console.log('[THD] Bar-raising status: ACHIEVED');
 }
 `
 
@@ -1886,9 +1886,9 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 # THD Core Shell Function Library - AUTO-GENERATED
 # ===================================================================
 #
-# 🎯 GENERATED FROM: api.yaml specification
-# 🔧 SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
-# 📋 PURPOSE: Standard shell wrapper for THD API endpoints
+# GENERATED FROM: api.yaml specification
+# SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
+# PURPOSE: Standard shell wrapper for THD API endpoints
 # 
 # DO NOT EDIT MANUALLY - Regenerate with: make generate
 # ===================================================================
@@ -1947,7 +1947,7 @@ EOF
 )
     
     thd::api_call "POST" "/sessions/$THD_SESSION_ID/objects" "$payload"
-    echo "📦 $name at ($x,$y,$z)"
+    echo "OBJECT: $name at ($x,$y,$z)"
 }
 
 # Auto-generated from PUT /sessions/{sessionId}/camera/position
@@ -1969,7 +1969,7 @@ EOF
 )
     
     thd::api_call "PUT" "/sessions/$THD_SESSION_ID/camera/position" "$payload"
-    echo "📷 Camera positioned at ($x,$y,$z)"
+    echo "CAMERA: Positioned at ($x,$y,$z)"
 }
 
 # Auto-generated from POST /browser/canvas
@@ -1996,7 +1996,7 @@ EOF
 
 # Clear holodeck (uses canvas control)
 thd::clear() {
-    echo "🧹 Clearing holodeck..."
+    echo "CLEAR: Clearing holodeck..."
     thd::canvas_control "clear"
 }
 
@@ -2027,7 +2027,7 @@ thd::delete_object() {
     fi
     
     thd::api_call "DELETE" "/sessions/$THD_SESSION_ID/objects/$name"
-    echo "🗑️ Deleted object: $name"
+    echo "DELETE: Object $name"
 }
 
 # Auto-generated from POST /sessions
@@ -2049,15 +2049,15 @@ thd::get_session() {
 # Auto-generated from POST /sessions/{sessionId}/world
 thd::init_world() {
     thd::api_call "POST" "/sessions/$THD_SESSION_ID/world"
-    echo "🌍 World initialized"
+    echo "WORLD: Initialized"
 }
 
-echo "🎯 THD Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
-echo "📋 Generated from: api.yaml specification"
-echo "🔧 Single source of truth: Zero manual synchronization"
-echo "💡 Functions: create_object, camera, canvas_control, clear, list_objects"
-echo "🌍 Session management: create_session, get_session, init_world"
-echo "🏆 Bar-raising status: ACHIEVED"
+echo "THD: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
+echo "SPEC: Generated from api.yaml specification"
+echo "SYNC: Single source of truth - Zero manual synchronization"
+echo "FUNCS: create_object, camera, canvas_control, clear, list_objects"
+echo "SESSION: create_session, get_session, init_world"
+echo "STATUS: Bar-raising achieved"
 `
 
 	outputPath := filepath.Join(outputDir, "thdlib.sh")
