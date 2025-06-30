@@ -40,10 +40,6 @@ func main() {
 		setTraceModules()
 	case "set-canvas":
 		setCanvas()
-	case "get-world-spec":
-		getWorldSpec()
-	case "initialize-world":
-		initializeWorld()
 	case "load-scene":
 		loadScene()
 	case "save-scene-from-session":
@@ -100,8 +96,6 @@ func showHelp() {
 	fmt.Println("  set-log-level - POST /admin/logging/level")
 	fmt.Println("  set-trace-modules - POST /admin/logging/trace")
 	fmt.Println("  set-canvas - POST /browser/canvas")
-	fmt.Println("  get-world-spec - GET /sessions/{sessionId}/world")
-	fmt.Println("  initialize-world - POST /sessions/{sessionId}/world")
 	fmt.Println("  load-scene - POST /scenes/{sceneId}")
 	fmt.Println("  save-scene-from-session - POST /sessions/{sessionId}/scenes/save")
 	fmt.Println("  play-recording - POST /sessions/{sessionId}/recording/play")
@@ -286,28 +280,6 @@ func setCanvas() {
 	makeRequest("POST", "/browser/canvas", body)
 }
 
-func getWorldSpec() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/world", nil)
-}
-
-func initializeWorld() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/world", body)
-}
 
 func loadScene() {
 	if len(os.Args) < 3 {

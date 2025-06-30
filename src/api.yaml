@@ -166,64 +166,116 @@ paths:
       x-function: "DeleteSession"
 
   # ========================================
-  # WORLD MANAGEMENT
+  # ENVIRONMENT MANAGEMENT
   # ========================================
-  /sessions/{sessionId}/world:
-    post:
-      operationId: initializeWorld
-      tags: [World]
-      summary: Initialize 3D world coordinate system
+  /environments:
+    get:
+      operationId: listEnvironments
+      tags: [Environments]
+      summary: List available environments
       description: |
-        Sets up universal 25x25x25 grid with [-12, +12] boundaries.
-        Creates reference grid points at configurable transparency.
-        This MUST be called before any object operations.
+        Returns all available HD1 environments with their physics settings.
+        Environments define scale, gravity, atmosphere, and world physics parameters.
+      responses:
+        '200':
+          description: Available environments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  environments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EnvironmentInfo'
+              example:
+                success: true
+                environments:
+                  - id: "earth-surface"
+                    name: "Earth Surface"
+                    description: "Standard terrestrial environment"
+                    scale_unit: "m"
+                    gravity: 9.8
+                    atmosphere: "air"
+                  - id: "molecular-scale"
+                    name: "Molecular Scale"
+                    description: "Nanometer-scale molecular environment"
+                    scale_unit: "nm"
+                    gravity: 0.0
+                    atmosphere: "vacuum"
+      x-handler: "api/environments/list.go"
+      x-function: "ListEnvironments"
+
+  /environments/{environmentId}:
+    post:
+      operationId: applyEnvironment
+      tags: [Environments]
+      summary: Apply environment to session
+      description: |
+        Applies environment settings (scale, gravity, atmosphere) to specified session.
+        Environment settings affect all objects and physics in the session.
       parameters:
-        - name: sessionId
+        - name: environmentId
           in: path
           required: true
           schema:
             type: string
+            pattern: '^[a-z][a-z0-9\-]*[a-z0-9]$'
+          example: "earth-surface"
+          description: Environment identifier
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorldInit'
+              type: object
+              required:
+                - session_id
+              properties:
+                session_id:
+                  type: string
+                  pattern: '^session_[a-f0-9]{8}$'
+                  description: Target session for environment application
+                  example: "session_a1b2c3d4"
             example:
-              size: 25
-              transparency: 0.1
-              camera_position: [-10, -10, -10]
-      responses:
-        '201':
-          description: World initialized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WorldInitialized'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-      x-handler: "api/world/init.go"
-      x-function: "InitializeWorld"
-
-    get:
-      operationId: getWorldSpec
-      tags: [World]
-      summary: Get world specifications
-      description: Returns current world boundaries, grid size, and coordinate system info
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
+              session_id: "session_a1b2c3d4"
       responses:
         '200':
-          description: World specifications
+          description: Environment applied successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorldSpec'
-      x-handler: "api/world/spec.go"
-      x-function: "GetWorldSpec"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  environment_id:
+                    type: string
+                  session_id:
+                    type: string
+                  message:
+                    type: string
+              example:
+                success: true
+                environment_id: "earth-surface"
+                session_id: "session_a1b2c3d4"
+                message: "Environment 'Earth Surface' applied successfully"
+        '404':
+          description: Environment or session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Invalid environment or session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/environments/apply.go"
+      x-function: "ApplyEnvironment"
 
   # ========================================
   # SCENE MANAGEMENT
@@ -1295,33 +1347,41 @@ components:
               additionalProperties:
                 $ref: '#/components/schemas/ObjectDetail'
 
-    # World Schemas
-    WorldInit:
+    # Environment Schemas
+    EnvironmentInfo:
       type: object
+      required: [id, name, description, scale_unit, gravity, atmosphere]
       properties:
-        size:
-          type: integer
-          default: 25
-          minimum: 10
-          maximum: 50
-          description: "Grid size (size x size x size)"
-        transparency:
+        id:
+          type: string
+          pattern: '^[a-z][a-z0-9\-]*[a-z0-9]$'
+          example: "earth-surface"
+          description: "Environment identifier"
+        name:
+          type: string
+          example: "Earth Surface"
+          description: "Human-readable environment name"
+        description:
+          type: string
+          example: "Standard terrestrial environment"
+          description: "Environment description"
+        scale_unit:
+          type: string
+          enum: ["nm", "μm", "mm", "cm", "m", "km", "Mm", "Gm"]
+          example: "m"
+          description: "Scale unit for coordinate system"
+        gravity:
           type: number
-          default: 0.1
           minimum: 0.0
-          maximum: 1.0
-          description: "Grid transparency (0.1 = 90% transparent)"
-        camera_position:
-          $ref: '#/components/schemas/Coordinate3D'
-
-    WorldInitialized:
-      type: object
-      required: [success, bounds, grid_size, coordinate_system]
-      properties:
-        success:
-          type: boolean
-          example: true
-        bounds:
+          maximum: 100.0
+          example: 9.8
+          description: "Gravity acceleration (m/s²)"
+        atmosphere:
+          type: string
+          enum: ["air", "vacuum", "thin_air", "liquid"]
+          example: "air"
+          description: "Atmospheric conditions"
+        boundaries:
           type: object
           properties:
             min:
@@ -1330,32 +1390,18 @@ components:
             max:
               type: integer
               example: 12
-        grid_size:
-          type: integer
-          example: 25
-        coordinate_system:
+          description: "Coordinate system boundaries"
+        complexity:
           type: string
-          example: "fixed_grid"
-        message:
-          type: string
-          example: "World initialized - ready for objects"
-
-    WorldSpec:
-      type: object
-      required: [bounds, grid_size, total_points, coordinate_system]
-      properties:
-        bounds:
-          type: object
-          properties:
-            x: {type: array, items: {type: integer}, minItems: 2, maxItems: 2}
-            y: {type: array, items: {type: integer}, minItems: 2, maxItems: 2}
-            z: {type: array, items: {type: integer}, minItems: 2, maxItems: 2}
-        grid_size:
-          type: integer
-        total_points:
-          type: integer
-        coordinate_system:
-          type: string
+          enum: ["simple", "moderate", "complex"]
+          example: "simple"
+          description: "Environment complexity level"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["terrestrial", "standard"]
+          description: "Environment categorization tags"
 
     # Object Schemas
     ObjectCreate:

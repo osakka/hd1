@@ -22,9 +22,14 @@ Converting HD1 from monolithic scenes to industry-standard three-layer architect
 **Status**: 📋 **PLANNED**
 
 #### 1.1 OpenAPI Specification Extension
-- [ ] Add `/environments` endpoints to `src/api.yaml`
-- [ ] Add `/environments/{environmentId}` POST endpoint
-- [ ] Define Environment schema in OpenAPI spec
+- [x] Add `/environments` endpoints to `src/api.yaml`
+- [x] Add `/environments/{environmentId}` POST endpoint  
+- [x] **CRITICAL**: Remove redundant world endpoints (`/sessions/{sessionId}/world`)
+- [x] Define Environment schema in OpenAPI spec (EnvironmentInfo)
+- [x] Remove world schemas (WorldInit, WorldInitialized, WorldSpec)
+- [x] Clean up remaining world handler files and references
+- [x] Remove `src/api/world/` directory and handler files
+- [x] Remove world commands from client (`get-world-spec`, `initialize-world`)
 - [ ] Regenerate API handlers with `make generate`
 
 #### 1.2 Environment API Implementation  
@@ -50,6 +55,42 @@ Converting HD1 from monolithic scenes to industry-standard three-layer architect
 - [ ] Test environment switching in browser
 
 **Phase 1 Success Criteria**: Environment dropdown works, applies physics/scale to session
+
+#### 🗑️ **World Endpoints Removal Plan** (Part of Phase 1.1)
+**CRITICAL**: Clean removal of redundant world system to maintain single source of truth
+
+**Current World Endpoints to Remove**:
+- `POST /sessions/{sessionId}/world` - Initialize world coordinate system
+- `GET /sessions/{sessionId}/world` - Get world specifications  
+
+**Functionality Migration to Environment System**:
+- ✅ **Coordinate boundaries** ([-12, +12]) → Environment scale settings
+- ✅ **Grid initialization** → Environment application process  
+- ✅ **Camera positioning** → Environment default camera
+- ✅ **Transparency settings** → Environment visual settings
+- ✅ **Session initialization** → Environment application
+
+**Files to Remove**:
+- [ ] `src/api/world/init.go` 
+- [ ] `src/api/world/spec.go`
+- [ ] `src/api/world/` directory (if no other files)
+
+**Schema Components to Remove**:
+- [ ] `WorldInit` schema
+- [ ] `WorldInitialized` schema  
+- [ ] `WorldSpec` schema
+
+**Code Dependencies to Update**:
+- [ ] Remove world initialization calls in client code
+- [ ] Update any scene scripts calling world endpoints
+- [ ] Remove world-related WebSocket messages
+- [ ] Update documentation removing world references
+
+**Validation Steps**:
+- [x] Verify no remaining world endpoint references
+- [x] Confirm API specification validates with environment endpoints
+- [ ] Test session initialization without world endpoints  
+- [ ] Validate coordinate boundaries work via environment
 
 ---
 
@@ -256,7 +297,14 @@ Total Implementation: [⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜] 0%
 - OpenAPI-driven development maintains single source of truth
 - Backward compatibility ensures zero regressions
 
-**Next Session**: Begin OpenAPI specification extension for environment endpoints
+**Completed**:
+- ✅ **World System Removal**: Complete elimination of redundant world endpoints
+- ✅ **Environment API Extension**: Added `/environments` and `/environments/{environmentId}` endpoints
+- ✅ **Schema Definition**: Created comprehensive EnvironmentInfo schema with scale, gravity, atmosphere
+- ✅ **Single Source of Truth**: Maintained clean API specification without redundancy
+- ✅ **Zero Regressions**: Systematic removal of all world references (endpoints, schemas, handlers, client)
+
+**Next Session**: Create environment handler implementations and test API generation
 
 ---
 
