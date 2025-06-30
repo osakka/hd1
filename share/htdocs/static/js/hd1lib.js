@@ -74,46 +74,16 @@ class HD1APIClient {
     }
 
 
-    // GET /admin/logging/config - getLoggingConfig
-    getLoggingConfig() {
-        return this.request('GET', '/admin/logging/config');
-    }
-
-    // POST /admin/logging/config - setLoggingConfig
-    setLoggingConfig(data = null) {
-        return this.request('POST', '/admin/logging/config', data);
-    }
-
-    // POST /admin/logging/trace - setTraceModules
-    setTraceModules(data = null) {
-        return this.request('POST', '/admin/logging/trace', data);
-    }
-
-    // GET /admin/logging/logs - getLogs
-    getLogs() {
-        return this.request('GET', '/admin/logging/logs');
-    }
-
-    // POST /browser/canvas - setCanvas
-    setCanvas(data = null) {
-        return this.request('POST', '/browser/canvas', data);
-    }
-
-    // GET /sessions/{sessionId} - getSession
-    getSession(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+    // GET /sessions/{sessionId}/world - getWorldSpec
+    getWorldSpec(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
         return this.request('GET', path);
     }
 
-    // DELETE /sessions/{sessionId} - deleteSession
-    deleteSession(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
-        return this.request('DELETE', path);
-    }
-
-    // GET /scenes - listScenes
-    listScenes() {
-        return this.request('GET', '/scenes');
+    // POST /sessions/{sessionId}/world - initializeWorld
+    initializeWorld(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
+        return this.request('POST', path, data);
     }
 
     // POST /scenes/{sceneId}/fork - forkScene
@@ -122,10 +92,25 @@ class HD1APIClient {
         return this.request('POST', path, data);
     }
 
-    // POST /sessions/{sessionId}/recording/stop - stopRecording
-    stopRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/stop', [param1]);
+    // POST /sessions/{sessionId}/recording/start - startRecording
+    startRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/start', [param1]);
         return this.request('POST', path, data);
+    }
+
+    // POST /admin/logging/config - setLoggingConfig
+    setLoggingConfig(data = null) {
+        return this.request('POST', '/admin/logging/config', data);
+    }
+
+    // GET /admin/logging/config - getLoggingConfig
+    getLoggingConfig() {
+        return this.request('GET', '/admin/logging/config');
+    }
+
+    // GET /admin/logging/logs - getLogs
+    getLogs() {
+        return this.request('GET', '/admin/logging/logs');
     }
 
     // POST /browser/refresh - forceRefresh
@@ -133,27 +118,42 @@ class HD1APIClient {
         return this.request('POST', '/browser/refresh', data);
     }
 
-    // POST /sessions/{sessionId}/camera/orbit - startCameraOrbit
-    startCameraOrbit(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/camera/orbit', [param1]);
+    // POST /browser/canvas - setCanvas
+    setCanvas(data = null) {
+        return this.request('POST', '/browser/canvas', data);
+    }
+
+    // GET /sessions - listSessions
+    listSessions() {
+        return this.request('GET', '/sessions');
+    }
+
+    // POST /sessions - createSession
+    createSession(data = null) {
+        return this.request('POST', '/sessions', data);
+    }
+
+    // DELETE /sessions/{sessionId} - deleteSession
+    deleteSession(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+        return this.request('DELETE', path);
+    }
+
+    // GET /sessions/{sessionId} - getSession
+    getSession(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/recording/stop - stopRecording
+    stopRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/stop', [param1]);
         return this.request('POST', path, data);
     }
 
-    // GET /sessions/{sessionId}/recording/status - getRecordingStatus
-    getRecordingStatus(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/status', [param1]);
-        return this.request('GET', path);
-    }
-
-    // GET /sessions/{sessionId}/objects - listObjects
-    listObjects(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/objects - createObject
-    createObject(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
+    // POST /sessions/{sessionId}/recording/play - playRecording
+    playRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/play', [param1]);
         return this.request('POST', path, data);
     }
 
@@ -180,44 +180,20 @@ class HD1APIClient {
         return this.request('POST', '/admin/logging/level', data);
     }
 
-    // PUT /sessions/{sessionId}/camera/position - setCameraPosition
-    setCameraPosition(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/camera/position', [param1]);
-        return this.request('PUT', path, data);
+    // POST /admin/logging/trace - setTraceModules
+    setTraceModules(data = null) {
+        return this.request('POST', '/admin/logging/trace', data);
     }
 
-    // GET /sessions/{sessionId}/world - getWorldSpec
-    getWorldSpec(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/world - initializeWorld
-    initializeWorld(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/world', [param1]);
+    // POST /sessions/{sessionId}/camera/orbit - startCameraOrbit
+    startCameraOrbit(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/camera/orbit', [param1]);
         return this.request('POST', path, data);
     }
 
-    // POST /sessions/{sessionId}/recording/play - playRecording
-    playRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/play', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /sessions - listSessions
-    listSessions() {
-        return this.request('GET', '/sessions');
-    }
-
-    // POST /sessions - createSession
-    createSession(data = null) {
-        return this.request('POST', '/sessions', data);
-    }
-
-    // POST /scenes/{sceneId} - loadScene
-    loadScene(param1, data = null) {
-        const path = this.extractPathParams('/scenes/{sceneId}', [param1]);
-        return this.request('POST', path, data);
+    // GET /scenes - listScenes
+    listScenes() {
+        return this.request('GET', '/scenes');
     }
 
     // POST /sessions/{sessionId}/scenes/save - saveSceneFromSession
@@ -226,10 +202,34 @@ class HD1APIClient {
         return this.request('POST', path, data);
     }
 
-    // POST /sessions/{sessionId}/recording/start - startRecording
-    startRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/start', [param1]);
+    // POST /scenes/{sceneId} - loadScene
+    loadScene(param1, data = null) {
+        const path = this.extractPathParams('/scenes/{sceneId}', [param1]);
         return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/recording/status - getRecordingStatus
+    getRecordingStatus(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/status', [param1]);
+        return this.request('GET', path);
+    }
+
+    // GET /sessions/{sessionId}/objects - listObjects
+    listObjects(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/objects - createObject
+    createObject(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/objects', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // PUT /sessions/{sessionId}/camera/position - setCameraPosition
+    setCameraPosition(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/camera/position', [param1]);
+        return this.request('PUT', path, data);
     }
 
 }

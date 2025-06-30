@@ -39,7 +39,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ServeConsoleJS serves the holodeck-console.js with template processing
+// ServeConsoleJS serves the hd1-console.js with template processing
 func ServeConsoleJS(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -54,7 +54,7 @@ func ServeConsoleJS(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Serve template-processed console JavaScript
-	if err := templateProcessor.ServeTemplate(w, r, "static/js/holodeck-console.js", "application/javascript"); err != nil {
+	if err := templateProcessor.ServeTemplate(w, r, "static/js/hd1-console.js", "application/javascript"); err != nil {
 		logging.Error("failed to serve console template", map[string]interface{}{
 			"error": err.Error(),
 		})

@@ -97,7 +97,7 @@ func main() {
 	})
 	
 	// Template-processed JavaScript files
-	http.HandleFunc("/static/js/holodeck-console.js", server.ServeConsoleJS)
+	http.HandleFunc("/static/js/hd1-console.js", server.ServeConsoleJS)
 	
 	// REVOLUTIONARY: Auto-generated API router from specification
 	apiRouter := NewAPIRouter(hub)

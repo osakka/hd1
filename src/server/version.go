@@ -23,8 +23,8 @@ func updateJSVersion() {
 	rendererPath := "../share/htdocs/static/js/renderer.js"
 	matrixPath := "../share/htdocs/static/js/gl-matrix.js"
 	aframePath := "../share/htdocs/static/js/hd1-aframe.js"
-	consoleJSPath := "../share/htdocs/static/js/holodeck-console.js"
-	consoleCSSPath := "../share/htdocs/static/css/holodeck-console.css"
+	consoleJSPath := "../share/htdocs/static/js/hd1-console.js"
+	consoleCSSPath := "../share/htdocs/static/css/hd1-console.css"
 	indexPath := "../share/htdocs/index.html"
 	handlersPath := "server/handlers.go"
 

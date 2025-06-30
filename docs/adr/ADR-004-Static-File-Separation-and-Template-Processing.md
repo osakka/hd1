@@ -40,9 +40,9 @@ Implement surgical refactoring to extract all embedded static content to proper 
 ├── index.html                    # Main template with ${JS_VERSION}
 └── static/
     ├── css/
-    │   └── holodeck-console.css   # Extracted CSS (~500 lines)
+    │   └── hd1-console.css   # Extracted CSS (~500 lines)
     └── js/
-        └── holodeck-console.js    # Extracted JS (~888 lines) with template processing
+        └── hd1-console.js    # Extracted JS (~888 lines) with template processing
 ```
 
 ### Template Processing
@@ -63,7 +63,7 @@ func (tp *TemplateProcessor) ProcessTemplate(filePath string) (string, error) {
 ```go
 // Template-processed files
 http.HandleFunc("/", server.ServeHome)                              // index.html template
-http.HandleFunc("/static/js/holodeck-console.js", server.ServeConsoleJS)  // JS template
+http.HandleFunc("/static/js/hd1-console.js", server.ServeConsoleJS)  // JS template
 
 // Static files (standard file server)
 http.Handle("/static/", fileServer)                                 // All other static assets
