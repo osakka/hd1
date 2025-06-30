@@ -19,7 +19,7 @@ func LoadConfig() *Config {
 	config := &Config{
 		Level:        "INFO",
 		TraceModules: []string{},
-		LogDir:       "/opt/holo-deck/build/logs",
+		LogDir:       "/opt/hd1/build/logs",
 	}
 
 	// Load from environment variables

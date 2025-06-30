@@ -164,13 +164,6 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 	
-	// Mark object as "new" for session object tracking
-	updates := map[string]interface{}{
-		"tracking_status": "new",
-		"created_at": time.Now(),
-	}
-	h.GetStore().UpdateObject(sessionID, object.Name, updates)
-	
 	// Use provided color or default to green
 	objectColor := map[string]interface{}{
 		"r": 0.2,
@@ -186,6 +179,17 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 			"a": req.Color.A,
 		}
 	}
+	
+	// Store color as JSON string in Object struct for session restoration
+	colorJSON, _ := json.Marshal(objectColor)
+	
+	// Mark object as "new" for session object tracking and store color
+	updates := map[string]interface{}{
+		"tracking_status": "new",
+		"created_at": time.Now(),
+		"color": string(colorJSON),
+	}
+	h.GetStore().UpdateObject(sessionID, object.Name, updates)
 
 	// Broadcast object creation for real-time updates via canvas control (session-specific)
 	h.BroadcastToSession(sessionID, "canvas_control", map[string]interface{}{

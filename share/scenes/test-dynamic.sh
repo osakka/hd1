@@ -2,7 +2,7 @@
 # Test scene to verify dynamic dropdown updates
 
 # Set HD1_ROOT and source functions
-HD1_ROOT="/opt/holo-deck"
+HD1_ROOT="/opt/hd1"
 source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
     echo "ERROR: HD1 functions not available"
     exit 1

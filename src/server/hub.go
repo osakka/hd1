@@ -17,6 +17,7 @@ type Hub struct {
 	store         *SessionStore
 	scenesWatcher *ScenesWatcher
 	mutex         sync.RWMutex
+	restoredSessions map[string]bool  // Track which sessions have been restored to prevent loops
 }
 
 func NewHub() *Hub {
@@ -27,6 +28,7 @@ func NewHub() *Hub {
 		unregister: make(chan *Client),
 		logger:     NewLogManager(),
 		store:      NewSessionStore(),
+		restoredSessions: make(map[string]bool),
 	}
 	
 	// Initialize scenes watcher
@@ -364,6 +366,20 @@ func (s *SessionStore) GetWorld(sessionID string) (*World, bool) {
 // GetStore returns the session store for external access
 func (h *Hub) GetStore() *SessionStore {
 	return h.store
+}
+
+// IsSessionRestored checks if a session has already been restored
+func (h *Hub) IsSessionRestored(sessionID string) bool {
+	h.mutex.RLock()
+	defer h.mutex.RUnlock()
+	return h.restoredSessions[sessionID]
+}
+
+// MarkSessionRestored marks a session as restored to prevent future restoration loops
+func (h *Hub) MarkSessionRestored(sessionID string) {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	h.restoredSessions[sessionID] = true
 }
 
 

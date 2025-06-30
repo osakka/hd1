@@ -72,11 +72,86 @@
             <div id="debug-scene-bar">
                 <select id="debug-scene-select">
                     <option value="">Select Scene...</option>
-                    <option value="empty">Empty Grid</option>
+                    <option value="empty-grid">Empty Grid</option>
                     <option value="anime-ui">Anime UI Demo</option>
                     <option value="ultimate">Ultimate Demo</option>
                     <option value="basic-shapes">Basic Shapes</option>
                 </select>
+            </div>
+            <div id="debug-info-panels">
+                <div class="info-panel" id="environment-panel">
+                    <div class="panel-title">ENVIRONMENT</div>
+                    <div class="panel-content">
+                        <div class="info-row">
+                            <span class="info-label">Scale:</span>
+                            <span class="info-value" id="environment-scale">Human Scale (m)</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Gravity:</span>
+                            <span class="info-value" id="environment-gravity">9.81 m/s²</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Temperature:</span>
+                            <span class="info-value" id="environment-temperature">20°C</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Atmosphere:</span>
+                            <span class="info-value" id="environment-atmosphere">Earth Surface</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-panel" id="hardware-panel">
+                    <div class="panel-title">HARDWARE</div>
+                    <div class="panel-content">
+                        <div class="info-row">
+                            <span class="info-label">FPS:</span>
+                            <span class="info-value" id="hardware-fps">60</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">GPU:</span>
+                            <span class="info-value" id="hardware-gpu">WebGL Ready</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Memory:</span>
+                            <span class="info-value" id="hardware-memory">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Renderer:</span>
+                            <span class="info-value" id="hardware-renderer">A-Frame</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="debug-objects-panel">
+                <div class="info-panel info-panel-wide" id="objects-panel">
+                    <div class="panel-title">OBJECTS</div>
+                    <div class="panel-content">
+                        <div class="info-row">
+                            <span class="info-label">Total:</span>
+                            <span class="info-value" id="objects-total">0</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Visible:</span>
+                            <span class="info-value" id="objects-visible">0</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Lights:</span>
+                            <span class="info-value" id="objects-lights">0</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Primitives:</span>
+                            <span class="info-value" id="objects-primitives">0</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Last Update:</span>
+                            <span class="info-value" id="objects-last-update">Never</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Scene:</span>
+                            <span class="info-value" id="objects-scene">None</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="debug-controls-bar">
                 <div class="control-buttons-container">

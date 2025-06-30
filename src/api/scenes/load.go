@@ -160,7 +160,7 @@ func clearAllObjects(sessionID string, h *server.Hub) {
 // getSceneScript returns the script path for a given scene ID
 func getSceneScript(sceneID string) string {
 	// Dynamic scene discovery - single source of truth
-	scenesDir := "/opt/holo-deck/share/scenes"
+	scenesDir := "/opt/hd1/share/scenes"
 	scriptPath := filepath.Join(scenesDir, sceneID+".sh")
 	
 	// Check if file exists
@@ -177,7 +177,7 @@ func executeSceneScript(scriptPath string, sessionID string) (int, string) {
 	
 	// Execute the scene script with session ID
 	cmd := exec.Command("/bin/bash", scriptPath, sessionID)
-	cmd.Dir = "/opt/holo-deck"  // Set working directory
+	cmd.Dir = "/opt/hd1"  // Set working directory
 	output, err := cmd.Output()
 	
 	if err != nil {

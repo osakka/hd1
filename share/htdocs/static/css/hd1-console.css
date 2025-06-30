@@ -546,3 +546,65 @@ a-scene { display: block; }
 .debug-data {
     color: rgba(255, 255, 255, 0.8);
 }
+
+/* Info Panels */
+#debug-info-panels {
+    display: flex;
+    gap: 4px;
+    margin: 8px 8px 8px 8px;
+}
+
+.info-panel {
+    flex: 1;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+}
+
+.panel-title {
+    background: rgba(0, 255, 255, 0.05);
+    color: #00ffff;
+    font-size: 8px;
+    font-weight: bold;
+    text-align: left;
+    padding: 4px 6px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    letter-spacing: 0.5px;
+}
+
+.panel-content {
+    padding: 6px 8px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+.info-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 8px;
+    font-weight: normal;
+}
+
+.info-value {
+    color: #00ffff;
+    font-size: 8px;
+    font-weight: bold;
+    text-align: right;
+}
+
+/* Objects Panel */
+#debug-objects-panel {
+    margin: 8px 8px 8px 8px;
+}
+
+.info-panel-wide {
+    width: 100%;
+}

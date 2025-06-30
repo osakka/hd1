@@ -151,6 +151,104 @@ func (c *Client) handleClientMessage(message []byte) {
 			logging.Info("client session associated", map[string]interface{}{
 				"session_id": sessionID,
 			})
+			
+			// SURGICAL FIX: Send existing session objects ONLY ONCE per session globally
+			if c.hub.store != nil && !c.hub.IsSessionRestored(sessionID) {
+				existingObjects := c.hub.store.ListObjects(sessionID)
+				if len(existingObjects) > 0 {
+					// Format objects for canvas control message (EXACT same format as normal object creation)
+					var objectsData []map[string]interface{}
+					for _, obj := range existingObjects {
+						// Parse color string back to RGBA object (if stored as JSON string)
+						var colorObj map[string]interface{}
+						if obj.Color != "" {
+							// Try to parse as JSON first, fallback to default red if parsing fails
+							var parsedColor map[string]interface{}
+							if err := json.Unmarshal([]byte(obj.Color), &parsedColor); err == nil {
+								colorObj = parsedColor
+							} else {
+								// Default red color if parsing fails
+								colorObj = map[string]interface{}{"r": 1.0, "g": 0.2, "b": 0.2, "a": 1.0}
+							}
+						} else {
+							// Default red color if no color stored
+							colorObj = map[string]interface{}{"r": 1.0, "g": 0.2, "b": 0.2, "a": 1.0}
+						}
+						
+						// Use EXACT same format as normal object creation (/opt/hd1/src/api/objects/create.go)
+						objectData := map[string]interface{}{
+							"id":   obj.Name,
+							"name": obj.Name,
+							"type": obj.Type,
+							"transform": map[string]interface{}{
+								"position": map[string]interface{}{
+									"x": obj.X,
+									"y": obj.Y,
+									"z": obj.Z,
+								},
+								"scale": map[string]interface{}{
+									"x": obj.Scale,
+									"y": obj.Scale,
+									"z": obj.Scale,
+								},
+								"rotation": map[string]interface{}{
+									"x": 0,
+									"y": 0,
+									"z": 0,
+								},
+							},
+							"color": colorObj,
+							"material": map[string]interface{}{
+								"shader":      "standard",
+								"metalness":   0.1,
+								"roughness":   0.7,
+								"transparent": false,
+							},
+							"physics": map[string]interface{}{
+								"enabled": false,
+								"mass":    1.0,
+								"type":    "static",
+							},
+							"lighting": map[string]interface{}{
+								"castShadow":    true,
+								"receiveShadow": true,
+							},
+							"visible":   true,
+							"wireframe": false,
+							"text":      "",
+							"lightType": "",
+							"intensity": 1,
+						}
+						objectsData = append(objectsData, objectData)
+					}
+					
+					// Send session restoration message to this client only
+					message := map[string]interface{}{
+						"type": "canvas_control",
+						"data": map[string]interface{}{
+							"command": "create",
+							"objects": objectsData,
+						},
+						"timestamp": time.Now().Unix(),
+					}
+					
+					if jsonData, err := json.Marshal(message); err == nil {
+						select {
+						case c.send <- jsonData:
+						default:
+							// Client channel blocked, don't wait
+						}
+					}
+					
+					logging.Info("session objects restored to client", map[string]interface{}{
+						"session_id": sessionID,
+						"object_count": len(existingObjects),
+					})
+					
+					// Mark this session as globally restored to prevent future restoration loops
+					c.hub.MarkSessionRestored(sessionID)
+				}
+			}
 		}
 		
 	case "interaction":

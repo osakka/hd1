@@ -80,6 +80,14 @@ This directory contains all architectural decision records (ADRs) documenting th
 - **Result**: Prevents deployment of incomplete implementations
 - **Key Achievement**: Make-based standard build system
 
+### Phase 5: Color Persistence and Session Restoration (2025-06-30)
+
+**[ADR-013: Object Color Storage and Session Restoration](ADR-013-Object-Color-Storage-and-Session-Restoration.md)**
+- **Status**: ✅ Accepted | **Impact**: 🎨 Color Persistence Excellence
+- **Decision**: Comprehensive color storage architecture for session restoration
+- **Result**: Objects maintain colors across WebSocket reconnections and session restoration
+- **Key Achievement**: Single source of truth for color data flow from creation to restoration
+
 ## 🏗️ Architectural Evolution Summary
 
 ### Advanced Milestones
@@ -97,6 +105,7 @@ This directory contains all architectural decision records (ADRs) documenting th
 - **🔧 Quality Assurance**: Build system validation (ADR-011)
 - **🎨 User Experience**: Standard UI enhancement (ADR-003)
 - **🎯 Optimal Simplicity**: Simple scene updates (ADR-005)
+- **🎨 Color Persistence**: Object color storage and session restoration (ADR-013)
 
 ## 📊 ADR Status Overview
 
@@ -113,6 +122,7 @@ This directory contains all architectural decision records (ADRs) documenting th
 | ADR-009 | ✅ Accepted | ⚡ Real-time | Core System |
 | ADR-010 | ✅ Accepted | 🌍 Spatial | Core System |
 | ADR-011 | ✅ Accepted | 🔧 Quality | Core System |
+| ADR-013 | ✅ Accepted | 🎨 Color Persistence | Session Restoration |
 
 ## 🎯 Key Architectural Principles
 

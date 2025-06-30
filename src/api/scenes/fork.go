@@ -64,7 +64,7 @@ func ForkSceneHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 	}
 
 	// Execute scene script to load objects into session
-	scriptPath := filepath.Join("/opt/holo-deck/share/glibsh/scenes", sceneID+".sh")
+	scriptPath := filepath.Join("/opt/hd1/share/scenes", sceneID+".sh")
 	objectCount, message := executeSceneScript(scriptPath, req.SessionID)
 	
 	if objectCount == 0 && strings.Contains(message, "failed") {

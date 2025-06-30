@@ -23,6 +23,7 @@ Welcome to the comprehensive documentation center for HD1 - the world's first st
 - [ADR Timeline and Index](adr/README.md) - Complete chronological decision history
 - Advanced milestones and standard standards implementation
 - Impact assessment and architectural principles
+- **Latest**: [ADR-013](adr/ADR-013-Object-Color-Storage-and-Session-Restoration.md) - Object Color Storage and Session Restoration
 
 ### 📋 [Guidelines](guidelines/)
 **Development Standards & Best Practices**

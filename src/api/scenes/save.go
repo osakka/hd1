@@ -55,7 +55,7 @@ func SaveSceneFromSessionHandler(w http.ResponseWriter, r *http.Request, hub int
 	}
 
 	// Check if scene already exists
-	scenePath := filepath.Join("/opt/holo-deck/share/glibsh/scenes", req.SceneID+".sh")
+	scenePath := filepath.Join("/opt/hd1/share/scenes", req.SceneID+".sh")
 	if _, err := os.Stat(scenePath); err == nil && !req.Overwrite {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusConflict)
@@ -142,7 +142,7 @@ if [[ -z "$SESSION_ID" ]]; then
 fi
 
 # Path to auto-generated HD1 client
-HD1_CLIENT="/opt/holo-deck/build/bin/hd1-client"
+HD1_CLIENT="/opt/hd1/build/bin/hd1-client"
 
 echo "Creating %s scene..."
 

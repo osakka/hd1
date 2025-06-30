@@ -25,7 +25,7 @@ if [[ -z "$SESSION_ID" ]]; then
 fi
 
 # Path to auto-generated HD1 client
-HD1_CLIENT="/opt/holo-deck/build/bin/hd1-client"
+HD1_CLIENT="/opt/hd1/build/bin/hd1-client"
 
 echo "Creating anime UI demo scene..."
 

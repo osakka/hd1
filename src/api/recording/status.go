@@ -44,7 +44,7 @@ func GetRecordingStatusHandler(w http.ResponseWriter, r *http.Request, hub inter
 	// TODO: Check session recording metadata when available
 
 	// Get available recordings
-	recordingsDir := "/opt/holo-deck/recordings"
+	recordingsDir := "/opt/hd1/recordings"
 	if entries, err := os.ReadDir(recordingsDir); err == nil {
 		recordings := []map[string]interface{}{}
 		

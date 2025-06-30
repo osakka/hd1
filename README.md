@@ -12,13 +12,15 @@
 - **Real-time WebSocket**: Instant 3D object synchronization
 - **Specification-Driven**: OpenAPI 3.0.3 single source of truth
 
-### Scene Management (v3.4.0 - v3.6.0)
+### Scene Management (v3.4.0 - v3.7.0)
 - **Scene Loading**: API-based scene discovery and loading
 - **Scene Forking**: Load scenes into sessions for non-destructive editing
 - **FREEZE-FRAME Mode**: Save current session state as new scenes
 - **TEMPORAL SEQUENCE Mode**: Session recording with playback capabilities
 - **Object Tracking**: Complete provenance system (base/modified/new)
 - **Script Generation**: Dynamic scene file creation from session state
+- **Color Persistence**: Objects maintain colors across session restoration
+- **Reactive Scene Graph**: Real-time state synchronization with rollback protection
 
 ### Auto-Generated Clients (v3.5.0)
 - **JavaScript API Client**: Complete API wrapper auto-generated from specification

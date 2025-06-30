@@ -16,7 +16,7 @@ import (
 
 // HD1 Path Configuration - 100% Absolute Paths
 const (
-	HD1_ROOT_DIR      = "/opt/holo-deck"
+	HD1_ROOT_DIR      = "/opt/hd1"
 	HD1_BUILD_DIR     = HD1_ROOT_DIR + "/build"
 	HD1_BIN_DIR       = HD1_BUILD_DIR + "/bin"
 	HD1_LOG_DIR       = HD1_BUILD_DIR + "/logs"
@@ -181,7 +181,7 @@ func showHelp() {
 	fmt.Println()
 	fmt.Println("EXAMPLES:")
 	fmt.Println("  hd1")
-	fmt.Println("  hd1 --daemon --log-file /opt/holo-deck/build/logs/hd1.log")
+	fmt.Println("  hd1 --daemon --log-file /opt/hd1/build/logs/hd1.log")
 	fmt.Println("  hd1 --host 127.0.0.1 --port 9090")
 	fmt.Println()
 	fmt.Printf("DEFAULT PATHS:\n")

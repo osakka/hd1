@@ -19,7 +19,7 @@ type ScenesWatcher struct {
 func NewScenesWatcher(hub *Hub) *ScenesWatcher {
 	return &ScenesWatcher{
 		hub:        hub,
-		scenesPath: "/opt/holo-deck/share/scenes",
+		scenesPath: "/opt/hd1/share/scenes",
 	}
 }
 

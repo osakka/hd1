@@ -65,6 +65,244 @@ function updateDebugSession(sessionId) {
     }
 }
 
+// Update environmental info display (read-only)
+function updateEnvironmentalDisplay() {
+    if (!hd1Manager || !hd1Manager.state) return;
+    
+    const sceneState = hd1Manager.state;
+    const environment = sceneState.environment;
+    
+    // Get display elements
+    const scaleDisplay = document.getElementById('environment-scale');
+    const gravityDisplay = document.getElementById('environment-gravity');
+    const temperatureDisplay = document.getElementById('environment-temperature');
+    const atmosphereDisplay = document.getElementById('environment-atmosphere');
+    
+    // Scale info mapping
+    const scaleInfo = {
+        'nm': { name: 'Molecular', unit: 'nm' },
+        'μm': { name: 'Microscopic', unit: 'μm' },
+        'mm': { name: 'Precision', unit: 'mm' },
+        'cm': { name: 'Small Objects', unit: 'cm' },
+        'm': { name: 'Human Scale', unit: 'm' },
+        'km': { name: 'Landscape', unit: 'km' },
+        'Mm': { name: 'Continental', unit: 'Mm' },
+        'Gm': { name: 'Planetary', unit: 'Gm' }
+    };
+    
+    // Atmosphere type mapping
+    const atmosphereTypes = {
+        'air': 'Earth Surface',
+        'vacuum': 'Space Vacuum',
+        'thin_air': 'High Altitude',
+        'liquid': 'Underwater'
+    };
+    
+    const scale = scaleInfo[environment.scale] || { name: 'Unknown', unit: environment.scale };
+    const atmosphereType = atmosphereTypes[environment.atmosphere.composition] || 'Custom';
+    
+    // Update displays
+    if (scaleDisplay) {
+        scaleDisplay.textContent = `${scale.name} (${scale.unit})`;
+    }
+    
+    if (gravityDisplay) {
+        gravityDisplay.textContent = `${environment.gravity} m/s²`;
+    }
+    
+    if (temperatureDisplay) {
+        const celsius = (environment.temperature - 273.15).toFixed(1);
+        temperatureDisplay.textContent = `${celsius}°C`;
+    }
+    
+    if (atmosphereDisplay) {
+        const density = environment.atmosphere.density;
+        atmosphereDisplay.textContent = `${atmosphereType} (${density} kg/m³)`;
+    }
+    
+    console.log(`[HD1] Environmental display updated: ${scale.name} scale, ${environment.gravity}m/s², ${(environment.temperature-273.15).toFixed(1)}°C`);
+}
+
+// Hardware monitoring
+function initializeHardwareMonitoring() {
+    const fpsDisplay = document.getElementById('hardware-fps');
+    const gpuDisplay = document.getElementById('hardware-gpu');
+    const memoryDisplay = document.getElementById('hardware-memory');
+    const rendererDisplay = document.getElementById('hardware-renderer');
+    
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let fps = 0;
+    
+    // FPS monitoring
+    function updateFPS() {
+        frameCount++;
+        const currentTime = performance.now();
+        
+        if (currentTime - lastTime >= 1000) {
+            fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+            frameCount = 0;
+            lastTime = currentTime;
+            
+            if (fpsDisplay) {
+                fpsDisplay.textContent = fps;
+            }
+        }
+        
+        requestAnimationFrame(updateFPS);
+    }
+    
+    // GPU and WebGL info
+    function updateGPUInfo() {
+        try {
+            // Create temporary canvas to avoid context conflicts
+            const tempCanvas = document.createElement('canvas');
+            const gl = tempCanvas.getContext('webgl') || tempCanvas.getContext('experimental-webgl');
+            
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                let gpuInfo = 'WebGL Ready';
+                
+                if (debugInfo) {
+                    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                    gpuInfo = renderer.split('(')[0].trim();
+                    if (gpuInfo.length > 15) {
+                        gpuInfo = gpuInfo.substring(0, 15) + '...';
+                    }
+                }
+                
+                if (gpuDisplay) {
+                    gpuDisplay.textContent = gpuInfo;
+                }
+                
+                // Clean up
+                const loseContext = gl.getExtension('WEBGL_lose_context');
+                if (loseContext) loseContext.loseContext();
+            } else {
+                if (gpuDisplay) {
+                    gpuDisplay.textContent = 'WebGL Not Available';
+                }
+            }
+        } catch (error) {
+            if (gpuDisplay) {
+                gpuDisplay.textContent = 'WebGL Detection Error';
+            }
+        }
+    }
+    
+    // Memory monitoring  
+    function updateMemoryInfo() {
+        if (performance.memory) {
+            const used = Math.round(performance.memory.usedJSHeapSize / 1048576); // MB
+            const total = Math.round(performance.memory.totalJSHeapSize / 1048576); // MB
+            
+            if (memoryDisplay) {
+                memoryDisplay.textContent = `${used}/${total} MB`;
+            }
+        }
+    }
+    
+    // Initialize monitoring
+    updateFPS();
+    updateGPUInfo();
+    
+    // Update GPU info once A-Frame is ready
+    setTimeout(updateGPUInfo, 2000);
+    
+    // Update memory info periodically
+    setInterval(updateMemoryInfo, 2000);
+    
+    console.log('[HD1] Hardware monitoring initialized');
+}
+
+// Objects tracking display - counts A-Frame entities directly
+function updateObjectsDisplay() {
+    // Count objects directly from A-Frame scene instead of broken reactive state
+    const scene = document.getElementById('holodeck-scene');
+    const objectsContainer = document.getElementById('holodeck-objects');
+    
+    if (!scene || !objectsContainer) return;
+    
+    // Count all child entities in the objects container
+    const allEntities = objectsContainer.querySelectorAll('a-entity, a-box, a-sphere, a-cylinder, a-plane, a-cone, a-light');
+    const totalObjects = allEntities.length;
+    
+    let visibleObjects = 0;
+    let lightObjects = 0;
+    let primitiveObjects = 0;
+    
+    allEntities.forEach(entity => {
+        // Check visibility
+        const visible = entity.getAttribute('visible');
+        if (visible !== false && visible !== 'false') visibleObjects++;
+        
+        // Check type by tag name or geometry component
+        const tagName = entity.tagName.toLowerCase();
+        const geometry = entity.getAttribute('geometry');
+        
+        if (tagName === 'a-light' || entity.hasAttribute('light')) {
+            lightObjects++;
+        } else if (['a-box', 'a-sphere', 'a-cylinder', 'a-plane', 'a-cone'].includes(tagName) || 
+                   (geometry && ['box', 'sphere', 'cylinder', 'plane', 'cone'].includes(geometry.primitive))) {
+            primitiveObjects++;
+        }
+    });
+    
+    // Get current scene name
+    const sceneSelect = document.getElementById('debug-scene-select');
+    const currentScene = sceneSelect ? sceneSelect.value : 'None';
+    const sceneName = currentScene === '' ? 'None' : currentScene;
+    
+    // Update displays
+    const totalDisplay = document.getElementById('objects-total');
+    const visibleDisplay = document.getElementById('objects-visible');
+    const lightsDisplay = document.getElementById('objects-lights');
+    const primitivesDisplay = document.getElementById('objects-primitives');
+    const lastUpdateDisplay = document.getElementById('objects-last-update');
+    const sceneDisplay = document.getElementById('objects-scene');
+    
+    if (totalDisplay) totalDisplay.textContent = totalObjects;
+    if (visibleDisplay) visibleDisplay.textContent = visibleObjects;
+    if (lightsDisplay) lightsDisplay.textContent = lightObjects;
+    if (primitivesDisplay) primitivesDisplay.textContent = primitiveObjects;
+    if (lastUpdateDisplay) lastUpdateDisplay.textContent = new Date().toLocaleTimeString();
+    if (sceneDisplay) sceneDisplay.textContent = sceneName;
+    
+    // Only log when objects change significantly
+    if (totalObjects > 0) {
+        console.log(`[HD1] Objects: ${totalObjects} total, ${visibleObjects} visible, ${lightObjects} lights, ${primitiveObjects} primitives`);
+    }
+}
+
+// Debounced objects update using MutationObserver
+let objectsUpdateTimeout;
+function scheduleObjectsUpdate() {
+    clearTimeout(objectsUpdateTimeout);
+    objectsUpdateTimeout = setTimeout(() => {
+        updateObjectsDisplay();
+    }, 100); // Small delay to batch multiple DOM changes
+}
+
+// Initialize MutationObserver to watch for object changes
+function initializeObjectsObserver() {
+    const objectsContainer = document.getElementById('holodeck-objects');
+    if (!objectsContainer) return;
+    
+    const observer = new MutationObserver(() => {
+        scheduleObjectsUpdate();
+    });
+    
+    observer.observe(objectsContainer, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['visible', 'geometry', 'light']
+    });
+    
+    console.log('[HD1] Objects MutationObserver initialized');
+}
+
+
 // Debug logging function
 function addDebug(command, data = null) {
     const time = new Date().toLocaleTimeString();
@@ -133,16 +371,19 @@ async function ensureSession() {
                 if (!sessionInitialized) {
                     sessionInitialized = true;
                     localStorage.setItem('hd1_session_initialized', 'true');
-                    setTimeout(() => {
-                        const savedScene = getCookie('hd1_scene');
-                        if (savedScene && debugSceneSelect) {
-                            debugSceneSelect.value = savedScene;
-                            if (savedScene !== '') {
-                                addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_restore'});
-                                loadScene(savedScene);
-                            }
-                        }
-                    }, 1500); // Wait for session to fully restore
+                    
+                    // Load saved scene immediately - no delays
+                    const savedScene = getCookie('hd1_scene');
+                    console.log(`[HD1] Bootstrap check: savedScene="${savedScene}", debugSceneSelect=${!!debugSceneSelect}, sessionInitialized=${sessionInitialized}`);
+                    
+                    if (savedScene && savedScene !== '' && debugSceneSelect) {
+                        debugSceneSelect.value = savedScene;
+                        addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_restore'});
+                        loadScene(savedScene);
+                        console.log(`[HD1] Bootstrap: Auto-loading scene "${savedScene}"`);
+                    } else {
+                        console.log(`[HD1] Bootstrap: No scene to auto-load - savedScene="${savedScene}"`);
+                    }
                 }
                 return;
             } else {
@@ -183,16 +424,19 @@ async function ensureSession() {
             if (!sessionInitialized) {
                 sessionInitialized = true;
                 localStorage.setItem('hd1_session_initialized', 'true');
-                setTimeout(() => {
-                    const savedScene = getCookie('hd1_scene');
-                    if (savedScene && debugSceneSelect) {
-                        debugSceneSelect.value = savedScene;
-                        if (savedScene !== '') {
-                            addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_create'});
-                            loadScene(savedScene);
-                        }
-                    }
-                }, 1000); // Wait for session to fully establish
+                
+                // Load saved scene immediately - no delays
+                const savedScene = getCookie('hd1_scene');
+                console.log(`[HD1] Bootstrap check (new session): savedScene="${savedScene}", debugSceneSelect=${!!debugSceneSelect}`);
+                
+                if (savedScene && savedScene !== '' && debugSceneSelect) {
+                    debugSceneSelect.value = savedScene;
+                    addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_create'});
+                    loadScene(savedScene);
+                    console.log(`[HD1] Bootstrap: Auto-loading scene "${savedScene}" for new session`);
+                } else {
+                    console.log(`[HD1] Bootstrap: No scene to auto-load for new session - savedScene="${savedScene}"`);
+                }
             }
         } else {
             console.error('Failed to create session:', sessionData);
@@ -344,6 +588,14 @@ function connectWebSocket() {
                         });
                         console.log('[HD1] HD1 Manager.processMessage SUCCESS');
                         addDebug('RENDER_OK', 'Objects sent to HD1 Manager');
+                        
+                        // Update environmental display and schedule objects update
+                        if (hd1Manager.state) {
+                            if (typeof updateEnvironmentalDisplay === 'function') {
+                                updateEnvironmentalDisplay();
+                            }
+                            scheduleObjectsUpdate();
+                        }
                     } catch(e) {
                         console.error('[HD1] HD1 Manager.processMessage FAILED:', e);
                         addDebug('RENDER_FAIL', {error: e.message});
@@ -442,11 +694,11 @@ window.addEventListener('error', function(e) {
 });
 
 try {
-    // Initialize A-Frame manager when scene is ready
+    // Initialize REACTIVE A-Frame manager when scene is ready
     scene.addEventListener('loaded', function() {
-        hd1Manager = new HD1AFrameManager(scene);
-        sendLog('info', 'HD1 A-Frame Manager initialized successfully');
-        console.log('[HD1] A-Frame scene loaded and manager ready');
+        hd1Manager = new HD1ReactiveManager(scene);
+        sendLog('info', 'HD1 Reactive Manager initialized successfully');
+        console.log('[HD1] A-Frame scene loaded and REACTIVE manager ready');
         
         // Initialize any pending world data
         if (window.pendingWorldData) {
@@ -454,13 +706,16 @@ try {
             window.pendingWorldData = null;
             console.log('[HD1] Applied pending world data');
         }
+        
+        // Initialize displays immediately when manager is ready
+        initializeDisplays();
     });
     
     // Fallback: initialize even if scene doesn't fire loaded event
     setTimeout(function() {
         if (!hd1Manager) {
-            hd1Manager = new HD1AFrameManager(scene);
-            console.log('[HD1] A-Frame manager initialized via fallback');
+            hd1Manager = new HD1ReactiveManager(scene);
+            console.log('[HD1] REACTIVE A-Frame manager initialized via fallback');
             
             // Initialize any pending world data
             if (window.pendingWorldData) {
@@ -468,6 +723,9 @@ try {
                 window.pendingWorldData = null;
                 console.log('[HD1] Applied pending world data via fallback');
             }
+            
+            // Initialize displays via fallback
+            initializeDisplays();
         }
     }, 2000);
     
@@ -571,8 +829,17 @@ function setupMouseControls() {
     setStatus('connected', 'A-Frame controls ready - WASD to move, mouse to look');
 }
 
-// Start mouse controls after a delay
-setTimeout(setupMouseControls, 1000);
+// Initialize mouse controls when scene is ready
+setupMouseControls();
+
+// Event-driven initialization when HD1 manager becomes available
+function initializeDisplays() {
+    if (hd1Manager && hd1Manager.state) {
+        updateEnvironmentalDisplay();
+        scheduleObjectsUpdate();
+        console.log('[HD1] Displays initialized via event-driven method');
+    }
+}
 
 // Debug panel collapsible functionality (initialized after cookie functions)
 let debugCollapsed = false;
@@ -591,6 +858,7 @@ function loadSavedScene() {
 // Save scene to cookie
 function saveScene(sceneId) {
     setCookie('hd1_scene', sceneId, 30); // 30 days
+    console.log(`[HD1] Scene saved to cookie: "${sceneId}"`);
 }
 
 // Cookie utilities
@@ -638,6 +906,13 @@ async function loadScene(sceneId) {
             const result = await response.json();
             addDebug('SCENE_LOADED', {scene: sceneId, objects: result.objects_created || 0});
             setStatus('receiving', 'Loading scene: ' + sceneId);
+            
+            // Update displays immediately after scene load response
+            if (typeof updateEnvironmentalDisplay === 'function') {
+                updateEnvironmentalDisplay();
+            }
+            // Use MutationObserver to update when DOM actually changes
+            scheduleObjectsUpdate();
         } else {
             addDebug('SCENE_ERROR', {scene: sceneId, status: response.status});
             setStatus('error', 'Failed to load scene');
@@ -932,6 +1207,10 @@ setDebugState(debugCollapsed, false);
 
 // Load version information
 loadVersionInfo();
+
+// Initialize hardware monitoring and objects observer
+initializeHardwareMonitoring();
+initializeObjectsObserver();
 
 // Start connection
 connectWebSocket();
