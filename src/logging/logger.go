@@ -48,7 +48,7 @@ var levelFromString = map[string]LogLevel{
 	"FATAL": FATAL,
 }
 
-// Logger provides unified logging for THD system
+// Logger provides unified logging for HD1 system
 type Logger struct {
 	level       LogLevel
 	traceModules map[string]bool
@@ -93,7 +93,7 @@ func NewLogger(logDir string, level LogLevel, traceModules []string) (*Logger, e
 		return nil, fmt.Errorf("failed to create log directory: %w", err)
 	}
 
-	logFile := filepath.Join(logDir, "thd.log")
+	logFile := filepath.Join(logDir, "hd1.log")
 	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)

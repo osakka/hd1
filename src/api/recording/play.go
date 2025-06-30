@@ -53,7 +53,7 @@ func PlayRecordingHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	}
 
 	// Load recording file
-	recordingPath := filepath.Join("/opt/holo-deck/recordings", req.RecordingID+".thd")
+	recordingPath := filepath.Join("/opt/holo-deck/recordings", req.RecordingID+".hd1")
 	recordingData, err := os.ReadFile(recordingPath)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -108,7 +108,7 @@ func PlayRecordingHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	})
 }
 
-// RecordingFile represents the structure of a .thd recording file
+// RecordingFile represents the structure of a .hd1 recording file
 type RecordingFile struct {
 	RecordingID      string                   `yaml:"recording_id"`
 	Name             string                   `yaml:"name"`
@@ -162,7 +162,7 @@ func playbackRecording(hub *server.Hub, sessionID, recordingID string, recording
 		}
 
 		// Execute operation (would need to integrate with object creation/updates)
-		// This is a placeholder - would execute actual THD operations
+		// This is a placeholder - would execute actual HD1 operations
 		playbackMessage := map[string]interface{}{
 			"type": "playback_operation",
 			"session_id": sessionID,

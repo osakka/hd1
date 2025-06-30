@@ -47,7 +47,7 @@ func StopRecordingHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	duration := time.Since(startTimeParsed)
 
 	// Generate recording file
-	recordingPath := filepath.Join("/opt/holo-deck/recordings", recordingID+".thd")
+	recordingPath := filepath.Join("/opt/holo-deck/recordings", recordingID+".hd1")
 	if err := os.MkdirAll(filepath.Dir(recordingPath), 0755); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to create recordings directory: %v", err), http.StatusInternalServerError)
 		return
@@ -90,15 +90,15 @@ func StopRecordingHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	})
 }
 
-// generateRecordingFile creates a .thd recording file with temporal sequence
+// generateRecordingFile creates a .hd1 recording file with temporal sequence
 func generateRecordingFile(recordingID, name, startTime string, duration time.Duration, operations []map[string]interface{}) string {
-	content := fmt.Sprintf(`# THD Recording: %s
+	content := fmt.Sprintf(`# HD1 Recording: %s
 # ID: %s
 # Created: %s
 # Duration: %s
 # Operations: %d
 #
-# This is a temporal recording file (.thd) containing a sequence of 
+# This is a temporal recording file (.hd1) containing a sequence of 
 # holodeck operations with timestamps for accurate playback.
 
 recording_id: %s

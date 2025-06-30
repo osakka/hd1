@@ -11,7 +11,7 @@ This directory contains the core implementation of **HD1 (Holodeck One)** - the 
 api.yaml (specification) → generator.go → {
     auto_router.go (Go routing)
     hd1lib.sh (shell API client)
-    thdlib.js (JavaScript API client)
+    hd1lib.js (JavaScript API client)
     aframelib.sh (A-Frame shell integration)
     aframelib.js (A-Frame JavaScript bridge)
 }
@@ -28,7 +28,7 @@ api.yaml (specification) → generator.go → {
 - **Build-time validation** - prevents deployment of incomplete implementations
 
 ### **2. Advanced Upstream/Downstream Integration**
-- **Upstream**: Core HD1 API wrappers (`thdlib.*`)
+- **Upstream**: Core HD1 API wrappers (`hd1lib.*`)
 - **Downstream**: A-Frame WebXR integration (`aframelib.*`)
 - **Identical signatures** - shell and JavaScript functions have identical parameters
 - **Perfect layering** - downstream imports upstream maintaining single source of truth
@@ -109,7 +109,7 @@ src/
 **Advanced unified generator** producing:
 - **Go routing** from OpenAPI specification
 - **Shell API client** (`hd1lib.sh`) from API endpoints
-- **JavaScript API client** (`thdlib.js`) from API endpoints
+- **JavaScript API client** (`hd1lib.js`) from API endpoints
 - **Web UI components** auto-generated from schemas
 - **A-Frame integration** (`aframelib.*`) with schema validation
 
@@ -122,7 +122,7 @@ make generate
 ```
 ✅ auto_router.go - Go routing (28 routes)
 ✅ ../lib/hd1lib.sh - Shell API client (upstream)
-✅ ../share/htdocs/static/js/thdlib.js - JavaScript client (upstream)
+✅ ../share/htdocs/static/js/hd1lib.js - JavaScript client (upstream)
 ✅ ../lib/downstream/aframelib.sh - A-Frame shell integration
 ✅ ../lib/downstream/aframelib.js - A-Frame JavaScript bridge
 ✅ Web UI components with dynamic forms
@@ -136,26 +136,26 @@ make generate
 ```bash
 # Shell
 source /opt/holodeck-one/lib/hd1lib.sh
-thd::create_object "cube1" "box" 0 1 0
-thd::camera 5 5 5
+hd1::create_object "cube1" "box" 0 1 0
+hd1::camera 5 5 5
 ```
 
 ```javascript
 // JavaScript (identical API coverage)
-await thdAPI.createObject('session-id', {name: 'cube1', type: 'box', x: 0, y: 1, z: 0});
-await thdAPI.setCameraPosition('session-id', {x: 5, y: 5, z: 5});
+await hd1API.createObject('session-id', {name: 'cube1', type: 'box', x: 0, y: 1, z: 0});
+await hd1API.setCameraPosition('session-id', {x: 5, y: 5, z: 5});
 ```
 
 **Downstream A-Frame Integration** (Identical signatures):
 ```bash
 # Shell A-Frame integration
 source /opt/holodeck-one/lib/downstream/aframelib.sh
-thd::create_enhanced_object "crystal" "cone" 0 3 0 --color "#ff0000" --metalness 0.8
+hd1::create_enhanced_object "crystal" "cone" 0 3 0 --color "#ff0000" --metalness 0.8
 ```
 
 ```javascript
 // JavaScript A-Frame bridge (identical signature)
-await thd.createEnhancedObject('crystal', 'cone', 0, 3, 0, {color: '#ff0000', metalness: 0.8});
+await hd1.createEnhancedObject('crystal', 'cone', 0, 3, 0, {color: '#ff0000', metalness: 0.8});
 ```
 
 ### **2. Standard Scene Management**
@@ -183,7 +183,7 @@ make generate
 # All clients now updated automatically:
 # - Go routing (auto_router.go)
 # - Shell functions (lib/hd1lib.sh)  
-# - JavaScript client (share/htdocs/static/js/thdlib.js)
+# - JavaScript client (share/htdocs/static/js/hd1lib.js)
 # - A-Frame integration (lib/downstream/aframelib.*)
 ```
 
@@ -308,7 +308,7 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 ### **NEVER EDIT (Auto-Generated)**
 - `auto_router.go` - Generated from specification
 - `lib/hd1lib.sh` - Generated from API endpoints
-- `share/htdocs/static/js/thdlib.js` - Generated JavaScript client
+- `share/htdocs/static/js/hd1lib.js` - Generated JavaScript client
 - `lib/downstream/aframelib.*` - Generated A-Frame integration
 
 ### **ALWAYS EDIT (Source of Truth)**

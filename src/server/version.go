@@ -22,7 +22,7 @@ func updateJSVersion() {
 	// Create version hash based on all frontend files
 	rendererPath := "../share/htdocs/static/js/renderer.js"
 	matrixPath := "../share/htdocs/static/js/gl-matrix.js"
-	aframePath := "../share/htdocs/static/js/thd-aframe.js"
+	aframePath := "../share/htdocs/static/js/hd1-aframe.js"
 	consoleJSPath := "../share/htdocs/static/js/holodeck-console.js"
 	consoleCSSPath := "../share/htdocs/static/css/holodeck-console.css"
 	indexPath := "../share/htdocs/index.html"

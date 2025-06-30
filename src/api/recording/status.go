@@ -49,8 +49,8 @@ func GetRecordingStatusHandler(w http.ResponseWriter, r *http.Request, hub inter
 		recordings := []map[string]interface{}{}
 		
 		for _, entry := range entries {
-			if strings.HasSuffix(entry.Name(), ".thd") {
-				recordingID := strings.TrimSuffix(entry.Name(), ".thd")
+			if strings.HasSuffix(entry.Name(), ".hd1") {
+				recordingID := strings.TrimSuffix(entry.Name(), ".hd1")
 				info, _ := entry.Info()
 				
 				recordings = append(recordings, map[string]interface{}{

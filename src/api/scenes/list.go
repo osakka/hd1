@@ -23,7 +23,7 @@ type ListScenesResponse struct {
 	Scenes  []SceneInfo `json:"scenes"`
 }
 
-// ListScenesHandler returns all available THD scenes by scanning script directory
+// ListScenesHandler returns all available HD1 scenes by scanning script directory
 func ListScenesHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 	// Dynamically discover scenes from script directory
 	scenes := []SceneInfo{}
@@ -95,7 +95,7 @@ func parseSceneScript(sceneID, scriptPath string) *SceneInfo {
 		}
 		
 		// Count object creation commands
-		if (strings.Contains(line, "thd::create_object") || 
+		if (strings.Contains(line, "hd1::create_object") || 
 		    strings.Contains(line, "$HD1_CLIENT create-object")) && 
 		   !strings.HasPrefix(strings.TrimSpace(line), "#") {
 			objectCount++

@@ -118,7 +118,7 @@ func generateSceneScript(sceneID, name, description string, objects []server.Obj
 	script := fmt.Sprintf(`#!/bin/bash
 
 # =========================================================================
-# THD Scene: %s - %s
+# HD1 Scene: %s - %s
 # =========================================================================
 #
 # %s
@@ -141,8 +141,8 @@ if [[ -z "$SESSION_ID" ]]; then
     exit 1
 fi
 
-# Path to auto-generated THD client
-HD1_CLIENT="/opt/holo-deck/build/bin/thd-client"
+# Path to auto-generated HD1 client
+HD1_CLIENT="/opt/holo-deck/build/bin/hd1-client"
 
 echo "Creating %s scene..."
 
@@ -150,7 +150,7 @@ echo "Creating %s scene..."
 
 	// Add object creation commands
 	for _, obj := range objects {
-		// Convert object to JSON for thd-client
+		// Convert object to JSON for hd1-client
 		objectJSON := fmt.Sprintf(`{
     "name": "%s",
     "type": "%s",
@@ -176,7 +176,7 @@ $HD1_CLIENT create-object "$SESSION_ID" '%s' > /dev/null
 
 	// Add footer
 	script += fmt.Sprintf(`
-echo "THD Scene '$SCENE_NAME' loaded successfully"
+echo "HD1 Scene '$SCENE_NAME' loaded successfully"
 echo "Objects created: %d"
 echo "Session: $SESSION_ID"
 `, len(objects))

@@ -135,7 +135,7 @@ func (g *EnhancedCodeGenerator) generateEnhancedShellFunctions() error {
 	shellFunctionsTemplate := `#!/bin/bash
 #
 # ===================================================================
-# THD Enhanced Shell Function Library with A-Frame Integration
+# HD1 Enhanced Shell Function Library with A-Frame Integration
 # ===================================================================
 #
 # ⚡ REVOLUTIONARY FEATURES:
@@ -145,23 +145,23 @@ func (g *EnhancedCodeGenerator) generateEnhancedShellFunctions() error {
 # • Bar-raising standard development experience
 #
 # 🎯 GENERATED FROM:
-# • api.yaml (THD API specification)
+# • api.yaml (HD1 API specification)
 # • A-Frame component schemas (downstream dependency)
 # • Enhanced code generation pipeline
 #
 # 🏆 CROWN JEWEL: Unified function signatures across shell/web/CLI
 # ===================================================================
 
-# Load THD configuration
-source "${HD1_ROOT}/lib/thd-functions.sh" 2>/dev/null || {
-    echo "ERROR: THD function library not found"
+# Load HD1 configuration
+source "${HD1_ROOT}/lib/hd1-functions.sh" 2>/dev/null || {
+    echo "ERROR: HD1 function library not found"
     exit 1
 }
 
 # Enhanced functions with A-Frame integration
 {{range .GeneratedFunctions}}
 # {{.Description}}
-# A-Frame Component: {{if .AFrameMapping}}{{.AFrameMapping.Name}} ({{.AFrameMapping.Category}}){{else}}Custom THD{{end}}
+# A-Frame Component: {{if .AFrameMapping}}{{.AFrameMapping.Name}} ({{.AFrameMapping.Category}}){{else}}Custom HD1{{end}}
 {{.Name}}() {
     {{range .Parameters}}local {{.Name}}="${{add $.Index 1}}"  # {{.Description}}{{if .Default}} (default: {{.Default}}){{end}}
     {{end}}
@@ -192,12 +192,12 @@ source "${HD1_ROOT}/lib/thd-functions.sh" 2>/dev/null || {
 {{range $category, $components := .AFrameComponents}}
 # {{$category | title}} functions
 {{range $components}}
-thd::create_{{.Category}}_{{.Name}}() {
+hd1::create_{{.Category}}_{{.Name}}() {
     local object_name="$1"
     {{range $prop, $spec := .Schema}}local {{$prop}}="${{add 2 (index . 0)}}"  # {{$spec.Description}}{{if $spec.Default}} (default: {{$spec.Default}}){{end}}
     {{end}}
     
-    thd::create_object "${object_name}" "{{.Category}}" 0 0 0 \
+    hd1::create_object "${object_name}" "{{.Category}}" 0 0 0 \
         --{{.Category}}-type "{{.Name}}" \
         {{range $prop, $spec := .Schema}}--{{$prop}} "${{"$" + $prop}}" \{{end}}
 }
@@ -206,7 +206,7 @@ thd::create_{{.Category}}_{{.Name}}() {
 {{end}}
 
 # Enhanced object creation with complete A-Frame integration
-thd::create_enhanced_object() {
+hd1::create_enhanced_object() {
     local name="$1"
     local type="$2"
     local x="$3" 
@@ -249,7 +249,7 @@ thd::create_enhanced_object() {
 }
 
 # A-Frame component availability check
-thd::aframe_capabilities() {
+hd1::aframe_capabilities() {
     echo "A-Frame Capabilities ({{.AFrameCapabilities.total_components}} components):"
     {{range $category, $count := .AFrameCapabilities.categories}}echo "  {{$category}}: {{$count}} components"
     {{end}}
@@ -284,7 +284,7 @@ logging.Info "enhanced shell function library loaded" \
 		return fmt.Errorf("failed to parse shell functions template: %w", err)
 	}
 
-	outputPath := filepath.Join(g.OutputDir, "thd-enhanced-functions.sh")
+	outputPath := filepath.Join(g.OutputDir, "hd1-enhanced-functions.sh")
 	file, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to create shell functions file: %w", err)
@@ -320,7 +320,7 @@ func (g *EnhancedCodeGenerator) generateJavaScriptBridge() error {
 
 	jsBridgeTemplate := `/**
  * ===================================================================
- * THD JavaScript Function Bridge with A-Frame Integration
+ * HD1 JavaScript Function Bridge with A-Frame Integration
  * ===================================================================
  *
  * 🏆 REVOLUTIONARY FEATURES:
@@ -330,16 +330,16 @@ func (g *EnhancedCodeGenerator) generateJavaScriptBridge() error {
  * • Single source of truth architecture
  *
  * 🎯 GENERATED FROM:
- * • api.yaml (THD API specification)  
+ * • api.yaml (HD1 API specification)  
  * • A-Frame component schemas (downstream dependency)
  * • Enhanced code generation pipeline
  *
- * ✨ CROWN JEWEL: thd.createLight() works exactly like thd::create_light
+ * ✨ CROWN JEWEL: hd1.createLight() works exactly like hd1::create_light
  * ===================================================================
  */
 
-// Enhanced THD JavaScript API Bridge
-window.thd = window.thd || {};
+// Enhanced HD1 JavaScript API Bridge
+window.hd1 = window.hd1 || {};
 
 // Core session management
 function getCurrentSessionId() {
@@ -375,10 +375,10 @@ const aframeValidation = {
 {{range .GeneratedFunctions}}
 /**
  * {{.Description}}
- * A-Frame Component: {{if .AFrameMapping}}{{.AFrameMapping.Name}} ({{.AFrameMapping.Category}}){{else}}Custom THD{{end}}
+ * A-Frame Component: {{if .AFrameMapping}}{{.AFrameMapping.Name}} ({{.AFrameMapping.Category}}){{else}}Custom HD1{{end}}
  * Shell Equivalent: {{.ShellSignature}}
  */
-thd.{{.Name}} = function({{range $i, $param := .Parameters}}{{if gt $i 0}}, {{end}}{{.Name}}{{end}}) {
+hd1.{{.Name}} = function({{range $i, $param := .Parameters}}{{if gt $i 0}}, {{end}}{{.Name}}{{end}}) {
     try {
         // A-Frame schema validation
         {{if .AFrameMapping}}{{range $prop, $spec := .AFrameMapping.Schema}}
@@ -394,14 +394,14 @@ thd.{{.Name}} = function({{range $i, $param := .Parameters}}{{if gt $i 0}}, {{en
         };
         
         // Execute enhanced API call
-        return thdApiClient.request('{{.APIEndpoint}}', {
+        return hd1ApiClient.request('{{.APIEndpoint}}', {
             method: 'POST',
             data: payload,
             sessionId: getCurrentSessionId()
         });
         
     } catch (error) {
-        console.error(` + "`" + `[THD] {{.Name}} validation error:` + "`" + `, error);
+        console.error(` + "`" + `[HD1] {{.Name}} validation error:` + "`" + `, error);
         throw error;
     }
 };
@@ -412,8 +412,8 @@ thd.{{.Name}} = function({{range $i, $param := .Parameters}}{{if gt $i 0}}, {{en
 {{range $category, $components := .AFrameComponents}}
 // {{$category | title}} creation functions
 {{range $components}}
-thd.create{{.Category | title}}{{.Name | title}} = function(objectName{{range $prop, $spec := .Schema}}, {{$prop}}{{end}}) {
-    return thd.createObject(objectName, '{{.Category}}', 0, 0, 0, {
+hd1.create{{.Category | title}}{{.Name | title}} = function(objectName{{range $prop, $spec := .Schema}}, {{$prop}}{{end}}) {
+    return hd1.createObject(objectName, '{{.Category}}', 0, 0, 0, {
         {{.Category}}Type: '{{.Name}}'{{range $prop, $spec := .Schema}},
         {{$prop}}: {{$prop}}{{end}}
     });
@@ -423,7 +423,7 @@ thd.create{{.Category | title}}{{.Name | title}} = function(objectName{{range $p
 {{end}}
 
 // Enhanced object creation with complete A-Frame integration
-thd.createEnhancedObject = function(name, type, x, y, z, options = {}) {
+hd1.createEnhancedObject = function(name, type, x, y, z, options = {}) {
     const payload = {
         name: String(name),
         type: String(type),
@@ -440,23 +440,23 @@ thd.createEnhancedObject = function(name, type, x, y, z, options = {}) {
     if (options.light) payload.light = options.light;
     if (options.animation) payload.animation = options.animation;
     
-    return thdApiClient.createObject(getCurrentSessionId(), payload);
+    return hd1ApiClient.createObject(getCurrentSessionId(), payload);
 };
 
 // A-Frame capabilities inspection
-thd.aframeCapabilities = function() {
+hd1.aframeCapabilities = function() {
     const capabilities = {{.AFrameCapabilities | toJSON}};
     console.log('A-Frame Capabilities:', capabilities);
     return capabilities;
 };
 
 // Unified signature verification
-thd.verifySignatures = function() {
+hd1.verifySignatures = function() {
     const shellFunctions = [
         {{range .GeneratedFunctions}}'{{.Name}}',{{end}}
     ];
     
-    const jsFunctions = Object.keys(thd).filter(key => typeof thd[key] === 'function');
+    const jsFunctions = Object.keys(hd1).filter(key => typeof hd1[key] === 'function');
     
     console.log('Shell Function Compatibility:');
     shellFunctions.forEach(func => {
@@ -473,10 +473,10 @@ thd.verifySignatures = function() {
 
 // Console integration
 if (typeof console !== 'undefined') {
-    console.log('[THD] Enhanced JavaScript bridge loaded');
-    console.log(` + "`" + `[THD] Functions: ${Object.keys(thd).length}` + "`" + `);
-    console.log('[THD] A-Frame integration: ✅');
-    console.log('[THD] Bar-raising status: 🏆 ACHIEVED');
+    console.log('[HD1] Enhanced JavaScript bridge loaded');
+    console.log(` + "`" + `[HD1] Functions: ${Object.keys(hd1).length}` + "`" + `);
+    console.log('[HD1] A-Frame integration: ✅');
+    console.log('[HD1] Bar-raising status: 🏆 ACHIEVED');
 }
 `
 
@@ -491,7 +491,7 @@ if (typeof console !== 'undefined') {
 		return fmt.Errorf("failed to parse JavaScript bridge template: %w", err)
 	}
 
-	outputPath := filepath.Join(g.OutputDir, "thd-enhanced-bridge.js")
+	outputPath := filepath.Join(g.OutputDir, "hd1-enhanced-bridge.js")
 	file, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to create JavaScript bridge file: %w", err)
@@ -570,7 +570,7 @@ func (g *EnhancedCodeGenerator) buildShellSignature(component *AFrameComponentSp
 	for prop := range component.Schema {
 		params = append(params, prop)
 	}
-	return fmt.Sprintf("thd::%s %s", component.Name, strings.Join(params, " "))
+	return fmt.Sprintf("hd1::%s %s", component.Name, strings.Join(params, " "))
 }
 
 // buildJSSignature creates JavaScript function signature
@@ -579,7 +579,7 @@ func (g *EnhancedCodeGenerator) buildJSSignature(component *AFrameComponentSpec)
 	for prop := range component.Schema {
 		params = append(params, prop)
 	}
-	return fmt.Sprintf("thd.%s(%s)", component.Name, strings.Join(params, ", "))
+	return fmt.Sprintf("hd1.%s(%s)", component.Name, strings.Join(params, ", "))
 }
 
 // buildParameters creates parameter specifications
