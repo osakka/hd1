@@ -23,7 +23,7 @@ api.yaml (31 endpoints) → generator.go → {
 
 ### **1. Three-Layer Game Engine Architecture**
 - **Environment Layer**: Physics contexts (gravity, atmosphere, scale) - 4 distinct environments
-- **Props Layer**: Reusable objects with realistic physics properties - 5 categories
+- **Props Layer**: Reusable objects with realistic physics properties - 6 categories
 - **Scene Layer**: Orchestration combining environments + prop placement (future Phase 3)
 - **Game Engine Parity**: Matches Unity (World Settings + Prefabs + Scenes) and Unreal patterns
 

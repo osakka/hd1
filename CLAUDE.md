@@ -28,7 +28,7 @@
 ### Revolutionary Three-Layer Architecture Achievement
 - **Complete Game Engine Architecture** - Environment + Props + Scene layers matching Unity/Unreal patterns
 - **Environment System** - 4 physics contexts with realistic material adaptation
-- **Props System** - 5 categories of reusable objects with YAML-based definitions  
+- **Props System** - 6 categories of reusable objects with YAML-based definitions  
 - **Physics Cohesion Engine** - Props automatically adapt to environment physics
 - **API Extension** - 31 endpoints including comprehensive three-layer APIs
 - **Single Source of Truth** - All three-layer functionality auto-generated from specification
@@ -44,7 +44,7 @@
 ### Active Features
 - **Three-Layer Architecture**: Environment + Props + Scene system fully operational
 - **Environment APIs**: `/environments` (GET/POST) with 4 physics contexts
-- **Props APIs**: `/props` (GET) and `/sessions/{id}/props/{propId}` (POST) with 5 categories
+- **Props APIs**: `/props` (GET) and `/sessions/{id}/props/{propId}` (POST) with 6 categories
 - **Physics Cohesion**: Real-time environment-aware physics adaptation
 - **Web UI Console**: Dynamic version display "Holodeck I v1.0.0 aa74f3f3"
 - **API Endpoints**: All 31 endpoints functional including three-layer architecture
@@ -54,8 +54,8 @@
 
 ### Git Repository Status
 - **Branch**: master (up to date with origin)
-- **Last Commit**: 98c8a4d "feat: Complete three-layer architecture with comprehensive ADR documentation"
-- **Status**: Working tree has documentation updates in progress
+- **Last Commit**: 73f7169 "refactor: Complete surgical code audit with comprehensive documentation update"
+- **Status**: Working tree has technical documentation accuracy updates in progress
 - **Remote**: https://git.uk.home.arpa/itdlabs/holo-deck.git
 
 ### Key Components

@@ -6,17 +6,29 @@ Welcome to the comprehensive documentation center for HD1 - the world's first th
 
 ## 📚 Documentation Structure
 
-### 📄 [Whitepaper](whitepaper/)
-**Technical Foundation Documents**
-- [Advanced Holodeck Architecture](whitepaper/advanced-holodeck-architecture.md) - Complete technical whitepaper
-- System architecture, innovations, and engineering principles
-- Performance analysis and scalability considerations
+### 📚 [User Guides](guides/)
+**Getting Started & User Documentation**
+- [Getting Started Guide](guides/getting-started.md) - Quick start for new users
+- Installation, configuration, and basic usage
+- Step-by-step tutorials and examples
 
-### 🎨 [Design](design/)
-**System & Software Design Documentation**
-- [API Documentation](design/api/) - Complete API reference and specifications
-- [Architecture Documentation](design/architecture/) - System architecture and component design
-- Design decisions, patterns, and technical specifications
+### 🔧 [API Documentation](api/)
+**Complete API Reference & Integration**
+- [API Reference](api/README.md) - Complete endpoint documentation
+- [Enhanced Integration](api/enhanced-integration.md) - Advanced API patterns
+- Authentication, examples, and best practices
+
+### 🏗️ [Architecture](architecture/)
+**System Design & Technical Foundation**
+- [Architecture Overview](architecture/overview.md) - Three-layer system design
+- [System Architecture](architecture/system-architecture.md) - Detailed system design
+- [Coordinate System](architecture/coordinate-system.md) - 3D space implementation
+
+### 👩‍💻 [Development](development/)
+**Developer Resources & Standards**
+- [Contributing Guide](development/contributing.md) - How to contribute to HD1
+- [Three-Layer Implementation](development/three-layer-implementation.md) - Implementation plan
+- [Session Handoff](development/session-handoff.md) - Development context
 
 ### 📜 [Architecture Decision Records (ADRs)](adr/)
 **Architectural Evolution Timeline**
@@ -59,7 +71,7 @@ Welcome to the comprehensive documentation center for HD1 - the world's first th
 
 ### Three-Layer Game Engine Architecture
 - **Environment System**: 4 physics contexts with realistic material adaptation
-- **Props System**: 5 categories of reusable objects with YAML-based definitions
+- **Props System**: 6 categories of reusable objects with YAML-based definitions
 - **Scene Orchestration**: Smart composition (future Phase 3)
 - **Game Engine Parity**: Matches Unity/Unreal Engine architectural patterns
 

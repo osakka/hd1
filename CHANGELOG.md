@@ -25,7 +25,7 @@ This revolutionary release establishes HD1 as a **standard game engine architect
 #### **🏗️ Props System (Layer 2)**
 - **Props API**: `/props` (GET), `/sessions/{sessionId}/props/{propId}` (POST)
 - **YAML-Based Definitions**: Structured prop specifications with physics properties
-- **5 Prop Categories**: Decorative, Electronic, Furniture, Organic, Structural, Tools
+- **6 Prop Categories**: Decorative, Electronic, Furniture, Organic, Structural, Tools
 - **Realistic Physics**: Material-accurate properties (wood: 600 kg/m³, metal: 7800 kg/m³)
 - **Scale Compatibility**: Props adapt to environment scale (nm, mm, cm, m, km)
 

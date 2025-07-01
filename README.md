@@ -20,7 +20,7 @@
 
 ### Three-Layer Architecture System (v4.0.0)
 - **Environment Management**: 4 physics contexts (Earth Surface, Molecular Scale, Space Vacuum, Underwater)
-- **Props Library**: Realistic physics objects (Decorative, Electronic, Furniture, Organic, Structural, Tools)
+- **Props Library**: Realistic physics objects (6 categories: Decorative, Electronic, Furniture, Organic, Structural, Tools)
 - **Physics Cohesion**: Props automatically adapt to environment physics (mass, friction, gravity effects)
 - **Hot-Swappable**: Change environment mid-session with real-time physics recalculation
 - **Material Accuracy**: Realistic properties (wood: 600 kg/m³, metal: 7800 kg/m³)
@@ -196,7 +196,7 @@ GET  /api/sessions/{id}         # Get session details
 ```bash
 # Environment System
 GET  /api/environments                          # List available environments
-POST /api/sessions/{id}/environments/{envId}   # Apply environment to session
+POST /api/environments/{environmentId}          # Apply environment to session
 
 # Props System  
 GET  /api/props                                 # List available props
@@ -266,7 +266,7 @@ make status      # Status reporting
 │   │   ├── molecular-scale.sh    # Nanometer scale
 │   │   ├── space-vacuum.sh       # Weightless physics
 │   │   └── underwater.sh         # Buoyancy effects
-│   ├── props/                    # 🏗️ Props library (5 categories)
+│   ├── props/                    # 🏗️ Props library (6 categories)
 │   │   ├── decorative/           # Aesthetic objects
 │   │   ├── electronic/           # Technology props
 │   │   ├── furniture/            # Seating, tables, storage
@@ -316,8 +316,8 @@ hd1::create_sky "environment" "#1a1a2e"
 - **Boundaries**: [-12, +12] on all X, Y, Z axes
 - **Floor Level**: Y=0 (world floor)
 - **Eye Level**: Y=1.7 (human standing height)
-- **Max Objects**: 1000 per session
-- **Max Sessions**: 100 concurrent
+- **Max Objects**: Configurable per deployment
+- **Max Sessions**: Configurable per deployment
 
 ## Licensing & Attribution
 
@@ -357,26 +357,25 @@ HD1 demonstrates how easy it is to integrate open-source frameworks:
 
 ## Example Scenarios
 
-Run the complete holodeck demonstration:
+Create your own holodeck experiences using the shell function library:
 ```bash
+# Load HD1 functions
+source lib/hd1lib.sh
+
 # Set your session ID
 export HD1_SESSION_ID="your-session-id"
 
-# Run the complete scenario
-./scenarios/complete-holodeck.hd1
+# Create basic objects and environments
+hd1::create_object "platform" "cylinder" 0 -0.1 0
+hd1::create_object "demonstration_cube" "cube" 0 1 0
 ```
 
-This creates a complete holodeck experience with:
-- Sky environment with atmospheric effects
-- Cinematic lighting system (4 light sources)
-- Circular metallic platform foundation
-- Crystal formations with materials
-- Particle effects (fire, smoke, sparkles)
-- Physics simulation with bouncing spheres
-- Architectural elements (glass walls, metal beams)
-- 3D holographic text displays
-- Interactive control panels
-- Floating artistic sculptures
+HD1 provides comprehensive APIs for creating immersive experiences with:
+- Environment physics contexts with real-time switching
+- Props with realistic material properties and physics
+- API-driven scene composition and management
+- WebSocket real-time synchronization
+- VR/AR WebXR compatibility
 
 ## Contributing
 

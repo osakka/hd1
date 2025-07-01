@@ -1,4 +1,4 @@
-# ADR-004: Static File Separation and Template Processing
+# ADR-015: Static File Separation and Template Processing
 
 ## Status
 Accepted (2025-06-30)

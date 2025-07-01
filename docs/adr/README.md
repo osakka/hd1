@@ -96,6 +96,12 @@ This directory contains all architectural decision records (ADRs) documenting th
 - **Result**: Realistic physics cohesion with environment-specific prop behavior
 - **Key Achievement**: Unity/Unreal-level object management with API-driven development
 
+**[ADR-015: Static File Separation and Template Processing](ADR-015-Static-File-Separation-and-Template-Processing.md)**
+- **Status**: ✅ Accepted | **Impact**: 🏗️ Architectural Foundation
+- **Decision**: Separate static files from embedded Go strings for better development workflow
+- **Result**: Clean separation of concerns between frontend and backend
+- **Key Achievement**: Template processing system with variable substitution
+
 ## 🏗️ Architectural Evolution Summary
 
 ### Advanced Milestones
@@ -131,6 +137,8 @@ This directory contains all architectural decision records (ADRs) documenting th
 | ADR-010 | ✅ Accepted | 🌍 Spatial | Core System |
 | ADR-011 | ✅ Accepted | 🔧 Quality | Core System |
 | ADR-013 | ✅ Accepted | 🎨 Color Persistence | Session Restoration |
+| ADR-014 | ✅ Accepted | 🎮 Game Engine Parity | Three-Layer Architecture |
+| ADR-015 | ✅ Accepted | 🏗️ Architectural | Foundation |
 
 ## 🎯 Key Architectural Principles
 
