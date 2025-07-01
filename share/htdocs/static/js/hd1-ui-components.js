@@ -17,77 +17,77 @@ class HD1UIComponents {
     initializeComponents() {
         console.log('🎨 Initializing auto-generated UI components...');
 
-        this.components.set('listsessions', this.createListSessionsComponent());
+        this.components.set('getversion', this.createGetVersionComponent());
 
         this.components.set('createsession', this.createCreateSessionComponent());
 
-        this.components.set('listenvironments', this.createListEnvironmentsComponent());
-
-        this.components.set('instantiateprop', this.createInstantiatePropComponent());
-
-        this.components.set('listscenes', this.createListScenesComponent());
-
-        this.components.set('loadscene', this.createLoadSceneComponent());
-
-        this.components.set('settracemodules', this.createSetTraceModulesComponent());
-
-        this.components.set('getlogs', this.createGetLogsComponent());
-
-        this.components.set('setcameraposition', this.createSetCameraPositionComponent());
-
-        this.components.set('listprops', this.createListPropsComponent());
+        this.components.set('listsessions', this.createListSessionsComponent());
 
         this.components.set('savescenefromsession', this.createSaveSceneFromSessionComponent());
 
-        this.components.set('forkscene', this.createForkSceneComponent());
-
-        this.components.set('getobject', this.createGetObjectComponent());
-
-        this.components.set('updateobject', this.createUpdateObjectComponent());
-
-        this.components.set('deleteobject', this.createDeleteObjectComponent());
-
-        this.components.set('setloglevel', this.createSetLogLevelComponent());
-
-        this.components.set('startcameraorbit', this.createStartCameraOrbitComponent());
-
-        this.components.set('getversion', this.createGetVersionComponent());
-
-        this.components.set('deletesession', this.createDeleteSessionComponent());
-
-        this.components.set('getsession', this.createGetSessionComponent());
-
-        this.components.set('applyenvironment', this.createApplyEnvironmentComponent());
-
-        this.components.set('startrecording', this.createStartRecordingComponent());
-
-        this.components.set('stoprecording', this.createStopRecordingComponent());
-
         this.components.set('playrecording', this.createPlayRecordingComponent());
-
-        this.components.set('getrecordingstatus', this.createGetRecordingStatusComponent());
 
         this.components.set('listobjects', this.createListObjectsComponent());
 
         this.components.set('createobject', this.createCreateObjectComponent());
 
-        this.components.set('setloggingconfig', this.createSetLoggingConfigComponent());
+        this.components.set('updateobject', this.createUpdateObjectComponent());
+
+        this.components.set('deleteobject', this.createDeleteObjectComponent());
+
+        this.components.set('getobject', this.createGetObjectComponent());
+
+        this.components.set('settracemodules', this.createSetTraceModulesComponent());
+
+        this.components.set('listenvironments', this.createListEnvironmentsComponent());
+
+        this.components.set('stoprecording', this.createStopRecordingComponent());
+
+        this.components.set('setloglevel', this.createSetLogLevelComponent());
+
+        this.components.set('setcanvas', this.createSetCanvasComponent());
+
+        this.components.set('startcameraorbit', this.createStartCameraOrbitComponent());
+
+        this.components.set('instantiateprop', this.createInstantiatePropComponent());
+
+        this.components.set('loadscene', this.createLoadSceneComponent());
+
+        this.components.set('forkscene', this.createForkSceneComponent());
+
+        this.components.set('startrecording', this.createStartRecordingComponent());
 
         this.components.set('getloggingconfig', this.createGetLoggingConfigComponent());
 
+        this.components.set('setloggingconfig', this.createSetLoggingConfigComponent());
+
+        this.components.set('getlogs', this.createGetLogsComponent());
+
+        this.components.set('getsession', this.createGetSessionComponent());
+
+        this.components.set('deletesession', this.createDeleteSessionComponent());
+
+        this.components.set('applyenvironment', this.createApplyEnvironmentComponent());
+
+        this.components.set('listprops', this.createListPropsComponent());
+
+        this.components.set('listscenes', this.createListScenesComponent());
+
+        this.components.set('getrecordingstatus', this.createGetRecordingStatusComponent());
+
         this.components.set('forcerefresh', this.createForceRefreshComponent());
 
-        this.components.set('setcanvas', this.createSetCanvasComponent());
+        this.components.set('setcameraposition', this.createSetCameraPositionComponent());
 
         console.log('✅ UI components initialized');
     }
 
 
-    // Component for GET /sessions
-    createListSessionsComponent() {
+    // Component for GET /version
+    createGetVersionComponent() {
         return {
-            name: 'listsessions',
-            endpoint: '/sessions',
+            name: 'getversion',
+            endpoint: '/version',
             method: 'GET',
             
             render: (containerId) => {
@@ -97,17 +97,17 @@ class HD1UIComponents {
                     return;
                 }
                 
-                container.innerHTML = '<div class="hd1-component"><h4>ListSessions</h4><form id="listSessions-form"><button type="submit">Execute</button></form><div id="listSessions-result" class="result-area"></div></div>';
-                this.attachEventListeners('listsessions', container);
+                container.innerHTML = '<div class="hd1-component"><h4>GetVersion</h4><form id="getVersion-form"><button type="submit">Execute</button></form><div id="getVersion-result" class="result-area"></div></div>';
+                this.attachEventListeners('getversion', container);
             },
             
             execute: async (formData) => {
                 try {
-                    const result = await this.api.listSessions();
-                    this.showResult('listsessions', result);
+                    const result = await this.api.getVersion();
+                    this.showResult('getversion', result);
                     return result;
                 } catch (error) {
-                    this.showError('listsessions', error);
+                    this.showError('getversion', error);
                     throw error;
                 }
             }
@@ -145,11 +145,11 @@ class HD1UIComponents {
         };
     }
 
-    // Component for GET /environments
-    createListEnvironmentsComponent() {
+    // Component for GET /sessions
+    createListSessionsComponent() {
         return {
-            name: 'listenvironments',
-            endpoint: '/environments',
+            name: 'listsessions',
+            endpoint: '/sessions',
             method: 'GET',
             
             render: (containerId) => {
@@ -159,234 +159,17 @@ class HD1UIComponents {
                     return;
                 }
                 
-                container.innerHTML = '<div class="hd1-component"><h4>ListEnvironments</h4><form id="listEnvironments-form"><button type="submit">Execute</button></form><div id="listEnvironments-result" class="result-area"></div></div>';
-                this.attachEventListeners('listenvironments', container);
+                container.innerHTML = '<div class="hd1-component"><h4>ListSessions</h4><form id="listSessions-form"><button type="submit">Execute</button></form><div id="listSessions-result" class="result-area"></div></div>';
+                this.attachEventListeners('listsessions', container);
             },
             
             execute: async (formData) => {
                 try {
-                    const result = await this.api.listEnvironments();
-                    this.showResult('listenvironments', result);
+                    const result = await this.api.listSessions();
+                    this.showResult('listsessions', result);
                     return result;
                 } catch (error) {
-                    this.showError('listenvironments', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /sessions/{sessionId}/props/{propId}
-    createInstantiatePropComponent() {
-        return {
-            name: 'instantiateprop',
-            endpoint: '/sessions/{sessionId}/props/{propId}',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>InstantiateProp</h4><form id="instantiateProp-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="instantiateProp-result" class="result-area"></div></div>';
-                this.attachEventListeners('instantiateprop', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.instantiateProp(formData.param1, formData.param2, formData);
-                    this.showResult('instantiateprop', result);
-                    return result;
-                } catch (error) {
-                    this.showError('instantiateprop', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /scenes
-    createListScenesComponent() {
-        return {
-            name: 'listscenes',
-            endpoint: '/scenes',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>ListScenes</h4><form id="listScenes-form"><button type="submit">Execute</button></form><div id="listScenes-result" class="result-area"></div></div>';
-                this.attachEventListeners('listscenes', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.listScenes();
-                    this.showResult('listscenes', result);
-                    return result;
-                } catch (error) {
-                    this.showError('listscenes', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /scenes/{sceneId}
-    createLoadSceneComponent() {
-        return {
-            name: 'loadscene',
-            endpoint: '/scenes/{sceneId}',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>LoadScene</h4><form id="loadScene-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="loadScene-result" class="result-area"></div></div>';
-                this.attachEventListeners('loadscene', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.loadScene(formData.param1, formData);
-                    this.showResult('loadscene', result);
-                    return result;
-                } catch (error) {
-                    this.showError('loadscene', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /admin/logging/trace
-    createSetTraceModulesComponent() {
-        return {
-            name: 'settracemodules',
-            endpoint: '/admin/logging/trace',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>SetTraceModules</h4><form id="setTraceModules-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setTraceModules-result" class="result-area"></div></div>';
-                this.attachEventListeners('settracemodules', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.setTraceModules(formData);
-                    this.showResult('settracemodules', result);
-                    return result;
-                } catch (error) {
-                    this.showError('settracemodules', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /admin/logging/logs
-    createGetLogsComponent() {
-        return {
-            name: 'getlogs',
-            endpoint: '/admin/logging/logs',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>GetLogs</h4><form id="getLogs-form"><button type="submit">Execute</button></form><div id="getLogs-result" class="result-area"></div></div>';
-                this.attachEventListeners('getlogs', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getLogs();
-                    this.showResult('getlogs', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getlogs', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for PUT /sessions/{sessionId}/camera/position
-    createSetCameraPositionComponent() {
-        return {
-            name: 'setcameraposition',
-            endpoint: '/sessions/{sessionId}/camera/position',
-            method: 'PUT',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>SetCameraPosition</h4><form id="setCameraPosition-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setCameraPosition-result" class="result-area"></div></div>';
-                this.attachEventListeners('setcameraposition', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.setCameraPosition(formData.param1, formData);
-                    this.showResult('setcameraposition', result);
-                    return result;
-                } catch (error) {
-                    this.showError('setcameraposition', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /props
-    createListPropsComponent() {
-        return {
-            name: 'listprops',
-            endpoint: '/props',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>ListProps</h4><form id="listProps-form"><button type="submit">Execute</button></form><div id="listProps-result" class="result-area"></div></div>';
-                this.attachEventListeners('listprops', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.listProps();
-                    this.showResult('listprops', result);
-                    return result;
-                } catch (error) {
-                    this.showError('listprops', error);
+                    this.showError('listsessions', error);
                     throw error;
                 }
             }
@@ -424,378 +207,6 @@ class HD1UIComponents {
         };
     }
 
-    // Component for POST /scenes/{sceneId}/fork
-    createForkSceneComponent() {
-        return {
-            name: 'forkscene',
-            endpoint: '/scenes/{sceneId}/fork',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>ForkScene</h4><form id="forkScene-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="forkScene-result" class="result-area"></div></div>';
-                this.attachEventListeners('forkscene', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.forkScene(formData.param1, formData);
-                    this.showResult('forkscene', result);
-                    return result;
-                } catch (error) {
-                    this.showError('forkscene', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /sessions/{sessionId}/objects/{objectName}
-    createGetObjectComponent() {
-        return {
-            name: 'getobject',
-            endpoint: '/sessions/{sessionId}/objects/{objectName}',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>GetObject</h4><form id="getObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><button type="submit">Execute</button></form><div id="getObject-result" class="result-area"></div></div>';
-                this.attachEventListeners('getobject', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getObject(formData.param1, formData.param2);
-                    this.showResult('getobject', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getobject', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for PUT /sessions/{sessionId}/objects/{objectName}
-    createUpdateObjectComponent() {
-        return {
-            name: 'updateobject',
-            endpoint: '/sessions/{sessionId}/objects/{objectName}',
-            method: 'PUT',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>UpdateObject</h4><form id="updateObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="updateObject-result" class="result-area"></div></div>';
-                this.attachEventListeners('updateobject', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.updateObject(formData.param1, formData.param2, formData);
-                    this.showResult('updateobject', result);
-                    return result;
-                } catch (error) {
-                    this.showError('updateobject', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for DELETE /sessions/{sessionId}/objects/{objectName}
-    createDeleteObjectComponent() {
-        return {
-            name: 'deleteobject',
-            endpoint: '/sessions/{sessionId}/objects/{objectName}',
-            method: 'DELETE',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>DeleteObject</h4><form id="deleteObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><button type="submit">Execute</button></form><div id="deleteObject-result" class="result-area"></div></div>';
-                this.attachEventListeners('deleteobject', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.deleteObject(formData.param1, formData.param2);
-                    this.showResult('deleteobject', result);
-                    return result;
-                } catch (error) {
-                    this.showError('deleteobject', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /admin/logging/level
-    createSetLogLevelComponent() {
-        return {
-            name: 'setloglevel',
-            endpoint: '/admin/logging/level',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>SetLogLevel</h4><form id="setLogLevel-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setLogLevel-result" class="result-area"></div></div>';
-                this.attachEventListeners('setloglevel', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.setLogLevel(formData);
-                    this.showResult('setloglevel', result);
-                    return result;
-                } catch (error) {
-                    this.showError('setloglevel', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /sessions/{sessionId}/camera/orbit
-    createStartCameraOrbitComponent() {
-        return {
-            name: 'startcameraorbit',
-            endpoint: '/sessions/{sessionId}/camera/orbit',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>StartCameraOrbit</h4><form id="startCameraOrbit-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="startCameraOrbit-result" class="result-area"></div></div>';
-                this.attachEventListeners('startcameraorbit', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.startCameraOrbit(formData.param1, formData);
-                    this.showResult('startcameraorbit', result);
-                    return result;
-                } catch (error) {
-                    this.showError('startcameraorbit', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /version
-    createGetVersionComponent() {
-        return {
-            name: 'getversion',
-            endpoint: '/version',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>GetVersion</h4><form id="getVersion-form"><button type="submit">Execute</button></form><div id="getVersion-result" class="result-area"></div></div>';
-                this.attachEventListeners('getversion', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getVersion();
-                    this.showResult('getversion', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getversion', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for DELETE /sessions/{sessionId}
-    createDeleteSessionComponent() {
-        return {
-            name: 'deletesession',
-            endpoint: '/sessions/{sessionId}',
-            method: 'DELETE',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>DeleteSession</h4><form id="deleteSession-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><button type="submit">Execute</button></form><div id="deleteSession-result" class="result-area"></div></div>';
-                this.attachEventListeners('deletesession', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.deleteSession(formData.param1);
-                    this.showResult('deletesession', result);
-                    return result;
-                } catch (error) {
-                    this.showError('deletesession', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /sessions/{sessionId}
-    createGetSessionComponent() {
-        return {
-            name: 'getsession',
-            endpoint: '/sessions/{sessionId}',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>GetSession</h4><form id="getSession-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><button type="submit">Execute</button></form><div id="getSession-result" class="result-area"></div></div>';
-                this.attachEventListeners('getsession', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getSession(formData.param1);
-                    this.showResult('getsession', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getsession', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /environments/{environmentId}
-    createApplyEnvironmentComponent() {
-        return {
-            name: 'applyenvironment',
-            endpoint: '/environments/{environmentId}',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>ApplyEnvironment</h4><form id="applyEnvironment-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="applyEnvironment-result" class="result-area"></div></div>';
-                this.attachEventListeners('applyenvironment', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.applyEnvironment(formData.param1, formData);
-                    this.showResult('applyenvironment', result);
-                    return result;
-                } catch (error) {
-                    this.showError('applyenvironment', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /sessions/{sessionId}/recording/start
-    createStartRecordingComponent() {
-        return {
-            name: 'startrecording',
-            endpoint: '/sessions/{sessionId}/recording/start',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>StartRecording</h4><form id="startRecording-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="startRecording-result" class="result-area"></div></div>';
-                this.attachEventListeners('startrecording', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.startRecording(formData.param1, formData);
-                    this.showResult('startrecording', result);
-                    return result;
-                } catch (error) {
-                    this.showError('startrecording', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for POST /sessions/{sessionId}/recording/stop
-    createStopRecordingComponent() {
-        return {
-            name: 'stoprecording',
-            endpoint: '/sessions/{sessionId}/recording/stop',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>StopRecording</h4><form id="stopRecording-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="stopRecording-result" class="result-area"></div></div>';
-                this.attachEventListeners('stoprecording', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.stopRecording(formData.param1, formData);
-                    this.showResult('stoprecording', result);
-                    return result;
-                } catch (error) {
-                    this.showError('stoprecording', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
     // Component for POST /sessions/{sessionId}/recording/play
     createPlayRecordingComponent() {
         return {
@@ -821,37 +232,6 @@ class HD1UIComponents {
                     return result;
                 } catch (error) {
                     this.showError('playrecording', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /sessions/{sessionId}/recording/status
-    createGetRecordingStatusComponent() {
-        return {
-            name: 'getrecordingstatus',
-            endpoint: '/sessions/{sessionId}/recording/status',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>GetRecordingStatus</h4><form id="getRecordingStatus-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><button type="submit">Execute</button></form><div id="getRecordingStatus-result" class="result-area"></div></div>';
-                this.attachEventListeners('getrecordingstatus', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getRecordingStatus(formData.param1);
-                    this.showResult('getrecordingstatus', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getrecordingstatus', error);
                     throw error;
                 }
             }
@@ -920,11 +300,104 @@ class HD1UIComponents {
         };
     }
 
-    // Component for POST /admin/logging/config
-    createSetLoggingConfigComponent() {
+    // Component for PUT /sessions/{sessionId}/objects/{objectName}
+    createUpdateObjectComponent() {
         return {
-            name: 'setloggingconfig',
-            endpoint: '/admin/logging/config',
+            name: 'updateobject',
+            endpoint: '/sessions/{sessionId}/objects/{objectName}',
+            method: 'PUT',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>UpdateObject</h4><form id="updateObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="updateObject-result" class="result-area"></div></div>';
+                this.attachEventListeners('updateobject', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.updateObject(formData.param1, formData.param2, formData);
+                    this.showResult('updateobject', result);
+                    return result;
+                } catch (error) {
+                    this.showError('updateobject', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for DELETE /sessions/{sessionId}/objects/{objectName}
+    createDeleteObjectComponent() {
+        return {
+            name: 'deleteobject',
+            endpoint: '/sessions/{sessionId}/objects/{objectName}',
+            method: 'DELETE',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>DeleteObject</h4><form id="deleteObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><button type="submit">Execute</button></form><div id="deleteObject-result" class="result-area"></div></div>';
+                this.attachEventListeners('deleteobject', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.deleteObject(formData.param1, formData.param2);
+                    this.showResult('deleteobject', result);
+                    return result;
+                } catch (error) {
+                    this.showError('deleteobject', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /sessions/{sessionId}/objects/{objectName}
+    createGetObjectComponent() {
+        return {
+            name: 'getobject',
+            endpoint: '/sessions/{sessionId}/objects/{objectName}',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>GetObject</h4><form id="getObject-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><button type="submit">Execute</button></form><div id="getObject-result" class="result-area"></div></div>';
+                this.attachEventListeners('getobject', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.getObject(formData.param1, formData.param2);
+                    this.showResult('getobject', result);
+                    return result;
+                } catch (error) {
+                    this.showError('getobject', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /admin/logging/trace
+    createSetTraceModulesComponent() {
+        return {
+            name: 'settracemodules',
+            endpoint: '/admin/logging/trace',
             method: 'POST',
             
             render: (containerId) => {
@@ -934,17 +407,296 @@ class HD1UIComponents {
                     return;
                 }
                 
-                container.innerHTML = '<div class="hd1-component"><h4>SetLoggingConfig</h4><form id="setLoggingConfig-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setLoggingConfig-result" class="result-area"></div></div>';
-                this.attachEventListeners('setloggingconfig', container);
+                container.innerHTML = '<div class="hd1-component"><h4>SetTraceModules</h4><form id="setTraceModules-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setTraceModules-result" class="result-area"></div></div>';
+                this.attachEventListeners('settracemodules', container);
             },
             
             execute: async (formData) => {
                 try {
-                    const result = await this.api.setLoggingConfig(formData);
-                    this.showResult('setloggingconfig', result);
+                    const result = await this.api.setTraceModules(formData);
+                    this.showResult('settracemodules', result);
                     return result;
                 } catch (error) {
-                    this.showError('setloggingconfig', error);
+                    this.showError('settracemodules', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /environments
+    createListEnvironmentsComponent() {
+        return {
+            name: 'listenvironments',
+            endpoint: '/environments',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>ListEnvironments</h4><form id="listEnvironments-form"><button type="submit">Execute</button></form><div id="listEnvironments-result" class="result-area"></div></div>';
+                this.attachEventListeners('listenvironments', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.listEnvironments();
+                    this.showResult('listenvironments', result);
+                    return result;
+                } catch (error) {
+                    this.showError('listenvironments', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /sessions/{sessionId}/recording/stop
+    createStopRecordingComponent() {
+        return {
+            name: 'stoprecording',
+            endpoint: '/sessions/{sessionId}/recording/stop',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>StopRecording</h4><form id="stopRecording-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="stopRecording-result" class="result-area"></div></div>';
+                this.attachEventListeners('stoprecording', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.stopRecording(formData.param1, formData);
+                    this.showResult('stoprecording', result);
+                    return result;
+                } catch (error) {
+                    this.showError('stoprecording', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /admin/logging/level
+    createSetLogLevelComponent() {
+        return {
+            name: 'setloglevel',
+            endpoint: '/admin/logging/level',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>SetLogLevel</h4><form id="setLogLevel-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setLogLevel-result" class="result-area"></div></div>';
+                this.attachEventListeners('setloglevel', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.setLogLevel(formData);
+                    this.showResult('setloglevel', result);
+                    return result;
+                } catch (error) {
+                    this.showError('setloglevel', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /browser/canvas
+    createSetCanvasComponent() {
+        return {
+            name: 'setcanvas',
+            endpoint: '/browser/canvas',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>SetCanvas</h4><form id="setCanvas-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setCanvas-result" class="result-area"></div></div>';
+                this.attachEventListeners('setcanvas', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.setCanvas(formData);
+                    this.showResult('setcanvas', result);
+                    return result;
+                } catch (error) {
+                    this.showError('setcanvas', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /sessions/{sessionId}/camera/orbit
+    createStartCameraOrbitComponent() {
+        return {
+            name: 'startcameraorbit',
+            endpoint: '/sessions/{sessionId}/camera/orbit',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>StartCameraOrbit</h4><form id="startCameraOrbit-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="startCameraOrbit-result" class="result-area"></div></div>';
+                this.attachEventListeners('startcameraorbit', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.startCameraOrbit(formData.param1, formData);
+                    this.showResult('startcameraorbit', result);
+                    return result;
+                } catch (error) {
+                    this.showError('startcameraorbit', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /sessions/{sessionId}/props/{propId}
+    createInstantiatePropComponent() {
+        return {
+            name: 'instantiateprop',
+            endpoint: '/sessions/{sessionId}/props/{propId}',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>InstantiateProp</h4><form id="instantiateProp-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="param2">Parameter 2:</label><input type="text" name="param2" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="instantiateProp-result" class="result-area"></div></div>';
+                this.attachEventListeners('instantiateprop', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.instantiateProp(formData.param1, formData.param2, formData);
+                    this.showResult('instantiateprop', result);
+                    return result;
+                } catch (error) {
+                    this.showError('instantiateprop', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /scenes/{sceneId}
+    createLoadSceneComponent() {
+        return {
+            name: 'loadscene',
+            endpoint: '/scenes/{sceneId}',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>LoadScene</h4><form id="loadScene-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="loadScene-result" class="result-area"></div></div>';
+                this.attachEventListeners('loadscene', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.loadScene(formData.param1, formData);
+                    this.showResult('loadscene', result);
+                    return result;
+                } catch (error) {
+                    this.showError('loadscene', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /scenes/{sceneId}/fork
+    createForkSceneComponent() {
+        return {
+            name: 'forkscene',
+            endpoint: '/scenes/{sceneId}/fork',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>ForkScene</h4><form id="forkScene-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="forkScene-result" class="result-area"></div></div>';
+                this.attachEventListeners('forkscene', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.forkScene(formData.param1, formData);
+                    this.showResult('forkscene', result);
+                    return result;
+                } catch (error) {
+                    this.showError('forkscene', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /sessions/{sessionId}/recording/start
+    createStartRecordingComponent() {
+        return {
+            name: 'startrecording',
+            endpoint: '/sessions/{sessionId}/recording/start',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>StartRecording</h4><form id="startRecording-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="startRecording-result" class="result-area"></div></div>';
+                this.attachEventListeners('startrecording', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.startRecording(formData.param1, formData);
+                    this.showResult('startrecording', result);
+                    return result;
+                } catch (error) {
+                    this.showError('startrecording', error);
                     throw error;
                 }
             }
@@ -982,6 +734,254 @@ class HD1UIComponents {
         };
     }
 
+    // Component for POST /admin/logging/config
+    createSetLoggingConfigComponent() {
+        return {
+            name: 'setloggingconfig',
+            endpoint: '/admin/logging/config',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>SetLoggingConfig</h4><form id="setLoggingConfig-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setLoggingConfig-result" class="result-area"></div></div>';
+                this.attachEventListeners('setloggingconfig', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.setLoggingConfig(formData);
+                    this.showResult('setloggingconfig', result);
+                    return result;
+                } catch (error) {
+                    this.showError('setloggingconfig', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /admin/logging/logs
+    createGetLogsComponent() {
+        return {
+            name: 'getlogs',
+            endpoint: '/admin/logging/logs',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>GetLogs</h4><form id="getLogs-form"><button type="submit">Execute</button></form><div id="getLogs-result" class="result-area"></div></div>';
+                this.attachEventListeners('getlogs', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.getLogs();
+                    this.showResult('getlogs', result);
+                    return result;
+                } catch (error) {
+                    this.showError('getlogs', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /sessions/{sessionId}
+    createGetSessionComponent() {
+        return {
+            name: 'getsession',
+            endpoint: '/sessions/{sessionId}',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>GetSession</h4><form id="getSession-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><button type="submit">Execute</button></form><div id="getSession-result" class="result-area"></div></div>';
+                this.attachEventListeners('getsession', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.getSession(formData.param1);
+                    this.showResult('getsession', result);
+                    return result;
+                } catch (error) {
+                    this.showError('getsession', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for DELETE /sessions/{sessionId}
+    createDeleteSessionComponent() {
+        return {
+            name: 'deletesession',
+            endpoint: '/sessions/{sessionId}',
+            method: 'DELETE',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>DeleteSession</h4><form id="deleteSession-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><button type="submit">Execute</button></form><div id="deleteSession-result" class="result-area"></div></div>';
+                this.attachEventListeners('deletesession', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.deleteSession(formData.param1);
+                    this.showResult('deletesession', result);
+                    return result;
+                } catch (error) {
+                    this.showError('deletesession', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /environments/{environmentId}
+    createApplyEnvironmentComponent() {
+        return {
+            name: 'applyenvironment',
+            endpoint: '/environments/{environmentId}',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>ApplyEnvironment</h4><form id="applyEnvironment-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="applyEnvironment-result" class="result-area"></div></div>';
+                this.attachEventListeners('applyenvironment', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.applyEnvironment(formData.param1, formData);
+                    this.showResult('applyenvironment', result);
+                    return result;
+                } catch (error) {
+                    this.showError('applyenvironment', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /props
+    createListPropsComponent() {
+        return {
+            name: 'listprops',
+            endpoint: '/props',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>ListProps</h4><form id="listProps-form"><button type="submit">Execute</button></form><div id="listProps-result" class="result-area"></div></div>';
+                this.attachEventListeners('listprops', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.listProps();
+                    this.showResult('listprops', result);
+                    return result;
+                } catch (error) {
+                    this.showError('listprops', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /scenes
+    createListScenesComponent() {
+        return {
+            name: 'listscenes',
+            endpoint: '/scenes',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>ListScenes</h4><form id="listScenes-form"><button type="submit">Execute</button></form><div id="listScenes-result" class="result-area"></div></div>';
+                this.attachEventListeners('listscenes', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.listScenes();
+                    this.showResult('listscenes', result);
+                    return result;
+                } catch (error) {
+                    this.showError('listscenes', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /sessions/{sessionId}/recording/status
+    createGetRecordingStatusComponent() {
+        return {
+            name: 'getrecordingstatus',
+            endpoint: '/sessions/{sessionId}/recording/status',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>GetRecordingStatus</h4><form id="getRecordingStatus-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><button type="submit">Execute</button></form><div id="getRecordingStatus-result" class="result-area"></div></div>';
+                this.attachEventListeners('getrecordingstatus', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.getRecordingStatus(formData.param1);
+                    this.showResult('getrecordingstatus', result);
+                    return result;
+                } catch (error) {
+                    this.showError('getrecordingstatus', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
     // Component for POST /browser/refresh
     createForceRefreshComponent() {
         return {
@@ -1013,12 +1013,12 @@ class HD1UIComponents {
         };
     }
 
-    // Component for POST /browser/canvas
-    createSetCanvasComponent() {
+    // Component for PUT /sessions/{sessionId}/camera/position
+    createSetCameraPositionComponent() {
         return {
-            name: 'setcanvas',
-            endpoint: '/browser/canvas',
-            method: 'POST',
+            name: 'setcameraposition',
+            endpoint: '/sessions/{sessionId}/camera/position',
+            method: 'PUT',
             
             render: (containerId) => {
                 const container = document.getElementById(containerId);
@@ -1027,17 +1027,17 @@ class HD1UIComponents {
                     return;
                 }
                 
-                container.innerHTML = '<div class="hd1-component"><h4>SetCanvas</h4><form id="setCanvas-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setCanvas-result" class="result-area"></div></div>';
-                this.attachEventListeners('setcanvas', container);
+                container.innerHTML = '<div class="hd1-component"><h4>SetCameraPosition</h4><form id="setCameraPosition-form"><div class="form-field"><label for="param1">Parameter 1:</label><input type="text" name="param1" required></div><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="setCameraPosition-result" class="result-area"></div></div>';
+                this.attachEventListeners('setcameraposition', container);
             },
             
             execute: async (formData) => {
                 try {
-                    const result = await this.api.setCanvas(formData);
-                    this.showResult('setcanvas', result);
+                    const result = await this.api.setCameraPosition(formData.param1, formData);
+                    this.showResult('setcameraposition', result);
                     return result;
                 } catch (error) {
-                    this.showError('setcanvas', error);
+                    this.showError('setcameraposition', error);
                     throw error;
                 }
             }
