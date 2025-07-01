@@ -77,7 +77,7 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Cast hub to proper type
 	h, ok := hub.(*server.Hub)
 	if !ok {
-		logging.Error("failed to cast hub interface", map[string]interface{}{
+		logging.Error("hub interface cast failed", map[string]interface{}{
 			"expected_type": "*server.Hub",
 		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -87,7 +87,7 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Extract session ID from path
 	sessionID := extractSessionID(r.URL.Path)
 	if sessionID == "" {
-		logging.Warn("object creation attempted without session ID", map[string]interface{}{
+		logging.Warn("missing session ID", map[string]interface{}{
 			"path": r.URL.Path,
 		})
 		w.Header().Set("Content-Type", "application/json")
@@ -102,7 +102,7 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	
 	// Validate session exists
 	if _, exists := h.GetStore().GetSession(sessionID); !exists {
-		logging.Warn("object creation attempted for non-existent session", map[string]interface{}{
+		logging.Warn("session not found", map[string]interface{}{
 			"session_id": sessionID,
 		})
 		w.Header().Set("Content-Type", "application/json")
@@ -118,7 +118,7 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Parse request body
 	var req CreateObjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		logging.Error("invalid JSON in object creation request", map[string]interface{}{
+		logging.Error("invalid JSON in request", map[string]interface{}{
 			"session_id": sessionID,
 			"error": err.Error(),
 		})
@@ -311,7 +311,7 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		},
 	})
 	
-	logging.Info("object created successfully", map[string]interface{}{
+	logging.Info("object created", map[string]interface{}{
 		"session_id": sessionID,
 		"object_name": object.Name,
 		"object_type": object.Type,

@@ -13,7 +13,7 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	// Cast hub to proper type
 	h, ok := hub.(*server.Hub)
 	if !ok {
-		logging.Error("failed to cast hub interface", map[string]interface{}{
+		logging.Error("hub interface cast failed", map[string]interface{}{
 			"expected_type": "*server.Hub",
 		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -30,7 +30,7 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	// Automatically initialize world with holodeck coordinate system (floor=Y:0, human eye level=Y:1.7)
 	world, err := h.GetStore().InitializeWorld(session.ID, 25, 0.01, 0, 1.7, 0)
 	if err != nil {
-		logging.Error("failed to initialize world for session", map[string]interface{}{
+		logging.Error("world initialization failed", map[string]interface{}{
 			"session_id": session.ID,
 			"error": err.Error(),
 		})

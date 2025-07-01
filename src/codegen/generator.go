@@ -233,8 +233,8 @@ func (r *APIRouter) {{.FuncName}}(w http.ResponseWriter, req *http.Request) {
 
 // Handler validation and generation
 func main() {
-	fmt.Println("🏆 REVOLUTIONARY CODE GENERATOR - UPSTREAM/DOWNSTREAM INTEGRATION")
-	fmt.Println("================================================================")
+	fmt.Println("HD1 Code Generator - Upstream/Downstream Integration")
+	fmt.Println("======================================================")
 
 	// Initialize logging for code generation
 	logging.InitLogger("/opt/hd1/build/logs", logging.INFO, []string{})
@@ -264,8 +264,8 @@ func main() {
 		"version": spec.Info.Version,
 		"total_paths": len(spec.Paths),
 	})
-	fmt.Printf("✅ Loaded API Spec: %s v%s\n", spec.Info.Title, spec.Info.Version)
-	fmt.Printf("📊 Found %d paths to process\n", len(spec.Paths))
+	fmt.Printf("Loaded API Spec: %s v%s\n", spec.Info.Title, spec.Info.Version)
+	fmt.Printf("Found %d paths to process\n", len(spec.Paths))
 
 	// Analyze and validate all endpoints
 	var routes []RouteInfo
@@ -286,7 +286,7 @@ func main() {
 				continue
 			}
 
-			fmt.Printf("PROC: %s %s -> %s\n", method, path, op.OperationID)
+			fmt.Printf("Processing: %s %s -> %s\n", method, path, op.OperationID)
 
 			// Validate handler file exists
 			if op.XHandler != "" {
@@ -325,11 +325,11 @@ func main() {
 
 	// FAIL BUILD if handlers missing and strict mode enabled
 	if spec.XCodeGeneration.FailOnMissingHandlers && len(missingHandlers) > 0 {
-		fmt.Println("\n❌ BUILD FAILURE - MISSING REQUIRED HANDLERS:")
+		fmt.Println("\nBuild Failure - Missing Required Handlers:")
 		for _, missing := range missingHandlers {
-			fmt.Printf("   🚫 %s\n", missing)
+			fmt.Printf("   Missing: %s\n", missing)
 		}
-		fmt.Println("\n💡 Create the missing handler files or disable strict validation")
+		fmt.Println("\nCreate the missing handler files or disable strict validation")
 		os.Exit(1)
 	}
 
@@ -339,7 +339,7 @@ func main() {
 	}
 
 	// Generate router code
-	fmt.Printf("\n🏗️  Generating auto-router with %d routes...\n", len(routes))
+	fmt.Printf("\nGenerating auto-router with %d routes...\n", len(routes))
 
 	tmpl, err := loadTemplate("templates/go/router.tmpl")
 	if err != nil {
@@ -372,48 +372,48 @@ func main() {
 		})
 	}
 
-	fmt.Println("✅ SUCCESS: auto_router.go generated")
-	fmt.Printf("📊 Generated %d routes\n", len(routes))
-	fmt.Printf("🔗 Generated %d handler stubs\n", len(handlerStubs))
+	fmt.Println("auto_router.go generated successfully")
+	fmt.Printf("Generated %d routes\n", len(routes))
+	fmt.Printf("Generated %d handler stubs\n", len(handlerStubs))
 	
 	if len(missingHandlers) > 0 {
-		fmt.Printf("⚠️  WARNING: %d handlers missing (build will continue)\n", len(missingHandlers))
+		fmt.Printf("Warning: %d handlers missing (build will continue)\n", len(missingHandlers))
 	}
 
 	// Generate HD1 Client from same spec
-	fmt.Println("\n🔧 GENERATING HD1 CLIENT...")
+	fmt.Println("\nGenerating HD1 client...")
 	generateHD1Client(spec, routes)
 
-	// Generate Web UI Client - THE CROWN JEWEL
-	fmt.Println("\n👑 GENERATING WEB UI CLIENT - THE CROWN JEWEL...")
+	// Generate Web UI Client
+	fmt.Println("\nGenerating Web UI client...")
 	generateWebUIClient(spec, routes)
 
 	// Generate core shell functions from API specification
-	fmt.Println("\n🔧 GENERATING CORE SHELL FUNCTIONS FROM API SPEC...")
+	fmt.Println("\nGenerating core shell functions from API spec...")
 	if err := generateCoreShellFunctions(&spec, routes); err != nil {
 		logging.Error("core shell function generation failed", map[string]interface{}{
 			"error": err.Error(),
 		})
-		fmt.Printf("⚠️  WARNING: Core shell function generation failed: %v\n", err)
+		fmt.Printf("Warning: Core shell function generation failed: %v\n", err)
 	} else {
-		fmt.Printf("✅ SUCCESS: Core shell functions generated from API specification\n")
-		fmt.Printf("🔧 Generated: /opt/hd1/lib/hd1lib.sh (upstream core library)\n")
+		fmt.Printf("Core shell functions generated from API specification\n")
+		fmt.Printf("Generated: /opt/hd1/lib/hd1lib.sh (upstream core library)\n")
 	}
 
 	// Advanced enhanced generation with A-Frame integration
-	fmt.Println("\n🏆 GENERATING REVOLUTIONARY A-FRAME INTEGRATION...")
+	fmt.Println("\nGenerating A-Frame integration...")
 	if err := generateEnhancedIntegration(spec, routes); err != nil {
 		logging.Error("enhanced integration generation failed", map[string]interface{}{
 			"error": err.Error(),
 		})
-		fmt.Printf("⚠️  WARNING: Enhanced generation failed: %v\n", err)
+		fmt.Printf("Warning: Enhanced generation failed: %v\n", err)
 	} else {
-		fmt.Printf("🏆 SUCCESS: Advanced A-Frame integration generated\n")
-		fmt.Printf("SHELL: A-Frame shell integration: /opt/hd1/lib/downstream/aframelib.sh\n")
-		fmt.Printf("JS: A-Frame JavaScript bridge: /opt/hd1/lib/downstream/aframelib.js\n")
+		fmt.Printf("A-Frame integration generated successfully\n")
+		fmt.Printf("Shell: A-Frame shell integration: /opt/hd1/lib/downstream/aframelib.sh\n")
+		fmt.Printf("JavaScript: A-Frame JavaScript bridge: /opt/hd1/lib/downstream/aframelib.js\n")
 	}
 
-	fmt.Println("\n🚀 REVOLUTIONARY CODE GENERATION COMPLETE!")
+	fmt.Println("\nCode generation complete")
 	fmt.Println("   • Standard generation: API specification drives all routing")
 	fmt.Println("   • Core shell functions: Auto-generated from API spec (SINGLE SOURCE)")
 	fmt.Println("   • Enhanced generation: A-Frame schemas drive function bridge")
@@ -487,7 +487,7 @@ func generateHD1Client(spec OpenAPISpec, routes []RouteInfo) {
 		return
 	}
 	
-	fmt.Printf("✅ SUCCESS: hd1-client Go binary generated with %d commands\n", len(routes))
+	fmt.Printf("hd1-client Go binary generated with %d commands\n", len(routes))
 }
 
 // generateGoClient creates the Go source code for HD1 client
@@ -702,8 +702,8 @@ func generateWebUIClient(spec OpenAPISpec, routes []RouteInfo) {
 		return
 	}
 	
-	fmt.Printf("✅ SUCCESS: Web UI Client generated with %d API endpoints\n", len(routes))
-	fmt.Println("👑 CROWN JEWEL ACHIEVED: 100% Single Source of Truth")
+	fmt.Printf("Web UI Client generated with %d API endpoints\n", len(routes))
+	fmt.Println("Single source of truth achieved")
 	fmt.Println("   • JavaScript API client auto-generated")
 	fmt.Println("   • UI components auto-generated")
 	fmt.Println("   • Dynamic forms auto-generated")

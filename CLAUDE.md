@@ -23,6 +23,76 @@
 - **Build system validation** - prevents deployment of incomplete implementations
 - **Always use make start/stop and other commands from src to start and stop the server** - maintain one source of truth for development commands
 
+## Logging Standards & Troubleshooting
+
+### Single Source of Truth Logging Architecture
+HD1 uses a unified logging system (`holodeck1/logging`) across the entire codebase. **No standard library `log` package usage anywhere.**
+
+### Log Format Standard
+**Format**: `timestamp [processid:threadid] [level] functionname.filename(without extension) line_num: short message goes here`
+
+**Example**: `2025-07-01T10:30:45.123456789Z [1234:g1] [INFO] main.main:15 server starting`
+
+### Log Levels & Audience Targeting
+- **TRACE**: Development only - function-level debugging with module filtering (`logging.Trace("module", "message", data)`)
+- **DEBUG**: Development environment - detailed operational information
+- **INFO**: Production SRE - normal operational events worth noting
+- **WARN**: Production SRE - potential issues that need attention  
+- **ERROR**: Production SRE - error conditions requiring immediate action
+- **FATAL**: All environments - fatal errors that terminate the process
+
+### Dynamic Log Level Control
+Supports real-time log level adjustment via:
+- **API**: `POST /admin/logging/level {"level": "DEBUG"}`
+- **Environment**: `HD1_LOG_LEVEL=DEBUG`
+- **Flag**: `--log-level debug`
+
+### Trace Module System
+Enable/disable tracing per functionality:
+```bash
+# API control
+POST /admin/logging/trace {"modules": ["sessions", "objects"]}
+
+# Environment variable  
+HD1_TRACE_MODULES=sessions,objects,websocket
+```
+
+### Thread Safety & Performance
+- **Thread-safe**: All logging operations use sync.RWMutex for concurrent access
+- **Zero-overhead when disabled**: Log levels below threshold consume no CPU cycles
+- **Structured JSON**: Machine-readable with optional human-readable console output
+- **Log rotation**: 10MB max size, 3 rotated files retained
+
+### Message Quality Standards
+- **Concise**: Remove redundant context (function/file already captured)
+- **Actionable**: Messages should point to specific issues
+- **No decorations**: No emojis, "SUCCESS:", "[TAGS]", etc.
+- **Error separation**: System logging separate from user console output
+
+### Troubleshooting Workflow
+1. **Increase verbosity**: `curl -X POST /api/admin/logging/level -d '{"level":"TRACE"}'`
+2. **Enable module tracing**: `curl -X POST /api/admin/logging/trace -d '{"modules":["target_module"]}'`
+3. **Check structured logs**: `tail -f /opt/hd1/build/logs/hd1.log | jq .`
+4. **Restore normal levels**: Return to INFO/WARN for production
+
+### Implementation Examples
+```go
+// Good - structured logging with relevant context
+logging.Error("session creation failed", map[string]interface{}{
+    "user_id": userID,
+    "error": err.Error(),
+})
+
+// Bad - redundant context and decorative elements  
+logging.Error("ERROR: failed to create session in CreateSessionHandler()", map[string]interface{}{
+    "function": "CreateSessionHandler", // redundant - already captured
+    "message": "Session creation failed", // redundant - already in message
+})
+```
+
+### Pre-logging Initialization
+Use `fmt.Fprintf(os.Stderr, "FATAL: message")` **only** for errors before logging system initialization. All post-initialization fatal errors use `logging.Fatal()`.
+
 ## Current System State (2025-07-01)
 
 ### Revolutionary Three-Layer Architecture Achievement

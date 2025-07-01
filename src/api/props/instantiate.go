@@ -9,7 +9,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"log"
+	
+	"holodeck1/logging"
 	"holodeck1/server"
 )
 
@@ -159,7 +160,11 @@ func InstantiatePropHandler(w http.ResponseWriter, r *http.Request, hub interfac
 		return
 	}
 
-	log.Printf("[HD1] Prop '%s' instantiated as '%s' in session '%s'", propID, req.InstanceName, sessionID)
+	logging.Info("prop instantiated successfully", map[string]interface{}{
+		"prop_id":       propID,
+		"instance_name": req.InstanceName,
+		"session_id":    sessionID,
+	})
 
 	// Send prop instantiation notification via WebSocket
 	h.BroadcastToSession(sessionID, "prop_instantiated", map[string]interface{}{
@@ -255,7 +260,9 @@ func findPropDefinition(propID string) *PropInfo {
 
 // executePropScript executes the prop's script to create objects in the session
 func executePropScript(prop *PropInfo, req *InstantiateRequest, sessionID string, envInfo *EnvironmentInfo) (int, error) {
-	log.Printf("[HD1] Executing prop script for: %s", prop.ID)
+	logging.Debug("executing prop script", map[string]interface{}{
+		"prop_id": prop.ID,
+	})
 	
 	// For now, create a simple script execution
 	// In a full implementation, this would extract and execute the script from the YAML
@@ -296,11 +303,17 @@ func executePropScript(prop *PropInfo, req *InstantiateRequest, sessionID string
 	
 	output, err := cmd.Output()
 	if err != nil {
-		log.Printf("[HD1] Prop script execution failed: %v", err)
+		logging.Error("prop script execution failed", map[string]interface{}{
+			"prop_id": prop.ID,
+			"error":   err.Error(),
+		})
 		return 0, err
 	}
 	
-	log.Printf("[HD1] Prop script output: %s", string(output))
+	logging.Debug("prop script executed successfully", map[string]interface{}{
+		"prop_id": prop.ID,
+		"output":  string(output),
+	})
 	
 	// Parse output to determine number of objects created
 	objectsCreated := parseObjectCount(string(output))

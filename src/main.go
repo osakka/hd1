@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -18,7 +17,8 @@ import (
 func main() {
 	// Initialize configuration system - Single Source of Truth
 	if err := config.Initialize(); err != nil {
-		log.Fatalf("FATAL: Configuration initialization failed: %v", err)
+		fmt.Fprintf(os.Stderr, "FATAL: Configuration initialization failed: %v\n", err)
+		os.Exit(1)
 	}
 
 	// Additional flags specific to main only (not part of configuration system)
@@ -43,7 +43,8 @@ func main() {
 		LogDir:       config.Config.Logging.LogDir,
 	}
 	if err := logging.ApplyConfig(logConfig); err != nil {
-		log.Fatalf("FATAL: Failed to initialize logging: %v", err)
+		fmt.Fprintf(os.Stderr, "FATAL: Failed to initialize logging: %v\n", err)
+		os.Exit(1)
 	}
 
 	// Setup legacy logging compatibility if specified

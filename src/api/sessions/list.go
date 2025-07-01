@@ -14,7 +14,7 @@ func ListSessionsHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Cast hub to proper type
 	h, ok := hub.(*server.Hub)
 	if !ok {
-		logging.Error("failed to cast hub interface", map[string]interface{}{
+		logging.Error("hub interface cast failed", map[string]interface{}{
 			"expected_type": "*server.Hub",
 		})
 		http.Error(w, "Internal server error", http.StatusInternalServerError)

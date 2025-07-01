@@ -7,7 +7,8 @@ import (
 	"strings"
 	"os"
 	"os/exec"
-	"log"
+	
+	"holodeck1/logging"
 	"holodeck1/server"
 )
 
@@ -121,11 +122,18 @@ func ApplyEnvironmentHandler(w http.ResponseWriter, r *http.Request, hub interfa
 		return
 	}
 
-	log.Printf("[HD1] Environment '%s' applied to session '%s'", environmentID, req.SessionID)
+	logging.Info("environment applied successfully", map[string]interface{}{
+		"environment_id": environmentID,
+		"session_id":     req.SessionID,
+	})
 
 	// Update session with current environment ID for props physics cohesion
 	if err := h.GetStore().UpdateSessionEnvironment(req.SessionID, environmentID); err != nil {
-		log.Printf("[HD1] Warning: Failed to update session environment ID: %v", err)
+		logging.Warn("session environment tracking update failed", map[string]interface{}{
+			"environment_id": environmentID,
+			"session_id":     req.SessionID,
+			"error":          err.Error(),
+		})
 		// Don't fail the request for this warning, environment is still applied
 	}
 
@@ -167,7 +175,10 @@ func getEnvironmentScript(environmentID string) string {
 
 // executeEnvironmentScript runs the environment script and applies settings to session
 func executeEnvironmentScript(scriptPath string, sessionID string, h *server.Hub) error {
-	log.Printf("[HD1] Executing environment script: %s with session %s", scriptPath, sessionID)
+	logging.Debug("executing environment script", map[string]interface{}{
+		"script_path": scriptPath,
+		"session_id":  sessionID,
+	})
 	
 	// Execute the environment script with session ID
 	cmd := exec.Command("/bin/bash", scriptPath, sessionID)
@@ -180,11 +191,19 @@ func executeEnvironmentScript(scriptPath string, sessionID string, h *server.Hub
 	
 	output, err := cmd.Output()
 	if err != nil {
-		log.Printf("[HD1] Environment script execution failed: %v", err)
+		logging.Error("script execution failed", map[string]interface{}{
+			"script_path": scriptPath,
+			"session_id":  sessionID,
+			"error":       err.Error(),
+		})
 		return err
 	}
 	
-	log.Printf("[HD1] Environment script output: %s", string(output))
+	logging.Debug("environment script executed successfully", map[string]interface{}{
+		"script_path": scriptPath,
+		"session_id":  sessionID,
+		"output":      string(output),
+	})
 	
 	// Send environment change notification via WebSocket
 	h.BroadcastToSession(sessionID, "environment_changed", map[string]interface{}{

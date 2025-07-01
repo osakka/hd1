@@ -3,15 +3,16 @@ package scenes
 import (
 	"encoding/json"
 	"net/http"
-	"holodeck1/server"
 	"fmt"
-	"log"
 	"strings"
 	"os/exec"
 	"strconv"
 	"regexp"
 	"os"
 	"path/filepath"
+	
+	"holodeck1/logging"
+	"holodeck1/server"
 )
 
 type LoadSceneRequest struct {
@@ -124,7 +125,11 @@ func LoadSceneHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 	// Execute scene script with session ID
 	objectsCreated, message = executeSceneScript(sceneScript, req.SessionID)
 
-	log.Printf("[HD1] Scene '%s' loaded into session '%s' with %d objects", sceneID, req.SessionID, objectsCreated)
+	logging.Info("scene loaded", map[string]interface{}{
+		"scene_id":        sceneID,
+		"session_id":      req.SessionID,
+		"objects_created": objectsCreated,
+	})
 
 	response := LoadSceneResponse{
 		Success:        true,
@@ -173,7 +178,10 @@ func getSceneScript(sceneID string) string {
 
 // executeSceneScript runs the scene script and parses the output
 func executeSceneScript(scriptPath string, sessionID string) (int, string) {
-	log.Printf("[HD1] Executing scene script: %s with session %s", scriptPath, sessionID)
+	logging.Debug("executing script", map[string]interface{}{
+		"script_path": scriptPath,
+		"session_id":  sessionID,
+	})
 	
 	// Execute the scene script with session ID
 	cmd := exec.Command("/bin/bash", scriptPath, sessionID)
@@ -181,12 +189,20 @@ func executeSceneScript(scriptPath string, sessionID string) (int, string) {
 	output, err := cmd.Output()
 	
 	if err != nil {
-		log.Printf("[HD1] Scene script execution failed: %v", err)
+		logging.Error("script execution failed", map[string]interface{}{
+			"script_path": scriptPath,
+			"session_id":  sessionID,
+			"error":       err.Error(),
+		})
 		return 0, fmt.Sprintf("Scene script execution failed: %v", err)
 	}
 	
 	outputStr := string(output)
-	log.Printf("[HD1] Scene script output: %s", outputStr)
+	logging.Debug("script executed", map[string]interface{}{
+		"script_path": scriptPath,
+		"session_id":  sessionID,
+		"output":      outputStr,
+	})
 	
 	// Parse object count from script output
 	objectCount := parseObjectCount(outputStr)
