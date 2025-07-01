@@ -215,14 +215,17 @@ func extractPropID(path string) string {
 func findPropDefinition(propID string) *PropInfo {
 	propsDir := "/opt/hd1/share/props"
 	
+	var foundProp *PropInfo
+	
 	// Search all category directories for the prop
-	err := filepath.Walk(propsDir, func(path string, info os.FileInfo, err error) error {
+	filepath.Walk(propsDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
 		
 		if strings.HasSuffix(info.Name(), ".yaml") {
 			if prop := parsePropFile(path); prop != nil && prop.ID == propID {
+				foundProp = prop
 				return fmt.Errorf("found") // Use error to break out of walk
 			}
 		}
@@ -230,24 +233,11 @@ func findPropDefinition(propID string) *PropInfo {
 		return nil
 	})
 	
-	if err != nil && err.Error() == "found" {
-		// Re-parse the found file (inefficient but simple)
-		filepath.Walk(propsDir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return nil
-			}
-			
-			if strings.HasSuffix(info.Name(), ".yaml") {
-				if prop := parsePropFile(path); prop != nil && prop.ID == propID {
-					return nil // Found it
-				}
-			}
-			
-			return nil
-		})
+	if foundProp != nil {
+		return foundProp
 	}
 	
-	// For now, return default props if file system fails
+	// Fall back to default props if file system fails
 	defaults := getDefaultProps()
 	for _, prop := range defaults {
 		if prop.ID == propID {
@@ -273,8 +263,12 @@ func executePropScript(prop *PropInfo, req *InstantiateRequest, sessionID string
 	posZ := strconv.FormatFloat(req.Position.Z, 'f', 6, 64)
 	scale := strconv.FormatFloat(req.Scale, 'f', 6, 64)
 	
-	// Create a temporary script file (simplified approach)
-	scriptContent := generateSimplePropScript(prop, req.InstanceName, envInfo)
+	// Create a temporary script file using actual prop script
+	scriptContent := prop.Script
+	if scriptContent == "" {
+		// Fallback to simple script if no script defined
+		scriptContent = generateSimplePropScript(prop, req.InstanceName, envInfo)
+	}
 	
 	tmpScript, err := os.CreateTemp("", "prop-*.sh")
 	if err != nil {

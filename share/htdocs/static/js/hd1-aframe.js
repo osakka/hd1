@@ -897,6 +897,17 @@ const StateTransitions = {
         return state.withObjects(newObjects);
     },
     
+    object_updated: (state, {object_name, tracking_status, timestamp}) => {
+        const newObjects = new Map(state.objects);
+        if (newObjects.has(object_name)) {
+            const obj = {...newObjects.get(object_name)};
+            obj.tracking_status = tracking_status;
+            obj.last_updated = timestamp;
+            newObjects.set(object_name, obj);
+        }
+        return state.withObjects(newObjects);
+    },
+    
     camera: (state, cameraData) => state.withCamera(cameraData),
     
     world_initialized: (state, {data}) => state.withWorld(data),
@@ -1007,6 +1018,13 @@ const StateTransitions = {
         newObjects.delete(prop_name);
         console.log(`[HD1-Props] Deleted prop: ${prop_name}`);
         return state.withObjects(newObjects);
+    },
+    
+    prop_instantiated: (state, {prop_id, instance_name, objects_created}) => {
+        console.log(`[HD1-Props] Prop instantiated: ${prop_id} as ${instance_name}`, objects_created);
+        // State remains unchanged as the objects are already processed by create messages
+        // This handler acknowledges the prop instantiation for logging and potential UI updates
+        return state;
     }
 };
 
@@ -1815,17 +1833,17 @@ class HD1AFrameManager extends HD1ReactiveManager {
                 });
                 break;
             case 'light':
-                this.createLight(entity, obj);
+                HD1AFrameManager.prototype.createLight.call(this, entity, obj);
                 return;
             case 'sky':
-                this.createSky(entity, obj);
+                HD1AFrameManager.prototype.createSky.call(this, entity, obj);
                 return;
             case 'text':
                 console.warn('[HD1-AFrame] Text objects temporarily disabled due to FontLoader compatibility');
                 entity.setAttribute('geometry', {primitive: 'box', width: 2, height: 0.5, depth: 0.1});
                 break;
             case 'environment':
-                this.createEnvironment(entity, obj);
+                HD1AFrameManager.prototype.createEnvironment.call(this, entity, obj);
                 return;
             case 'particle':
                 console.warn('[HD1-AFrame] Particle systems temporarily disabled due to browser compatibility');
@@ -1884,21 +1902,37 @@ class HD1AFrameManager extends HD1ReactiveManager {
 
     // Helper methods for special object types
     createLight(entity, obj) {
-        const lightProps = {
-            type: obj.lightType || 'point',
-            color: obj.color ? this.colorToHex(obj.color) : '#ffffff',
-            intensity: obj.intensity || 1.0
-        };
+        // HD1 Tied API Architecture: Expose A-Frame light primitives
+        // Maps HD1 light objects to A-Frame <a-light> primitives
         
-        if (obj.lightType === 'directional') {
-            lightProps.castShadow = true;
-        }
+        const lightConfig = obj.light || {};
+        const lightType = lightConfig.type || 'point';
+        const color = lightConfig.color || obj.color || '#ffffff';
+        const intensity = lightConfig.intensity || 1.0;
+        const distance = lightConfig.distance || 0;
+        const decay = lightConfig.decay || 2;
         
-        entity.setAttribute('light', lightProps);
+        // Set A-Frame light component - downstream API exposure
+        entity.setAttribute('light', {
+            type: lightType,
+            color: typeof color === 'string' ? color : HD1AFrameManager.prototype.colorToHex.call(this, color),
+            intensity: intensity,
+            distance: distance,
+            decay: decay
+        });
+        
+        // Position the light (no geometry needed for pure lights)
+        entity.setAttribute('position', {
+            x: obj.x || 0,
+            y: obj.y || 0,
+            z: obj.z || 0
+        });
+        
+        console.log(`[HD1-AFrame] Light created: ${lightType} at (${obj.x || 0}, ${obj.y || 0}, ${obj.z || 0})`);
     }
 
     createSky(entity, obj) {
-        const color = obj.color ? this.colorToHex(obj.color) : '#87CEEB';
+        const color = obj.color ? HD1AFrameManager.prototype.colorToHex.call(this, obj.color) : '#87CEEB';
         
         entity.setAttribute('geometry', {primitive: 'sphere', radius: 5000});
         entity.setAttribute('material', {

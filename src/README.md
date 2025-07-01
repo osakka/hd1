@@ -6,7 +6,7 @@ This directory contains the core implementation of **HD1 (Holodeck One)** with r
 
 ## 🎯 Advanced Architecture Overview
 
-### **Three-Layer Architecture Pipeline**
+### **Tied API Architecture with Three-Layer Pipeline**
 ```
 api.yaml (31 endpoints) → generator.go → {
     auto_router.go (Go routing with 3-layer APIs)
@@ -16,6 +16,12 @@ api.yaml (31 endpoints) → generator.go → {
     aframelib.js (A-Frame JavaScript bridge)
 }
 ```
+
+**Core Architectural Pattern**: 
+- **Tied API Architecture** - Platform APIs + Downstream APIs via unified interface
+- **Scripts as Bidirectional Bridges** - API targets AND API consumers
+- **100% API-Driven Service** - All commands flow through API endpoints
+- **WebSocket State Sync Only** - Real-time updates, no command execution
 
 **Revolutionary Achievement**: Complete game engine architecture with Environment + Props + Scene layers, all auto-generated from single specification source.
 

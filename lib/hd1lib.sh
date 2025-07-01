@@ -40,6 +40,113 @@ hd1::api_call() {
 }
 
 
+# Auto-generated from DELETE /sessions/{sessionId}/objects/{objectName}
+hd1::delete_object() {
+    local name="$1"
+    
+    if [[ -z "$name" ]]; then
+        echo "Usage: hd1::delete_object <name>"
+        return 1
+    fi
+    
+    hd1::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
+    echo "DELETE: Object $name"
+}
+
+# Auto-generated from GET /sessions/{sessionId}/objects/{objectName}
+hd1::get_object() {
+    local name="$1"
+    
+    if [[ -z "$name" ]]; then
+        echo "Usage: hd1::get_object <name>"
+        return 1
+    fi
+    
+    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
+}
+
+# Auto-generated from PUT /sessions/{sessionId}/objects/{objectName}
+hd1::update_object() {
+    local name="$1"
+    local property="$2"
+    local value="$3"
+    
+    if [[ -z "$name" || -z "$property" || -z "$value" ]]; then
+        echo "Usage: hd1::update_object <name> <property> <value>"
+        return 1
+    fi
+    
+    local payload=$(cat <<EOF
+{
+    "$property": "$value"
+}
+EOF
+)
+    
+    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/objects/$name" "$payload"
+    echo "UPDATE: Object $name property $property"
+}
+
+# Auto-generated from PUT /sessions/{sessionId}/camera/position
+hd1::camera() {
+    local x="$1" y="$2" z="$3"
+    
+    if [[ -z "$x" || -z "$y" || -z "$z" ]]; then
+        echo "Usage: hd1::camera <x> <y> <z>"
+        return 1
+    fi
+    
+    local payload=$(cat <<EOF
+{
+    "x": $x,
+    "y": $y,
+    "z": $z
+}
+EOF
+)
+    
+    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
+    echo "CAMERA: Positioned at ($x,$y,$z)"
+}
+
+# Auto-generated from POST /browser/canvas
+hd1::canvas_control() {
+    local command="$1"
+    shift
+    local objects="$@"
+    
+    if [[ -z "$command" ]]; then
+        echo "Usage: hd1::canvas_control <command> [objects...]"
+        return 1
+    fi
+    
+    local payload=$(cat <<EOF
+{
+    "command": "$command",
+    "objects": [$objects]
+}
+EOF
+)
+    
+    hd1::api_call "POST" "/browser/canvas" "$payload"
+}
+
+# Clear holodeck (uses canvas control)
+hd1::clear() {
+    echo "CLEAR: Clearing holodeck..."
+    hd1::canvas_control "clear"
+}
+
+# Auto-generated from GET /sessions
+hd1::list_sessions() {
+    hd1::api_call "GET" "/sessions"
+}
+
+# Auto-generated from POST /sessions
+hd1::create_session() {
+    hd1::api_call "POST" "/sessions"
+}
+
 # Auto-generated from GET /sessions/{sessionId}
 hd1::get_session() {
     local session_id="${1:-$HD1_SESSION_ID}"
@@ -77,113 +184,6 @@ EOF
     
     hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
     echo "OBJECT: $name at ($x,$y,$z)"
-}
-
-# Auto-generated from GET /sessions/{sessionId}/objects/{objectName}
-hd1::get_object() {
-    local name="$1"
-    
-    if [[ -z "$name" ]]; then
-        echo "Usage: hd1::get_object <name>"
-        return 1
-    fi
-    
-    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
-}
-
-# Auto-generated from PUT /sessions/{sessionId}/objects/{objectName}
-hd1::update_object() {
-    local name="$1"
-    local property="$2"
-    local value="$3"
-    
-    if [[ -z "$name" || -z "$property" || -z "$value" ]]; then
-        echo "Usage: hd1::update_object <name> <property> <value>"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "$property": "$value"
-}
-EOF
-)
-    
-    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/objects/$name" "$payload"
-    echo "UPDATE: Object $name property $property"
-}
-
-# Auto-generated from DELETE /sessions/{sessionId}/objects/{objectName}
-hd1::delete_object() {
-    local name="$1"
-    
-    if [[ -z "$name" ]]; then
-        echo "Usage: hd1::delete_object <name>"
-        return 1
-    fi
-    
-    hd1::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
-    echo "DELETE: Object $name"
-}
-
-# Auto-generated from POST /browser/canvas
-hd1::canvas_control() {
-    local command="$1"
-    shift
-    local objects="$@"
-    
-    if [[ -z "$command" ]]; then
-        echo "Usage: hd1::canvas_control <command> [objects...]"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "command": "$command",
-    "objects": [$objects]
-}
-EOF
-)
-    
-    hd1::api_call "POST" "/browser/canvas" "$payload"
-}
-
-# Clear holodeck (uses canvas control)
-hd1::clear() {
-    echo "CLEAR: Clearing holodeck..."
-    hd1::canvas_control "clear"
-}
-
-# Auto-generated from PUT /sessions/{sessionId}/camera/position
-hd1::camera() {
-    local x="$1" y="$2" z="$3"
-    
-    if [[ -z "$x" || -z "$y" || -z "$z" ]]; then
-        echo "Usage: hd1::camera <x> <y> <z>"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "x": $x,
-    "y": $y,
-    "z": $z
-}
-EOF
-)
-    
-    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
-    echo "CAMERA: Positioned at ($x,$y,$z)"
-}
-
-# Auto-generated from GET /sessions
-hd1::list_sessions() {
-    hd1::api_call "GET" "/sessions"
-}
-
-# Auto-generated from POST /sessions
-hd1::create_session() {
-    hd1::api_call "POST" "/sessions"
 }
 
 

@@ -2,7 +2,10 @@
 
 ## Core Development Principles
 
-- **API-first development** from our spec yaml
+- **Tied API Architecture** - HD1 exposes everything via unified API surface (platform + downstream APIs)
+- **API-first development** from our spec yaml - 100% API-driven service
+- **Scripts are bidirectional bridges** - API targets AND API consumers
+- **WebSocket for state sync only** - all commands flow through API
 - **Quality solutions only**
 - **One source of truth, no parallels**
 - **No regressions ever**
@@ -104,6 +107,11 @@ Use `fmt.Fprintf(os.Stderr, "FATAL: message")` **only** for errors before loggin
 - **Single Source of Truth** - All three-layer functionality auto-generated from specification
 
 ### Recent Major Achievements  
+- **Complete Lighting System Implementation** - API-first lighting with WebSocket reactivity and A-Frame integration
+- **Session Restoration Fix** - Per-client object synchronization replacing global session locks
+- **Method Context Binding Resolution** - Fixed JavaScript prototype chain issues in reactive system
+- **WebSocket Message Handler Completion** - Added missing `prop_instantiated` handler for full reactivity
+- **API Specification Alignment** - Unified object creation format across client/server boundaries
 - **Object Visibility System** - Clean, API-first visibility management with client validation and toggle
 - **Infinite WebSocket Resilience** - Graceful error handling with intelligent rebootstrapping after 99 attempts
 - **Complete THD → HD1 transformation** across entire codebase
@@ -116,6 +124,10 @@ Use `fmt.Fprintf(os.Stderr, "FATAL: message")` **only** for errors before loggin
 - **Reactive Scene Graph** - Comprehensive state management with rollback protection
 
 ### Active Features
+- **Complete Lighting System**: Point, directional, ambient, and spot lights with API-first architecture
+- **Per-Client Session Restoration**: Every client receives full session state on connection
+- **WebSocket Reactive System**: Full message handling including prop instantiation events
+- **Method Context Binding**: Resolved JavaScript prototype chain issues across reactive system
 - **Three-Layer Architecture**: Environment + Props + Scene system fully operational
 - **Environment APIs**: `/environments` (GET/POST) with 4 physics contexts
 - **Props APIs**: `/props` (GET) and `/sessions/{id}/props/{propId}` (POST) with 6 categories

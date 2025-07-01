@@ -1128,7 +1128,14 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 	}
 	defer outputFile.Close()
 
-	if err := tmpl.Execute(outputFile, nil); err != nil {
+	// Pass routes data to template for dynamic generation
+	templateData := struct {
+		Routes []RouteInfo
+	}{
+		Routes: routes,
+	}
+	
+	if err := tmpl.Execute(outputFile, templateData); err != nil {
 		return fmt.Errorf("failed to execute core shell template: %w", err)
 	}
 	

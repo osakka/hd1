@@ -39,7 +39,8 @@ hd1::api_call() {
     fi
 }
 
-# Auto-generated from POST /sessions/{sessionId}/objects
+{{range .Routes}}{{if eq .OperationID "createObject"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::create_object() {
     local name="$1"
     local type="$2" 
@@ -63,11 +64,33 @@ hd1::create_object() {
 EOF
 )
     
-    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
+    hd1::api_call "{{.Method}}" "/sessions/$HD1_SESSION_ID/objects" "$payload"
     echo "OBJECT: $name at ($x,$y,$z)"
 }
-
-# Auto-generated from PUT /sessions/{sessionId}/camera/position
+{{end}}{{if eq .OperationID "updateObject"}}
+# Auto-generated from {{.Method}} {{.Path}}
+hd1::update_object() {
+    local name="$1"
+    local property="$2"
+    local value="$3"
+    
+    if [[ -z "$name" || -z "$property" || -z "$value" ]]; then
+        echo "Usage: hd1::update_object <name> <property> <value>"
+        return 1
+    fi
+    
+    local payload=$(cat <<EOF
+{
+    "$property": "$value"
+}
+EOF
+)
+    
+    hd1::api_call "{{.Method}}" "/sessions/$HD1_SESSION_ID/objects/$name" "$payload"
+    echo "UPDATE: Object $name property $property"
+}
+{{end}}{{if eq .OperationID "setCameraPosition"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::camera() {
     local x="$1" y="$2" z="$3"
     
@@ -85,11 +108,11 @@ hd1::camera() {
 EOF
 )
     
-    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
+    hd1::api_call "{{.Method}}" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
     echo "CAMERA: Positioned at ($x,$y,$z)"
 }
-
-# Auto-generated from POST /browser/canvas
+{{end}}{{if eq .OperationID "setCanvas"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::canvas_control() {
     local command="$1"
     shift
@@ -108,7 +131,7 @@ hd1::canvas_control() {
 EOF
 )
     
-    hd1::api_call "POST" "/browser/canvas" "$payload"
+    hd1::api_call "{{.Method}}" "/browser/canvas" "$payload"
 }
 
 # Clear holodeck (uses canvas control)
@@ -116,13 +139,13 @@ hd1::clear() {
     echo "CLEAR: Clearing holodeck..."
     hd1::canvas_control "clear"
 }
-
-# Auto-generated from GET /sessions/{sessionId}/objects
+{{end}}{{if eq .OperationID "listObjects"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::list_objects() {
-    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects"
+    hd1::api_call "{{.Method}}" "/sessions/$HD1_SESSION_ID/objects"
 }
-
-# Auto-generated from GET /sessions/{sessionId}/objects/{objectName}
+{{end}}{{if eq .OperationID "getObject"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::get_object() {
     local name="$1"
     
@@ -131,10 +154,10 @@ hd1::get_object() {
         return 1
     fi
     
-    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
+    hd1::api_call "{{.Method}}" "/sessions/$HD1_SESSION_ID/objects/$name"
 }
-
-# Auto-generated from DELETE /sessions/{sessionId}/objects/{objectName}
+{{end}}{{if eq .OperationID "deleteObject"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::delete_object() {
     local name="$1"
     
@@ -143,35 +166,30 @@ hd1::delete_object() {
         return 1
     fi
     
-    hd1::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
+    hd1::api_call "{{.Method}}" "/sessions/$HD1_SESSION_ID/objects/$name"
     echo "DELETE: Object $name"
 }
-
-# Auto-generated from POST /sessions
+{{end}}{{if eq .OperationID "createSession"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::create_session() {
-    hd1::api_call "POST" "/sessions"
+    hd1::api_call "{{.Method}}" "/sessions"
 }
-
-# Auto-generated from GET /sessions
+{{end}}{{if eq .OperationID "listSessions"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::list_sessions() {
-    hd1::api_call "GET" "/sessions"
+    hd1::api_call "{{.Method}}" "/sessions"
 }
-
-# Auto-generated from GET /sessions/{sessionId}
+{{end}}{{if eq .OperationID "getSession"}}
+# Auto-generated from {{.Method}} {{.Path}}
 hd1::get_session() {
     local session_id="${1:-$HD1_SESSION_ID}"
-    hd1::api_call "GET" "/sessions/$session_id"
+    hd1::api_call "{{.Method}}" "/sessions/$session_id"
 }
-
-# Auto-generated from POST /sessions/{sessionId}/world
-hd1::init_world() {
-    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/world"
-    echo "WORLD: Initialized"
-}
+{{end}}{{end}}
 
 echo "HD1: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
 echo "SPEC: Generated from api.yaml specification"
 echo "SYNC: Single source of truth - Zero manual synchronization"
-echo "FUNCS: create_object, camera, canvas_control, clear, list_objects"
+echo "FUNCS: create_object, update_object, camera, canvas_control, clear, list_objects"
 echo "SESSION: create_session, get_session, init_world"
 echo "STATUS: Bar-raising achieved"

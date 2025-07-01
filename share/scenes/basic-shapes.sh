@@ -29,59 +29,58 @@ HD1_CLIENT="/opt/hd1/build/bin/hd1-client"
 
 echo "Creating basic shapes scene..."
 
-# Basic cube - red
+# Basic cube - red (API-first format)
 $HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "demo_cube",
     "type": "cube", 
-    "x": -3, "y": 1, "z": 0,
-    "scale": 1,
-    "color": {"r": 1.0, "g": 0.2, "b": 0.2, "a": 1.0}
+    "position": [-3, 1, 0],
+    "scale": [1, 1, 1],
+    "color": [1.0, 0.2, 0.2]
 }' > /dev/null
 
-# Basic sphere - green
+# Basic sphere - green (API-first format)
 $HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "demo_sphere",
     "type": "sphere",
-    "x": 0, "y": 1, "z": 0, 
-    "scale": 1,
-    "color": {"r": 0.2, "g": 1.0, "b": 0.2, "a": 1.0}
+    "position": [0, 1, 0],
+    "scale": [1, 1, 1],
+    "color": [0.2, 1.0, 0.2]
 }' > /dev/null
 
-# Basic cylinder - blue
+# Basic cylinder - blue (API-first format)
 $HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "demo_cylinder", 
     "type": "cylinder",
-    "x": 3, "y": 1, "z": 0,
-    "scale": 1,
-    "color": {"r": 0.2, "g": 0.2, "b": 1.0, "a": 1.0}
+    "position": [3, 1, 0],
+    "scale": [1, 1, 1],
+    "color": [0.2, 0.2, 1.0]
 }' > /dev/null
 
-# Basic cone - yellow
+# Basic cone - yellow (API-first format)
 $HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "demo_cone",
     "type": "cone",
-    "x": -1.5, "y": 1, "z": -3,
-    "scale": 1,
-    "color": {"r": 1.0, "g": 1.0, "b": 0.2, "a": 1.0}
+    "position": [-1.5, 1, -3],
+    "scale": [1, 1, 1],
+    "color": [1.0, 1.0, 0.2]
 }' > /dev/null
 
-# Wireframe cube - white wireframe
+# Wireframe cube - white wireframe (API-first format)
 $HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "wireframe_cube",
     "type": "cube",
-    "x": 1.5, "y": 1, "z": -3,
-    "scale": 1,
-    "color": {"r": 0.8, "g": 0.8, "b": 0.8, "a": 1.0},
-    "wireframe": true
+    "position": [1.5, 1, -3],
+    "scale": [1, 1, 1],
+    "color": [0.8, 0.8, 0.8]
 }' > /dev/null
 
-# Info panel
+# Info panel (API-first format)
 $HD1_CLIENT create-object "$SESSION_ID" '{
     "name": "shapes_label",
     "type": "plane", 
-    "x": 0, "y": 3, "z": -1,
-    "scale": 2,
-    "color": {"r": 1.0, "g": 1.0, "b": 1.0, "a": 0.3}
+    "position": [0, 3, -1],
+    "scale": [2, 2, 2],
+    "color": [1.0, 1.0, 1.0]
 }' > /dev/null
 
 echo "HD1 Scene '$SCENE_NAME' loaded successfully"

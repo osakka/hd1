@@ -152,8 +152,8 @@ func (c *Client) handleClientMessage(message []byte) {
 				"session_id": sessionID,
 			})
 			
-			// SURGICAL FIX: Send existing session objects ONLY ONCE per session globally
-			if c.hub.store != nil && !c.hub.IsSessionRestored(sessionID) {
+			// SURGICAL FIX: Send existing session objects to EVERY connecting client
+			if c.hub.store != nil {
 				existingObjects := c.hub.store.ListObjects(sessionID)
 				if len(existingObjects) > 0 {
 					// Format objects for canvas control message (EXACT same format as normal object creation)
@@ -245,8 +245,7 @@ func (c *Client) handleClientMessage(message []byte) {
 						"object_count": len(existingObjects),
 					})
 					
-					// Mark this session as globally restored to prevent future restoration loops
-					c.hub.MarkSessionRestored(sessionID)
+					// Session objects sent to this client - no global lock needed
 				}
 			}
 		}

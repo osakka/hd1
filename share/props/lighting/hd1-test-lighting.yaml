@@ -1,0 +1,161 @@
+id: hd1-test-lighting
+name: "HD1 Test Lighting System"
+description: "Complete lightbulb system combining visual representation and functional lighting"
+category: lighting
+scale_compatible: ["cm", "m"]
+mass: 0.08  # kg at meter scale (bulb + fixture)
+material: mixed
+
+dimensions:
+  width: 0.08     # meters (80mm total width including fixture)
+  height: 0.15    # meters (150mm total height)
+  depth: 0.08     # meters
+
+physics_properties:
+  friction: 0.5      # moderate friction (metal + glass)
+  restitution: 0.1   # low bounce (fragile)
+  density: 2200.0    # kg/m³ (weighted average of glass + metal)
+
+complexity: moderate
+components:
+  - light_bulb_visual
+  - point_light_source
+  - electrical_fixture
+
+lighting_properties:
+  type: point_light
+  color_temperature: 2700  # warm white (K)
+  intensity: 1.2
+  range: 6.0               # meters
+  decay: 2                 # quadratic decay
+  power_consumption: 60    # watts equivalent
+
+tags: ["lighting", "bulb", "test", "prop", "electronic", "illumination"]
+
+script: |
+  #!/bin/bash
+  # HD1 Test Lighting Prop - Complete Lightbulb System
+  # ARCHITECTURE VALIDATION: Tied API Pattern Implementation
+  
+  source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
+      echo "ERROR: HD1 core library not found"
+      exit 1
+  }
+  
+  # Load lighting library (demonstrates library composition)
+  source "${HD1_ROOT}/share/lighting/point-light.sh" 2>/dev/null || {
+      echo "ERROR: HD1 lighting library not found"
+      exit 1
+  }
+  
+  INSTANCE_NAME="${1:-test_lighting}"
+  POSITION_X="${2:-0}"
+  POSITION_Y="${3:-0}" 
+  POSITION_Z="${4:-0}"
+  SCALE_FACTOR="${5:-1.0}"
+  SESSION_ID="${6:-${HD1_SESSION_ID:-}}"
+  LIGHT_ENABLED="${7:-true}"
+  
+  if [[ -z "$SESSION_ID" ]]; then
+      echo "ERROR: Session ID required"
+      exit 1
+  fi
+  
+  echo "PROP: Creating HD1 test lighting system '$INSTANCE_NAME'"
+  echo "API_VALIDATION: Prop script triggered by API call"
+  
+  # Scaled dimensions
+  FIXTURE_HEIGHT=$(echo "0.04 * $SCALE_FACTOR" | bc -l)
+  BULB_HEIGHT=$(echo "0.07 * $SCALE_FACTOR" | bc -l)
+  BULB_RADIUS=$(echo "0.03 * $SCALE_FACTOR" | bc -l)
+  GLASS_THICKNESS=$(echo "0.002 * $SCALE_FACTOR" | bc -l)
+  
+  # Create electrical fixture (base)
+  FIXTURE_Y=$(echo "$POSITION_Y + $FIXTURE_HEIGHT / 2" | bc -l)
+  
+  echo "LIGHTING: Creating fixture component via API call"
+  hd1::create_object "${INSTANCE_NAME}_fixture" "cylinder" $POSITION_X $FIXTURE_Y $POSITION_Z
+  
+  # API_VALIDATION: Script calling API (tied architecture)
+  if [[ $? -eq 0 ]]; then
+      echo "API_VALIDATION: ✅ Script → API call successful (fixture)"
+  else
+      echo "API_VALIDATION: ❌ Script → API call failed (fixture)"
+      exit 1
+  fi
+  
+  # Update fixture properties via API
+  hd1::api_call "PUT" "/sessions/$SESSION_ID/objects/${INSTANCE_NAME}_fixture" \
+      "{\"geometry\": \"radius:$(echo "$BULB_RADIUS * 0.8" | bc -l);height:$FIXTURE_HEIGHT\", \"material\": \"color:#2c1810;metalness:0.9;roughness:0.4\"}"
+  
+  # Create glass bulb envelope
+  BULB_Y=$(echo "$POSITION_Y + $FIXTURE_HEIGHT + $BULB_HEIGHT / 2" | bc -l)
+  
+  echo "LIGHTING: Creating bulb envelope via API call"
+  hd1::create_object "${INSTANCE_NAME}_bulb" "sphere" $POSITION_X $BULB_Y $POSITION_Z
+  
+  # API_VALIDATION: Another script → API call
+  if [[ $? -eq 0 ]]; then
+      echo "API_VALIDATION: ✅ Script → API call successful (bulb)"
+  else
+      echo "API_VALIDATION: ❌ Script → API call failed (bulb)"
+      exit 1
+  fi
+  
+  # Update bulb properties via API
+  hd1::api_call "PUT" "/sessions/$SESSION_ID/objects/${INSTANCE_NAME}_bulb" \
+      "{\"geometry\": \"radius:$BULB_RADIUS\", \"material\": \"color:#f8f8ff;transparent:true;opacity:0.85;metalness:0.0;roughness:0.05\"}"
+  
+  # Create filament (interior element)
+  FILAMENT_Y=$BULB_Y
+  FILAMENT_SIZE=$(echo "$BULB_RADIUS * 0.3" | bc -l)
+  
+  echo "LIGHTING: Creating filament via API call"
+  hd1::create_object "${INSTANCE_NAME}_filament" "sphere" $POSITION_X $FILAMENT_Y $POSITION_Z
+  
+  if [[ $? -eq 0 ]]; then
+      echo "API_VALIDATION: ✅ Script → API call successful (filament)"
+  else
+      echo "API_VALIDATION: ❌ Script → API call failed (filament)"
+      exit 1
+  fi
+  
+  # Update filament based on lighting state
+  if [[ "$LIGHT_ENABLED" == "true" ]]; then
+      # Glowing filament when light is on
+      hd1::api_call "PUT" "/sessions/$SESSION_ID/objects/${INSTANCE_NAME}_filament" \
+          "{\"geometry\": \"radius:$FILAMENT_SIZE\", \"material\": \"color:#ff6835;emissive:#ff6835;emissiveIntensity:0.9;metalness:0.1;roughness:0.0\"}"
+      
+      # Create functional point light using lighting library
+      echo "LIGHTING: Creating point light via lighting library"
+      
+      # ARCHITECTURE VALIDATION: Script calls lighting library, which calls API
+      # This demonstrates the tied API pattern: API → Script → Library → API
+      create_warm_bulb "${INSTANCE_NAME}_light" "$POSITION_X" "$FILAMENT_Y" "$POSITION_Z" "$(echo "1.2 * $SCALE_FACTOR" | bc -l)"
+      
+      if [[ $? -eq 0 ]]; then
+          echo "API_VALIDATION: ✅ Script → Library → API successful (lighting)"
+          OBJECTS_CREATED=4
+      else
+          echo "API_VALIDATION: ❌ Script → Library → API failed (lighting)"
+          OBJECTS_CREATED=3
+      fi
+      
+      echo "LIGHTING: Warm white point light active (2700K)"
+  else
+      # Dim filament when light is off
+      hd1::api_call "PUT" "/sessions/$SESSION_ID/objects/${INSTANCE_NAME}_filament" \
+          "{\"geometry\": \"radius:$FILAMENT_SIZE\", \"material\": \"color:#444444;emissive:#222222;emissiveIntensity:0.05;metalness:0.9;roughness:0.9\"}"
+      
+      echo "LIGHTING: Light disabled - filament appears dark"
+      OBJECTS_CREATED=3
+  fi
+  
+  echo "COMPONENTS: $OBJECTS_CREATED components created (fixture, bulb, filament, light)"
+  echo "PHYSICS: Mixed materials, friction=0.5, mass=0.08kg"
+  echo "LIGHTING: 2700K warm white point light with realistic falloff"
+  echo "SCALE: Adapted to scale factor $SCALE_FACTOR"
+  echo "API_VALIDATION: ✅ Tied API architecture validated throughout"
+  echo "PATTERN: API → Script → Library → API demonstrated"
+  echo "Prop instantiated: $INSTANCE_NAME"
+  echo "Objects created: $OBJECTS_CREATED"

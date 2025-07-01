@@ -19,31 +19,31 @@ func init() {
 }
 
 func updateJSVersion() {
-	// Create version hash based on all frontend files
-	rendererPath := "../share/htdocs/static/js/renderer.js"
-	matrixPath := "../share/htdocs/static/js/gl-matrix.js"
+	// API-FIRST DEVELOPMENT: Version driven by API specification (single source of truth)
+	apiSpecPath := "api.yaml"
+	
+	// Include generated files that derive from API spec
 	aframePath := "../share/htdocs/static/js/hd1-aframe.js"
 	consoleJSPath := "../share/htdocs/static/js/hd1-console.js"
-	consoleCSSPath := "../share/htdocs/static/css/hd1-console.css"
+	libJSPath := "../share/htdocs/static/js/hd1lib.js"
 	indexPath := "../share/htdocs/index.html"
-	handlersPath := "server/handlers.go"
 
-	rendererHash := getFileHash(rendererPath)
-	matrixHash := getFileHash(matrixPath)
+	// PRIMARY: API specification hash (single source of truth)
+	apiSpecHash := getFileHash(apiSpecPath)
+	
+	// SECONDARY: Generated artifacts that should match API spec
 	aframeHash := getFileHash(aframePath)
 	consoleJSHash := getFileHash(consoleJSPath)
-	consoleCSSHash := getFileHash(consoleCSSPath)
+	libJSHash := getFileHash(libJSPath)
 	indexHash := getFileHash(indexPath)
-	handlersHash := getFileHash(handlersPath)
 
-	jsVersion = fmt.Sprintf("%s-%s-%s-%s-%s-%s-%s", 
-		rendererHash[:8], 
-		matrixHash[:8],
-		aframeHash[:8],
-		consoleJSHash[:8],
-		consoleCSSHash[:8],
-		indexHash[:8],
-		handlersHash[:8])
+	// Version format: API-spec-hash + generated-artifacts
+	jsVersion = fmt.Sprintf("%s-%s-%s-%s-%s", 
+		apiSpecHash[:8],   // API specification drives everything
+		aframeHash[:8],    // A-Frame bridge (generated)
+		consoleJSHash[:8], // Console UI (generated)
+		libJSHash[:8],     // API client library (generated)
+		indexHash[:8])     // Main UI template
 	jsVersionTime = time.Now()
 }
 

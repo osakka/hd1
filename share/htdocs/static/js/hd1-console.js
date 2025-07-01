@@ -272,7 +272,16 @@ function initializeHardwareMonitoring() {
 
 // Objects tracking display - counts A-Frame entities directly
 function updateObjectsDisplay() {
-    // Count objects directly from A-Frame scene instead of broken reactive state
+    // HD1 Object Categorization - API-First Architecture
+    // =====================================================
+    // Raw Objects: Total A-Frame entities in scene container
+    // Props: Multi-component instantiated props (lightbulb = fixture + bulb + filament + light)
+    // Objects: Standalone objects created via API (not part of props)
+    // Lights: All light sources (standalone + prop lights)
+    // Visible: Objects currently visible (regardless of type)
+    // Environment: Current physics context
+    // =====================================================
+    
     const scene = document.getElementById('holodeck-scene');
     const objectsContainer = document.getElementById('holodeck-objects');
     
@@ -284,7 +293,8 @@ function updateObjectsDisplay() {
     
     let visibleObjects = 0;
     let lightObjects = 0;
-    let primitiveObjects = 0;
+    let standaloneObjects = 0;
+    let propObjects = 0;
     
     allEntities.forEach(entity => {
         // Check visibility
@@ -294,38 +304,62 @@ function updateObjectsDisplay() {
         // Check type by tag name or geometry component
         const tagName = entity.tagName.toLowerCase();
         const geometry = entity.getAttribute('geometry');
+        const entityId = entity.id || '';
+        
+        // Count prop objects first (entities that are part of instantiated props)
+        const isPropComponent = entityId.includes('_fixture') || entityId.includes('_bulb') || 
+                               entityId.includes('_filament') || entityId.includes('_base') || 
+                               entityId.includes('_envelope') || entityId.includes('_light');
         
         if (tagName === 'a-light' || entity.hasAttribute('light')) {
             lightObjects++;
+            // Don't count lights as standalone if they're part of props
+            if (!isPropComponent) {
+                standaloneObjects++;
+            }
         } else if (['a-box', 'a-sphere', 'a-cylinder', 'a-plane', 'a-cone'].includes(tagName) || 
                    (geometry && ['box', 'sphere', 'cylinder', 'plane', 'cone'].includes(geometry.primitive))) {
-            primitiveObjects++;
+            // Only count as standalone object if NOT part of a prop
+            if (!isPropComponent) {
+                standaloneObjects++;
+            }
+        }
+        
+        if (isPropComponent) {
+            propObjects++;
         }
     });
     
-    // Get current scene name
+    // Get current scene and environment names
     const sceneSelect = document.getElementById('debug-scene-select');
+    const environmentSelect = document.getElementById('debug-environment-select');
     const currentScene = sceneSelect ? sceneSelect.value : 'None';
+    const currentEnvironment = environmentSelect ? environmentSelect.value : 'Earth Surface';
     const sceneName = currentScene === '' ? 'None' : currentScene;
+    const environmentName = currentEnvironment === '' ? 'Earth Surface' : currentEnvironment;
     
     // Update displays
-    const totalDisplay = document.getElementById('objects-total');
+    const rawTotalDisplay = document.getElementById('objects-raw-total');
+    const propsDisplay = document.getElementById('objects-props');
     const visibleDisplay = document.getElementById('objects-visible');
     const lightsDisplay = document.getElementById('objects-lights');
-    const primitivesDisplay = document.getElementById('objects-primitives');
+    const standaloneDisplay = document.getElementById('objects-standalone');
     const lastUpdateDisplay = document.getElementById('objects-last-update');
     const sceneDisplay = document.getElementById('objects-scene');
+    const environmentDisplay = document.getElementById('objects-environment');
     
-    if (totalDisplay) totalDisplay.textContent = totalObjects;
+    if (rawTotalDisplay) rawTotalDisplay.textContent = totalObjects;
+    if (propsDisplay) propsDisplay.textContent = propObjects;
     if (visibleDisplay) visibleDisplay.textContent = visibleObjects;
     if (lightsDisplay) lightsDisplay.textContent = lightObjects;
-    if (primitivesDisplay) primitivesDisplay.textContent = primitiveObjects;
+    if (standaloneDisplay) standaloneDisplay.textContent = standaloneObjects;
     if (lastUpdateDisplay) lastUpdateDisplay.textContent = new Date().toLocaleTimeString();
     if (sceneDisplay) sceneDisplay.textContent = sceneName;
+    if (environmentDisplay) environmentDisplay.textContent = environmentName;
     
     // Only log when objects change significantly
     if (totalObjects > 0) {
-        console.log(`[HD1] Objects: ${totalObjects} total, ${visibleObjects} visible, ${lightObjects} lights, ${primitiveObjects} primitives`);
+        console.log(`[HD1] Objects: ${totalObjects} raw, ${propObjects} props, ${standaloneObjects} standalone, ${lightObjects} lights, ${visibleObjects} visible`);
     }
 }
 
@@ -548,9 +582,11 @@ function connectWebSocket() {
         // Send client capabilities
         setTimeout(sendClientInfo, 500);
         
-        // Load scenes and environments on initial connection
+        // Load scenes, environments, props, and lighting on initial connection
         setTimeout(refreshSceneDropdown, 1000);
         setTimeout(refreshEnvironmentDropdown, 1000);
+        setTimeout(refreshPropsDropdown, 1200);
+        setTimeout(refreshLightingDropdown, 1300);
         
         // Initialize session connection without object restoration
         setTimeout(ensureSession, 2000);
@@ -1038,6 +1074,125 @@ debugEnvironmentSelect.addEventListener('change', function() {
     }
 });
 
+// Handle props selection
+const debugPropsSelect = document.getElementById('debug-props-select');
+if (debugPropsSelect) {
+    debugPropsSelect.addEventListener('change', function() {
+        const selectedProp = this.value;
+        if (selectedProp && currentSessionId) {
+            addDebug('PROP_SELECT', {prop: selectedProp, session: currentSessionId, manual: true});
+            instantiateProp(selectedProp);
+            // Reset selection after use
+            this.value = '';
+        }
+    });
+}
+
+// Handle lighting selection  
+const debugLightingSelect = document.getElementById('debug-lighting-select');
+if (debugLightingSelect) {
+    debugLightingSelect.addEventListener('change', function() {
+        const selectedLighting = this.value;
+        if (selectedLighting && currentSessionId) {
+            addDebug('LIGHTING_SELECT', {lighting: selectedLighting, session: currentSessionId, manual: true});
+            instantiateLighting(selectedLighting);
+            // Reset selection after use
+            this.value = '';
+        }
+    });
+}
+
+// Instantiate prop via API call
+async function instantiateProp(propId) {
+    try {
+        const response = await fetch(`/api/sessions/${currentSessionId}/props/${propId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                instance_name: `${propId}_${Date.now()}`,
+                position: {x: 0, y: 1.5, z: 0},
+                scale: 1.0
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            addDebug('PROP_INSTANTIATED', {prop: propId, objects: result.objects_created});
+            setStatus('receiving', `Prop ${propId} instantiated`);
+        } else {
+            addDebug('PROP_ERROR', {prop: propId, status: response.status});
+            setStatus('error', `Failed to instantiate prop ${propId}`);
+        }
+    } catch (error) {
+        console.error('Failed to instantiate prop:', error);
+        addDebug('PROP_FAIL', {prop: propId, error: error.message});
+        setStatus('error', 'Prop instantiation failed');
+    }
+}
+
+// Instantiate lighting via API call (tied API architecture)
+async function instantiateLighting(lightingId) {
+    try {
+        if (lightingId === 'hd1-test-lighting') {
+            // Use props API for complex lighting systems
+            const response = await fetch(`/api/sessions/${currentSessionId}/props/hd1-test-lighting`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    instance_name: `lighting_${Date.now()}`,
+                    position: {x: Math.random() * 4 - 2, y: 2, z: Math.random() * 4 - 2},
+                    scale: 1.0,
+                    light_enabled: true
+                })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                addDebug('LIGHTING_INSTANTIATED', {lighting: lightingId, objects: result.objects_created});
+                setStatus('receiving', `Lighting ${lightingId} instantiated`);
+            } else {
+                addDebug('LIGHTING_ERROR', {lighting: lightingId, status: response.status});
+                setStatus('error', `Failed to instantiate lighting ${lightingId}`);
+            }
+        } else {
+            // Direct light object creation for simple lights (API-first format)
+            const lightData = {
+                name: `light_${Date.now()}`,
+                type: 'light',
+                position: [Math.random() * 4 - 2, 2.5, Math.random() * 4 - 2],
+                visible: true,
+                lightType: lightingId === 'ambient-soft' ? 'ambient' : 'point',
+                intensity: lightingId === 'daylight' ? 0.8 : 1.2,
+                color: lightingId === 'warm-bulb' ? [1.0, 0.9, 0.7] : [1.0, 1.0, 1.0]
+            };
+            
+            const response = await fetch(`/api/sessions/${currentSessionId}/objects`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(lightData)
+            });
+            
+            if (response.ok) {
+                addDebug('LIGHT_CREATED', {lighting: lightingId});
+                setStatus('receiving', `Light ${lightingId} created`);
+            } else {
+                addDebug('LIGHT_ERROR', {lighting: lightingId, status: response.status});
+                setStatus('error', `Failed to create light ${lightingId}`);
+            }
+        }
+    } catch (error) {
+        console.error('Failed to instantiate lighting:', error);
+        addDebug('LIGHTING_FAIL', {lighting: lightingId, error: error.message});
+        setStatus('error', 'Lighting instantiation failed');
+    }
+}
+
 // Apply environment via API call
 async function applyEnvironment(environmentId) {
     try {
@@ -1108,6 +1263,83 @@ async function refreshEnvironmentDropdown() {
     } catch (error) {
         console.error('Failed to fetch environments:', error);
         addDebug('ENV_FETCH_FAIL', {error: error.message});
+    }
+}
+
+// Refresh props dropdown
+async function refreshPropsDropdown() {
+    try {
+        const response = await fetch('/api/props');
+        if (response.ok) {
+            const data = await response.json();
+            const select = document.getElementById('debug-props-select');
+            
+            if (!select) return;
+            
+            // Save current selection
+            const currentValue = select.value;
+            
+            // Clear existing options except first
+            while (select.children.length > 1) {
+                select.removeChild(select.lastChild);
+            }
+            
+            // Add prop options
+            if (data.props && Array.isArray(data.props)) {
+                data.props.forEach(prop => {
+                    const option = document.createElement('option');
+                    option.value = prop.id;
+                    option.textContent = `${prop.name} (${prop.category})`;
+                    select.appendChild(option);
+                });
+            }
+            
+            // Restore selection if still valid
+            if (currentValue) {
+                select.value = currentValue;
+            }
+            
+            addDebug('PROPS_REFRESH', {count: data.props?.length || 0});
+        } else {
+            addDebug('PROPS_FETCH_ERROR', {status: response.status});
+        }
+    } catch (error) {
+        console.error('Failed to fetch props:', error);
+        addDebug('PROPS_FETCH_FAIL', {error: error.message});
+    }
+}
+
+// Refresh lighting dropdown (using lighting library)
+async function refreshLightingDropdown() {
+    try {
+        const select = document.getElementById('debug-lighting-select');
+        
+        if (!select) return;
+        
+        // Clear existing options except first
+        while (select.children.length > 1) {
+            select.removeChild(select.lastChild);
+        }
+        
+        // Add lighting options (predefined lighting types)
+        const lightingTypes = [
+            {id: 'hd1-test-lighting', name: 'HD1 Test Lightbulb', category: 'point'},
+            {id: 'warm-bulb', name: 'Warm White Bulb', category: 'point'},
+            {id: 'daylight', name: 'Daylight Source', category: 'point'},
+            {id: 'ambient-soft', name: 'Soft Ambient', category: 'ambient'}
+        ];
+        
+        lightingTypes.forEach(light => {
+            const option = document.createElement('option');
+            option.value = light.id;
+            option.textContent = `${light.name} (${light.category})`;
+            select.appendChild(option);
+        });
+        
+        addDebug('LIGHTING_REFRESH', {count: lightingTypes.length});
+    } catch (error) {
+        console.error('Failed to populate lighting dropdown:', error);
+        addDebug('LIGHTING_POPULATE_FAIL', {error: error.message});
     }
 }
 

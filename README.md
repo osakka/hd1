@@ -13,10 +13,11 @@
 ### Core VR/AR Capabilities
 - **VR/AR Support**: WebXR integration with headset compatibility
 - **A-Frame WebXR Engine**: Built on Mozilla's A-Frame framework (MIT License)
-- **API-First Architecture**: Everything controlled via REST API (31 endpoints)
-- **Coordinate System**: [-12, +12] holodeck boundaries on all axes
-- **Real-time WebSocket**: Instant 3D object synchronization
+- **Tied API Architecture**: Unified platform + downstream APIs, scripts as bidirectional bridges
+- **100% API-Driven Service**: Everything controlled via REST API (31 endpoints)
+- **WebSocket State Sync**: Real-time 3D object synchronization (commands via API only)
 - **Specification-Driven**: OpenAPI 3.0.3 single source of truth
+- **Coordinate System**: [-12, +12] holodeck boundaries on all axes
 
 ### Three-Layer Architecture System (v4.0.0)
 - **Environment Management**: 4 physics contexts (Earth Surface, Molecular Scale, Space Vacuum, Underwater)

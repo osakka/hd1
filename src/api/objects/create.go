@@ -56,11 +56,10 @@ type Particle struct {
 type CreateObjectRequest struct {
 	Name         string     `json:"name"`
 	Type         string     `json:"type"`
-	X            float64    `json:"x"`
-	Y            float64    `json:"y"`
-	Z            float64    `json:"z"`
+	Position     []float64  `json:"position"`     // API-first: Coordinate3D array [x,y,z]
+	Scale        []float64  `json:"scale,omitempty"`        // API-first: Scale3D array [x,y,z]
+	Color        []float64  `json:"color,omitempty"`        // API-first: ColorRGB array [r,g,b]
 	Visible      *bool      `json:"visible,omitempty"`
-	Color        *Color     `json:"color,omitempty"`
 	Material     *Material  `json:"material,omitempty"`
 	Physics      *Physics   `json:"physics,omitempty"`
 	Lighting     *Lighting  `json:"lighting,omitempty"`
@@ -145,14 +144,29 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 	
+	// Validate position array (API-first: must be [x,y,z])
+	if len(req.Position) != 3 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid position",
+			"message": "position must be array [x,y,z]",
+		})
+		return
+	}
+	
+	// Extract coordinates from position array
+	x, y, z := req.Position[0], req.Position[1], req.Position[2]
+	
 	// Create object using SessionStore with coordinate validation
-	object, err := h.GetStore().CreateObject(sessionID, req.Name, req.Type, req.X, req.Y, req.Z)
+	object, err := h.GetStore().CreateObject(sessionID, req.Name, req.Type, x, y, z)
 	if err != nil {
 		logging.Error("object creation failed", map[string]interface{}{
 			"session_id": sessionID,
 			"object_name": req.Name,
 			"object_type": req.Type,
-			"position": map[string]float64{"x": req.X, "y": req.Y, "z": req.Z},
+			"position": req.Position,
 			"error": err.Error(),
 		})
 		w.Header().Set("Content-Type", "application/json")
@@ -165,19 +179,19 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 	
-	// Use provided color or default to green
+	// Use provided color or default to green (API-first: ColorRGB array format)
 	objectColor := map[string]interface{}{
 		"r": 0.2,
 		"g": 0.8,
 		"b": 0.2,
 		"a": 1.0,
 	}
-	if req.Color != nil {
+	if req.Color != nil && len(req.Color) >= 3 {
 		objectColor = map[string]interface{}{
-			"r": req.Color.R,
-			"g": req.Color.G,
-			"b": req.Color.B,
-			"a": req.Color.A,
+			"r": req.Color[0],
+			"g": req.Color[1],
+			"b": req.Color[2],
+			"a": 1.0, // Default alpha
 		}
 	}
 	
@@ -321,7 +335,7 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		"session_id": sessionID,
 		"object_name": object.Name,
 		"object_type": object.Type,
-		"position": map[string]float64{"x": object.X, "y": object.Y, "z": object.Z},
+		"position": []float64{object.X, object.Y, object.Z},
 	})
 
 	w.Header().Set("Content-Type", "application/json")

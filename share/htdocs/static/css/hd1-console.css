@@ -101,12 +101,13 @@ a-scene { display: block; }
     padding: 6px 8px;
     border-bottom: 1px solid rgba(0, 255, 255, 0.1);
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
     align-items: center;
     font-size: 9px;
     transition: height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
     overflow: hidden;
-    min-height: 20px;
+    min-height: 36px;
 }
 
 #debug-scene-bar.collapsed {
@@ -116,7 +117,10 @@ a-scene { display: block; }
     min-height: 0;
 }
 
-#debug-scene-select {
+#debug-scene-select,
+#debug-environment-select,
+#debug-props-select,
+#debug-lighting-select {
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(0, 255, 255, 0.3);
     color: #00ffff;
@@ -124,30 +128,18 @@ a-scene { display: block; }
     font-size: 9px;
     padding: 2px 4px;
     border-radius: 2px;
-    width: 100%;
-    margin-top: 2px;
+    flex: 1;
+    margin-right: 4px;
+    min-width: 120px;
 }
 
-#debug-scene-select:focus {
+
+#debug-scene-select:focus,
+#debug-environment-select:focus,
+#debug-props-select:focus,
+#debug-lighting-select:focus {
     outline: none;
     border-color: rgba(0, 255, 255, 0.6);
-}
-
-#debug-environment-select {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 165, 0, 0.3);
-    color: #ffaa00;
-    font-family: 'Courier New', monospace;
-    font-size: 9px;
-    padding: 2px 4px;
-    border-radius: 2px;
-    width: 100%;
-    margin-top: 2px;
-}
-
-#debug-environment-select:focus {
-    outline: none;
-    border-color: rgba(255, 165, 0, 0.6);
 }
 
 #debug-controls-bar {

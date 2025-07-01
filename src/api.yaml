@@ -1643,7 +1643,7 @@ components:
           example: "my_cube"
         type:
           type: string
-          enum: [cube, sphere, plane, line]
+          enum: [cube, sphere, plane, line, light]
         position:
           $ref: '#/components/schemas/Coordinate3D'
         scale:
@@ -1654,6 +1654,16 @@ components:
           type: boolean
           default: true
           description: "Whether the object is visible in the scene"
+        lightType:
+          type: string
+          enum: [point, directional, ambient, spot]
+          description: "Light type (only for type: light)"
+        intensity:
+          type: number
+          minimum: 0
+          maximum: 10
+          default: 1.0
+          description: "Light intensity (only for type: light)"
 
     ObjectCreated:
       type: object

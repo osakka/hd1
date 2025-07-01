@@ -71,16 +71,26 @@
         </div>
         <div id="debug-content">
             <div id="debug-scene-bar">
-                <select id="debug-scene-select">
-                    <option value="">Select Scene...</option>
-                    <option value="empty-grid">Empty Grid</option>
-                    <option value="anime-ui">Anime UI Demo</option>
-                    <option value="ultimate">Ultimate Demo</option>
-                    <option value="basic-shapes">Basic Shapes</option>
-                </select>
-                <select id="debug-environment-select">
-                    <option value="">Select Environment...</option>
-                </select>
+                <div style="width: 100%; display: flex; gap: 4px; margin-bottom: 4px;">
+                    <select id="debug-scene-select" style="flex: 2;" title="Load a complete scene with multiple objects">
+                        <option value="">Select Scene...</option>
+                        <option value="empty-grid">Empty Grid</option>
+                        <option value="anime-ui">Anime UI Demo</option>
+                        <option value="ultimate">Ultimate Demo</option>
+                        <option value="basic-shapes">Basic Shapes</option>
+                    </select>
+                    <select id="debug-environment-select" style="flex: 2;" title="Change physics context (gravity, atmosphere, scale)">
+                        <option value="">Select Environment...</option>
+                    </select>
+                </div>
+                <div style="width: 100%; display: flex; gap: 4px;">
+                    <select id="debug-props-select" style="flex: 1;" title="Add multi-component props (furniture, electronics, tools)">
+                        <option value="">Add Prop...</option>
+                    </select>
+                    <select id="debug-lighting-select" style="flex: 1;" title="Add lighting systems (bulbs, ambient, directional)">
+                        <option value="">Add Lighting...</option>
+                    </select>
+                </div>
             </div>
             <div id="debug-info-panels">
                 <div class="info-panel" id="environment-panel">
@@ -130,21 +140,25 @@
                 <div class="info-panel info-panel-wide" id="objects-panel">
                     <div class="panel-title">OBJECTS</div>
                     <div class="panel-content">
-                        <div class="info-row">
-                            <span class="info-label">Total:</span>
-                            <span class="info-value" id="objects-total">0</span>
+                        <div class="info-row" title="Total A-Frame entities in scene container">
+                            <span class="info-label">Raw Objects:</span>
+                            <span class="info-value" id="objects-raw-total">0</span>
                         </div>
-                        <div class="info-row">
+                        <div class="info-row" title="Multi-component instantiated props (lightbulb = fixture + bulb + filament + light)">
+                            <span class="info-label">Props:</span>
+                            <span class="info-value" id="objects-props">0</span>
+                        </div>
+                        <div class="info-row" title="Objects currently visible in scene">
                             <span class="info-label">Visible:</span>
                             <span class="info-value" id="objects-visible">0</span>
                         </div>
-                        <div class="info-row">
+                        <div class="info-row" title="All light sources (standalone + prop lights)">
                             <span class="info-label">Lights:</span>
                             <span class="info-value" id="objects-lights">0</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Primitives:</span>
-                            <span class="info-value" id="objects-primitives">0</span>
+                        <div class="info-row" title="Standalone objects created via API (not part of props)">
+                            <span class="info-label">Objects:</span>
+                            <span class="info-value" id="objects-standalone">0</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Last Update:</span>
@@ -153,6 +167,10 @@
                         <div class="info-row">
                             <span class="info-label">Scene:</span>
                             <span class="info-value" id="objects-scene">None</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Environment:</span>
+                            <span class="info-value" id="objects-environment">Earth Surface</span>
                         </div>
                     </div>
                 </div>
