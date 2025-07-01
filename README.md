@@ -1,16 +1,29 @@
-# HD1 (Holodeck One) - VR/AR Holodeck Platform
+# HD1 (Holodeck One) - Game Engine Architecture VR/AR Platform
 
-**API-first 3D/VR visualization engine powered by A-Frame WebXR**
+**Three-layer architecture VR/AR platform with environment physics and reusable props system**
 
 ## Features
 
-### Core 3D/VR Capabilities
+### 🏗️ Three-Layer Game Engine Architecture
+- **Environment System**: Physics contexts (gravity, atmosphere, scale) with 4 distinct environments
+- **Props System**: Reusable objects with realistic physics (5 categories, YAML-based definitions)
+- **Scene Orchestration**: Smart composition of environments + props (future Phase 3)
+- **Game Engine Parity**: Matches Unity (World Settings + Prefabs + Scenes) and Unreal Engine patterns
+
+### Core VR/AR Capabilities
 - **VR/AR Support**: WebXR integration with headset compatibility
 - **A-Frame WebXR Engine**: Built on Mozilla's A-Frame framework (MIT License)
-- **API-First Architecture**: Everything controlled via REST API
+- **API-First Architecture**: Everything controlled via REST API (31 endpoints)
 - **Coordinate System**: [-12, +12] holodeck boundaries on all axes
 - **Real-time WebSocket**: Instant 3D object synchronization
 - **Specification-Driven**: OpenAPI 3.0.3 single source of truth
+
+### Three-Layer Architecture System (v4.0.0)
+- **Environment Management**: 4 physics contexts (Earth Surface, Molecular Scale, Space Vacuum, Underwater)
+- **Props Library**: Realistic physics objects (Decorative, Electronic, Furniture, Organic, Structural, Tools)
+- **Physics Cohesion**: Props automatically adapt to environment physics (mass, friction, gravity effects)
+- **Hot-Swappable**: Change environment mid-session with real-time physics recalculation
+- **Material Accuracy**: Realistic properties (wood: 600 kg/m³, metal: 7800 kg/m³)
 
 ### Scene Management (v3.4.0 - v3.7.0)
 - **Scene Loading**: API-based scene discovery and loading
@@ -50,6 +63,31 @@ make start
 # Use WASD to move, mouse to look around
 # Click VR button for full immersive experience
 ```
+
+## Three-Layer Architecture Workflow
+
+### Environment + Props Integration
+```bash
+# Create a session
+SESSION_ID=$(./build/bin/hd1-client create-session | jq -r '.session_id')
+
+# Apply physics environment (underwater with buoyancy)
+./build/bin/hd1-client apply-environment "$SESSION_ID" underwater
+
+# Instantiate props that automatically adapt to underwater physics
+./build/bin/hd1-client instantiate-prop "$SESSION_ID" wooden-chair "{\"x\": 0, \"y\": 2, \"z\": 0}"
+# Wooden chair now has: 0.6x mass (buoyancy), 2.0x friction (water resistance)
+
+# Change environment mid-session (space vacuum)
+./build/bin/hd1-client apply-environment "$SESSION_ID" space-vacuum
+# Same chair now has: 0.1x mass (weightless), 1.2x restitution (bouncy)
+```
+
+### Available Environments & Effects
+- **Earth Surface**: Standard physics (1x mass, normal gravity)
+- **Molecular Scale**: Nanometer scale, modified physics for molecular interactions
+- **Space Vacuum**: Weightless (0.1x mass), bouncy collisions (1.2x restitution)
+- **Underwater**: Buoyancy effects (0.6x mass), increased friction (2.0x water resistance)
 
 ## Scene Forking & Recording Workflow
 
@@ -154,6 +192,17 @@ GET  /api/sessions              # List active sessions
 GET  /api/sessions/{id}         # Get session details
 ```
 
+### Three-Layer Architecture APIs
+```bash
+# Environment System
+GET  /api/environments                          # List available environments
+POST /api/sessions/{id}/environments/{envId}   # Apply environment to session
+
+# Props System  
+GET  /api/props                                 # List available props
+POST /api/sessions/{id}/props/{propId}          # Instantiate prop in session
+```
+
 ### Object Creation
 ```bash
 POST /api/sessions/{id}/objects              # Create 3D objects
@@ -200,22 +249,41 @@ make status      # Status reporting
 ## File Structure
 
 ```
-/opt/holodeck-one/
+/opt/hd1/
 ├── src/                          # Go source code
 │   ├── main.go                   # HD1 daemon entry point
-│   ├── auto_router.go            # Auto-generated API routing
+│   ├── auto_router.go            # Auto-generated API routing (31 endpoints)
 │   ├── api.yaml                  # OpenAPI specification (single source of truth)
 │   ├── api/                      # API handler packages
+│   │   ├── environments/         # Environment system handlers
+│   │   ├── props/                # Props system handlers
+│   │   ├── sessions/             # Session management
+│   │   └── objects/              # Object lifecycle
 │   └── server/                   # Core server infrastructure
 ├── share/
+│   ├── environments/             # 🌍 Environment definitions (4 physics contexts)
+│   │   ├── earth-surface.sh      # Standard physics
+│   │   ├── molecular-scale.sh    # Nanometer scale
+│   │   ├── space-vacuum.sh       # Weightless physics
+│   │   └── underwater.sh         # Buoyancy effects
+│   ├── props/                    # 🏗️ Props library (5 categories)
+│   │   ├── decorative/           # Aesthetic objects
+│   │   ├── electronic/           # Technology props
+│   │   ├── furniture/            # Seating, tables, storage
+│   │   ├── organic/              # Natural objects
+│   │   ├── structural/           # Building elements
+│   │   └── tools/                # Functional implements
+│   ├── scenes/                   # 🎬 Scene collection
 │   └── htdocs/
 │       └── static/js/
 │           └── hd1-aframe.js     # A-Frame holodeck integration
 ├── lib/
-│   └── hd1-functions.sh          # Holodeck shell function library
-├── scenarios/
-│   └── complete-holodeck.hd1     # Example holodeck scenarios
+│   ├── hd1lib.sh                 # Auto-generated shell API client
+│   └── downstream/
+│       └── aframelib.sh          # A-Frame integration library
 ├── docs/                         # Architecture Decision Records
+│   └── adr/
+│       └── ADR-014-Three-Layer-Architecture-Environment-Props-System.md
 └── build/                        # Build artifacts (excluded from git)
     ├── bin/hd1                   # HD1 daemon binary
     ├── runtime/hd1.pid           # Process management

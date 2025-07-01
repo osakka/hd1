@@ -1,8 +1,8 @@
 # HD1 Documentation Center
 
-**Standard Documentation for HD1 (Holodeck One) Advanced VR/AR Platform**
+**Three-Layer Game Engine Architecture Documentation for HD1 (Holodeck One)**
 
-Welcome to the comprehensive documentation center for HD1 - the world's first standard holodeck platform combining specification-driven architecture with high-quality VR/AR capabilities.
+Welcome to the comprehensive documentation center for HD1 - the world's first three-layer game engine holodeck platform combining Environment + Props + Scene architecture with specification-driven development and industry-standard VR/AR capabilities.
 
 ## 📚 Documentation Structure
 
@@ -23,7 +23,7 @@ Welcome to the comprehensive documentation center for HD1 - the world's first st
 - [ADR Timeline and Index](adr/README.md) - Complete chronological decision history
 - Advanced milestones and standard standards implementation
 - Impact assessment and architectural principles
-- **Latest**: [ADR-013](adr/ADR-013-Object-Color-Storage-and-Session-Restoration.md) - Object Color Storage and Session Restoration
+- **Latest**: [ADR-014](adr/ADR-014-Three-Layer-Architecture-Environment-Props-System.md) - Three-Layer Architecture Environment + Props System
 
 ### 📋 [Guidelines](guidelines/)
 **Development Standards & Best Practices**
@@ -57,15 +57,21 @@ Welcome to the comprehensive documentation center for HD1 - the world's first st
 
 ## 🚀 Advanced Features
 
-### Single Source of Truth Architecture
-- **OpenAPI 3.0.3 Driven**: All routing and clients auto-generated
-- **Zero Manual Synchronization**: Perfect specification-to-implementation consistency
-- **Standard Standards**: High-quality engineering throughout
+### Three-Layer Game Engine Architecture
+- **Environment System**: 4 physics contexts with realistic material adaptation
+- **Props System**: 5 categories of reusable objects with YAML-based definitions
+- **Scene Orchestration**: Smart composition (future Phase 3)
+- **Game Engine Parity**: Matches Unity/Unreal Engine architectural patterns
 
-### Upstream/Downstream API Integration
-- **Advanced Bridge**: HD1 API ↔ A-Frame WebXR integration
-- **Identical Function Signatures**: Shell and JavaScript function parity
-- **A-Frame Schema Validation**: Complete capability validation
+### Single Source of Truth Architecture
+- **OpenAPI 3.0.3 Driven**: All routing and clients auto-generated (31 endpoints)
+- **Zero Manual Synchronization**: Perfect specification-to-implementation consistency
+- **Three-Layer APIs**: Environment and Props APIs auto-generated from specification
+
+### Physics Cohesion Engine
+- **Environment-Aware Props**: Props automatically adapt physics based on session environment
+- **Real-time Adaptation**: Physics recalculated instantly on environment changes
+- **Material Accuracy**: Realistic properties (wood: 600 kg/m³, metal: 7800 kg/m³)
 
 ### Standard VR/AR Platform
 - **100% Local A-Frame**: Complete 2.5MB WebXR ecosystem
@@ -74,12 +80,13 @@ Welcome to the comprehensive documentation center for HD1 - the world's first st
 
 ## 📈 Version Information
 
-**Current Version**: v3.6.0 - Simple Scene Updates & Code Audit Perfection
+**Current Version**: v4.0.0 - Three-Layer Architecture Revolution
 
 **Key Milestones**:
+- v4.0.0: Three-layer game engine architecture (Environment + Props + Scenes)
 - v3.6.0: Simple scene updates & precise code audit
 - v3.5.0: Advanced API bridge system
-- v3.4.0: Auto-generated web UI client (Auto-Generated Client)
+- v3.4.0: Auto-generated web UI client
 - v3.3.0: Standard UI excellence & scene management
 - v3.2.0: Scene forking and temporal recording
 - v3.1.0: A-Frame WebXR integration
@@ -87,13 +94,13 @@ Welcome to the comprehensive documentation center for HD1 - the world's first st
 
 ## 🔗 External Resources
 
-- **Git Repository**: `https://git.uk.home.arpa/itdlabs/holodeck-one.git`
+- **Git Repository**: `https://git.uk.home.arpa/itdlabs/holo-deck.git`
 - **Project Module**: `holodeck` (Go module)
 - **Binary**: `hd1` (standard daemon)
-- **Runtime Location**: `/opt/holodeck-one/`
+- **Runtime Location**: `/opt/hd1/`
 
 ---
 
-**HD1: Where immersive holodeck technology meets standard engineering excellence.**
+**HD1: Where three-layer game engine architecture meets immersive holodeck technology.**
 
-*This documentation represents the complete technical foundation for the advanced HD1 platform - the world's first standard VR/AR holodeck with specification-driven architecture.*
+*This documentation represents the complete technical foundation for the revolutionary HD1 platform - the world's first three-layer game engine holodeck with Environment + Props + Scene architecture and specification-driven development.*

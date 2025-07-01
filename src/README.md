@@ -1,39 +1,45 @@
-# HD1 Source Code - Specification-Driven Architecture
+# HD1 Source Code - Three-Layer Game Engine Architecture
 
-**VR/AR Holodeck Platform with Color Persistence and Reactive Scene Graph**
+**Game Engine Architecture VR/AR Platform with Environment Physics and Props System**
 
-This directory contains the core implementation of **HD1 (Holodeck One)** with advanced specification-driven architecture, complete object color persistence, and reactive scene graph technology for reliable session restoration.
+This directory contains the core implementation of **HD1 (Holodeck One)** with revolutionary three-layer architecture (Environment + Props + Scenes), advanced specification-driven development, and industry-standard game engine patterns matching Unity and Unreal Engine.
 
 ## 🎯 Advanced Architecture Overview
 
-### **Single Source of Truth Pipeline**
+### **Three-Layer Architecture Pipeline**
 ```
-api.yaml (specification) → generator.go → {
-    auto_router.go (Go routing)
-    hd1lib.sh (shell API client)
+api.yaml (31 endpoints) → generator.go → {
+    auto_router.go (Go routing with 3-layer APIs)
+    hd1lib.sh (shell API client with environment/props)
     hd1lib.js (JavaScript API client)
     aframelib.sh (A-Frame shell integration)
     aframelib.js (A-Frame JavaScript bridge)
 }
 ```
 
-**Advanced Achievement**: Change the API specification = automatically regenerate ALL client libraries and routing across ALL environments.
+**Revolutionary Achievement**: Complete game engine architecture with Environment + Props + Scene layers, all auto-generated from single specification source.
 
 ## 🏗️ Architectural Principles
 
-### **1. Specification-Driven Development**
-- **OpenAPI 3.0.3** as absolute single source of truth
-- **Zero manual routing** - everything auto-generated
+### **1. Three-Layer Game Engine Architecture**
+- **Environment Layer**: Physics contexts (gravity, atmosphere, scale) - 4 distinct environments
+- **Props Layer**: Reusable objects with realistic physics properties - 5 categories
+- **Scene Layer**: Orchestration combining environments + prop placement (future Phase 3)
+- **Game Engine Parity**: Matches Unity (World Settings + Prefabs + Scenes) and Unreal patterns
+
+### **2. Specification-Driven Development**
+- **OpenAPI 3.0.3** as absolute single source of truth (31 endpoints)
+- **Zero manual routing** - everything auto-generated including three-layer APIs
 - **Perfect synchronization** - clients never fall out of sync
 - **Build-time validation** - prevents deployment of incomplete implementations
 
-### **2. Advanced Upstream/Downstream Integration**
-- **Upstream**: Core HD1 API wrappers (`hd1lib.*`)
-- **Downstream**: A-Frame WebXR integration (`aframelib.*`)
-- **Identical signatures** - shell and JavaScript functions have identical parameters
-- **Perfect layering** - downstream imports upstream maintaining single source of truth
+### **3. Advanced Physics Cohesion Engine**
+- **Environment-Aware Props**: Props automatically adapt physics based on session environment
+- **Realistic Materials**: Material-accurate properties (wood: 600 kg/m³, metal: 7800 kg/m³)
+- **Real-time Adaptation**: Physics recalculated instantly on environment changes
+- **Scale Compatibility**: Props work across multiple scale units (nm, mm, cm, m, km)
 
-### **3. Standard Engineering Standards**
+### **4. Standard Engineering Standards**
 - **Thread-safe concurrency** - mutex-protected session management
 - **High-quality logging** - structured, timestamped, trace modules
 - **Quality assurance** - comprehensive validation preventing regressions
@@ -54,7 +60,15 @@ src/
 │   ├── enhanced_generator.go  # A-Frame integration generator
 │   └── aframe_schema_reader.go  # A-Frame schema validation
 │
-├── api/                   # 🎪 PROFESSIONAL API HANDLER IMPLEMENTATIONS
+├── api/                   # 🎪 THREE-LAYER API HANDLER IMPLEMENTATIONS
+│   ├── environments/      # 🌍 Environment System (Layer 1)
+│   │   ├── list.go        # GET /environments - List physics contexts
+│   │   └── apply.go       # POST /environments/{id} - Apply environment to session
+│   │
+│   ├── props/             # 🏗️ Props System (Layer 2)
+│   │   ├── list.go        # GET /props - List available props
+│   │   └── instantiate.go # POST /props/{id} - Instantiate prop in session
+│   │
 │   ├── sessions/          # Session lifecycle management
 │   │   ├── create.go      # POST /sessions - Create holodeck session
 │   │   ├── list.go        # GET /sessions - List active sessions
@@ -105,10 +119,10 @@ src/
 
 ## 🎯 Advanced Code Generation
 
-### **Core Generator (`codegen/generator.go`)**
-**Advanced unified generator** producing:
-- **Go routing** from OpenAPI specification
-- **Shell API client** (`hd1lib.sh`) from API endpoints
+### **Three-Layer Generator (`codegen/generator.go`)**
+**Revolutionary unified generator** producing:
+- **Go routing** from OpenAPI specification (31 endpoints including environment/props)
+- **Shell API client** (`hd1lib.sh`) with three-layer architecture support
 - **JavaScript API client** (`hd1lib.js`) from API endpoints
 - **Web UI components** auto-generated from schemas
 - **A-Frame integration** (`aframelib.*`) with schema validation
@@ -120,8 +134,8 @@ make generate
 
 **Produces:**
 ```
-✅ auto_router.go - Go routing (28 routes)
-✅ ../lib/hd1lib.sh - Shell API client (upstream)
+✅ auto_router.go - Go routing (31 routes including environment/props APIs)
+✅ ../lib/hd1lib.sh - Shell API client with three-layer support
 ✅ ../share/htdocs/static/js/hd1lib.js - JavaScript client (upstream)
 ✅ ../lib/downstream/aframelib.sh - A-Frame shell integration
 ✅ ../lib/downstream/aframelib.js - A-Frame JavaScript bridge
@@ -130,7 +144,32 @@ make generate
 
 ## 🏆 Advanced Features
 
-### **1. Perfect Upstream/Downstream Integration**
+### **1. Three-Layer Game Engine Architecture**
+
+**Environment System (Layer 1):**
+```bash
+# Shell API
+hd1::apply_environment "session-id" "underwater"
+
+# JavaScript API  
+await hd1API.applyEnvironment('session-id', 'underwater');
+```
+
+**Props System (Layer 2):**
+```bash
+# Shell API
+hd1::instantiate_prop "session-id" "wooden-chair" '{"x": 0, "y": 2, "z": 0}'
+
+# JavaScript API
+await hd1API.instantiateProp('session-id', 'wooden-chair', {x: 0, y: 2, z: 0});
+```
+
+**Physics Cohesion Engine:**
+- Props automatically adapt to environment physics
+- Real-time physics recalculation on environment changes
+- Material-accurate properties (wood, metal, plastic densities)
+
+### **2. Perfect Upstream/Downstream Integration**
 
 **Upstream Libraries** (Auto-generated from `api.yaml`):
 ```bash
@@ -346,8 +385,10 @@ func HandlerName(w http.ResponseWriter, r *http.Request, hub interface{}) {
 
 ## 🏆 Architectural Achievements
 
-- **🎯 100% Single Source of Truth**: API specification drives everything
-- **🔄 Zero Manual Synchronization**: All clients auto-generated and consistent
+- **🏗️ Three-Layer Game Engine**: Environment + Props + Scene architecture matching Unity/Unreal patterns
+- **🌍 Physics Cohesion Engine**: Real-time environment-aware physics adaptation
+- **🎯 100% Single Source of Truth**: API specification drives everything (31 endpoints)
+- **🔄 Zero Manual Synchronization**: All clients auto-generated including three-layer APIs
 - **🛡️ Enterprise Concurrency**: Thread-safe session management
 - **⚡ Real-time Communication**: WebSocket hub with session association
 - **🎮 Standard VR/AR**: Complete A-Frame WebXR integration
