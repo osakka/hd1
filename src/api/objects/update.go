@@ -13,6 +13,7 @@ type UpdateObjectRequest struct {
 	X        *float64 `json:"x,omitempty"`
 	Y        *float64 `json:"y,omitempty"`
 	Z        *float64 `json:"z,omitempty"`
+	Visible  *bool    `json:"visible,omitempty"`
 	Color    *Color   `json:"color,omitempty"`
 	Scale    *float64 `json:"scale,omitempty"`
 	Rotation *string  `json:"rotation,omitempty"`
@@ -81,6 +82,9 @@ func UpdateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	if req.Rotation != nil {
 		updates["rotation"] = *req.Rotation
 	}
+	if req.Visible != nil {
+		updates["visible"] = *req.Visible
+	}
 	
 	// Mark object as "modified" if it was previously "base"
 	if object.TrackingStatus == "base" {
@@ -91,11 +95,26 @@ func UpdateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// Save updated object
 	store.UpdateObject(sessionID, objectName, updates)
 	
-	// Broadcast update
+	// Get updated object for broadcast
+	updatedObject, _ := store.GetObject(sessionID, objectName)
+	
+	// Broadcast comprehensive update including visibility
 	h.BroadcastToSession(sessionID, "object_updated", map[string]interface{}{
 		"object_name": objectName,
-		"tracking_status": object.TrackingStatus,
+		"tracking_status": updatedObject.TrackingStatus,
 		"timestamp": time.Now().Format(time.RFC3339),
+		"updates": updates,
+		"position": map[string]interface{}{
+			"x": updatedObject.X,
+			"y": updatedObject.Y,
+			"z": updatedObject.Z,
+		},
+		"visible": func() bool {
+			if visible, ok := updates["visible"]; ok {
+				return visible.(bool)
+			}
+			return true // Default to visible if not specified
+		}(),
 	})
 	
 	w.Header().Set("Content-Type", "application/json")

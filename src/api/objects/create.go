@@ -59,6 +59,7 @@ type CreateObjectRequest struct {
 	X            float64    `json:"x"`
 	Y            float64    `json:"y"`
 	Z            float64    `json:"z"`
+	Visible      *bool      `json:"visible,omitempty"`
 	Color        *Color     `json:"color,omitempty"`
 	Material     *Material  `json:"material,omitempty"`
 	Physics      *Physics   `json:"physics,omitempty"`
@@ -267,7 +268,12 @@ func CreateObjectHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 					}
 					return lighting
 				}(),
-				"visible":   true,
+				"visible": func() bool {
+					if req.Visible != nil {
+						return *req.Visible
+					}
+					return true // Default to visible
+				}(),
 				"wireframe": false,
 				// A-Frame specific properties
 				"text": req.Text,

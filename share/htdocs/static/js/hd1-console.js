@@ -15,9 +15,64 @@ let hd1Manager;
 let ws;
 let lastMessageTime = 0;
 let reconnectAttempts = 0;
-let maxReconnectAttempts = 99;
+let maxReconnectAttempts = 99; // After 99 attempts, trigger rebootstrap
 let reconnectTimeout;
 let jsVersion = '${JS_VERSION}'; // Server will replace this
+let initialConnection = true; // Track first connection attempt
+let connectionQuality = 'unknown'; // Track connection health
+let lastSuccessfulConnection = null;
+let silentRetryPhase = true; // Start in silent mode during page load
+let rebootstrapCycles = 0; // Track how many rebootstrap cycles we've done
+
+// Exit silent mode after 10 seconds regardless of connection status
+setTimeout(() => {
+    if (silentRetryPhase) {
+        silentRetryPhase = false;
+        console.log('[HD1-Connection] Exiting silent retry phase - connection attempts now visible');
+    }
+}, 10000);
+
+// Connection quality and retry logic
+function getRetryDelay() {
+    if (silentRetryPhase) return 100; // Fast retries during page load
+    if (reconnectAttempts <= 5) return 1000; // 1s for first 5 attempts
+    if (reconnectAttempts <= 15) return 2000; // 2s for next 10 attempts
+    if (reconnectAttempts <= 30) return 5000; // 5s for next 15 attempts
+    if (reconnectAttempts <= 60) return 10000; // 10s for next 30 attempts
+    return 30000; // 30s for final attempts before rebootstrap
+}
+
+function shouldShowError() {
+    // Only show errors after initial silent phase and for significant attempts
+    return !silentRetryPhase && reconnectAttempts > 3;
+}
+
+function triggerRebootstrap() {
+    rebootstrapCycles++;
+    reconnectAttempts = 0; // Reset counter for new cycle
+    
+    setStatus('connecting', `rebootstrapping system (cycle ${rebootstrapCycles})...`);
+    
+    // Clear any existing state that might be causing issues
+    localStorage.removeItem('hd1_session_id');
+    
+    // Force a complete page reload after a brief delay
+    setTimeout(() => {
+        console.log(`[HD1-Resilience] Rebootstrap cycle ${rebootstrapCycles} - refreshing interface`);
+        window.location.reload(true);
+    }, 2000);
+}
+
+function updateConnectionQuality() {
+    const now = Date.now();
+    if (lastSuccessfulConnection) {
+        const timeSinceLastSuccess = now - lastSuccessfulConnection;
+        if (timeSinceLastSuccess < 5000) connectionQuality = 'excellent';
+        else if (timeSinceLastSuccess < 30000) connectionQuality = 'good';
+        else if (timeSinceLastSuccess < 120000) connectionQuality = 'poor';
+        else connectionQuality = 'critical';
+    }
+}
 
 // Status management
 function setStatus(status, message) {
@@ -448,19 +503,38 @@ async function ensureSession() {
     }
 }
 
-// Auto-reconnect functionality
+// Auto-reconnect functionality with infinite resilience
 function connectWebSocket() {
     if (reconnectAttempts >= maxReconnectAttempts) {
-        setStatus('error', 'max reconnect attempts reached');
+        // After 99 attempts, trigger intelligent rebootstrap
+        triggerRebootstrap();
         return;
     }
     
-    setStatus('connecting', 'connecting... attempt ' + (reconnectAttempts + 1));
+    updateConnectionQuality();
+    
+    // Intelligent status messaging
+    if (shouldShowError()) {
+        const quality = connectionQuality !== 'unknown' ? ` (${connectionQuality} quality)` : '';
+        setStatus('connecting', `reconnecting... attempt ${reconnectAttempts + 1}${quality}`);
+    } else if (!silentRetryPhase) {
+        setStatus('connecting', 'establishing connection...');
+    }
     
     ws = new WebSocket('ws://' + window.location.host + '/ws');
     
     ws.onopen = function() {
+        // Successful connection - reset all tracking variables
         reconnectAttempts = 0;
+        lastSuccessfulConnection = Date.now();
+        connectionQuality = 'excellent';
+        
+        // Exit silent retry phase after first successful connection
+        if (initialConnection) {
+            initialConnection = false;
+            silentRetryPhase = false;
+        }
+        
         setStatus('connected', 'connected');
         
         // Send version check
@@ -640,18 +714,37 @@ function connectWebSocket() {
         }
     };
     
-    ws.onclose = function() {
-        if (reconnectAttempts < maxReconnectAttempts) {
-            reconnectAttempts++;
-            setStatus('error', 'disconnected • retrying in 2s');
-            reconnectTimeout = setTimeout(connectWebSocket, 2000);
-        } else {
-            setStatus('error', 'connection failed permanently');
+    ws.onclose = function(event) {
+        // Always attempt reconnection - infinite resilience
+        reconnectAttempts++;
+        
+        // Clear any existing reconnect timeout
+        if (reconnectTimeout) {
+            clearTimeout(reconnectTimeout);
         }
+        
+        // Determine retry delay with exponential backoff
+        const retryDelay = getRetryDelay();
+        
+        // Graceful status messaging
+        if (shouldShowError()) {
+            const delaySeconds = Math.round(retryDelay / 1000);
+            setStatus('error', `disconnected • retrying in ${delaySeconds}s`);
+        }
+        
+        // Schedule reconnection with intelligent delay
+        reconnectTimeout = setTimeout(connectWebSocket, retryDelay);
     };
     
     ws.onerror = function(error) {
-        console.error('WebSocket error:', error);
+        // Graceful error handling - only log if not in silent phase
+        if (!silentRetryPhase) {
+            console.log('[HD1-Connection] WebSocket error - will retry automatically');
+        }
+        
+        // Update connection quality
+        connectionQuality = 'critical';
+        updateConnectionQuality();
     };
 }
 

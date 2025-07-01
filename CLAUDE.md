@@ -104,6 +104,8 @@ Use `fmt.Fprintf(os.Stderr, "FATAL: message")` **only** for errors before loggin
 - **Single Source of Truth** - All three-layer functionality auto-generated from specification
 
 ### Recent Major Achievements  
+- **Object Visibility System** - Clean, API-first visibility management with client validation and toggle
+- **Infinite WebSocket Resilience** - Graceful error handling with intelligent rebootstrapping after 99 attempts
 - **Complete THD → HD1 transformation** across entire codebase
 - **Template Architecture Revolution** - Surgically externalized 8 hardcoded templates (2,000+ lines) to maintainable external files
 - **Zero Regression Refactoring** - Complete template system overhaul with identical output validation
