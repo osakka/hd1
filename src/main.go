@@ -10,76 +10,66 @@ import (
 	"path/filepath"
 	"syscall"
 
+	"holodeck1/config"
 	"holodeck1/logging"
 	"holodeck1/server"
 )
 
-// HD1 Path Configuration - 100% Absolute Paths
-const (
-	HD1_ROOT_DIR      = "/opt/hd1"
-	HD1_BUILD_DIR     = HD1_ROOT_DIR + "/build"
-	HD1_BIN_DIR       = HD1_BUILD_DIR + "/bin"
-	HD1_LOG_DIR       = HD1_BUILD_DIR + "/logs"
-	HD1_RUNTIME_DIR   = HD1_BUILD_DIR + "/runtime"
-	HD1_SHARE_DIR     = HD1_ROOT_DIR + "/share"
-	HD1_HTDOCS_DIR    = HD1_SHARE_DIR + "/htdocs"
-	HD1_STATIC_DIR    = HD1_HTDOCS_DIR + "/static"
-	HD1_PID_FILE      = HD1_RUNTIME_DIR + "/hd1.pid"
-	HD1_DEFAULT_HOST  = "0.0.0.0"
-	HD1_DEFAULT_PORT  = "8080"
-)
-
 func main() {
-	// Command line flags - LONG FLAGS ONLY
+	// Initialize configuration system - Single Source of Truth
+	if err := config.Initialize(); err != nil {
+		log.Fatalf("FATAL: Configuration initialization failed: %v", err)
+	}
+
+	// Additional flags specific to main only (not part of configuration system)
 	var (
-		daemonize = flag.Bool("daemon", false, "Run HD1 as daemon")
-		pidFile   = flag.String("pid-file", HD1_PID_FILE, "PID file path (absolute)")
-		logFile   = flag.String("log-file", "", "Log file path (absolute, defaults to timestamped)")
-		host      = flag.String("host", HD1_DEFAULT_HOST, "Host to bind to")
-		port      = flag.String("port", HD1_DEFAULT_PORT, "Port to bind to")
-		staticDir = flag.String("static-dir", HD1_STATIC_DIR, "Static files directory (absolute)")
-		help      = flag.Bool("help", false, "Show help message")
+		help = flag.Bool("help", false, "Show help message")
 	)
-	flag.Parse()
+	
+	// Parse flags after config initialization to allow overrides
+	if !flag.Parsed() {
+		flag.Parse()
+	}
 
 	if *help {
 		showHelp()
 		return
 	}
 
-	// Ensure all directories exist
-	if err := ensureDirectories(); err != nil {
-		log.Fatalf("FATAL: Failed to create directories: %v", err)
+	// Initialize unified logging system with configuration from config system
+	logConfig := &logging.Config{
+		Level:        config.Config.Logging.Level,
+		TraceModules: config.Config.Logging.TraceModules,
+		LogDir:       config.Config.Logging.LogDir,
 	}
-
-	// Initialize unified logging system
-	logConfig := logging.LoadConfig()
 	if err := logging.ApplyConfig(logConfig); err != nil {
 		log.Fatalf("FATAL: Failed to initialize logging: %v", err)
 	}
 
-	// Setup legacy logging compatibility (deprecated)
-	if err := setupLogging(*logFile); err != nil {
-		logging.Warn("legacy logging setup failed", map[string]interface{}{
-			"error": err.Error(),
-		})
+	// Setup legacy logging compatibility if specified
+	if config.Config.Logging.LogFile != "" {
+		if err := setupLogging(config.Config.Logging.LogFile); err != nil {
+			logging.Warn("legacy logging setup failed", map[string]interface{}{
+				"error": err.Error(),
+			})
+		}
 	}
 
 	// Handle daemon mode
-	if *daemonize {
-		if err := becomedaemon(*pidFile); err != nil {
+	if config.GetDaemon() {
+		if err := becomedaemon(config.GetPIDFile()); err != nil {
 			logging.Fatal("failed to daemonize process", map[string]interface{}{
-				"pid_file": *pidFile,
+				"pid_file": config.GetPIDFile(),
 				"error":    err.Error(),
 			})
 		}
-		defer removePidFile(*pidFile)
+		defer removePidFile(config.GetPIDFile())
 	}
 
-	// Validate static directory
-	if _, err := os.Stat(*staticDir); os.IsNotExist(err) {
+	// Validate static directory from configuration
+	if _, err := os.Stat(config.GetStaticDir()); os.IsNotExist(err) {
 		logging.Fatal("static directory does not exist", map[string]interface{}{
-			"static_dir": *staticDir,
+			"static_dir": config.GetStaticDir(),
 		})
 	}
 
@@ -87,8 +77,8 @@ func main() {
 	hub := server.NewHub()
 	go hub.Run()
 
-	// Initialize template processor with static directory
-	server.InitializeTemplateProcessor(*staticDir)
+	// Initialize template processor with configured static directory
+	server.InitializeTemplateProcessor(config.GetStaticDir())
 	
 	// WebSocket and static files
 	http.HandleFunc("/", server.ServeHome)
@@ -104,7 +94,7 @@ func main() {
 	http.Handle("/api/", apiRouter)
 	
 	// Serve static files with proper cache control headers
-	fileServer := http.FileServer(http.Dir(*staticDir))
+	fileServer := http.FileServer(http.Dir(config.GetStaticDir()))
 	http.Handle("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set cache control headers for static assets
 		if filepath.Ext(r.URL.Path) == ".js" || filepath.Ext(r.URL.Path) == ".css" {
@@ -126,15 +116,15 @@ func main() {
 	})
 	
 	logging.Info("directory configuration", map[string]interface{}{
-		"root_dir":    HD1_ROOT_DIR,
-		"static_dir":  *staticDir,
-		"log_dir":     HD1_LOG_DIR,
-		"runtime_dir": HD1_RUNTIME_DIR,
+		"root_dir":    config.GetRootDir(),
+		"static_dir":  config.GetStaticDir(),
+		"log_dir":     config.Config.Paths.LogDir,
+		"runtime_dir": config.Config.Paths.RuntimeDir,
 	})
 	
-	if *daemonize {
+	if config.GetDaemon() {
 		logging.Info("daemon mode enabled", map[string]interface{}{
-			"pid_file": *pidFile,
+			"pid_file": config.GetPIDFile(),
 		})
 	}
 
@@ -148,11 +138,11 @@ func main() {
 		"admin":       "/admin/logging/*",
 	})
 	
-	bindAddr := fmt.Sprintf("%s:%s", *host, *port)
+	bindAddr := fmt.Sprintf("%s:%s", config.Config.Server.Host, config.Config.Server.Port)
 	logging.Info("server binding to address", map[string]interface{}{
 		"address": bindAddr,
-		"host":    *host,
-		"port":    *port,
+		"host":    config.Config.Server.Host,
+		"port":    config.Config.Server.Port,
 	})
 	
 	if err := http.ListenAndServe(bindAddr, nil); err != nil {
@@ -185,14 +175,19 @@ func showHelp() {
 	fmt.Println("  hd1 --host 127.0.0.1 --port 9090")
 	fmt.Println()
 	fmt.Printf("DEFAULT PATHS:\n")
-	fmt.Printf("  Root: %s\n", HD1_ROOT_DIR)
-	fmt.Printf("  Static: %s\n", HD1_STATIC_DIR)
-	fmt.Printf("  Logs: %s\n", HD1_LOG_DIR)
-	fmt.Printf("  PID: %s\n", HD1_PID_FILE)
+	fmt.Printf("  Root: %s\n", config.GetRootDir())
+	fmt.Printf("  Static: %s\n", config.GetStaticDir())
+	fmt.Printf("  Logs: %s\n", config.Config.Paths.LogDir)
+	fmt.Printf("  PID: %s\n", config.GetPIDFile())
 }
 
 func ensureDirectories() error {
-	dirs := []string{HD1_BUILD_DIR, HD1_BIN_DIR, HD1_LOG_DIR, HD1_RUNTIME_DIR}
+	dirs := []string{
+		config.Config.Paths.BuildDir, 
+		config.Config.Paths.BinDir, 
+		config.Config.Paths.LogDir, 
+		config.Config.Paths.RuntimeDir,
+	}
 	for _, dir := range dirs {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %v", dir, err)
@@ -204,7 +199,7 @@ func ensureDirectories() error {
 func setupLogging(logFile string) error {
 	if logFile == "" {
 		// Default timestamped log file
-		logFile = filepath.Join(HD1_LOG_DIR, fmt.Sprintf("hd1_%s.log", 
+		logFile = filepath.Join(config.Config.Paths.LogDir, fmt.Sprintf("hd1_%s.log", 
 			server.GetTimestamp()))
 	}
 	

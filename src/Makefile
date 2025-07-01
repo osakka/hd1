@@ -4,11 +4,11 @@
 .PHONY: all clean generate build test run validate client logs status start stop restart daemon-start daemon-stop daemon-status
 
 # Professional build directory structure
-BUILD_DIR = ../build
+BUILD_DIR = $(shell test -n "$$HD1_BUILD_DIR" && echo "$$HD1_BUILD_DIR" || echo "../build")
 BIN_DIR = $(BUILD_DIR)/bin
-LOG_DIR = $(BUILD_DIR)/logs
+LOG_DIR = $(shell test -n "$$HD1_LOG_DIR" && echo "$$HD1_LOG_DIR" || echo "$(BUILD_DIR)/logs")
 RUNTIME_DIR = $(BUILD_DIR)/runtime
-SHARE_DIR = ../share
+SHARE_DIR = $(shell test -n "$$HD1_SHARE_DIR" && echo "$$HD1_SHARE_DIR" || echo "../share")
 
 # Default target
 all: validate generate build
@@ -56,7 +56,7 @@ client:
 	@mkdir -p $(BIN_DIR)
 	@echo '#!/bin/bash' > $(BIN_DIR)/hd1-client
 	@echo '# HD1 (Holodeck One) API Client' >> $(BIN_DIR)/hd1-client
-	@echo 'API_BASE="http://localhost:8080/api"' >> $(BIN_DIR)/hd1-client
+	@echo 'API_BASE="$${HD1_API_BASE:-http://localhost:8080/api}"' >> $(BIN_DIR)/hd1-client
 	@echo 'case "$${1:-help}" in' >> $(BIN_DIR)/hd1-client
 	@echo '  "sessions") curl -s "$$API_BASE/sessions" | jq "." ;;' >> $(BIN_DIR)/hd1-client
 	@echo '  "create-session") curl -s -X POST "$$API_BASE/sessions" | jq ".session_id" ;;' >> $(BIN_DIR)/hd1-client
@@ -118,15 +118,16 @@ start: build
 			rm -f $(RUNTIME_DIR)/hd1.pid; \
 		fi \
 	fi
-	@echo "Checking port 8080..."
-	@if netstat -tuln 2>/dev/null | grep -q ":8080 "; then \
-		echo "ERROR: Port 8080 already in use"; \
-		echo "Process using port 8080:"; \
-		lsof -ti:8080 | head -5; \
-		echo "Run 'make force-stop' to kill all processes on port 8080"; \
+	@HD1_PORT=$${HD1_PORT:-8080}; \
+	echo "Checking port $$HD1_PORT..."; \
+	if netstat -tuln 2>/dev/null | grep -q ":$$HD1_PORT "; then \
+		echo "ERROR: Port $$HD1_PORT already in use"; \
+		echo "Process using port $$HD1_PORT:"; \
+		lsof -ti:$$HD1_PORT | head -5; \
+		echo "Run 'make force-stop' to kill all processes on port $$HD1_PORT"; \
 		exit 1; \
-	fi
-	@echo "Port 8080 available"
+	fi; \
+	echo "Port $$HD1_PORT available"
 	@$(BIN_DIR)/hd1 --daemon
 	@sleep 2
 	@if [ -f $(RUNTIME_DIR)/hd1.pid ]; then \
@@ -166,7 +167,8 @@ stop:
 force-stop:
 	@echo "Force stopping all HD1 processes..."
 	@pkill -f hd1 || echo "No HD1 processes found"
-	@lsof -ti:8080 | xargs -r kill -9 || echo "No processes on port 8080"
+	@HD1_PORT=$${HD1_PORT:-8080}; \
+	lsof -ti:$$HD1_PORT | xargs -r kill -9 || echo "No processes on port $$HD1_PORT"
 	@rm -f $(RUNTIME_DIR)/hd1.pid
 	@echo "Force stop complete"
 
@@ -182,11 +184,12 @@ status:
 		PID=$$(cat $(RUNTIME_DIR)/hd1.pid); \
 		if kill -0 $$PID 2>/dev/null; then \
 			echo "STATUS: HD1 daemon is running (PID: $$PID)"; \
-			echo "PORT: Checking port 8080..."; \
-			if netstat -tuln 2>/dev/null | grep -q ":8080 "; then \
-				echo "PORT: Listening on port 8080"; \
+			HD1_PORT=$${HD1_PORT:-8080}; \
+			echo "PORT: Checking port $$HD1_PORT..."; \
+			if netstat -tuln 2>/dev/null | grep -q ":$$HD1_PORT "; then \
+				echo "PORT: Listening on port $$HD1_PORT"; \
 			else \
-				echo "WARNING: Not listening on port 8080"; \
+				echo "WARNING: Not listening on port $$HD1_PORT"; \
 			fi \
 		else \
 			echo "ERROR: HD1 daemon is not running (stale PID file)"; \

@@ -35,6 +35,8 @@
 
 ### Recent Major Achievements  
 - **Complete THD → HD1 transformation** across entire codebase
+- **Template Architecture Revolution** - Surgically externalized 8 hardcoded templates (2,000+ lines) to maintainable external files
+- **Zero Regression Refactoring** - Complete template system overhaul with identical output validation
 - **Dynamic version system** with real-time API/JS version display
 - **Enhanced console UI** with clickable status bar and dual arrow indicators
 - **Professional branding** with "Holodeck I" title and version info
@@ -98,9 +100,35 @@ cd src && make start
 - **Physics cohesion engine** - Props automatically adapt to environment physics with real-time recalculation
 - **Single binary approach** - daemon handles all functionality including three-layer APIs
 - **Auto-generated routing** - from OpenAPI spec to Go handlers (31 endpoints)
-- **Template processing** - surgical variable substitution
+- **External template system** - 8 templates organized by language with Go embed filesystem
+- **Template processing** - surgical variable substitution with caching optimization
 - **WebSocket real-time** - bidirectional communication
 - **A-Frame rendering** - WebXR-ready 3D scenes
+
+### Template Architecture (2025-07-01)
+Revolutionary externalization of code generation templates:
+
+```
+src/codegen/templates/
+├── go/
+│   ├── router.tmpl       # Auto-router generation
+│   └── client.tmpl       # Go CLI client
+├── javascript/
+│   ├── api-client.tmpl   # JS API wrapper
+│   ├── ui-components.tmpl # UI components
+│   ├── form-system.tmpl  # Dynamic forms
+│   └── aframe-bridge.tmpl # A-Frame integration
+└── shell/
+    ├── core-functions.tmpl    # Core API functions
+    └── aframe-functions.tmpl  # Enhanced A-Frame
+```
+
+**Benefits:**
+- **Maintainability**: Proper syntax highlighting and IDE support
+- **Developer Experience**: Frontend developers can directly edit templates
+- **Single Binary**: Go embed maintains deployment simplicity
+- **Performance**: Template caching with `loadTemplate()` system
+- **Zero Regression**: Identical output validated, surgical refactoring achieved
 
 ## Quality Assurance
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,6 +12,12 @@ import (
 	"gopkg.in/yaml.v3"
 	"holodeck1/logging"
 )
+
+//go:embed templates/*
+var templateFS embed.FS
+
+// Template cache for performance
+var templateCache = make(map[string]*template.Template)
 
 // OpenAPI Specification Structure
 type OpenAPISpec struct {
@@ -79,7 +86,27 @@ type CodeGenConfig struct {
 	FailOnMissingHandlers bool `yaml:"fail-on-missing-handlers"`
 }
 
-// Generated Router Template
+// loadTemplate loads and caches a template from the embedded filesystem
+func loadTemplate(templatePath string) (*template.Template, error) {
+	if tmpl, exists := templateCache[templatePath]; exists {
+		return tmpl, nil
+	}
+	
+	content, err := templateFS.ReadFile(templatePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read template %s: %w", templatePath, err)
+	}
+	
+	tmpl, err := template.New(filepath.Base(templatePath)).Parse(string(content))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse template %s: %w", templatePath, err)
+	}
+	
+	templateCache[templatePath] = tmpl
+	return tmpl, nil
+}
+
+// DEPRECATED: Legacy hardcoded template - replaced by external file
 const routerTemplate = `// ===================================================================
 // WARNING: AUTO-GENERATED CODE - DO NOT MODIFY THIS FILE
 // ===================================================================
@@ -314,7 +341,12 @@ func main() {
 	// Generate router code
 	fmt.Printf("\n🏗️  Generating auto-router with %d routes...\n", len(routes))
 
-	tmpl := template.Must(template.New("router").Parse(routerTemplate))
+	tmpl, err := loadTemplate("templates/go/router.tmpl")
+	if err != nil {
+		logging.Fatal("failed to load router template", map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
 	
 	routerFile, err := os.Create("auto_router.go")
 	if err != nil {
@@ -460,99 +492,6 @@ func generateHD1Client(spec OpenAPISpec, routes []RouteInfo) {
 
 // generateGoClient creates the Go source code for HD1 client
 func generateGoClient(clientPath string, spec OpenAPISpec, routes []RouteInfo) error {
-	clientTemplate := `package main
-
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-	"os"
-)
-
-const APIBase = "http://localhost:8080/api"
-
-func main() {
-	if len(os.Args) < 2 {
-		showHelp()
-		return
-	}
-
-	command := os.Args[1]
-	
-	switch command {
-{{range .Routes}}	case "{{.CommandName}}":
-		{{.FunctionName}}()
-{{end}}	case "help":
-		showHelp()
-	default:
-		fmt.Printf("Unknown command: %s\n", command)
-		showHelp()
-		os.Exit(1)
-	}
-}
-
-func showHelp() {
-	fmt.Println("HD1 Client - Auto-generated from API specification")
-	fmt.Println("Available commands:")
-{{range .Routes}}	fmt.Println("  {{.CommandName}} - {{.Method}} {{.Path}}")
-{{end}}
-}
-
-func makeRequest(method, path string, body interface{}) {
-	url := APIBase + path
-	
-	var reqBody io.Reader
-	if body != nil {
-		jsonData, err := json.Marshal(body)
-		if err != nil {
-			fmt.Printf("Error marshaling JSON: %v\n", err)
-			os.Exit(1)
-		}
-		reqBody = bytes.NewBuffer(jsonData)
-	}
-	
-	req, err := http.NewRequest(method, url, reqBody)
-	if err != nil {
-		fmt.Printf("Error creating request: %v\n", err)
-		os.Exit(1)
-	}
-	
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Printf("Error making request: %v\n", err)
-		os.Exit(1)
-	}
-	defer resp.Body.Close()
-	
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("Error reading response: %v\n", err)
-		os.Exit(1)
-	}
-	
-	// Pretty print JSON
-	var jsonData interface{}
-	if err := json.Unmarshal(responseBody, &jsonData); err == nil {
-		prettyJSON, _ := json.MarshalIndent(jsonData, "", "  ")
-		fmt.Println(string(prettyJSON))
-	} else {
-		fmt.Println(string(responseBody))
-	}
-}
-
-{{range .Routes}}
-func {{.FunctionName}}() {
-	{{.Implementation}}
-}
-{{end}}
-`
 
 	// Process routes for template
 	type ClientRoute struct {
@@ -581,9 +520,9 @@ func {{.FunctionName}}() {
 		Routes: clientRoutes,
 	}
 	
-	tmpl, err := template.New("client").Parse(clientTemplate)
+	tmpl, err := loadTemplate("templates/go/client.tmpl")
 	if err != nil {
-		return fmt.Errorf("template parse error: %v", err)
+		return fmt.Errorf("failed to load client template: %w", err)
 	}
 	
 	file, err := os.Create(clientPath)
@@ -773,98 +712,6 @@ func generateWebUIClient(spec OpenAPISpec, routes []RouteInfo) {
 
 // generateJavaScriptAPIClient creates the complete JavaScript API wrapper
 func generateJavaScriptAPIClient(outputDir string, spec OpenAPISpec, routes []RouteInfo) error {
-	apiClientTemplate := `// ===================================================================
-// WARNING: AUTO-GENERATED CODE - DO NOT MODIFY THIS FILE
-// ===================================================================
-//
-// This JavaScript API client is automatically generated from api.yaml
-// 
-// ⚠️  CRITICAL WARNING: ALL MANUAL CHANGES WILL BE LOST ⚠️
-//
-// • This file is regenerated on every build
-// • Changes made here are NON-PERSISTENT  
-// • Manual modifications will be OVERWRITTEN
-// • To modify API client: Update api.yaml specification
-//
-// Generation Command: make generate
-// Source File: /opt/hd1/src/api.yaml
-// Generated: Auto-generated by HD1 specification-driven development
-//
-// ===================================================================
-// THE CROWN JEWEL: 100% Single Source of Truth API Client
-// ===================================================================
-
-class HD1APIClient {
-    constructor(baseURL = 'http://localhost:8080/api') {
-        this.baseURL = baseURL;
-        this.defaultHeaders = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        };
-    }
-
-    // Core HTTP request method with standard error handling
-    async request(method, path, data = null, headers = {}) {
-        const url = this.baseURL + path;
-        const config = {
-            method: method.toUpperCase(),
-            headers: { ...this.defaultHeaders, ...headers }
-        };
-
-        if (data && (method.toUpperCase() === 'POST' || method.toUpperCase() === 'PUT')) {
-            config.body = JSON.stringify(data);
-        }
-
-        try {
-            const response = await fetch(url, config);
-            
-            // Standard error handling
-            if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error('HTTP ' + response.status + ': ' + errorData);
-            }
-
-            // Parse JSON response
-            const responseData = await response.json();
-            console.log('API Response:', method, path, responseData);
-            return responseData;
-        } catch (error) {
-            console.error('API Error:', method, path, error);
-            throw error;
-        }
-    }
-
-    // Extract path parameters from URL patterns
-    extractPathParams(pattern, values) {
-        let path = pattern;
-        const params = pattern.match(/\{([^}]+)\}/g) || [];
-        
-        params.forEach((param, index) => {
-            const paramName = param.slice(1, -1); // Remove { }
-            const value = values[index] || '';
-            path = path.replace(param, value);
-        });
-        
-        return path;
-    }
-
-{{range .Methods}}
-    // {{.Comment}}
-    {{.MethodName}}({{.Parameters}}) {
-        {{.Implementation}}
-    }
-{{end}}
-}
-
-// Export for use with existing HD1 A-Frame system
-window.HD1APIClient = HD1APIClient;
-
-// Create global API client instance
-window.hd1API = new HD1APIClient();
-
-console.log('👑 HD1 API Client loaded - Auto-generated from specification');
-console.log('Available methods:', Object.getOwnPropertyNames(HD1APIClient.prototype).filter(name => name !== 'constructor'));
-`
 
 	// Process routes for JavaScript template
 	type JSMethod struct {
@@ -891,9 +738,9 @@ console.log('Available methods:', Object.getOwnPropertyNames(HD1APIClient.protot
 		Methods: jsMethods,
 	}
 	
-	tmpl, err := template.New("jsapi").Parse(apiClientTemplate)
+	tmpl, err := loadTemplate("templates/javascript/api-client.tmpl")
 	if err != nil {
-		return fmt.Errorf("JavaScript API template parse error: %v", err)
+		return fmt.Errorf("failed to load JavaScript API template: %w", err)
 	}
 	
 	apiClientPath := filepath.Join(outputDir, "hd1lib.js")
@@ -912,124 +759,6 @@ console.log('Available methods:', Object.getOwnPropertyNames(HD1APIClient.protot
 
 // generateUIComponents creates auto-generated UI components for each endpoint
 func generateUIComponents(outputDir string, spec OpenAPISpec, routes []RouteInfo) error {
-	componentTemplate := `// ===================================================================
-// AUTO-GENERATED UI COMPONENTS - DO NOT MODIFY
-// ===================================================================
-//
-// Standard UI components auto-generated from OpenAPI specification
-// Updates automatically when API specification changes
-//
-// ===================================================================
-
-class HD1UIComponents {
-    constructor(apiClient) {
-        this.api = apiClient;
-        this.components = new Map();
-        this.initializeComponents();
-    }
-
-    initializeComponents() {
-        console.log('🎨 Initializing auto-generated UI components...');
-{{range .Components}}
-        this.components.set('{{.Name}}', this.create{{.ClassName}}Component());
-{{end}}
-        console.log('✅ UI components initialized');
-    }
-
-{{range .Components}}
-    // {{.Comment}}
-    create{{.ClassName}}Component() {
-        return {
-            name: '{{.Name}}',
-            endpoint: '{{.Endpoint}}',
-            method: '{{.Method}}',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '{{.HTML}}';
-                this.attachEventListeners('{{.Name}}', container);
-            },
-            
-            execute: async ({{.ExecuteParams}}) => {
-                try {
-                    const result = await this.api.{{.APIMethod}}({{.APIParams}});
-                    this.showResult('{{.Name}}', result);
-                    return result;
-                } catch (error) {
-                    this.showError('{{.Name}}', error);
-                    throw error;
-                }
-            }
-        };
-    }
-{{end}}
-
-    attachEventListeners(componentName, container) {
-        const component = this.components.get(componentName);
-        if (!component) return;
-        
-        const form = container.querySelector('form');
-        if (form) {
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
-                
-                try {
-                    await component.execute(data);
-                } catch (error) {
-                    console.error('Component execution failed:', error);
-                }
-            });
-        }
-    }
-
-    showResult(componentName, result) {
-        const resultDiv = document.getElementById(componentName + '-result');
-        if (resultDiv) {
-            resultDiv.innerHTML = '<pre class="success">' + JSON.stringify(result, null, 2) + '</pre>';
-        }
-    }
-
-    showError(componentName, error) {
-        const resultDiv = document.getElementById(componentName + '-result');
-        if (resultDiv) {
-            resultDiv.innerHTML = '<pre class="error">Error: ' + error.message + '</pre>';
-        }
-    }
-
-    getComponent(name) {
-        return this.components.get(name);
-    }
-
-    renderAll(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) {
-            console.error('Container not found:', containerId);
-            return;
-        }
-        
-        container.innerHTML = '<h2>HD1 API Interface</h2>';
-        this.components.forEach((component, name) => {
-            const div = document.createElement('div');
-            div.className = 'component-container';
-            div.id = name + '-container';
-            container.appendChild(div);
-            component.render(name + '-container');
-        });
-    }
-}
-
-// Export for global use
-window.HD1UIComponents = HD1UIComponents;
-
-console.log('🎨 HD1 UI Components loaded - Auto-generated from specification');
-`
 
 	// Process routes for UI components
 	type UIComponent struct {
@@ -1066,9 +795,9 @@ console.log('🎨 HD1 UI Components loaded - Auto-generated from specification')
 		Components: components,
 	}
 	
-	tmpl, err := template.New("components").Parse(componentTemplate)
+	tmpl, err := loadTemplate("templates/javascript/ui-components.tmpl")
 	if err != nil {
-		return fmt.Errorf("UI components template parse error: %v", err)
+		return fmt.Errorf("failed to load UI components template: %w", err)
 	}
 	
 	componentsPath := filepath.Join(outputDir, "hd1-ui-components.js")
@@ -1087,126 +816,6 @@ console.log('🎨 HD1 UI Components loaded - Auto-generated from specification')
 
 // generateFormSystem creates dynamic form generation system
 func generateFormSystem(outputDir string, spec OpenAPISpec, routes []RouteInfo) error {
-	formSystemTemplate := `// ===================================================================
-// AUTO-GENERATED FORM SYSTEM - DO NOT MODIFY
-// ===================================================================
-//
-// Dynamic form generation system auto-generated from OpenAPI schemas
-//
-// ===================================================================
-
-class HD1FormSystem {
-    constructor() {
-        this.formSchemas = new Map();
-        this.initializeSchemas();
-    }
-
-    initializeSchemas() {
-        console.log('📝 Initializing auto-generated form schemas...');
-{{range .FormSchemas}}
-        this.formSchemas.set('{{.Name}}', {{.Schema}});
-{{end}}
-        console.log('✅ Form schemas initialized');
-    }
-
-    generateForm(schemaName, containerId) {
-        const schema = this.formSchemas.get(schemaName);
-        if (!schema) {
-            console.error('Schema not found:', schemaName);
-            return;
-        }
-        
-        const container = document.getElementById(containerId);
-        if (!container) {
-            console.error('Container not found:', containerId);
-            return;
-        }
-        
-        const form = this.createFormFromSchema(schema);
-        container.appendChild(form);
-    }
-
-    createFormFromSchema(schema) {
-        const form = document.createElement('form');
-        form.className = 'hd1-auto-form';
-        
-        if (schema.title) {
-            const title = document.createElement('h3');
-            title.textContent = schema.title;
-            form.appendChild(title);
-        }
-        
-        Object.entries(schema.fields || {}).forEach(([fieldName, fieldSchema]) => {
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'form-field';
-            
-            const label = document.createElement('label');
-            label.textContent = fieldSchema.title || fieldName;
-            label.setAttribute('for', fieldName);
-            
-            const input = this.createInputForField(fieldName, fieldSchema);
-            
-            fieldDiv.appendChild(label);
-            fieldDiv.appendChild(input);
-            form.appendChild(fieldDiv);
-        });
-        
-        const submitBtn = document.createElement('button');
-        submitBtn.type = 'submit';
-        submitBtn.textContent = schema.submitText || 'Submit';
-        submitBtn.className = 'hd1-submit-btn';
-        form.appendChild(submitBtn);
-        
-        return form;
-    }
-
-    createInputForField(fieldName, fieldSchema) {
-        const input = document.createElement('input');
-        input.name = fieldName;
-        input.id = fieldName;
-        
-        switch (fieldSchema.type) {
-            case 'string':
-                input.type = 'text';
-                break;
-            case 'number':
-                input.type = 'number';
-                break;
-            case 'boolean':
-                input.type = 'checkbox';
-                break;
-            default:
-                input.type = 'text';
-        }
-        
-        if (fieldSchema.required) {
-            input.required = true;
-        }
-        
-        if (fieldSchema.placeholder) {
-            input.placeholder = fieldSchema.placeholder;
-        }
-        
-        return input;
-    }
-
-    getFormData(formElement) {
-        const formData = new FormData(formElement);
-        const data = {};
-        
-        for (const [key, value] of formData.entries()) {
-            data[key] = value;
-        }
-        
-        return data;
-    }
-}
-
-// Export for global use
-window.HD1FormSystem = HD1FormSystem;
-
-console.log('📝 HD1 Form System loaded - Auto-generated from specification');
-`
 
 	// Process routes for form schemas
 	type FormSchema struct {
@@ -1231,9 +840,9 @@ console.log('📝 HD1 Form System loaded - Auto-generated from specification');
 		FormSchemas: formSchemas,
 	}
 	
-	tmpl, err := template.New("forms").Parse(formSystemTemplate)
+	tmpl, err := loadTemplate("templates/javascript/form-system.tmpl")
 	if err != nil {
-		return fmt.Errorf("form system template parse error: %v", err)
+		return fmt.Errorf("form system template load error: %v", err)
 	}
 	
 	formsPath := filepath.Join(outputDir, "hd1-form-system.js")
@@ -1441,224 +1050,24 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 		"physics_bodies": []string{"dynamic", "static", "kinematic"},
 	}
 	
-	functionsTemplate := `#!/bin/bash
-#
-# ===================================================================
-# HD1 Enhanced Shell Function Library with A-Frame Integration
-# ===================================================================
-#
-# REVOLUTIONARY FEATURES:
-# • Complete A-Frame capability exposure through shell functions
-# • Perfect upstream/downstream API integration  
-# • Single source of truth architecture
-# • Bar-raising standard development experience
-#
-# Generated from: api.yaml + A-Frame schemas
-# ===================================================================
-
-# Load HD1 upstream core library
-source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
-    echo "ERROR: HD1 upstream library not found"
-    exit 1
-}
-
-# Enhanced object creation with A-Frame validation
-hd1::create_enhanced_object() {
-    local name="$1"
-    local type="$2" 
-    local x="$3"
-    local y="$4"
-    local z="$5"
-    shift 5
-    
-    # A-Frame geometry validation
-    case "$type" in
-        box|cube) ;;
-        sphere) ;;
-        cylinder) ;;
-        cone) ;;
-        plane) ;;
-        *) echo "ERROR: Invalid geometry type. Use: box, sphere, cylinder, cone, plane"; return 1 ;;
-    esac
-    
-    # Build enhanced properties
-    local properties=""
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            --color)
-                if [[ ! "$2" =~ ^#[0-9a-fA-F]{6}$ ]]; then
-                    echo "ERROR: Color must be hex format (#rrggbb)"
-                    return 1
-                fi
-                properties+=", \"color\": \"$2\""
-                shift 2
-                ;;
-            --metalness)
-                if [[ ! "$2" =~ ^0?\.[0-9]+$|^1\.0*$|^0\.?0*$ ]]; then
-                    echo "ERROR: Metalness must be between 0.0 and 1.0"
-                    return 1
-                fi
-                properties+=", \"material\": {\"metalness\": $2}"
-                shift 2
-                ;;
-            --roughness)
-                if [[ ! "$2" =~ ^0?\.[0-9]+$|^1\.0*$|^0\.?0*$ ]]; then
-                    echo "ERROR: Roughness must be between 0.0 and 1.0" 
-                    return 1
-                fi
-                properties+=", \"material\": {\"roughness\": $2}"
-                shift 2
-                ;;
-            --physics)
-                case "$2" in
-                    dynamic|static|kinematic) ;;
-                    *) echo "ERROR: Physics type must be: dynamic, static, kinematic"; return 1 ;;
-                esac
-                properties+=", \"physics\": {\"type\": \"$2\"}"
-                shift 2
-                ;;
-            *)
-                shift
-                ;;
-        esac
-    done
-    
-    # Enhanced API call with A-Frame schema validation
-    ${HD1_CLIENT} POST "/sessions/${HD1_SESSION}/objects" \
-        --data "{
-            \"name\": \"${name}\",
-            \"type\": \"${type}\",
-            \"position\": {\"x\": ${x}, \"y\": ${y}, \"z\": ${z}}${properties}
-        }"
-}
-
-# A-Frame light creation with schema validation
-hd1::create_enhanced_light() {
-    local name="$1"
-    local light_type="$2"
-    local x="$3"
-    local y="$4" 
-    local z="$5"
-    local intensity="${6:-1.0}"
-    local color="${7:-#ffffff}"
-    
-    # Validate light type
-    case "$light_type" in
-        directional|point|ambient|spot) ;;
-        *) echo "ERROR: Light type must be: directional, point, ambient, spot"; return 1 ;;
-    esac
-    
-    # Validate color format
-    if [[ ! "$color" =~ ^#[0-9a-fA-F]{6}$ ]]; then
-        echo "ERROR: Color must be hex format (#rrggbb)"
-        return 1
-    fi
-    
-    # Validate intensity
-    if [[ ! "$intensity" =~ ^[0-9]*\.?[0-9]+$ ]] || (( $(echo "$intensity < 0" | bc -l) )); then
-        echo "ERROR: Intensity must be a positive number"
-        return 1
-    fi
-    
-    ${HD1_CLIENT} POST "/sessions/${HD1_SESSION}/objects" \
-        --data "{
-            \"name\": \"${name}\",
-            \"type\": \"light\",
-            \"position\": {\"x\": ${x}, \"y\": ${y}, \"z\": ${z}},
-            \"lightType\": \"${light_type}\",
-            \"intensity\": ${intensity},
-            \"color\": \"${color}\"
-        }"
-}
-
-# A-Frame material update with PBR properties
-hd1::update_material() {
-    local object_name="$1"
-    local color="${2:-#ffffff}"
-    local metalness="${3:-0.1}"
-    local roughness="${4:-0.7}"
-    
-    # Validate parameters
-    [[ "$color" =~ ^#[0-9a-fA-F]{6}$ ]] || {
-        echo "ERROR: Color must be hex format (#rrggbb)"
-        return 1
-    }
-    
-    [[ "$metalness" =~ ^0?\.[0-9]+$|^1\.0*$|^0\.?0*$ ]] || {
-        echo "ERROR: Metalness must be between 0.0 and 1.0"
-        return 1
-    }
-    
-    [[ "$roughness" =~ ^0?\.[0-9]+$|^1\.0*$|^0\.?0*$ ]] || {
-        echo "ERROR: Roughness must be between 0.0 and 1.0"
-        return 1
-    }
-    
-    ${HD1_CLIENT} PUT "/sessions/${HD1_SESSION}/objects/${object_name}" \
-        --data "{
-            \"material\": {
-                \"color\": \"${color}\",
-                \"metalness\": ${metalness},
-                \"roughness\": ${roughness}
-            }
-        }"
-}
-
-# A-Frame capabilities inspection
-hd1::aframe_capabilities() {
-    echo "AFRAME: Integration Capabilities"
-    echo ""
-    echo "Geometry Types:"
-    echo "  - box (width, height, depth)"
-    echo "  - sphere (radius, segments)"  
-    echo "  - cylinder (radius, height)"
-    echo "  - cone (radius, height)"
-    echo "  - plane (width, height)"
-    echo ""
-    echo "Light Types:"
-    echo "  - directional (parallel rays)"
-    echo "  - point (omnidirectional)"
-    echo "  - ambient (global illumination)"
-    echo "  - spot (cone-shaped)"
-    echo ""
-    echo "Material Properties:"
-    echo "  - color (hex: #rrggbb)"
-    echo "  - metalness (0.0-1.0)"
-    echo "  - roughness (0.0-1.0)"
-    echo "  - transparency (boolean)"
-    echo ""
-    echo "Physics Bodies:"
-    echo "  - dynamic (responds to forces)"
-    echo "  - static (fixed position)"
-    echo "  - kinematic (script-controlled)"
-    echo ""
-    echo "EXAMPLES:"
-    echo "  hd1::create_enhanced_object cube1 box 0 1 0 --color #ff0000 --metalness 0.8"
-    echo "  hd1::create_enhanced_light sun directional 10 10 5 1.2 #ffffff"
-    echo "  hd1::update_material cube1 #00ff00 0.2 0.9"
-}
-
-# Function signature verification
-hd1::verify_integration() {
-    echo "STATUS: Enhanced Integration Status"
-    echo "  [OK] A-Frame schema validation: ACTIVE"
-    echo "  [OK] Enhanced object creation: AVAILABLE" 
-    echo "  [OK] Light system integration: AVAILABLE"
-    echo "  [OK] Material PBR properties: AVAILABLE"
-    echo "  [OK] Physics body support: AVAILABLE"
-    echo "  [OK] Parameter validation: ACTIVE"
-    echo ""
-    echo "STATUS: Bar-raising achieved"
-}
-
-logging.Info "enhanced shell function library loaded" \
-    "aframe_integration=true" \
-    "validation=enhanced" \
-    "bar_raising_status=achieved"
-`
+	tmpl, err := loadTemplate("templates/shell/aframe-functions.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to load A-Frame shell template: %w", err)
+	}
 
 	outputPath := filepath.Join(outputDir, "downstream/aframelib.sh")
-	if err := os.WriteFile(outputPath, []byte(functionsTemplate), 0755); err != nil {
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create enhanced shell functions file: %w", err)
+	}
+	defer outputFile.Close()
+
+	if err := tmpl.Execute(outputFile, nil); err != nil {
+		return fmt.Errorf("failed to execute A-Frame shell template: %w", err)
+	}
+	
+	// Set executable permissions
+	if err := os.Chmod(outputPath, 0755); err != nil {
 		return fmt.Errorf("failed to write enhanced shell functions: %w", err)
 	}
 	
@@ -1674,210 +1083,20 @@ logging.Info "enhanced shell function library loaded" \
 func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
 	outputDir := "/opt/hd1/lib"
 	
-	bridgeTemplate := `/**
- * ===================================================================
- * HD1 JavaScript Function Bridge with A-Frame Integration
- * ===================================================================
- *
- * REVOLUTIONARY FEATURES:
- * • Identical function signatures to shell functions
- * • Complete A-Frame capability exposure through JavaScript
- * • Standard upstream API integration
- * • Single source of truth architecture
- *
- * Generated from: api.yaml + A-Frame schemas
- * ===================================================================
- */
-
-// Enhanced HD1 JavaScript API Bridge
-window.hd1 = window.hd1 || {};
-
-// Core session management
-function getCurrentSessionId() {
-    return window.currentSessionId || document.querySelector('[data-session-id]')?.dataset.sessionId || 'default';
-}
-
-// A-Frame schema validation functions
-const aframeValidation = {
-    validateNumber: (value, min, max) => {
-        const num = parseFloat(value);
-        if (isNaN(num)) throw new Error(` + "`" + `Invalid number: ${value}` + "`" + `);
-        if (min !== undefined && num < min) throw new Error(` + "`" + `Value ${num} below minimum ${min}` + "`" + `);
-        if (max !== undefined && num > max) throw new Error(` + "`" + `Value ${num} above maximum ${max}` + "`" + `);
-        return num;
-    },
-    
-    validateColor: (value) => {
-        if (!/^#[0-9a-fA-F]{6}$/.test(value)) {
-            throw new Error(` + "`" + `Invalid color format: ${value}. Expected #rrggbb` + "`" + `);
-        }
-        return value;
-    },
-    
-    validateEnum: (value, options) => {
-        if (!options.includes(value)) {
-            throw new Error(` + "`" + `Invalid option: ${value}. Expected one of: ${options.join(', ')}` + "`" + `);
-        }
-        return value;
-    }
-};
-
-/**
- * Enhanced object creation with A-Frame validation
- * Shell equivalent: hd1::create_enhanced_object
- */
-hd1.createEnhancedObject = function(name, type, x, y, z, options = {}) {
-    try {
-        // A-Frame geometry validation
-        const validTypes = ['box', 'sphere', 'cylinder', 'cone', 'plane'];
-        type = aframeValidation.validateEnum(type, validTypes);
-        
-        // Position validation
-        x = aframeValidation.validateNumber(x);
-        y = aframeValidation.validateNumber(y);
-        z = aframeValidation.validateNumber(z);
-        
-        const payload = {
-            name: String(name),
-            type: type,
-            position: { x: x, y: y, z: z }
-        };
-        
-        // Add A-Frame component properties
-        if (options.color) {
-            payload.color = aframeValidation.validateColor(options.color);
-        }
-        if (options.material) {
-            if (options.material.metalness !== undefined) {
-                options.material.metalness = aframeValidation.validateNumber(options.material.metalness, 0, 1);
-            }
-            if (options.material.roughness !== undefined) {
-                options.material.roughness = aframeValidation.validateNumber(options.material.roughness, 0, 1);
-            }
-            payload.material = options.material;
-        }
-        if (options.physics) {
-            const validPhysics = ['dynamic', 'static', 'kinematic'];
-            options.physics.type = aframeValidation.validateEnum(options.physics.type, validPhysics);
-            payload.physics = options.physics;
-        }
-        
-        return hd1ApiClient.createObject(getCurrentSessionId(), payload);
-        
-    } catch (error) {
-        console.error('[HD1] createEnhancedObject validation error:', error);
-        throw error;
-    }
-};
-
-/**
- * Enhanced light creation with A-Frame validation
- * Shell equivalent: hd1::create_enhanced_light
- */
-hd1.createEnhancedLight = function(name, lightType, x, y, z, intensity = 1.0, color = '#ffffff') {
-    try {
-        // A-Frame light validation
-        const validLightTypes = ['directional', 'point', 'ambient', 'spot'];
-        lightType = aframeValidation.validateEnum(lightType, validLightTypes);
-        
-        // Parameter validation
-        x = aframeValidation.validateNumber(x);
-        y = aframeValidation.validateNumber(y);
-        z = aframeValidation.validateNumber(z);
-        intensity = aframeValidation.validateNumber(intensity, 0);
-        color = aframeValidation.validateColor(color);
-        
-        const payload = {
-            name: String(name),
-            type: 'light',
-            position: { x: x, y: y, z: z },
-            lightType: lightType,
-            intensity: intensity,
-            color: color
-        };
-        
-        return hd1ApiClient.createObject(getCurrentSessionId(), payload);
-        
-    } catch (error) {
-        console.error('[HD1] createEnhancedLight validation error:', error);
-        throw error;
-    }
-};
-
-/**
- * Material update with PBR properties
- * Shell equivalent: hd1::update_material
- */
-hd1.updateMaterial = function(objectName, color = '#ffffff', metalness = 0.1, roughness = 0.7) {
-    try {
-        // A-Frame material validation
-        color = aframeValidation.validateColor(color);
-        metalness = aframeValidation.validateNumber(metalness, 0, 1);
-        roughness = aframeValidation.validateNumber(roughness, 0, 1);
-        
-        const payload = {
-            material: {
-                color: color,
-                metalness: metalness,
-                roughness: roughness
-            }
-        };
-        
-        return hd1ApiClient.updateObject(getCurrentSessionId(), objectName, payload);
-        
-    } catch (error) {
-        console.error('[HD1] updateMaterial validation error:', error);
-        throw error;
-    }
-};
-
-/**
- * A-Frame capabilities inspection
- * Shell equivalent: hd1::aframe_capabilities
- */
-hd1.aframeCapabilities = function() {
-    const capabilities = {
-        geometryTypes: ['box', 'sphere', 'cylinder', 'cone', 'plane'],
-        lightTypes: ['directional', 'point', 'ambient', 'spot'],
-        materialProperties: ['color', 'metalness', 'roughness', 'transparency', 'emissive'],
-        physicsBodies: ['dynamic', 'static', 'kinematic']
-    };
-    
-    console.log('[HD1] A-Frame Integration Capabilities:', capabilities);
-    return capabilities;
-};
-
-/**
- * Function signature verification
- * Shell equivalent: hd1::verify_integration
- */
-hd1.verifyIntegration = function() {
-    const status = {
-        aframeSchemaValidation: true,
-        enhancedObjectCreation: typeof hd1.createEnhancedObject === 'function',
-        lightSystemIntegration: typeof hd1.createEnhancedLight === 'function',
-        materialPBRProperties: typeof hd1.updateMaterial === 'function',
-        physicsBodySupport: true,
-        parameterValidation: true,
-        barRaisingStatus: 'ACHIEVED'
-    };
-    
-    console.log('[HD1] Enhanced Integration Status:', status);
-    return status;
-};
-
-// Console integration
-if (typeof console !== 'undefined') {
-    console.log('[HD1] Enhanced JavaScript bridge loaded');
-    console.log('[HD1] A-Frame integration: ACTIVE');
-    console.log('[HD1] Identical signatures to shell functions: ACTIVE');
-    console.log('[HD1] Bar-raising status: ACHIEVED');
-}
-`
+	tmpl, err := loadTemplate("templates/javascript/aframe-bridge.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to load A-Frame bridge template: %w", err)
+	}
 
 	outputPath := filepath.Join(outputDir, "downstream/aframelib.js")
-	if err := os.WriteFile(outputPath, []byte(bridgeTemplate), 0644); err != nil {
-		return fmt.Errorf("failed to write JavaScript bridge: %w", err)
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create JavaScript bridge file: %w", err)
+	}
+	defer outputFile.Close()
+
+	if err := tmpl.Execute(outputFile, nil); err != nil {
+		return fmt.Errorf("failed to execute A-Frame bridge template: %w", err)
 	}
 	
 	logging.Info("JavaScript function bridge generated", map[string]interface{}{
@@ -1898,187 +1117,23 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 	}
 	
 	// Generate core shell function library
-	functionsTemplate := `#!/bin/bash
-# ===================================================================
-# HD1 Core Shell Function Library - AUTO-GENERATED
-# ===================================================================
-#
-# GENERATED FROM: api.yaml specification
-# SINGLE SOURCE OF TRUTH: All functions auto-generated from API spec
-# PURPOSE: Standard shell wrapper for HD1 API endpoints
-# 
-# DO NOT EDIT MANUALLY - Regenerate with: make generate
-# ===================================================================
-
-# Configuration
-HD1_API_BASE="http://localhost:8080/api"
-HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
-
-# Standard HTTP client with error handling
-hd1::api_call() {
-    local method="$1"
-    local endpoint="$2"
-    local payload="$3"
-    local content_type="${4:-application/json}"
-    
-    local response
-    if [[ -n "$payload" ]]; then
-        response=$(curl -s -X "$method" "$HD1_API_BASE$endpoint" \
-                        -H "Content-Type: $content_type" \
-                        -d "$payload")
-    else
-        response=$(curl -s -X "$method" "$HD1_API_BASE$endpoint")
-    fi
-    
-    # Standard JSON response parsing
-    if echo "$response" | jq . >/dev/null 2>&1; then
-        echo "$response" | jq -r '.message // .success // "Success"'
-    else
-        echo "ERROR: $response"
-        return 1
-    fi
-}
-
-# Auto-generated from POST /sessions/{sessionId}/objects
-hd1::create_object() {
-    local name="$1"
-    local type="$2" 
-    local x="$3"
-    local y="$4"
-    local z="$5"
-    
-    if [[ -z "$name" || -z "$type" || -z "$x" || -z "$y" || -z "$z" ]]; then
-        echo "Usage: hd1::create_object <name> <type> <x> <y> <z>"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "name": "$name",
-    "type": "$type", 
-    "x": $x,
-    "y": $y,
-    "z": $z
-}
-EOF
-)
-    
-    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
-    echo "OBJECT: $name at ($x,$y,$z)"
-}
-
-# Auto-generated from PUT /sessions/{sessionId}/camera/position
-hd1::camera() {
-    local x="$1" y="$2" z="$3"
-    
-    if [[ -z "$x" || -z "$y" || -z "$z" ]]; then
-        echo "Usage: hd1::camera <x> <y> <z>"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "x": $x,
-    "y": $y,
-    "z": $z
-}
-EOF
-)
-    
-    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
-    echo "CAMERA: Positioned at ($x,$y,$z)"
-}
-
-# Auto-generated from POST /browser/canvas
-hd1::canvas_control() {
-    local command="$1"
-    shift
-    local objects="$@"
-    
-    if [[ -z "$command" ]]; then
-        echo "Usage: hd1::canvas_control <command> [objects...]"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "command": "$command",
-    "objects": [$objects]
-}
-EOF
-)
-    
-    hd1::api_call "POST" "/browser/canvas" "$payload"
-}
-
-# Clear holodeck (uses canvas control)
-hd1::clear() {
-    echo "CLEAR: Clearing holodeck..."
-    hd1::canvas_control "clear"
-}
-
-# Auto-generated from GET /sessions/{sessionId}/objects
-hd1::list_objects() {
-    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects"
-}
-
-# Auto-generated from GET /sessions/{sessionId}/objects/{objectName}
-hd1::get_object() {
-    local name="$1"
-    
-    if [[ -z "$name" ]]; then
-        echo "Usage: hd1::get_object <name>"
-        return 1
-    fi
-    
-    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
-}
-
-# Auto-generated from DELETE /sessions/{sessionId}/objects/{objectName}
-hd1::delete_object() {
-    local name="$1"
-    
-    if [[ -z "$name" ]]; then
-        echo "Usage: hd1::delete_object <name>"
-        return 1
-    fi
-    
-    hd1::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
-    echo "DELETE: Object $name"
-}
-
-# Auto-generated from POST /sessions
-hd1::create_session() {
-    hd1::api_call "POST" "/sessions"
-}
-
-# Auto-generated from GET /sessions
-hd1::list_sessions() {
-    hd1::api_call "GET" "/sessions"
-}
-
-# Auto-generated from GET /sessions/{sessionId}
-hd1::get_session() {
-    local session_id="${1:-$HD1_SESSION_ID}"
-    hd1::api_call "GET" "/sessions/$session_id"
-}
-
-# Auto-generated from POST /sessions/{sessionId}/world
-hd1::init_world() {
-    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/world"
-    echo "WORLD: Initialized"
-}
-
-echo "HD1: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
-echo "SPEC: Generated from api.yaml specification"
-echo "SYNC: Single source of truth - Zero manual synchronization"
-echo "FUNCS: create_object, camera, canvas_control, clear, list_objects"
-echo "SESSION: create_session, get_session, init_world"
-echo "STATUS: Bar-raising achieved"
-`
-
+	tmpl, err := loadTemplate("templates/shell/core-functions.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to load core shell template: %w", err)
+	}
 	outputPath := filepath.Join(outputDir, "hd1lib.sh")
-	if err := os.WriteFile(outputPath, []byte(functionsTemplate), 0755); err != nil {
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create core shell functions file: %w", err)
+	}
+	defer outputFile.Close()
+
+	if err := tmpl.Execute(outputFile, nil); err != nil {
+		return fmt.Errorf("failed to execute core shell template: %w", err)
+	}
+	
+	// Set executable permissions
+	if err := os.Chmod(outputPath, 0755); err != nil {
 		return fmt.Errorf("failed to write core shell functions: %w", err)
 	}
 	
