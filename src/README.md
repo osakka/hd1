@@ -1,14 +1,15 @@
-# HD1 v5.0.0 Source - API-First Game Engine Platform
+# HD1 v5.0.1 Source - API-First Game Engine Platform
 
-**Game Engine as a Service** - World's first HTTP-controlled professional game engine
+**Game Engine as a Service** - World's first HTTP-controlled professional game engine with complete configuration management
 
 ## 🎯 Architecture Overview
 
-**HD1 v5.0.0** transforms game development through **API-First Game Engine** architecture:
-- **77 REST Endpoints**: Complete game engine control via HTTP APIs
+**HD1 v5.0.1** transforms game development through **API-First Game Engine** architecture:
+- **82 REST Endpoints**: Complete game engine control via HTTP APIs
 - **Real-Time WebSocket**: Entity lifecycle synchronization  
 - **PlayCanvas Engine**: Professional 3D rendering with ECS
 - **Single Source of Truth**: 100% auto-generated from `api.yaml`
+- **Configuration Management**: Complete standardization with 50+ environment variables
 
 ### Core Principle: "API = Control, WebSocket = Graph Extension"
 ```

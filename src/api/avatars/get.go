@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"holodeck1/config"
 	"holodeck1/logging"
 	"gopkg.in/yaml.v3"
 )
@@ -89,8 +90,8 @@ func GetAvatarSpecificationHandler(w http.ResponseWriter, r *http.Request, hub i
 		return
 	}
 
-	// Read avatar specification file
-	specPath := filepath.Join("/opt/hd1/share/avatars", avatarType, "avatar.yaml")
+	// Read avatar specification file from configured path
+	specPath := filepath.Join(config.GetAvatarsDir(), avatarType, "avatar.yaml")
 	specData, err := os.ReadFile(specPath)
 	if err != nil {
 		logger.Error("Failed to read avatar specification", map[string]interface{}{

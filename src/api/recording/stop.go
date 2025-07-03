@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"holodeck1/config"
 	"holodeck1/server"
 )
 
@@ -47,7 +48,7 @@ func StopRecordingHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	duration := time.Since(startTimeParsed)
 
 	// Generate recording file
-	recordingPath := filepath.Join("/opt/hd1/recordings", recordingID+".hd1")
+	recordingPath := filepath.Join(config.GetRecordingsDir(), recordingID+".hd1")
 	if err := os.MkdirAll(filepath.Dir(recordingPath), 0755); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to create recordings directory: %v", err), http.StatusInternalServerError)
 		return

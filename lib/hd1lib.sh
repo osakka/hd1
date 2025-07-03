@@ -10,8 +10,8 @@
 # DO NOT EDIT MANUALLY - Regenerate with: make generate
 # ===================================================================
 
-# Configuration - respects environment variables and defaults
-HD1_API_BASE="${HD1_API_BASE:-http://localhost:8080/api}"
+# Configuration - respects environment variables and defaults from config system
+HD1_API_BASE="${HD1_API_BASE:-http://0.0.0.0:8080/api}"
 HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
 
 # Standard HTTP client with error handling
@@ -39,16 +39,6 @@ hd1::api_call() {
     fi
 }
 
-
-# Auto-generated from GET /sessions
-hd1::list_sessions() {
-    hd1::api_call "GET" "/sessions"
-}
-
-# Auto-generated from POST /sessions
-hd1::create_session() {
-    hd1::api_call "POST" "/sessions"
-}
 
 # Auto-generated from POST /browser/canvas
 hd1::canvas_control() {
@@ -98,6 +88,16 @@ EOF
     
     hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
     echo "CAMERA: Positioned at ($x,$y,$z)"
+}
+
+# Auto-generated from GET /sessions
+hd1::list_sessions() {
+    hd1::api_call "GET" "/sessions"
+}
+
+# Auto-generated from POST /sessions
+hd1::create_session() {
+    hd1::api_call "POST" "/sessions"
 }
 
 # Auto-generated from GET /sessions/{sessionId}

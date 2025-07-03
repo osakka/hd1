@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 	"gopkg.in/yaml.v3"
+	"holodeck1/config"
 	"holodeck1/server"
 )
 
@@ -53,7 +54,7 @@ func PlayRecordingHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	}
 
 	// Load recording file
-	recordingPath := filepath.Join("/opt/hd1/recordings", req.RecordingID+".hd1")
+	recordingPath := filepath.Join(config.GetRecordingsDir(), req.RecordingID+".hd1")
 	recordingData, err := os.ReadFile(recordingPath)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")

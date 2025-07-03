@@ -10,6 +10,7 @@ import (
 	"text/template"
 	
 	"gopkg.in/yaml.v3"
+	"holodeck1/config"
 	"holodeck1/logging"
 )
 
@@ -114,8 +115,14 @@ func main() {
 	fmt.Println("HD1 Code Generator - Upstream/Downstream Integration")
 	fmt.Println("======================================================")
 
+	// Initialize configuration system for code generation
+	if err := config.Initialize(); err != nil {
+		fmt.Fprintf(os.Stderr, "FATAL: Configuration initialization failed: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Initialize logging for code generation
-	logging.InitLogger("/opt/hd1/build/logs", logging.INFO, []string{})
+	logging.InitLogger(config.GetLogDir(), logging.INFO, []string{})
 	logging.Info("advanced code generator starting", map[string]interface{}{
 		"task": "upstream-downstream-integration",
 		"single_source_of_truth": true,
@@ -1006,11 +1013,15 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 	}
 	defer outputFile.Close()
 
-	// Pass routes data to template for dynamic generation
+	// Pass routes data and configuration defaults to template for dynamic generation
 	templateData := struct {
-		Routes []RouteInfo
+		Routes           []RouteInfo
+		DefaultAPIBase   string
+		DefaultSessionID string
 	}{
-		Routes: routes,
+		Routes:           routes,
+		DefaultAPIBase:   config.GetAPIBase(),
+		DefaultSessionID: config.GetSessionDefaultID(),
 	}
 	
 	if err := tmpl.Execute(outputFile, templateData); err != nil {

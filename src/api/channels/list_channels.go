@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strings"
+	"holodeck1/config"
 	"holodeck1/logging"
 	"gopkg.in/yaml.v3"
 )
@@ -127,10 +128,12 @@ func convertMapInterfaceToStringInterface(input interface{}) interface{} {
 
 // ListChannelsHandler handles requests to list available channels
 func ListChannelsHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
-	logging.Info("listing available channels", nil)
-
-	// Define channels directory path
-	channelsDir := "/opt/hd1/share/channels"
+	// Get channels directory from configuration
+	channelsDir := config.GetChannelsDir()
+	
+	logging.Info("listing available channels", map[string]interface{}{
+		"channels_dir": channelsDir,
+	})
 	
 	// Read server configuration
 	serverConfig, err := loadServerConfig(channelsDir)

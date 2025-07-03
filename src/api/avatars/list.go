@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"holodeck1/config"
 	"holodeck1/logging"
 	"gopkg.in/yaml.v3"
 )
@@ -38,8 +39,8 @@ func ListAvatarsHandler(w http.ResponseWriter, r *http.Request, hub interface{})
 	logger := logging.GetLogger()
 	logger.Info("Listing available avatar types")
 
-	// Read avatar config
-	configPath := "/opt/hd1/share/avatars/config.yaml"
+	// Read avatar config from configured path
+	configPath := config.GetAvatarsConfigFile()
 	configData, err := os.ReadFile(configPath)
 	if err != nil {
 		logger.Error("Failed to read avatar config", map[string]interface{}{
@@ -50,8 +51,8 @@ func ListAvatarsHandler(w http.ResponseWriter, r *http.Request, hub interface{})
 		return
 	}
 
-	var config AvatarConfig
-	if err := yaml.Unmarshal(configData, &config); err != nil {
+	var avatarConfig AvatarConfig
+	if err := yaml.Unmarshal(configData, &avatarConfig); err != nil {
 		logger.Error("Failed to parse avatar config", map[string]interface{}{
 			"error": err,
 		})
@@ -61,9 +62,9 @@ func ListAvatarsHandler(w http.ResponseWriter, r *http.Request, hub interface{})
 
 	// Build avatar types list
 	var avatars []AvatarType
-	for avatarType, avatarInfo := range config.AvatarTypes {
+	for avatarType, avatarInfo := range avatarConfig.AvatarTypes {
 		// Read the individual avatar spec to get the name
-		avatarSpecPath := filepath.Join("/opt/hd1/share/avatars", avatarInfo.Path)
+		avatarSpecPath := filepath.Join(config.GetAvatarsDir(), avatarInfo.Path)
 		specData, err := os.ReadFile(avatarSpecPath)
 		if err != nil {
 			logger.Warn("Could not read avatar spec", map[string]interface{}{

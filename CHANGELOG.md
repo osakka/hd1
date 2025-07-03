@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [5.0.1] - 2025-07-03 - **🔧 CONFIGURATION MANAGEMENT STANDARDIZATION**
+
+### **CONFIGURATION MANAGEMENT: SINGLE SOURCE OF TRUTH ACHIEVED**
+
+This release achieves complete configuration management standardization with comprehensive environment variable support, eliminates all hardcoded values, and establishes a robust priority system: Flags > Environment Variables > .env File > Defaults.
+
+### **Added - Configuration Management System**
+- **Comprehensive Environment Variable Support**: 50+ configurable parameters with HD1_* prefix
+- **Recordings Directory Configuration**: HD1_RECORDINGS_DIR environment variable and config.GetRecordingsDir()
+- **Complete Path Management**: All directories now configurable via environment variables
+- **WebSocket Configuration**: All timeouts, buffer sizes, and connection parameters configurable
+- **Session Management Configuration**: Cleanup intervals, timeouts, and HTTP client settings configurable
+
+### **Fixed - Hardcoded Values Elimination**
+- **Channel Operations**: Fixed hardcoded /opt/hd1/share/channels paths in delete_channel.go
+- **Recording System**: Eliminated hardcoded /opt/hd1/recordings paths in play.go and stop.go  
+- **Configuration Priority**: Proper precedence system ensuring flags override environment variables
+- **Thread Safety**: Enhanced logging system thread safety during configuration initialization
+
+### **Changed - Single Source of Truth Architecture**
+- **Zero Hardcoded Paths**: All file system paths now use configuration system
+- **Environment Variable Integration**: Complete HD1_* environment variable support
+- **Configuration Structure**: Extended PathsConfig with RecordingsDir field
+- **Auto-Generated Defaults**: Shell library templates use configuration-derived defaults
+
+---
+
 ## [5.0.0] - 2025-07-03 - **🎮 API-FIRST GAME ENGINE WITH MULTIPLAYER AVATAR SYNC**
 
 ### **MAJOR RELEASE: COMPLETE ARCHITECTURAL TRANSFORMATION + AVATAR SYNCHRONIZATION**

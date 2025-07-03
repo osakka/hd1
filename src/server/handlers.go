@@ -24,7 +24,9 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 	
 	// Check if template processor is initialized
 	if templateProcessor == nil {
-		logging.Error("template processor not initialized", nil)
+		logging.Error("template processor not initialized", map[string]interface{}{
+			"handler": "ServeHome",
+		})
 		http.Error(w, "Server configuration error", http.StatusInternalServerError)
 		return
 	}
@@ -48,7 +50,9 @@ func ServeConsoleJS(w http.ResponseWriter, r *http.Request) {
 	
 	// Check if template processor is initialized
 	if templateProcessor == nil {
-		logging.Error("template processor not initialized", nil)
+		logging.Error("template processor not initialized", map[string]interface{}{
+			"handler": "ServeConsoleJS",
+		})
 		http.Error(w, "Server configuration error", http.StatusInternalServerError)
 		return
 	}
@@ -72,7 +76,9 @@ func ServeAFrameJS(w http.ResponseWriter, r *http.Request) {
 	
 	// Check if template processor is initialized
 	if templateProcessor == nil {
-		logging.Error("template processor not initialized", nil)
+		logging.Error("template processor not initialized", map[string]interface{}{
+			"handler": "ServeAFrameJS",
+		})
 		http.Error(w, "Server configuration error", http.StatusInternalServerError)
 		return
 	}

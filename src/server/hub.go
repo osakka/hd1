@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"gopkg.in/yaml.v3"
+	"holodeck1/config"
 	"holodeck1/logging"
 )
 
@@ -689,7 +690,7 @@ func generateID(length int) string {
 
 // startSessionCleanup runs periodic cleanup of inactive sessions
 func (h *Hub) startSessionCleanup() {
-	ticker := time.NewTicker(2 * time.Minute) // Check every 2 minutes
+	ticker := time.NewTicker(config.GetSessionCleanupInterval())
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -703,7 +704,7 @@ func (h *Hub) cleanupInactiveSessions() {
 	defer h.mutex.Unlock()
 
 	now := time.Now()
-	cutoff := now.Add(-10 * time.Minute) // 10 minutes ago
+	cutoff := now.Add(-config.GetSessionInactivityTimeout())
 	
 	sessions := h.store.ListSessions()
 	cleanedCount := 0
@@ -764,7 +765,7 @@ func (h *Hub) LoadNamedChannelIntoSession(sessionID, channelID string) error {
 	})
 	
 	// Read channel YAML configuration
-	channelPath := filepath.Join("/opt/hd1/share/channels", channelID+".yaml")
+	channelPath := filepath.Join(config.GetChannelsDir(), channelID+".yaml")
 	configData, err := ioutil.ReadFile(channelPath)
 	if err != nil {
 		return fmt.Errorf("failed to read channel config %s: %w", channelPath, err)
@@ -922,7 +923,7 @@ func (h *Hub) CreateEntityViaAPI(sessionID string, entityPayload map[string]inte
 	
 	req.Header.Set("Content-Type", "application/json")
 	
-	client := &http.Client{Timeout: time.Second * 5}
+	client := &http.Client{Timeout: config.GetSessionHTTPClientTimeout()}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to create entity via API: %w", err)
@@ -947,7 +948,7 @@ func (h *Hub) DeleteEntityByNameViaAPI(sessionID, entityName string) error {
 		return fmt.Errorf("failed to create list entities request: %w", err)
 	}
 	
-	client := &http.Client{Timeout: time.Second * 5}
+	client := &http.Client{Timeout: config.GetSessionHTTPClientTimeout()}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to list entities via API: %w", err)
@@ -1014,7 +1015,7 @@ func (h *Hub) UpdateEntityByNameViaAPI(sessionID, entityName string, updatePaylo
 		return fmt.Errorf("failed to create list entities request: %w", err)
 	}
 	
-	client := &http.Client{Timeout: time.Second * 5}
+	client := &http.Client{Timeout: config.GetSessionHTTPClientTimeout()}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to list entities via API: %w", err)
@@ -1089,7 +1090,7 @@ func (h *Hub) GetEntityByNameViaAPI(sessionID, entityName string) (map[string]in
 		return nil, fmt.Errorf("failed to create list entities request: %w", err)
 	}
 	
-	client := &http.Client{Timeout: time.Second * 5}
+	client := &http.Client{Timeout: config.GetSessionHTTPClientTimeout()}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list entities via API: %w", err)

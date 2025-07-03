@@ -23,7 +23,10 @@ func GetLoggingConfigHandler(w http.ResponseWriter, r *http.Request, hub *server
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(configJSON)
 
-	logging.Info("logging configuration retrieved")
+	logging.Info("logging configuration retrieved", map[string]interface{}{
+		"request_method": r.Method,
+		"user_agent":     r.UserAgent(),
+	})
 }
 
 // SetLoggingConfigHandler updates logging configuration

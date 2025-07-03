@@ -10,9 +10,9 @@
 # DO NOT EDIT MANUALLY - Regenerate with: make generate
 # ===================================================================
 
-# Configuration - respects environment variables and defaults
-HD1_API_BASE="${HD1_API_BASE:-http://localhost:8080/api}"
-HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
+# Configuration - respects environment variables and defaults from config system
+HD1_API_BASE="${HD1_API_BASE:-{{.DefaultAPIBase}}}"
+HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-{{.DefaultSessionID}}}}"
 
 # Standard HTTP client with error handling
 hd1::api_call() {

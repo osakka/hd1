@@ -28,9 +28,9 @@
 **WebGL/3D Native** → Professional PlayCanvas rendering engine  
 **Specification-Driven** → 100% auto-generated from OpenAPI specification (XVC Single Source of Truth)
 
-## 🚀 Current State: HD1 v5.0.0 (In Development)
+## 🚀 Current State: HD1 v5.0.1 (In Development)
 
-HD1 has a **complete API surface** for 3D engine control with **82 REST endpoints** and **advanced multiplayer avatar synchronization**. The foundation is built for the distributed services revolution.
+HD1 has a **complete API surface** for 3D engine control with **82 REST endpoints**, **advanced multiplayer avatar synchronization**, and **complete configuration management standardization**. The foundation is built for the distributed services revolution.
 
 ### 🎮 Complete 3D Engine via REST APIs
 ```

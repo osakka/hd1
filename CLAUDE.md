@@ -9,7 +9,7 @@
 - **"API = Control, WebSocket = Graph Extension"**
 
 ## Current State (2025-07-03)
-HD1 v5.0.0 is a **production-ready API-first game engine** platform with **advanced multiplayer avatar synchronization**.
+HD1 v5.0.1 is a **production-ready API-first game engine** platform with **complete configuration management standardization**.
 
 ### ✅ Completed Features
 - **82 REST Endpoints**: Complete game engine control via HTTP + Avatar management
@@ -21,6 +21,7 @@ HD1 v5.0.0 is a **production-ready API-first game engine** platform with **advan
 - **Console UI**: Professional monitoring with smooth animations
 - **Vendor Cleanup**: Removed 1.1GB redundant directories, optimized structure
 - **Template Architecture**: 8 externalized templates for maintainable code generation
+- **Configuration Management**: Complete single source of truth with 50+ environment variables
 
 ### Architecture
 ```
@@ -66,11 +67,21 @@ make generate                              # Auto-generate from api.yaml
 - **PlayCanvas Integration**: Professional Vec3.lerp() interpolation and Quat.slerp() rotation
 - **Error-Free Operation**: Fixed critical PlayCanvas constructor issues
 
+## Configuration Management
+**Priority**: Flags > Environment Variables > .env File > Defaults
+**Environment Variables**: 50+ HD1_* variables for complete configurability
+**Key Variables**:
+- `HD1_HOST`, `HD1_PORT` - Server binding configuration
+- `HD1_CHANNELS_DIR`, `HD1_AVATARS_DIR`, `HD1_RECORDINGS_DIR` - Path configuration
+- `HD1_WEBSOCKET_*` - WebSocket timeout and buffer configuration
+- `HD1_LOG_LEVEL`, `HD1_TRACE_MODULES` - Logging configuration
+
 ## Quality Standards
 - **Auto-Generated**: Never edit auto_router.go, hd1lib.js, hd1lib.sh
 - **Source Files**: Always edit api.yaml, handler implementations
 - **Zero Regressions**: All changes maintain compatibility
 - **Clean Architecture**: Separation of concerns maintained
+- **Single Source of Truth**: All configuration via config system, zero hardcoded values
 
 ## Logging Standards
 **Format**: `timestamp [pid:thread] [level] function.file:line message`
@@ -79,4 +90,4 @@ make generate                              # Auto-generate from api.yaml
 
 ---
 
-**HD1 v5.0.0**: Where OpenAPI specifications become immersive multiplayer game worlds with real-time avatar synchronization.
+**HD1 v5.0.1**: Where OpenAPI specifications become immersive multiplayer game worlds with complete configuration management standardization.

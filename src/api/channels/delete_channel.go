@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"holodeck1/config"
 	"holodeck1/logging"
 	"gopkg.in/yaml.v3"
 )
@@ -38,7 +39,7 @@ func DeleteChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	}
 
 	// Validate channel exists
-	channelsDir := "/opt/hd1/share/channels"
+	channelsDir := config.GetChannelsDir()
 	channelPath := filepath.Join(channelsDir, channelId)
 	configPath := filepath.Join(channelPath, "config.yaml")
 	
@@ -52,7 +53,7 @@ func DeleteChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	}
 
 	// Load server configuration to check if this is the default channel
-	serverConfigPath := "/opt/hd1/share/channels/config.yaml"
+	serverConfigPath := filepath.Join(config.GetChannelsDir(), "config.yaml")
 	serverConfigData, err := os.ReadFile(serverConfigPath)
 	if err == nil {
 		var serverConfig struct {

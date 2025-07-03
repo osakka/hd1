@@ -162,12 +162,14 @@ func (l *Logger) DisableTrace(modules []string) {
 
 // log is the core logging function
 func (l *Logger) log(level LogLevel, message string, data map[string]interface{}) {
+	// Thread-safe level check with single lock acquisition
 	l.mu.RLock()
 	currentLevel := l.level
+	enabled := level >= currentLevel
 	l.mu.RUnlock()
 
-	// Quick return if level not enabled
-	if level < currentLevel {
+	// Zero-overhead quick return if level not enabled
+	if !enabled {
 		return
 	}
 
@@ -310,9 +312,20 @@ func (l *Logger) writeEntry(entry LogEntry, level LogLevel) {
 	}
 }
 
-// getThreadID returns a thread identifier
+// getThreadID returns the current goroutine ID
 func getThreadID() string {
-	// Go doesn't expose thread IDs directly, use goroutine ID approximation
+	var buf [64]byte
+	n := runtime.Stack(buf[:], false)
+	
+	// Parse goroutine ID from stack trace: "goroutine 1 [running]:"
+	stack := string(buf[:n])
+	if idx := strings.Index(stack, " "); idx > 0 && idx >= 10 {
+		if gid := stack[10:idx]; gid != "" {
+			return gid
+		}
+	}
+	
+	// Fallback to "main" if parsing fails
 	return "main"
 }
 
@@ -324,28 +337,64 @@ func (l *Logger) Close() error {
 	return nil
 }
 
-// Convenience functions using default logger
+// Zero-overhead convenience functions using default logger
 func Trace(module, message string, data ...map[string]interface{}) {
-	GetLogger().Trace(module, message, data...)
+	logger := GetLogger()
+	logger.mu.RLock()
+	enabled := logger.traceModules[strings.ToLower(module)]
+	logger.mu.RUnlock()
+	
+	if enabled {
+		logger.Trace(module, message, data...)
+	}
 }
 
 func Debug(message string, data ...map[string]interface{}) {
-	GetLogger().Debug(message, data...)
+	logger := GetLogger()
+	logger.mu.RLock()
+	enabled := logger.level <= DEBUG
+	logger.mu.RUnlock()
+	
+	if enabled {
+		logger.Debug(message, data...)
+	}
 }
 
 func Info(message string, data ...map[string]interface{}) {
-	GetLogger().Info(message, data...)
+	logger := GetLogger()
+	logger.mu.RLock()
+	enabled := logger.level <= INFO
+	logger.mu.RUnlock()
+	
+	if enabled {
+		logger.Info(message, data...)
+	}
 }
 
 func Warn(message string, data ...map[string]interface{}) {
-	GetLogger().Warn(message, data...)
+	logger := GetLogger()
+	logger.mu.RLock()
+	enabled := logger.level <= WARN
+	logger.mu.RUnlock()
+	
+	if enabled {
+		logger.Warn(message, data...)
+	}
 }
 
 func Error(message string, data ...map[string]interface{}) {
-	GetLogger().Error(message, data...)
+	logger := GetLogger()
+	logger.mu.RLock()
+	enabled := logger.level <= ERROR
+	logger.mu.RUnlock()
+	
+	if enabled {
+		logger.Error(message, data...)
+	}
 }
 
 func Fatal(message string, data ...map[string]interface{}) {
+	// FATAL always logs regardless of level
 	GetLogger().Fatal(message, data...)
 }
 
@@ -355,6 +404,31 @@ func SetLevel(level LogLevel) {
 
 func SetLevelFromString(levelStr string) error {
 	return GetLogger().SetLevelFromString(levelStr)
+}
+
+// Zero-overhead level checking functions for conditional logging
+func IsTraceEnabled(module string) bool {
+	logger := GetLogger()
+	logger.mu.RLock()
+	enabled := logger.traceModules[strings.ToLower(module)]
+	logger.mu.RUnlock()
+	return enabled
+}
+
+func IsDebugEnabled() bool {
+	logger := GetLogger()
+	logger.mu.RLock()
+	enabled := logger.level <= DEBUG
+	logger.mu.RUnlock()
+	return enabled
+}
+
+func IsInfoEnabled() bool {
+	logger := GetLogger()
+	logger.mu.RLock()
+	enabled := logger.level <= INFO
+	logger.mu.RUnlock()
+	return enabled
 }
 
 func EnableTrace(modules []string) {

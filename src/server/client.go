@@ -7,22 +7,35 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"holodeck1/config"
 	"holodeck1/logging"
 )
 
-const (
-	writeWait      = 10 * time.Second
-	pongWait       = 60 * time.Second
-	pingPeriod     = (pongWait * 9) / 10
-	maxMessageSize = 512
-)
+// WebSocket configuration functions (using config system)
+func getWriteWait() time.Duration {
+	return config.GetWebSocketWriteTimeout()
+}
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true // Allow all origins for now
-	},
+func getPongWait() time.Duration {
+	return config.GetWebSocketPongTimeout()
+}
+
+func getPingPeriod() time.Duration {
+	return config.GetWebSocketPingPeriod()
+}
+
+func getMaxMessageSize() int64 {
+	return config.GetWebSocketMaxMessageSize()
+}
+
+func getUpgrader() websocket.Upgrader {
+	return websocket.Upgrader{
+		ReadBufferSize:  config.GetWebSocketReadBufferSize(),
+		WriteBufferSize: config.GetWebSocketWriteBufferSize(),
+		CheckOrigin: func(r *http.Request) bool {
+			return true // Allow all origins for now
+		},
+	}
 }
 
 type ClientInfo struct {
@@ -58,10 +71,10 @@ func (c *Client) readPump() {
 		c.conn.Close()
 	}()
 	
-	c.conn.SetReadLimit(maxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.conn.SetReadLimit(getMaxMessageSize())
+	c.conn.SetReadDeadline(time.Now().Add(getPongWait()))
 	c.conn.SetPongHandler(func(string) error {
-		c.conn.SetReadDeadline(time.Now().Add(pongWait))
+		c.conn.SetReadDeadline(time.Now().Add(getPongWait()))
 		return nil
 	})
 	
@@ -208,7 +221,7 @@ func (c *Client) handleClientMessage(message []byte) {
 }
 
 func (c *Client) writePump() {
-	ticker := time.NewTicker(pingPeriod)
+	ticker := time.NewTicker(getPingPeriod())
 	defer func() {
 		ticker.Stop()
 		c.conn.Close()
@@ -217,7 +230,7 @@ func (c *Client) writePump() {
 	for {
 		select {
 		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			c.conn.SetWriteDeadline(time.Now().Add(getWriteWait()))
 			if !ok {
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
@@ -228,7 +241,7 @@ func (c *Client) writePump() {
 			}
 			
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			c.conn.SetWriteDeadline(time.Now().Add(getWriteWait()))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
@@ -237,6 +250,7 @@ func (c *Client) writePump() {
 }
 
 func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	upgrader := getUpgrader()
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		logging.Error("websocket upgrade failed", map[string]interface{}{
@@ -245,7 +259,7 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, config.GetWebSocketClientChannelBuffer())}
 	client.hub.register <- client
 	
 	go client.writePump()
