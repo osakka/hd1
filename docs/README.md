@@ -7,7 +7,7 @@ Welcome to the comprehensive documentation for HD1, the world's first API-first 
 ## 🚀 **Quick Start**
 
 - **[Getting Started Guide](getting-started/README.md)** - Installation, setup, and first steps
-- **[API Reference](reference/api-specification.md)** - Complete API documentation (77 endpoints)
+- **[API Reference](reference/api-specification.md)** - Complete API documentation (82 endpoints)
 - **[Examples](getting-started/examples/)** - Code samples and tutorials
 
 ## 📚 **Documentation Categories**
@@ -15,7 +15,7 @@ Welcome to the comprehensive documentation for HD1, the world's first API-first 
 ### **For Users**
 - **[User Guide](user-guide/README.md)** - Complete user documentation
   - [Core Concepts](user-guide/concepts.md) - Understanding HD1 architecture
-  - [API Reference](user-guide/api-reference.md) - Using the 77 REST endpoints
+  - [API Reference](user-guide/api-reference.md) - Using the 82 REST endpoints
   - [Channels](user-guide/channels.md) - Scene management and collaboration
   - [Entities & Components](user-guide/entities-components.md) - Game object system
   - [Troubleshooting](user-guide/troubleshooting.md) - Common issues and solutions
@@ -59,7 +59,7 @@ Welcome to the comprehensive documentation for HD1, the world's first API-first 
 ## 🎯 **HD1 v5.0.0 Key Features**
 
 ### **Professional Game Engine**
-- **77 REST Endpoints** - Complete game engine control via HTTP APIs
+- **82 REST Endpoints** - Complete game engine control via HTTP APIs
 - **PlayCanvas Integration** - Professional 3D rendering engine
 - **Entity-Component-System** - Modern game architecture
 - **Real-Time Synchronization** - WebSocket state sync across clients
@@ -110,5 +110,5 @@ This documentation follows industry-standard technical writing practices:
 
 **HD1 v5.0.0** - The world's first API-first game engine platform  
 **Documentation Version**: 5.0.0 (Updated: 2025-07-03)  
-**API Surface**: 77 REST endpoints  
+**API Surface**: 82 REST endpoints  
 **Architecture**: Entity-Component-System with PlayCanvas rendering

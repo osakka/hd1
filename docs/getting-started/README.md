@@ -123,7 +123,7 @@ Open http://localhost:8080 in your browser and you'll see:
 
 ### **Learn Core Concepts**
 - **[User Guide](../user-guide/README.md)** - Complete user documentation
-- **[API Reference](../reference/api-specification.md)** - All 77 endpoints documented
+- **[API Reference](../reference/api-specification.md)** - All 82 endpoints documented
 - **[Architecture Overview](../architecture/overview.md)** - System architecture
 
 ### **Build Something**
@@ -201,7 +201,7 @@ tail -f build/logs/hd1.log
 
 ## 📖 **Additional Resources**
 
-- **[Complete API Documentation](../reference/api-specification.md)** - All 77 endpoints
+- **[Complete API Documentation](../reference/api-specification.md)** - All 82 endpoints
 - **[Channel Configuration](../user-guide/channels.md)** - YAML-based scene management
 - **[Entity-Component System](../user-guide/entities-components.md)** - Game object architecture
 - **[Architectural Decisions](../decisions/README.md)** - Design rationale and history

@@ -41,7 +41,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 ### **API-First Game Engine**
 HD1 is the world's first "Game Engine as a Service" platform, providing complete game engine functionality through HTTP APIs:
 
-- **77 REST Endpoints** - Complete game engine control
+- **82 REST Endpoints** - Complete game engine control
 - **Real-Time Synchronization** - WebSocket state sync across clients
 - **Professional 3D Rendering** - PlayCanvas integration
 - **Industry-Standard Architecture** - Entity-Component-System design
@@ -86,7 +86,7 @@ Multi-user collaboration through YAML-configured channels:
 ## 📊 **System Metrics**
 
 ### **API Surface**
-- **Total Endpoints**: 77 REST endpoints
+- **Total Endpoints**: 82 REST endpoints
 - **HTTP Methods**: GET (27), POST (33), PUT (12), DELETE (5)
 - **Unique Paths**: 56 distinct API paths
 - **Specification Size**: 2,847 lines of OpenAPI YAML

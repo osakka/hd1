@@ -17,7 +17,7 @@ All significant architectural decisions are documented using the ADR format:
 
 ## 📚 **Complete ADR Collection**
 
-For the complete collection of all 23 ADRs with detailed timeline and cross-references, see:
+For the complete collection of all 25 ADRs with detailed timeline and cross-references, see:
 
 **[Complete ADR Index](adr/README.md)** - Full chronological timeline and decision history
 
@@ -27,6 +27,8 @@ For the complete collection of all 23 ADRs with detailed timeline and cross-refe
 - **[ADR-021: PlayCanvas Migration Implementation](adr/ADR-021-PlayCanvas-Migration-Implementation.md)** - Complete transition to professional game engine
 - **[ADR-022: Three-Layer to Channel Architecture Migration](adr/ADR-022-Three-Layer-to-Channel-Architecture-Migration.md)** - Modern YAML-based configuration
 - **[ADR-023: Legacy Code Elimination](adr/ADR-023-Legacy-Code-Elimination-v5.md)** - Clean architecture with zero legacy debt
+- **[ADR-024: Avatar Synchronization System](adr/ADR-024-Avatar-Synchronization-System.md)** - High-frequency multiplayer avatar tracking
+- **[ADR-025: Advanced Camera System](adr/ADR-025-Advanced-Camera-System.md)** - Professional camera controls with orbital mode
 
 #### **v4.0.0 Code Organization**
 - **[ADR-020: Template Externalization Implementation](adr/ADR-020-Template-Externalization-Implementation.md)** - Maintainable code generation system
@@ -61,7 +63,7 @@ For the complete collection of all 23 ADRs with detailed timeline and cross-refe
 ## 🔄 **Decision Status Overview**
 
 ### **Active Decisions** (Currently Implemented)
-- **22 Accepted ADRs** - Currently guiding system design
+- **24 Accepted ADRs** - Currently guiding system design
 - **1 Superseded ADR** - ADR-014 (replaced by channel architecture)
 
 ### **Decision Evolution**
@@ -106,5 +108,5 @@ ADRs guide system evolution by:
 ---
 
 **HD1 v5.0.0** - API-First Game Engine Platform  
-**ADR Collection**: 23 decisions spanning v1.0 through v5.0.0  
+**ADR Collection**: 25 decisions spanning v1.0 through v5.0.0  
 **Last Updated**: 2025-07-03

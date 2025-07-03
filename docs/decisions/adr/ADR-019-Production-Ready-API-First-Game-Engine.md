@@ -34,7 +34,7 @@ We have implemented and standardized a comprehensive API-first game engine archi
 
 ## Technical Implementation
 
-### API Surface (77 Endpoints)
+### API Surface (82 Endpoints)
 
 #### Entity Management
 ```
@@ -357,7 +357,7 @@ curl -X POST /api/admin/logging/trace -d '{"modules": ["sessions", "entities"]}'
 4. **Clean Cutover**: No deprecated functionality, clean architecture decisions
 
 ### Testing Strategy
-1. **API Testing**: All 77 endpoints tested via curl and automated tests
+1. **API Testing**: All 82 endpoints tested via curl and automated tests
 2. **WebSocket Testing**: Real-time message flow verification
 3. **Integration Testing**: End-to-end entity lifecycle testing
 4. **Performance Testing**: Load testing with 100+ concurrent connections

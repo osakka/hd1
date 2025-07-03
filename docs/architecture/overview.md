@@ -15,8 +15,8 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 
 ### **API Router (Auto-Generated)**
 - **Source**: Auto-generated from `src/api.yaml` OpenAPI specification
-- **Endpoints**: 77 REST endpoints covering complete game engine functionality
-- **Methods**: GET (27), POST (33), PUT (12), DELETE (5)
+- **Endpoints**: 82 REST endpoints covering complete game engine functionality
+- **Methods**: GET (31), POST (34), PUT (12), DELETE (5)
 - **Performance**: <50ms average response time
 
 ### **WebSocket Hub**

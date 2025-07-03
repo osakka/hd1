@@ -184,7 +184,7 @@ type ScenesWatcher struct {
 4. **Remove scenes watcher**: Delete file monitoring system
 
 ### Phase 3: Validation
-1. **Build system**: Verify 77 endpoints with handlers
+1. **Build system**: Verify 82 endpoints with handlers
 2. **API testing**: Validate all channel operations
 3. **Scene rendering**: Verify PlayCanvas integration
 4. **Documentation**: Update all references

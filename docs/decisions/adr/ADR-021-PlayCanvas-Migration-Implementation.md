@@ -35,7 +35,7 @@ HD1 v5.0.0: API-First Game Engine Platform
 │   ├── YAML-driven PlayCanvas scenes
 │   ├── Direct physics settings
 │   └── Component-based entity definitions
-├── API Surface (77 endpoints)
+├── API Surface (82 endpoints)
 │   ├── Scene Graph Management
 │   ├── Entity Lifecycle
 │   ├── Component Management
@@ -50,7 +50,7 @@ HD1 v5.0.0: API-First Game Engine Platform
 1. **Remove legacy systems**: Complete A-Frame and shell script removal
 2. **Implement PlayCanvas core**: Entity-component-system integration
 3. **Channel architecture**: YAML-based scene configuration
-4. **API expansion**: 77 modern game engine endpoints
+4. **API expansion**: 82 modern game engine endpoints
 5. **WebSocket integration**: Real-time scene synchronization
 
 ## Implementation Evidence
@@ -58,7 +58,7 @@ HD1 v5.0.0: API-First Game Engine Platform
 ### Git History
 - **Migration start**: Commits implementing PlayCanvas integration
 - **Legacy removal**: Complete shell script and A-Frame removal
-- **API implementation**: 77 endpoint REST API completion
+- **API implementation**: 82 endpoint REST API completion
 - **Build validation**: Clean build with zero dependencies
 
 ### File System Changes
@@ -67,7 +67,7 @@ ADDED:
 + share/htdocs/static/js/hd1-playcanvas.js
 + share/htdocs/static/js/vendor/playcanvas.min.js
 + share/channels/ (YAML configuration system)
-+ 77 API handler files in src/api/
++ 82 API handler files in src/api/
 
 REMOVED:
 - share/scenes/ (shell script system)
@@ -79,7 +79,7 @@ REMOVED:
 
 ### API Surface Transformation
 - **Before**: 31 endpoints (basic visualization)
-- **After**: 77 endpoints (full game engine)
+- **After**: 82 endpoints (full game engine)
 - **New capabilities**: Scene graphs, entity management, physics world, components
 
 ### Channel System Architecture
@@ -121,7 +121,7 @@ playcanvas:
 - **Dependency**: PlayCanvas library requirement
 
 ### Risk Mitigation
-- **Comprehensive testing**: Build system validates all 77 endpoints
+- **Comprehensive testing**: Build system validates all 82 endpoints
 - **Documentation**: Complete API reference and migration guide
 - **Backward compatibility**: API versioning strategy
 - **Progressive migration**: Channel-by-channel conversion
@@ -130,17 +130,17 @@ playcanvas:
 
 ### Build System
 - **Clean build**: Zero warnings or errors
-- **Generation**: Auto-router with 77 routes
+- **Generation**: Auto-router with 82 routes
 - **Validation**: 100% endpoint-to-handler mapping
 - **Size**: Optimized vendor dependencies
 
 ### API Completeness
 ```
 Generated Successfully:
-✅ 77 routes in auto-router
-✅ 77 handler stubs
-✅ 77 CLI commands
-✅ 77 JavaScript API functions
+✅ 82 routes in auto-router
+✅ 82 handler stubs
+✅ 82 CLI commands
+✅ 82 JavaScript API functions
 ✅ Dynamic form generation
 ✅ UI component auto-generation
 ```

@@ -12,7 +12,7 @@
 HD1 v5.0.0 is a **production-ready API-first game engine** platform with **advanced multiplayer avatar synchronization**.
 
 ### ✅ Completed Features
-- **79 REST Endpoints**: Complete game engine control via HTTP + Avatar management
+- **82 REST Endpoints**: Complete game engine control via HTTP + Avatar management
 - **Real-Time WebSocket**: <10ms entity lifecycle synchronization + avatar position updates
 - **PlayCanvas Integration**: Professional 3D rendering with ECS + advanced camera system
 - **Avatar Synchronization**: High-frequency multiplayer avatar tracking with persistence
@@ -28,7 +28,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → Client Ren
 ```
 
 **Key Files:**
-- `src/api.yaml` - Single source of truth (79 endpoints)
+- `src/api.yaml` - Single source of truth (82 endpoints)
 - `src/auto_router.go` - Auto-generated routing
 - `src/codegen/templates/` - External template files
 - `share/channels/*.yaml` - Scene configurations
