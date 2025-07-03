@@ -27,22 +27,14 @@ func ListSessionsHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		"total_sessions": len(sessions),
 	})
 	
-	// Transform to response format with object counts
+	// Transform to response format with current architecture
 	var sessionList []map[string]interface{}
 	for _, session := range sessions {
-		objects := h.GetStore().ListObjects(session.ID)
-		world, worldExists := h.GetStore().GetWorld(session.ID)
-		
 		sessionData := map[string]interface{}{
-			"id":                session.ID,
-			"created_at":        session.CreatedAt,
-			"status":           session.Status,
-			"object_count":     len(objects),
-			"world_initialized": worldExists,
-		}
-		
-		if worldExists {
-			sessionData["world"] = world
+			"id":         session.ID,
+			"created_at": session.CreatedAt,
+			"status":     session.Status,
+			"channel_id": session.ChannelID, // Current channel joined
 		}
 		
 		sessionList = append(sessionList, sessionData)

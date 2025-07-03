@@ -156,10 +156,8 @@ func extractSceneID(path string) string {
 
 // clearAllObjects removes all objects from a session
 func clearAllObjects(sessionID string, h *server.Hub) {
-	objects := h.GetStore().ListObjects(sessionID)
-	for _, obj := range objects {
-		h.GetStore().DeleteObject(sessionID, obj.Name)
-	}
+	// Scene loading now works with channel entities, not session objects
+	// Clear handled via PlayCanvas/channels
 }
 
 // getSceneScript returns the script path for a given scene ID

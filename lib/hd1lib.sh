@@ -40,53 +40,6 @@ hd1::api_call() {
 }
 
 
-# Auto-generated from DELETE /sessions/{sessionId}/objects/{objectName}
-hd1::delete_object() {
-    local name="$1"
-    
-    if [[ -z "$name" ]]; then
-        echo "Usage: hd1::delete_object <name>"
-        return 1
-    fi
-    
-    hd1::api_call "DELETE" "/sessions/$HD1_SESSION_ID/objects/$name"
-    echo "DELETE: Object $name"
-}
-
-# Auto-generated from GET /sessions/{sessionId}/objects/{objectName}
-hd1::get_object() {
-    local name="$1"
-    
-    if [[ -z "$name" ]]; then
-        echo "Usage: hd1::get_object <name>"
-        return 1
-    fi
-    
-    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects/$name"
-}
-
-# Auto-generated from PUT /sessions/{sessionId}/objects/{objectName}
-hd1::update_object() {
-    local name="$1"
-    local property="$2"
-    local value="$3"
-    
-    if [[ -z "$name" || -z "$property" || -z "$value" ]]; then
-        echo "Usage: hd1::update_object <name> <property> <value>"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "$property": "$value"
-}
-EOF
-)
-    
-    hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/objects/$name" "$payload"
-    echo "UPDATE: Object $name property $property"
-}
-
 # Auto-generated from PUT /sessions/{sessionId}/camera/position
 hd1::camera() {
     local x="$1" y="$2" z="$3"
@@ -137,6 +90,12 @@ hd1::clear() {
     hd1::canvas_control "clear"
 }
 
+# Auto-generated from GET /sessions/{sessionId}
+hd1::get_session() {
+    local session_id="${1:-$HD1_SESSION_ID}"
+    hd1::api_call "GET" "/sessions/$session_id"
+}
+
 # Auto-generated from GET /sessions
 hd1::list_sessions() {
     hd1::api_call "GET" "/sessions"
@@ -147,49 +106,10 @@ hd1::create_session() {
     hd1::api_call "POST" "/sessions"
 }
 
-# Auto-generated from GET /sessions/{sessionId}
-hd1::get_session() {
-    local session_id="${1:-$HD1_SESSION_ID}"
-    hd1::api_call "GET" "/sessions/$session_id"
-}
-
-# Auto-generated from GET /sessions/{sessionId}/objects
-hd1::list_objects() {
-    hd1::api_call "GET" "/sessions/$HD1_SESSION_ID/objects"
-}
-
-# Auto-generated from POST /sessions/{sessionId}/objects
-hd1::create_object() {
-    local name="$1"
-    local type="$2" 
-    local x="$3"
-    local y="$4"
-    local z="$5"
-    
-    if [[ -z "$name" || -z "$type" || -z "$x" || -z "$y" || -z "$z" ]]; then
-        echo "Usage: hd1::create_object <name> <type> <x> <y> <z>"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "name": "$name",
-    "type": "$type", 
-    "x": $x,
-    "y": $y,
-    "z": $z
-}
-EOF
-)
-    
-    hd1::api_call "POST" "/sessions/$HD1_SESSION_ID/objects" "$payload"
-    echo "OBJECT: $name at ($x,$y,$z)"
-}
-
 
 echo "HD1: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
 echo "SPEC: Generated from api.yaml specification"
 echo "SYNC: Single source of truth - Zero manual synchronization"
-echo "FUNCS: create_object, update_object, camera, canvas_control, clear, list_objects"
-echo "SESSION: create_session, get_session, init_world"
+echo "FUNCS: canvas_control, clear, camera, session management"
+echo "SESSION: create_session, get_session, join_channel"
 echo "STATUS: Bar-raising achieved"

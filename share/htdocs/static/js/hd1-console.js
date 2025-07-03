@@ -1,1698 +1,567 @@
-const scene = document.getElementById('holodeck-scene');
-const debugLog = document.getElementById('debug-log');
-const debugHeader = document.getElementById('debug-header');
-const debugCollapseIcon = document.getElementById('debug-collapse-icon');
-
-// Status bar elements
-const statusConnectionIndicator = document.getElementById('status-connection-indicator');
-const statusConnectionText = document.getElementById('status-connection-text');
-const statusLockIndicator = document.getElementById('status-lock-indicator');
-const sessionIdTagStatus = document.getElementById('session-id-tag-status');
-const statusBar = document.getElementById('debug-status-bar');
-const statusCollapseArrow = document.getElementById('status-collapse-arrow');
-
-let hd1Manager;
-let ws;
-let lastMessageTime = 0;
-let reconnectAttempts = 0;
-let maxReconnectAttempts = 99; // After 99 attempts, trigger rebootstrap
-let reconnectTimeout;
-let jsVersion = '${JS_VERSION}'; // Server will replace this
-let initialConnection = true; // Track first connection attempt
-let connectionQuality = 'unknown'; // Track connection health
-let lastSuccessfulConnection = null;
-let silentRetryPhase = true; // Start in silent mode during page load
-let rebootstrapCycles = 0; // Track how many rebootstrap cycles we've done
-
-// Exit silent mode after 10 seconds regardless of connection status
-setTimeout(() => {
-    if (silentRetryPhase) {
-        silentRetryPhase = false;
-        console.log('[HD1-Connection] Exiting silent retry phase - connection attempts now visible');
-    }
-}, 10000);
-
-// Connection quality and retry logic
-function getRetryDelay() {
-    if (silentRetryPhase) return 100; // Fast retries during page load
-    if (reconnectAttempts <= 5) return 1000; // 1s for first 5 attempts
-    if (reconnectAttempts <= 15) return 2000; // 2s for next 10 attempts
-    if (reconnectAttempts <= 30) return 5000; // 5s for next 15 attempts
-    if (reconnectAttempts <= 60) return 10000; // 10s for next 30 attempts
-    return 30000; // 30s for final attempts before rebootstrap
-}
-
-function shouldShowError() {
-    // Only show errors after initial silent phase and for significant attempts
-    return !silentRetryPhase && reconnectAttempts > 3;
-}
-
-function triggerRebootstrap() {
-    rebootstrapCycles++;
-    reconnectAttempts = 0; // Reset counter for new cycle
-    
-    setStatus('connecting', `rebootstrapping system (cycle ${rebootstrapCycles})...`);
-    
-    // Clear any existing state that might be causing issues
-    localStorage.removeItem('hd1_session_id');
-    
-    // Force a complete page reload after a brief delay
-    setTimeout(() => {
-        console.log(`[HD1-Resilience] Rebootstrap cycle ${rebootstrapCycles} - refreshing interface`);
-        window.location.reload(true);
-    }, 2000);
-}
-
-function updateConnectionQuality() {
-    const now = Date.now();
-    if (lastSuccessfulConnection) {
-        const timeSinceLastSuccess = now - lastSuccessfulConnection;
-        if (timeSinceLastSuccess < 5000) connectionQuality = 'excellent';
-        else if (timeSinceLastSuccess < 30000) connectionQuality = 'good';
-        else if (timeSinceLastSuccess < 120000) connectionQuality = 'poor';
-        else connectionQuality = 'critical';
-    }
-}
-
-// Status management
-function setStatus(status, message) {
-    // Update status bar connection indicator
-    statusConnectionIndicator.className = status;
-    statusConnectionIndicator.setAttribute('data-status', message || status);
-    
-    switch(status) {
-        case 'connecting':
-            statusConnectionText.textContent = 'Connecting';
-            break;
-        case 'connected':
-            statusConnectionText.textContent = 'Connected';
-            break;
-        case 'disconnected':
-            statusConnectionText.textContent = 'Disconnected';
-            break;
-        case 'error':
-            statusConnectionText.textContent = 'Error';
-            break;
-        case 'receiving':
-            statusConnectionText.textContent = 'Receiving';
-            break;
-        default:
-            statusConnectionText.textContent = 'Unknown';
-    }
-}
-
-// Lock status management
-function setLockStatus(status, message) {
-    // Update status bar lock indicator
-    statusLockIndicator.className = status;
-    statusLockIndicator.setAttribute('data-status', message || status);
-    statusLockIndicator.textContent = status === 'locked' ? 'ESC' : '';
-}
-
-// Update debug session ID when session changes
-function updateDebugSession(sessionId) {
-    // Update status bar session ID tag
-    if (sessionId && sessionId !== 'No Session') {
-        sessionIdTagStatus.textContent = sessionId;
-        sessionIdTagStatus.style.display = 'inline';
-    } else {
-        sessionIdTagStatus.style.display = 'none';
-    }
-}
-
-// Update environmental info display (read-only)
-function updateEnvironmentalDisplay() {
-    if (!hd1Manager || !hd1Manager.state) return;
-    
-    const sceneState = hd1Manager.state;
-    const environment = sceneState.environment;
-    
-    // Get display elements
-    const scaleDisplay = document.getElementById('environment-scale');
-    const gravityDisplay = document.getElementById('environment-gravity');
-    const temperatureDisplay = document.getElementById('environment-temperature');
-    const atmosphereDisplay = document.getElementById('environment-atmosphere');
-    
-    // Scale info mapping
-    const scaleInfo = {
-        'nm': { name: 'Molecular', unit: 'nm' },
-        'μm': { name: 'Microscopic', unit: 'μm' },
-        'mm': { name: 'Precision', unit: 'mm' },
-        'cm': { name: 'Small Objects', unit: 'cm' },
-        'm': { name: 'Human Scale', unit: 'm' },
-        'km': { name: 'Landscape', unit: 'km' },
-        'Mm': { name: 'Continental', unit: 'Mm' },
-        'Gm': { name: 'Planetary', unit: 'Gm' }
-    };
-    
-    // Atmosphere type mapping
-    const atmosphereTypes = {
-        'air': 'Earth Surface',
-        'vacuum': 'Space Vacuum',
-        'thin_air': 'High Altitude',
-        'liquid': 'Underwater'
-    };
-    
-    const scale = scaleInfo[environment.scale] || { name: 'Unknown', unit: environment.scale };
-    const atmosphereType = atmosphereTypes[environment.atmosphere.composition] || 'Custom';
-    
-    // Update displays
-    if (scaleDisplay) {
-        scaleDisplay.textContent = `${scale.name} (${scale.unit})`;
-    }
-    
-    if (gravityDisplay) {
-        gravityDisplay.textContent = `${environment.gravity} m/s²`;
-    }
-    
-    if (temperatureDisplay) {
-        const celsius = (environment.temperature - 273.15).toFixed(1);
-        temperatureDisplay.textContent = `${celsius}°C`;
-    }
-    
-    if (atmosphereDisplay) {
-        const density = environment.atmosphere.density;
-        atmosphereDisplay.textContent = `${atmosphereType} (${density} kg/m³)`;
-    }
-    
-    console.log(`[HD1] Environmental display updated: ${scale.name} scale, ${environment.gravity}m/s², ${(environment.temperature-273.15).toFixed(1)}°C`);
-}
-
-// Hardware monitoring
-function initializeHardwareMonitoring() {
-    const fpsDisplay = document.getElementById('hardware-fps');
-    const gpuDisplay = document.getElementById('hardware-gpu');
-    const memoryDisplay = document.getElementById('hardware-memory');
-    const rendererDisplay = document.getElementById('hardware-renderer');
-    
-    let frameCount = 0;
-    let lastTime = performance.now();
-    let fps = 0;
-    
-    // FPS monitoring
-    function updateFPS() {
-        frameCount++;
-        const currentTime = performance.now();
-        
-        if (currentTime - lastTime >= 1000) {
-            fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
-            frameCount = 0;
-            lastTime = currentTime;
-            
-            if (fpsDisplay) {
-                fpsDisplay.textContent = fps;
-            }
-        }
-        
-        requestAnimationFrame(updateFPS);
-    }
-    
-    // GPU and WebGL info
-    function updateGPUInfo() {
-        try {
-            // Create temporary canvas to avoid context conflicts
-            const tempCanvas = document.createElement('canvas');
-            const gl = tempCanvas.getContext('webgl') || tempCanvas.getContext('experimental-webgl');
-            
-            if (gl) {
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                let gpuInfo = 'WebGL Ready';
-                
-                if (debugInfo) {
-                    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-                    gpuInfo = renderer.split('(')[0].trim();
-                    if (gpuInfo.length > 15) {
-                        gpuInfo = gpuInfo.substring(0, 15) + '...';
-                    }
-                }
-                
-                if (gpuDisplay) {
-                    gpuDisplay.textContent = gpuInfo;
-                }
-                
-                // Clean up
-                const loseContext = gl.getExtension('WEBGL_lose_context');
-                if (loseContext) loseContext.loseContext();
-            } else {
-                if (gpuDisplay) {
-                    gpuDisplay.textContent = 'WebGL Not Available';
-                }
-            }
-        } catch (error) {
-            if (gpuDisplay) {
-                gpuDisplay.textContent = 'WebGL Detection Error';
-            }
-        }
-    }
-    
-    // Memory monitoring  
-    function updateMemoryInfo() {
-        if (performance.memory) {
-            const used = Math.round(performance.memory.usedJSHeapSize / 1048576); // MB
-            const total = Math.round(performance.memory.totalJSHeapSize / 1048576); // MB
-            
-            if (memoryDisplay) {
-                memoryDisplay.textContent = `${used}/${total} MB`;
-            }
-        }
-    }
-    
-    // Initialize monitoring
-    updateFPS();
-    updateGPUInfo();
-    
-    // Update GPU info once A-Frame is ready
-    setTimeout(updateGPUInfo, 2000);
-    
-    // Update memory info periodically
-    setInterval(updateMemoryInfo, 2000);
-    
-    console.log('[HD1] Hardware monitoring initialized');
-}
-
-// Objects tracking display - counts A-Frame entities directly
-function updateObjectsDisplay() {
-    // HD1 Object Categorization - API-First Architecture
-    // =====================================================
-    // Raw Objects: Total A-Frame entities in scene container
-    // Props: Multi-component instantiated props (lightbulb = fixture + bulb + filament + light)
-    // Objects: Standalone objects created via API (not part of props)
-    // Lights: All light sources (standalone + prop lights)
-    // Visible: Objects currently visible (regardless of type)
-    // Environment: Current physics context
-    // =====================================================
-    
-    const scene = document.getElementById('holodeck-scene');
-    const objectsContainer = document.getElementById('holodeck-objects');
-    
-    if (!scene || !objectsContainer) return;
-    
-    // Count all child entities in the objects container
-    const allEntities = objectsContainer.querySelectorAll('a-entity, a-box, a-sphere, a-cylinder, a-plane, a-cone, a-light');
-    const totalObjects = allEntities.length;
-    
-    let visibleObjects = 0;
-    let lightObjects = 0;
-    let standaloneObjects = 0;
-    let propObjects = 0;
-    
-    allEntities.forEach(entity => {
-        // Check visibility
-        const visible = entity.getAttribute('visible');
-        if (visible !== false && visible !== 'false') visibleObjects++;
-        
-        // Check type by tag name or geometry component
-        const tagName = entity.tagName.toLowerCase();
-        const geometry = entity.getAttribute('geometry');
-        const entityId = entity.id || '';
-        
-        // Count prop objects first (entities that are part of instantiated props)
-        const isPropComponent = entityId.includes('_fixture') || entityId.includes('_bulb') || 
-                               entityId.includes('_filament') || entityId.includes('_base') || 
-                               entityId.includes('_envelope') || entityId.includes('_light');
-        
-        if (tagName === 'a-light' || entity.hasAttribute('light')) {
-            lightObjects++;
-            // Don't count lights as standalone if they're part of props
-            if (!isPropComponent) {
-                standaloneObjects++;
-            }
-        } else if (['a-box', 'a-sphere', 'a-cylinder', 'a-plane', 'a-cone'].includes(tagName) || 
-                   (geometry && ['box', 'sphere', 'cylinder', 'plane', 'cone'].includes(geometry.primitive))) {
-            // Only count as standalone object if NOT part of a prop
-            if (!isPropComponent) {
-                standaloneObjects++;
-            }
-        }
-        
-        if (isPropComponent) {
-            propObjects++;
-        }
-    });
-    
-    // Get current scene and environment names
-    const sceneSelect = document.getElementById('debug-scene-select');
-    const environmentSelect = document.getElementById('debug-environment-select');
-    const currentScene = sceneSelect ? sceneSelect.value : 'None';
-    const currentEnvironment = environmentSelect ? environmentSelect.value : 'Earth Surface';
-    const sceneName = currentScene === '' ? 'None' : currentScene;
-    const environmentName = currentEnvironment === '' ? 'Earth Surface' : currentEnvironment;
-    
-    // Update displays
-    const rawTotalDisplay = document.getElementById('objects-raw-total');
-    const propsDisplay = document.getElementById('objects-props');
-    const visibleDisplay = document.getElementById('objects-visible');
-    const lightsDisplay = document.getElementById('objects-lights');
-    const standaloneDisplay = document.getElementById('objects-standalone');
-    const lastUpdateDisplay = document.getElementById('objects-last-update');
-    const sceneDisplay = document.getElementById('objects-scene');
-    const environmentDisplay = document.getElementById('objects-environment');
-    
-    if (rawTotalDisplay) rawTotalDisplay.textContent = totalObjects;
-    if (propsDisplay) propsDisplay.textContent = propObjects;
-    if (visibleDisplay) visibleDisplay.textContent = visibleObjects;
-    if (lightsDisplay) lightsDisplay.textContent = lightObjects;
-    if (standaloneDisplay) standaloneDisplay.textContent = standaloneObjects;
-    if (lastUpdateDisplay) lastUpdateDisplay.textContent = new Date().toLocaleTimeString();
-    if (sceneDisplay) sceneDisplay.textContent = sceneName;
-    if (environmentDisplay) environmentDisplay.textContent = environmentName;
-    
-    // Only log when objects change significantly
-    if (totalObjects > 0) {
-        console.log(`[HD1] Objects: ${totalObjects} raw, ${propObjects} props, ${standaloneObjects} standalone, ${lightObjects} lights, ${visibleObjects} visible`);
-    }
-}
-
-// Debounced objects update using MutationObserver
-let objectsUpdateTimeout;
-function scheduleObjectsUpdate() {
-    clearTimeout(objectsUpdateTimeout);
-    objectsUpdateTimeout = setTimeout(() => {
-        updateObjectsDisplay();
-    }, 100); // Small delay to batch multiple DOM changes
-}
-
-// Initialize MutationObserver to watch for object changes
-function initializeObjectsObserver() {
-    const objectsContainer = document.getElementById('holodeck-objects');
-    if (!objectsContainer) return;
-    
-    const observer = new MutationObserver(() => {
-        scheduleObjectsUpdate();
-    });
-    
-    observer.observe(objectsContainer, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['visible', 'geometry', 'light']
-    });
-    
-    console.log('[HD1] Objects MutationObserver initialized');
-}
-
-
-// Debug logging function
-function addDebug(command, data = null) {
-    const time = new Date().toLocaleTimeString();
-    const entry = document.createElement('div');
-    entry.className = 'debug-entry';
-    
-    const timeSpan = document.createElement('span');
-    timeSpan.className = 'debug-time';
-    timeSpan.textContent = time + ' ';
-    
-    const commandSpan = document.createElement('span');
-    commandSpan.className = 'debug-command';
-    commandSpan.textContent = command;
-    
-    entry.appendChild(timeSpan);
-    entry.appendChild(commandSpan);
-    
-    if (data) {
-        const dataSpan = document.createElement('span');
-        dataSpan.className = 'debug-data';
-        dataSpan.textContent = ' ' + JSON.stringify(data, null, 0);
-        entry.appendChild(dataSpan);
-    }
-    
-    debugLog.appendChild(entry);
-    debugLog.scrollTop = debugLog.scrollHeight;
-    
-    // Keep only last 50 entries
-    while (debugLog.children.length > 50) {
-        debugLog.removeChild(debugLog.firstChild);
-    }
-}
-
-// Persistent HD1 session management
-let currentSessionId = localStorage.getItem('hd1_session_id');
-let sessionInitialized = localStorage.getItem('hd1_session_initialized') === 'true'; // Persistent flag to prevent multiple scene loads
-
-async function ensureSession() {
-    addDebug('SESSION_ENSURE', 'ensureSession() called - initialized: ' + sessionInitialized);
-    try {
-        // Check if we have a persistent session
-        if (currentSessionId) {
-            // Verify session still exists
-            const checkResponse = await fetch('/api/sessions/' + currentSessionId);
-            if (checkResponse.ok) {
-                const sessionData = await checkResponse.json();
-                updateDebugSession(currentSessionId);
-                
-                // Initialize world grid if it exists (defer if manager not ready)
-                if (sessionData.world) {
-                    if (hd1Manager && hd1Manager.initializeWorld) {
-                        hd1Manager.initializeWorld(sessionData.world);
-                    } else {
-                        // Store world data for later initialization
-                        window.pendingWorldData = sessionData.world;
-                    }
-                }
-                
-                console.log('HD1 Session restored:', currentSessionId);
-                setStatus('connected', 'HD1 session: ' + currentSessionId.slice(-8));
-                
-                // Associate WebSocket client with this session
-                associateSession(currentSessionId);
-                
-                // Auto-load saved scene after session is restored (ONCE only)
-                if (!sessionInitialized) {
-                    sessionInitialized = true;
-                    localStorage.setItem('hd1_session_initialized', 'true');
-                    
-                    // Load saved scene immediately - no delays
-                    const savedScene = getCookie('hd1_scene');
-                    console.log(`[HD1] Bootstrap check: savedScene="${savedScene}", debugSceneSelect=${!!debugSceneSelect}, sessionInitialized=${sessionInitialized}`);
-                    
-                    if (savedScene && savedScene !== '' && debugSceneSelect) {
-                        debugSceneSelect.value = savedScene;
-                        addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_restore'});
-                        loadScene(savedScene);
-                        console.log(`[HD1] Bootstrap: Auto-loading scene "${savedScene}"`);
-                    } else {
-                        console.log(`[HD1] Bootstrap: No scene to auto-load - savedScene="${savedScene}"`);
-                    }
-                }
-                return;
-            } else {
-                // Session expired, clear it and reset initialization flag
-                localStorage.removeItem('hd1_session_id');
-                localStorage.removeItem('hd1_session_initialized');
-                sessionInitialized = false;
-                currentSessionId = null;
-            }
-        }
-        
-        // Create new session only if needed
-        const response = await fetch('/api/sessions', { method: 'POST' });
-        const sessionData = await response.json();
-        
-        if (sessionData.success) {
-            currentSessionId = sessionData.session_id;
-            localStorage.setItem('hd1_session_id', currentSessionId);
-            updateDebugSession(currentSessionId);
-            
-            // Initialize world grid in HD1 manager (defer if not ready)
-            if (sessionData.world) {
-                if (hd1Manager && hd1Manager.initializeWorld) {
-                    hd1Manager.initializeWorld(sessionData.world);
-                } else {
-                    // Store world data for later initialization
-                    window.pendingWorldData = sessionData.world;
-                }
-            }
-            
-            console.log('HD1 Session created:', currentSessionId);
-            setStatus('connected', 'HD1 session: ' + currentSessionId.slice(-8));
-            
-            // Associate WebSocket client with this session
-            associateSession(currentSessionId);
-            
-            // Auto-load saved scene after session is established (ONCE only)
-            if (!sessionInitialized) {
-                sessionInitialized = true;
-                localStorage.setItem('hd1_session_initialized', 'true');
-                
-                // Load saved scene immediately - no delays
-                const savedScene = getCookie('hd1_scene');
-                console.log(`[HD1] Bootstrap check (new session): savedScene="${savedScene}", debugSceneSelect=${!!debugSceneSelect}`);
-                
-                if (savedScene && savedScene !== '' && debugSceneSelect) {
-                    debugSceneSelect.value = savedScene;
-                    addDebug('AUTO_SCENE', {scene: savedScene, trigger: 'session_create'});
-                    loadScene(savedScene);
-                    console.log(`[HD1] Bootstrap: Auto-loading scene "${savedScene}" for new session`);
-                } else {
-                    console.log(`[HD1] Bootstrap: No scene to auto-load for new session - savedScene="${savedScene}"`);
-                }
-            }
-        } else {
-            console.error('Failed to create session:', sessionData);
-            updateDebugSession('Session Failed');
-        }
-    } catch (error) {
-        console.error('Error managing session:', error);
-        updateDebugSession('Connection Error');
-    }
-}
-
-// Auto-reconnect functionality with infinite resilience
-function connectWebSocket() {
-    if (reconnectAttempts >= maxReconnectAttempts) {
-        // After 99 attempts, trigger intelligent rebootstrap
-        triggerRebootstrap();
-        return;
-    }
-    
-    updateConnectionQuality();
-    
-    // Intelligent status messaging
-    if (shouldShowError()) {
-        const quality = connectionQuality !== 'unknown' ? ` (${connectionQuality} quality)` : '';
-        setStatus('connecting', `reconnecting... attempt ${reconnectAttempts + 1}${quality}`);
-    } else if (!silentRetryPhase) {
-        setStatus('connecting', 'establishing connection...');
-    }
-    
-    ws = new WebSocket('ws://' + window.location.host + '/ws');
-    
-    ws.onopen = function() {
-        // Successful connection - reset all tracking variables
-        reconnectAttempts = 0;
-        lastSuccessfulConnection = Date.now();
-        connectionQuality = 'excellent';
-        
-        // Exit silent retry phase after first successful connection
-        if (initialConnection) {
-            initialConnection = false;
-            silentRetryPhase = false;
-        }
-        
-        setStatus('connected', 'connected');
-        
-        // Send version check
-        const versionMsg = {
-            type: 'version_check',
-            js_version: jsVersion
-        };
-        addDebug('WS_SEND', versionMsg);
-        ws.send(JSON.stringify(versionMsg));
-        
-        // Send client capabilities
-        setTimeout(sendClientInfo, 500);
-        
-        // Load scenes, environments, props, and lighting on initial connection
-        setTimeout(refreshSceneDropdown, 1000);
-        setTimeout(refreshEnvironmentDropdown, 1000);
-        setTimeout(refreshPropsDropdown, 1200);
-        setTimeout(refreshLightingDropdown, 1300);
-        
-        // Initialize session connection without object restoration
-        setTimeout(ensureSession, 2000);
-    };
-    
-    ws.onmessage = async function(event) {
-        try {
-            const message = JSON.parse(event.data);
-            addDebug('WS_RECV', message);
-            
-            // Handle system messages
-            if (message.type === 'version_mismatch') {
-                setStatus('connecting', 'updating interface...');
-                setTimeout(() => window.location.reload(true), 1000);
-                return;
-            }
-            
-            if (message.type === 'log') {
-                console.log('[SERVER]', message.data);
-                return;
-            }
-            
-            if (message.type === 'reload') {
-                setStatus('connecting', 'forced reload...');
-                window.location.reload(true);
-                return;
-            }
-            
-            // Handle scene list changes
-            if (message.type === 'scene_list_changed') {
-                console.log('[HD1] Scene list changed, refreshing dropdown');
-                addDebug('SCENE_LIST_CHANGED', 'Refreshing scene dropdown');
-                await refreshSceneDropdown();
-                return;
-            }
-            
-            // Handle environment changes
-            if (message.type === 'environment_changed') {
-                console.log('[HD1] Environment changed for session', message.session_id);
-                addDebug('ENV_CHANGED', {session: message.session_id, applied: message.environment_applied});
-                setStatus('receiving', 'Environment updated');
-                return;
-            }
-            
-            // Handle browser control messages
-            if (message.type === 'force_refresh') {
-                console.log('[HD1] Force refresh command received');
-                if (message.clear_storage) {
-                    localStorage.clear();
-                }
-                if (message.session_id) {
-                    localStorage.setItem('hd1_session_id', message.session_id);
-                }
-                setStatus('connecting', 'HD1 forced refresh...');
-                window.location.reload(true);
-                return;
-            }
-            
-            // Handle direct canvas control
-            if (message.type === 'canvas_control') {
-                const controlData = message.data || message;
-                console.log('[HD1] Canvas control command:', controlData.command, controlData.objects);
-                addDebug('CANVAS_CTRL', {cmd: controlData.command, objs: controlData.objects?.length || 0});
-                if (controlData.clear) {
-                    hd1Manager.processMessage({type: 'clear'});
-                }
-                if (controlData.command === 'delete' && controlData.object_name) {
-                    hd1Manager.processMessage({
-                        type: 'delete', 
-                        object_name: controlData.object_name
-                    });
-                    addDebug('DELETE', {obj: controlData.object_name});
-                }
-                if (controlData.objects) {
-                    // Convert server objects to renderer format
-                    const rendererObjects = controlData.objects.map(obj => {
-                        const converted = {
-                            id: obj.id || obj.name,
-                            name: obj.name || obj.id,
-                            type: obj.type,
-                            transform: obj.transform || {
-                                position: { x: obj.x || 0, y: obj.y || 0, z: obj.z || 0 },
-                                scale: { x: obj.scale || 1, y: obj.scale || 1, z: obj.scale || 1 },
-                                rotation: { x: 0, y: 0, z: 0 }
-                            },
-                            color: obj.color || { r: 0.2, g: 0.8, b: 0.2, a: 1.0 },
-                            wireframe: obj.wireframe || false,
-                            visible: obj.visible !== undefined ? obj.visible : true,
-                            // A-Frame specific properties
-                            text: obj.text,
-                            lightType: obj.lightType,
-                            intensity: obj.intensity,
-                            particleType: obj.particleType,
-                            count: obj.count,
-                            material: obj.material,
-                            physics: obj.physics,
-                            lighting: obj.lighting
-                        };
-                        console.log('[HD1] Converted object with text:', converted.text, converted);
-                        return converted;
-                    });
-                    if (!hd1Manager) {
-                        console.error('[HD1] HD1 MANAGER NOT FOUND - This is the root cause!');
-                        addDebug('ERROR', 'HD1 Manager not initialized');
-                        return;
-                    }
-                    if (!hd1Manager.processMessage) {
-                        console.error('[HD1] HD1_MANAGER.processMessage NOT FOUND - Missing method!');
-                        addDebug('ERROR', 'HD1 Manager.processMessage missing');
-                        return;
-                    }
-                    console.log('[HD1] Calling hd1Manager.processMessage with:', controlData.command, rendererObjects);
-                    addDebug('RENDER_CALL', {cmd: controlData.command, count: rendererObjects.length});
-                    try {
-                        hd1Manager.processMessage({
-                            type: controlData.command,
-                            objects: rendererObjects
-                        });
-                        console.log('[HD1] HD1 Manager.processMessage SUCCESS');
-                        addDebug('RENDER_OK', 'Objects sent to HD1 Manager');
-                        
-                        // Update environmental display and schedule objects update
-                        if (hd1Manager.state) {
-                            if (typeof updateEnvironmentalDisplay === 'function') {
-                                updateEnvironmentalDisplay();
-                            }
-                            scheduleObjectsUpdate();
-                        }
-                    } catch(e) {
-                        console.error('[HD1] HD1 Manager.processMessage FAILED:', e);
-                        addDebug('RENDER_FAIL', {error: e.message});
-                    }
-                }
-                if (message.camera) {
-                    hd1Manager.processMessage({
-                        type: 'camera',
-                        ...message.camera
-                    });
-                }
-                setStatus('receiving', 'HD1 canvas control');
-                setTimeout(() => {
-                    setStatus('connected', 'HD1 active • objects: ' + (hd1Manager?.getObjectCount() || 0));
-                }, 500);
-                return;
-            }
-            
-            // Regular 3D messages
-            if (hd1Manager) {
-                hd1Manager.processMessage(message);
-                
-                setStatus('receiving', 'receiving data');
-                clearTimeout(window.receivingTimeout);
-                window.receivingTimeout = setTimeout(() => {
-                    setStatus('connected', 'connected • objects: ' + (hd1Manager?.getObjectCount() || 0));
-                }, 200);
-            }
-            
-        } catch (e) {
-            console.error('Failed to process message:', e, event.data);
-            setStatus('error', 'message parse error');
-        }
-    };
-    
-    ws.onclose = function(event) {
-        // Always attempt reconnection - infinite resilience
-        reconnectAttempts++;
-        
-        // Clear any existing reconnect timeout
-        if (reconnectTimeout) {
-            clearTimeout(reconnectTimeout);
-        }
-        
-        // Determine retry delay with exponential backoff
-        const retryDelay = getRetryDelay();
-        
-        // Graceful status messaging
-        if (shouldShowError()) {
-            const delaySeconds = Math.round(retryDelay / 1000);
-            setStatus('error', `disconnected • retrying in ${delaySeconds}s`);
-        }
-        
-        // Schedule reconnection with intelligent delay
-        reconnectTimeout = setTimeout(connectWebSocket, retryDelay);
-    };
-    
-    ws.onerror = function(error) {
-        // Graceful error handling - only log if not in silent phase
-        if (!silentRetryPhase) {
-            console.log('[HD1-Connection] WebSocket error - will retry automatically');
-        }
-        
-        // Update connection quality
-        connectionQuality = 'critical';
-        updateConnectionQuality();
-    };
-}
-
-// Send logs to server
-function sendLog(level, message, data = null) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        const logMsg = {
-            type: 'client_log',
-            level: level,
-            message: message,
-            data: data,
-            timestamp: new Date().toISOString(),
-            url: window.location.href,
-            userAgent: navigator.userAgent
-        };
-        addDebug('LOG_' + level.toUpperCase(), {msg: message});
-        ws.send(JSON.stringify(logMsg));
-    }
-}
-
-// Override console methods to send logs to server
-const originalLog = console.log;
-const originalError = console.error;
-const originalWarn = console.warn;
-
-console.log = function(...args) {
-    originalLog.apply(console, args);
-    sendLog('info', args.join(' '), args);
-};
-
-console.error = function(...args) {
-    originalError.apply(console, args);
-    sendLog('error', args.join(' '), args);
-};
-
-console.warn = function(...args) {
-    originalWarn.apply(console, args);
-    sendLog('warn', args.join(' '), args);
-};
-
-// Global error handler
-window.addEventListener('error', function(e) {
-    sendLog('error', 'JavaScript Error: ' + e.message, {
-        filename: e.filename,
-        lineno: e.lineno,
-        colno: e.colno,
-        stack: e.error ? e.error.stack : null
-    });
-});
-
-try {
-    // Initialize REACTIVE A-Frame manager when scene is ready
-    scene.addEventListener('loaded', function() {
-        hd1Manager = new HD1ReactiveManager(scene);
-        sendLog('info', 'HD1 Reactive Manager initialized successfully');
-        console.log('[HD1] A-Frame scene loaded and REACTIVE manager ready');
-        
-        // Initialize any pending world data
-        if (window.pendingWorldData) {
-            hd1Manager.initializeWorld(window.pendingWorldData);
-            window.pendingWorldData = null;
-            console.log('[HD1] Applied pending world data');
-        }
-        
-        // Initialize displays immediately when manager is ready
-        initializeDisplays();
-    });
-    
-    // Fallback: initialize even if scene doesn't fire loaded event
-    setTimeout(function() {
-        if (!hd1Manager) {
-            hd1Manager = new HD1ReactiveManager(scene);
-            console.log('[HD1] REACTIVE A-Frame manager initialized via fallback');
-            
-            // Initialize any pending world data
-            if (window.pendingWorldData) {
-                hd1Manager.initializeWorld(window.pendingWorldData);
-                window.pendingWorldData = null;
-                console.log('[HD1] Applied pending world data via fallback');
-            }
-            
-            // Initialize displays via fallback
-            initializeDisplays();
-        }
-    }, 2000);
-    
-} catch (e) {
-    setStatus('error', 'A-Frame not supported');
-    sendLog('error', 'A-Frame initialization failed', e.message);
-}
-
-// A-Frame handles canvas sizing automatically
-function resize() {
-    // A-Frame scene automatically resizes
-    console.log('Window resized - A-Frame handles automatically');
-}
-window.addEventListener('resize', resize);
-
-// A-Frame provides built-in WASD and mouse controls
-console.log('A-Frame controls: WASD to move, mouse to look, VR ready');
-
-
-// Associate WebSocket client with HD1 session for isolation
-function associateSession(sessionId) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        const associateMsg = {
-            type: 'session_associate',
-            session_id: sessionId
-        };
-        addDebug('WS_SEND', {type: 'session_associate', session: sessionId});
-        ws.send(JSON.stringify(associateMsg));
-        console.log('[HD1] WebSocket associated with session:', sessionId);
-    }
-}
-
-// Send client info to server
-function sendClientInfo() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        const clientInfo = {
-            type: 'client_info',
-            screen: {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                devicePixelRatio: window.devicePixelRatio || 1,
-                orientation: screen.orientation ? screen.orientation.angle : 0
-            },
-            canvas: {
-                width: window.innerWidth,
-                height: window.innerHeight
-            },
-            capabilities: {
-                webgl: !!hd1Manager,
-                aframe: !!scene,
-                vr: AFRAME && AFRAME.utils.device.checkHeadsetConnected(),
-                touch: 'ontouchstart' in window,
-                mobile: /Mobi|Android/i.test(navigator.userAgent)
-            },
-            performance: {
-                memory: performance.memory ? {
-                    used: performance.memory.usedJSHeapSize,
-                    total: performance.memory.totalJSHeapSize,
-                    limit: performance.memory.jsHeapSizeLimit
-                } : null
-            }
-        };
-        addDebug('WS_SEND', {type: 'client_info', summary: 'capabilities'});
-        ws.send(JSON.stringify(clientInfo));
-    }
-}
-
-// Send client info on connect and resize
-window.addEventListener('resize', function() {
-    resize();
-    setTimeout(sendClientInfo, 100); // Delay to get accurate dimensions
-});
-
-// Add click interaction tracking on A-Frame scene
-scene.addEventListener('click', function(e) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        const interaction = {
-            type: 'interaction',
-            event: 'click',
-            position: {
-                x: e.clientX,
-                y: e.clientY,
-                normalized: {
-                    x: e.clientX / window.innerWidth,
-                    y: e.clientY / window.innerHeight
-                }
-            },
-            timestamp: Date.now()
-        };
-        addDebug('CLICK', {x: interaction.position.x, y: interaction.position.y});
-        ws.send(JSON.stringify(interaction));
-    }
-});
-
-// A-Frame provides built-in controls, no manual setup needed
-function setupMouseControls() {
-    // A-Frame handles all mouse and keyboard controls automatically
-    // WASD movement via wasd-controls component
-    // Mouse look via look-controls component
-    console.log('A-Frame controls initialized: WASD to move, mouse to look, VR ready');
-    setStatus('connected', 'A-Frame controls ready - WASD to move, mouse to look');
-}
-
-// Initialize mouse controls when scene is ready
-setupMouseControls();
-
-// Event-driven initialization when HD1 manager becomes available
-function initializeDisplays() {
-    if (hd1Manager && hd1Manager.state) {
-        updateEnvironmentalDisplay();
-        scheduleObjectsUpdate();
-        console.log('[HD1] Displays initialized via event-driven method');
-    }
-}
-
-// Debug panel collapsible functionality (initialized after cookie functions)
-let debugCollapsed = false;
-
-// Scene selection management
-const debugSceneSelect = document.getElementById('debug-scene-select');
-
-// Load saved scene from cookie
-function loadSavedScene() {
-    const savedScene = getCookie('hd1_scene');
-    if (savedScene) {
-        debugSceneSelect.value = savedScene;
-    }
-}
-
-// Save scene to cookie
-function saveScene(sceneId) {
-    setCookie('hd1_scene', sceneId, 30); // 30 days
-    console.log(`[HD1] Scene saved to cookie: "${sceneId}"`);
-}
-
-// Cookie utilities
-function setCookie(name, value, days) {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-    document.cookie = name + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
-}
-
-function getCookie(name) {
-    const nameEQ = name + '=';
-    const ca = document.cookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-    }
-    return null;
-}
-
-// Handle scene selection
-debugSceneSelect.addEventListener('change', function() {
-    const selectedScene = this.value;
-    if (selectedScene && currentSessionId) {
-        addDebug('SCENE_SELECT', {scene: selectedScene, session: currentSessionId, manual: true});
-        saveScene(selectedScene);
-        loadScene(selectedScene);
-    }
-});
-
-// Load scene via API call
-async function loadScene(sceneId) {
-    try {
-        const response = await fetch('/api/scenes/' + sceneId, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                session_id: currentSessionId
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            addDebug('SCENE_LOADED', {scene: sceneId, objects: result.objects_created || 0});
-            setStatus('receiving', 'Loading scene: ' + sceneId);
-            
-            // Update displays immediately after scene load response
-            if (typeof updateEnvironmentalDisplay === 'function') {
-                updateEnvironmentalDisplay();
-            }
-            // Use MutationObserver to update when DOM actually changes
-            scheduleObjectsUpdate();
-        } else {
-            addDebug('SCENE_ERROR', {scene: sceneId, status: response.status});
-            setStatus('error', 'Failed to load scene');
-        }
-    } catch (error) {
-        console.error('Failed to load scene:', error);
-        addDebug('SCENE_FAIL', {scene: sceneId, error: error.message});
-        setStatus('error', 'Scene load failed');
-    }
-}
-
-// Environment selection management
-const debugEnvironmentSelect = document.getElementById('debug-environment-select');
-
-// Handle environment selection
-debugEnvironmentSelect.addEventListener('change', function() {
-    const selectedEnvironment = this.value;
-    if (selectedEnvironment && currentSessionId) {
-        addDebug('ENV_SELECT', {environment: selectedEnvironment, session: currentSessionId, manual: true});
-        applyEnvironment(selectedEnvironment);
-    }
-});
-
-// Handle props selection
-const debugPropsSelect = document.getElementById('debug-props-select');
-if (debugPropsSelect) {
-    debugPropsSelect.addEventListener('change', function() {
-        const selectedProp = this.value;
-        if (selectedProp && currentSessionId) {
-            addDebug('PROP_SELECT', {prop: selectedProp, session: currentSessionId, manual: true});
-            instantiateProp(selectedProp);
-            // Reset selection after use
-            this.value = '';
-        }
-    });
-}
-
-// Handle lighting selection  
-const debugLightingSelect = document.getElementById('debug-lighting-select');
-if (debugLightingSelect) {
-    debugLightingSelect.addEventListener('change', function() {
-        const selectedLighting = this.value;
-        if (selectedLighting && currentSessionId) {
-            addDebug('LIGHTING_SELECT', {lighting: selectedLighting, session: currentSessionId, manual: true});
-            instantiateLighting(selectedLighting);
-            // Reset selection after use
-            this.value = '';
-        }
-    });
-}
-
-// Instantiate prop via API call
-async function instantiateProp(propId) {
-    try {
-        const response = await fetch(`/api/sessions/${currentSessionId}/props/${propId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                instance_name: `${propId}_${Date.now()}`,
-                position: {x: 0, y: 1.5, z: 0},
-                scale: 1.0
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            addDebug('PROP_INSTANTIATED', {prop: propId, objects: result.objects_created});
-            setStatus('receiving', `Prop ${propId} instantiated`);
-        } else {
-            addDebug('PROP_ERROR', {prop: propId, status: response.status});
-            setStatus('error', `Failed to instantiate prop ${propId}`);
-        }
-    } catch (error) {
-        console.error('Failed to instantiate prop:', error);
-        addDebug('PROP_FAIL', {prop: propId, error: error.message});
-        setStatus('error', 'Prop instantiation failed');
-    }
-}
-
-// Instantiate lighting via API call (tied API architecture)
-async function instantiateLighting(lightingId) {
-    try {
-        if (lightingId === 'hd1-test-lighting') {
-            // Use props API for complex lighting systems
-            const response = await fetch(`/api/sessions/${currentSessionId}/props/hd1-test-lighting`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    instance_name: `lighting_${Date.now()}`,
-                    position: {x: Math.random() * 4 - 2, y: 2, z: Math.random() * 4 - 2},
-                    scale: 1.0,
-                    light_enabled: true
-                })
-            });
-            
-            if (response.ok) {
-                const result = await response.json();
-                addDebug('LIGHTING_INSTANTIATED', {lighting: lightingId, objects: result.objects_created});
-                setStatus('receiving', `Lighting ${lightingId} instantiated`);
-            } else {
-                addDebug('LIGHTING_ERROR', {lighting: lightingId, status: response.status});
-                setStatus('error', `Failed to instantiate lighting ${lightingId}`);
-            }
-        } else {
-            // Direct light object creation for simple lights (API-first format)
-            const lightData = {
-                name: `light_${Date.now()}`,
-                type: 'light',
-                position: [Math.random() * 4 - 2, 2.5, Math.random() * 4 - 2],
-                visible: true,
-                lightType: lightingId === 'ambient-soft' ? 'ambient' : 'point',
-                intensity: lightingId === 'daylight' ? 0.8 : 1.2,
-                color: lightingId === 'warm-bulb' ? [1.0, 0.9, 0.7] : [1.0, 1.0, 1.0]
-            };
-            
-            const response = await fetch(`/api/sessions/${currentSessionId}/objects`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(lightData)
-            });
-            
-            if (response.ok) {
-                addDebug('LIGHT_CREATED', {lighting: lightingId});
-                setStatus('receiving', `Light ${lightingId} created`);
-            } else {
-                addDebug('LIGHT_ERROR', {lighting: lightingId, status: response.status});
-                setStatus('error', `Failed to create light ${lightingId}`);
-            }
-        }
-    } catch (error) {
-        console.error('Failed to instantiate lighting:', error);
-        addDebug('LIGHTING_FAIL', {lighting: lightingId, error: error.message});
-        setStatus('error', 'Lighting instantiation failed');
-    }
-}
-
-// Apply environment via API call
-async function applyEnvironment(environmentId) {
-    try {
-        const response = await fetch('/api/environments/' + environmentId, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                session_id: currentSessionId
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            addDebug('ENV_APPLIED', {environment: environmentId, session: result.session_id});
-            setStatus('receiving', 'Environment applied: ' + environmentId);
-            
-            // Update environment display and A-Frame physics
-            updateEnvironmentDisplay(environmentId);
-            updateAFrameEnvironment(environmentId);
-        } else {
-            addDebug('ENV_ERROR', {environment: environmentId, status: response.status});
-            setStatus('error', 'Failed to apply environment');
-        }
-    } catch (error) {
-        console.error('Failed to apply environment:', error);
-        addDebug('ENV_FAIL', {environment: environmentId, error: error.message});
-        setStatus('error', 'Environment application failed');
-    }
-}
-
-// Refresh environment dropdown from API
-async function refreshEnvironmentDropdown() {
-    try {
-        const response = await fetch('/api/environments');
-        if (response.ok) {
-            const data = await response.json();
-            const select = document.getElementById('debug-environment-select');
-            
-            // Save current selection
-            const currentValue = select.value;
-            
-            // Clear existing options except first
-            while (select.children.length > 1) {
-                select.removeChild(select.lastChild);
-            }
-            
-            // Add updated environments
-            if (data.environments) {
-                data.environments.forEach(env => {
-                    const option = document.createElement('option');
-                    option.value = env.id;
-                    option.textContent = `${env.name} (${env.scale_unit})`;
-                    select.appendChild(option);
-                });
-            }
-            
-            // Restore selection
-            if (currentValue) {
-                select.value = currentValue;
-            }
-            
-            addDebug('ENV_REFRESH', {count: data.environments?.length || 0});
-        } else {
-            addDebug('ENV_FETCH_ERROR', {status: response.status});
-        }
-    } catch (error) {
-        console.error('Failed to fetch environments:', error);
-        addDebug('ENV_FETCH_FAIL', {error: error.message});
-    }
-}
-
-// Refresh props dropdown
-async function refreshPropsDropdown() {
-    try {
-        const response = await fetch('/api/props');
-        if (response.ok) {
-            const data = await response.json();
-            const select = document.getElementById('debug-props-select');
-            
-            if (!select) return;
-            
-            // Save current selection
-            const currentValue = select.value;
-            
-            // Clear existing options except first
-            while (select.children.length > 1) {
-                select.removeChild(select.lastChild);
-            }
-            
-            // Add prop options
-            if (data.props && Array.isArray(data.props)) {
-                data.props.forEach(prop => {
-                    const option = document.createElement('option');
-                    option.value = prop.id;
-                    option.textContent = `${prop.name} (${prop.category})`;
-                    select.appendChild(option);
-                });
-            }
-            
-            // Restore selection if still valid
-            if (currentValue) {
-                select.value = currentValue;
-            }
-            
-            addDebug('PROPS_REFRESH', {count: data.props?.length || 0});
-        } else {
-            addDebug('PROPS_FETCH_ERROR', {status: response.status});
-        }
-    } catch (error) {
-        console.error('Failed to fetch props:', error);
-        addDebug('PROPS_FETCH_FAIL', {error: error.message});
-    }
-}
-
-// Refresh lighting dropdown (using lighting library)
-async function refreshLightingDropdown() {
-    try {
-        const select = document.getElementById('debug-lighting-select');
-        
-        if (!select) return;
-        
-        // Clear existing options except first
-        while (select.children.length > 1) {
-            select.removeChild(select.lastChild);
-        }
-        
-        // Add lighting options (predefined lighting types)
-        const lightingTypes = [
-            {id: 'hd1-test-lighting', name: 'HD1 Test Lightbulb', category: 'point'},
-            {id: 'warm-bulb', name: 'Warm White Bulb', category: 'point'},
-            {id: 'daylight', name: 'Daylight Source', category: 'point'},
-            {id: 'ambient-soft', name: 'Soft Ambient', category: 'ambient'}
+/**
+ * HD1 Console Manager - Ultimate Modular Architecture
+ * 
+ * Bar-raising console system with bulletproof error boundaries.
+ * 100% API-driven, modular, maintainable, and extensible.
+ * 
+ * Architecture:
+ * - Module-based design with dependency injection
+ * - Error boundaries prevent single failures from breaking system
+ * - Hot-reload capability for development
+ * - Configuration-driven UI
+ * - Graceful degradation
+ */
+class HD1ConsoleManager {
+    constructor() {
+        this.version = '3.0.0';
+        this.ready = false;
+        this.modules = new Map();
+        this.moduleLoadOrder = [
+            'dom',
+            'notification',
+            'ui-state',
+            'input',
+            'session',
+            'websocket',
+            'channel',
+            'stats'
         ];
         
-        lightingTypes.forEach(light => {
-            const option = document.createElement('option');
-            option.value = light.id;
-            option.textContent = `${light.name} (${light.category})`;
-            select.appendChild(option);
-        });
+        // Error boundary
+        this.errorCount = 0;
+        this.maxErrors = 10;
         
-        addDebug('LIGHTING_REFRESH', {count: lightingTypes.length});
-    } catch (error) {
-        console.error('Failed to populate lighting dropdown:', error);
-        addDebug('LIGHTING_POPULATE_FAIL', {error: error.message});
+        // Module loading state
+        this.loadingProgress = new Map();
+        
+        console.log(`[HD1-Console] Console Manager v${this.version} initializing`);
     }
-}
 
-// Update environment display panel
-function updateEnvironmentDisplay(environmentId) {
-    if (!environmentId) return;
-    
-    // Find environment data
-    fetch('/api/environments')
-        .then(response => response.json())
-        .then(data => {
-            const env = data.environments?.find(e => e.id === environmentId);
-            if (env) {
-                // Update environment panel
-                const scaleDisplay = document.getElementById('environment-scale');
-                const gravityDisplay = document.getElementById('environment-gravity');
-                const atmosphereDisplay = document.getElementById('environment-atmosphere');
-                
-                if (scaleDisplay) scaleDisplay.textContent = `${env.name} (${env.scale_unit})`;
-                if (gravityDisplay) gravityDisplay.textContent = `${env.gravity} m/s²`;
-                if (atmosphereDisplay) atmosphereDisplay.textContent = env.atmosphere;
-                
-                addDebug('ENV_DISPLAY_UPDATED', {name: env.name, scale: env.scale_unit, gravity: env.gravity});
+    /**
+     * Initialize the complete console system
+     */
+    async initialize() {
+        console.log('[HD1-Console] Starting modular console initialization');
+        
+        try {
+            // Wait for DOM to be ready
+            await this.waitForDOM();
+            
+            // Load all modules in order
+            await this.loadModules();
+            
+            // Initialize all modules
+            await this.initializeModules();
+            
+            // Setup global error handling
+            this.setupErrorHandling();
+            
+            // Setup module communication
+            this.setupModuleCommunication();
+            
+            // Monitor for PlayCanvas readiness
+            this.monitorPlayCanvasReadiness();
+            
+            this.ready = true;
+            console.log('[HD1-Console] Console system fully initialized and ready');
+            
+            // Log successful initialization
+            this.logDebug('CONSOLE_INIT', {
+                version: this.version,
+                modules: Array.from(this.modules.keys()),
+                ready: this.ready
+            });
+            
+        } catch (error) {
+            console.error('[HD1-Console] Critical initialization failure:', error);
+            this.handleCriticalError(error);
+        }
+    }
+
+    /**
+     * Wait for DOM to be ready
+     */
+    async waitForDOM() {
+        return new Promise((resolve) => {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', resolve);
+            } else {
+                resolve();
             }
-        })
-        .catch(error => {
-            console.error('Failed to update environment display:', error);
-            addDebug('ENV_DISPLAY_FAIL', {error: error.message});
         });
-}
+    }
 
-// Update A-Frame environment component
-function updateAFrameEnvironment(environmentId) {
-    if (!environmentId) return;
-    
-    // Find environment data and update A-Frame component
-    fetch('/api/environments')
-        .then(response => response.json())
-        .then(data => {
-            const env = data.environments?.find(e => e.id === environmentId);
-            if (env) {
-                const scene = document.getElementById('holodeck-scene');
-                if (scene) {
-                    // Update the holodeck-environment component
-                    scene.setAttribute('holodeck-environment', {
-                        scaleUnit: env.scale_unit,
-                        gravity: env.gravity,
-                        atmosphere: env.atmosphere
-                    });
-                    
-                    addDebug('AFRAME_ENV_UPDATED', {
-                        scale: env.scale_unit, 
-                        gravity: env.gravity, 
-                        atmosphere: env.atmosphere
-                    });
-                    
-                    console.log('[HD1] A-Frame environment updated:', env.name);
+    /**
+     * Load all modules dynamically
+     */
+    async loadModules() {
+        console.log('[HD1-Console] Loading modules...');
+        
+        const moduleConfigs = [
+            { name: 'dom', path: '/static/js/hd1-console/modules/dom-manager.js', class: 'HD1DOMManager' },
+            { name: 'notification', path: '/static/js/hd1-console/modules/notification-manager.js', class: 'HD1NotificationManager' },
+            { name: 'ui-state', path: '/static/js/hd1-console/modules/ui-state-manager.js', class: 'HD1UIStateManager' },
+            { name: 'input', path: '/static/js/hd1-console/modules/input-manager.js', class: 'HD1InputManager' },
+            { name: 'session', path: '/static/js/hd1-console/modules/session-manager.js', class: 'HD1SessionManager' },
+            { name: 'websocket', path: '/static/js/hd1-console/modules/websocket-manager.js', class: 'HD1WebSocketManager' },
+            { name: 'channel', path: '/static/js/hd1-console/modules/channel-manager.js', class: 'HD1ChannelManager' },
+            { name: 'stats', path: '/static/js/hd1-console/modules/stats-manager.js', class: 'HD1StatsManager' }
+        ];
+
+        for (const config of moduleConfigs) {
+            try {
+                console.log(`[HD1-Console] Loading module: ${config.name}`);
+                this.loadingProgress.set(config.name, 'loading');
+                
+                // Load module script
+                await this.loadScript(config.path);
+                
+                // Wait for class to be available
+                await this.waitForClass(config.class);
+                
+                // Create module instance with dependencies
+                const instance = this.createModuleInstance(config);
+                this.modules.set(config.name, instance);
+                
+                this.loadingProgress.set(config.name, 'loaded');
+                console.log(`[HD1-Console] Module loaded: ${config.name}`);
+                
+            } catch (error) {
+                console.error(`[HD1-Console] Failed to load module ${config.name}:`, error);
+                this.loadingProgress.set(config.name, 'error');
+                
+                // Continue loading other modules (graceful degradation)
+                this.handleModuleLoadError(config.name, error);
+            }
+        }
+    }
+
+    /**
+     * Load script dynamically
+     */
+    async loadScript(url) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = url;
+            script.onload = resolve;
+            script.onerror = () => reject(new Error(`Failed to load script: ${url}`));
+            document.head.appendChild(script);
+        });
+    }
+
+    /**
+     * Wait for class to be available in global scope
+     */
+    async waitForClass(className, timeout = 5000) {
+        const start = Date.now();
+        
+        while (!window[className]) {
+            if (Date.now() - start > timeout) {
+                throw new Error(`Timeout waiting for class: ${className}`);
+            }
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+    }
+
+    /**
+     * Create module instance with proper dependencies
+     */
+    createModuleInstance(config) {
+        const ModuleClass = window[config.class];
+        
+        switch (config.name) {
+            case 'dom':
+                return new ModuleClass();
+                
+            case 'notification':
+                return new ModuleClass(this.getModule('dom'));
+                
+            case 'ui-state':
+                return new ModuleClass(this.getModule('dom'));
+                
+            case 'input':
+                return new ModuleClass(this.getModule('dom'));
+                
+            case 'session':
+                return new ModuleClass(window.hd1API, this.getModule('dom'));
+                
+            case 'websocket':
+                return new ModuleClass(this.getModule('dom'));
+                
+            case 'channel':
+                return new ModuleClass(window.hd1API, this.getModule('dom'));
+                
+            case 'stats':
+                return new ModuleClass(this.getModule('dom'));
+                
+            default:
+                return new ModuleClass();
+        }
+    }
+
+    /**
+     * Initialize all modules in dependency order
+     */
+    async initializeModules() {
+        console.log('[HD1-Console] Initializing modules...');
+        
+        for (const moduleName of this.moduleLoadOrder) {
+            const module = this.modules.get(moduleName);
+            
+            if (!module) {
+                console.warn(`[HD1-Console] Module not found for initialization: ${moduleName}`);
+                continue;
+            }
+
+            try {
+                console.log(`[HD1-Console] Initializing module: ${moduleName}`);
+                
+                if (typeof module.initialize === 'function') {
+                    await module.initialize();
                 }
-            }
-        })
-        .catch(error => {
-            console.error('Failed to update A-Frame environment:', error);
-            addDebug('AFRAME_ENV_FAIL', {error: error.message});
-        });
-}
-
-// Load saved scene on page load
-loadSavedScene();
-
-// Photo/Video Controls Implementation
-const photoBtn = document.getElementById('photo-btn');
-const videoBtn = document.getElementById('video-btn');
-const recordingStatus = document.getElementById('recording-status');
-let isRecording = false;
-let recordingStartTime = null;
-
-// Photo Mode: Save current session state as new scene
-photoBtn.addEventListener('click', async function() {
-    if (!currentSessionId) {
-        addDebug('PHOTO_ERROR', 'No active session');
-        return;
-    }
-    
-    // Prompt for scene name
-    const sceneName = prompt('Enter scene name:');
-    if (!sceneName) return;
-    
-    const sceneId = sceneName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    
-    try {
-        addDebug('PHOTO_START', {session: currentSessionId, scene: sceneId});
-        
-        const response = await fetch('/api/sessions/' + currentSessionId + '/scenes/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                scene_id: sceneId,
-                name: sceneName,
-                description: 'Scene captured from session ' + currentSessionId
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            addDebug('PHOTO_SUCCESS', {scene: sceneId, objects: result.objects_count || 0});
-            setStatus('receiving', 'Freeze-frame saved: ' + sceneName);
-            
-            // Refresh scene dropdown
-            await refreshSceneDropdown();
-        } else {
-            addDebug('PHOTO_ERROR', {scene: sceneId, status: response.status});
-            setStatus('error', 'Freeze-frame save failed');
-        }
-    } catch (error) {
-        addDebug('PHOTO_FAIL', {error: error.message});
-        setStatus('error', 'Freeze-frame operation failed');
-    }
-});
-
-// Video Mode: Start/Stop recording
-videoBtn.addEventListener('click', async function() {
-    if (!currentSessionId) {
-        addDebug('VIDEO_ERROR', 'No active session');
-        return;
-    }
-    
-    try {
-        if (!isRecording) {
-            // Start recording
-            const response = await fetch('/api/sessions/' + currentSessionId + '/recording/start', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: 'Recording-' + Date.now(),
-                    description: 'Temporal session recording'
-                })
-            });
-            
-            if (response.ok) {
-                isRecording = true;
-                recordingStartTime = Date.now();
-                videoBtn.classList.add('active');
-                videoBtn.textContent = 'STOP SEQUENCE';
-                recordingStatus.textContent = 'REC';
-                addDebug('VIDEO_START', {session: currentSessionId});
-                setStatus('receiving', 'Temporal sequence started');
                 
-                // Update recording timer
-                updateRecordingTimer();
-            } else {
-                addDebug('VIDEO_START_ERROR', {status: response.status});
-                setStatus('error', 'Temporal sequence start failed');
-            }
-        } else {
-            // Stop recording
-            const response = await fetch('/api/sessions/' + currentSessionId + '/recording/stop', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            
-            if (response.ok) {
-                isRecording = false;
-                recordingStartTime = null;
-                videoBtn.classList.remove('active');
-                videoBtn.textContent = 'TEMPORAL SEQUENCE';
-                recordingStatus.textContent = '';
-                addDebug('VIDEO_STOP', {session: currentSessionId});
-                setStatus('receiving', 'Temporal sequence stopped');
-            } else {
-                addDebug('VIDEO_STOP_ERROR', {status: response.status});
-                setStatus('error', 'Temporal sequence stop failed');
+                console.log(`[HD1-Console] Module initialized: ${moduleName}`);
+                
+            } catch (error) {
+                console.error(`[HD1-Console] Failed to initialize module ${moduleName}:`, error);
+                this.handleModuleError(moduleName, error);
             }
         }
-    } catch (error) {
-        addDebug('VIDEO_FAIL', {error: error.message});
-        setStatus('error', 'Temporal sequence operation failed');
     }
-});
 
-// Update recording timer
-function updateRecordingTimer() {
-    if (isRecording && recordingStartTime) {
-        const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
-        const minutes = Math.floor(elapsed / 60);
-        const seconds = elapsed % 60;
-        recordingStatus.textContent = 'REC ' + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-        setTimeout(updateRecordingTimer, 1000);
-    }
-}
+    /**
+     * Setup global error handling
+     */
+    setupErrorHandling() {
+        // Catch unhandled errors
+        window.addEventListener('error', (event) => {
+            this.handleGlobalError(event.error, event);
+        });
 
-// Refresh scene dropdown from API
-async function refreshSceneDropdown() {
-    try {
-        const response = await fetch('/api/scenes');
-        if (response.ok) {
-            const data = await response.json();
-            const select = document.getElementById('debug-scene-select');
-            
-            // Save current selection
-            const currentValue = select.value;
-            
-            // Clear existing options except first
-            while (select.children.length > 1) {
-                select.removeChild(select.lastChild);
-            }
-            
-            // Add updated scenes
-            if (data.scenes) {
-                data.scenes.forEach(scene => {
-                    const option = document.createElement('option');
-                    option.value = scene.id;
-                    option.textContent = scene.name;
-                    select.appendChild(option);
-                });
-            }
-            
-            // Restore selection (saved scene or previous value)
-            const savedScene = getCookie('hd1_scene');
-            if (savedScene) {
-                select.value = savedScene;
-            } else if (currentValue) {
-                select.value = currentValue;
-            }
-            
-            addDebug('SCENE_REFRESH', {count: data.scenes?.length || 0, restored: savedScene || currentValue});
-        }
-    } catch (error) {
-        addDebug('SCENE_REFRESH_ERROR', {error: error.message});
-    }
-}
-
-// Pointer lock status indicator
-function updatePointerLockStatus() {
-    if (document.pointerLockElement) {
-        setLockStatus('locked', 'Freelook engaged • Press ESC to exit');
-        addDebug('FREELOOK_ACTIVE', 'Freelook engaged • Press ESC to exit');
-    } else {
-        setLockStatus('unlocked', 'Click holodeck for freelook navigation');
-        addDebug('FREELOOK_READY', 'Click holodeck for freelook navigation');
-    }
-}
-
-// Listen for pointer lock changes
-document.addEventListener('pointerlockchange', updatePointerLockStatus);
-document.addEventListener('pointerlockerror', function() {
-    addDebug('POINTER_ERROR', 'Pointer lock failed');
-});
-
-// Initial status
-updatePointerLockStatus();
-
-// Initialize debug panel with cookie persistence (after cookie functions are defined)
-debugCollapsed = getCookie('hd1_console_collapsed') === 'true';
-addDebug('CONSOLE_COOKIE', 'Loaded state: ' + (debugCollapsed ? 'collapsed' : 'expanded'));
-
-function setDebugState(collapsed, saveToCookie = true) {
-    debugCollapsed = collapsed;
-    const debugContent = document.getElementById('debug-content');
-    
-    if (debugCollapsed) {
-        debugCollapseIcon.classList.add('collapsed');
-        if (statusCollapseArrow) statusCollapseArrow.classList.add('collapsed');
-        if (debugContent) debugContent.classList.add('collapsed');
-    } else {
-        debugCollapseIcon.classList.remove('collapsed');
-        if (statusCollapseArrow) statusCollapseArrow.classList.remove('collapsed');
-        if (debugContent) debugContent.classList.remove('collapsed');
-    }
-    if (saveToCookie) {
-        setCookie('hd1_console_collapsed', debugCollapsed.toString(), 30); // 30 days
-        addDebug('CONSOLE_SAVE', 'State saved: ' + (debugCollapsed ? 'collapsed' : 'expanded'));
-    }
-}
-
-debugHeader.addEventListener('click', function(e) {
-    setDebugState(!debugCollapsed, true);
-});
-
-// Status bar session ID tag click handler for copying
-sessionIdTagStatus.addEventListener('click', function(e) {
-    e.stopPropagation(); // Prevent any propagation
-    const sessionId = currentSessionId;
-    if (sessionId) {
-        navigator.clipboard.writeText(sessionId).then(() => {
-            // Visual feedback
-            sessionIdTagStatus.classList.add('copied');
-            setTimeout(() => {
-                sessionIdTagStatus.classList.remove('copied');
-            }, 500);
-            addDebug('COPY_SESSION', {id: sessionId});
-        }).catch(err => {
-            // Fallback for older browsers
-            const textArea = document.createElement('textarea');
-            textArea.value = sessionId;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            addDebug('COPY_SESSION_FALLBACK', {id: sessionId});
+        // Catch unhandled promise rejections
+        window.addEventListener('unhandledrejection', (event) => {
+            this.handleGlobalError(event.reason, event);
         });
     }
-});
 
-// Status bar click handler for toggle
-statusBar.addEventListener('click', function(e) {
-    // Don't toggle if clicking on session ID tag (it has its own handler)
-    if (e.target !== sessionIdTagStatus) {
-        setDebugState(!debugCollapsed, true);
-    }
-});
-
-// Load version information dynamically
-async function loadVersionInfo() {
-    try {
-        const response = await fetch('/api/version');
-        if (response.ok) {
-            const versionData = await response.json();
-            
-            // Update API version
-            const apiVersionElement = document.getElementById('api-version');
-            if (apiVersionElement) {
-                apiVersionElement.textContent = 'v' + versionData.api_version;
+    /**
+     * Monitor for PlayCanvas readiness and show controls
+     */
+    monitorPlayCanvasReadiness() {
+        const checkPlayCanvasReady = () => {
+            if (window.hd1GameEngine && window.hd1GameEngine.root) {
+                console.log('[HD1-Console] PlayCanvas engine detected, showing controls');
+                
+                // Show PlayCanvas controls
+                const uiManager = this.getModule('ui-state');
+                if (uiManager && uiManager.showPlayCanvasControls) {
+                    uiManager.showPlayCanvasControls();
+                }
+                
+                // Notify input manager
+                this.notifyModules('playcanvas_ready', { engine: window.hd1GameEngine });
+                
+                return true;
             }
+            return false;
+        };
+        
+        // Check immediately
+        if (!checkPlayCanvasReady()) {
+            // Poll every second for PlayCanvas readiness
+            const pollInterval = setInterval(() => {
+                if (checkPlayCanvasReady()) {
+                    clearInterval(pollInterval);
+                }
+            }, 1000);
             
-            // Update JS version (first 8 characters)
-            const jsVersionElement = document.getElementById('js-version');
-            if (jsVersionElement) {
-                jsVersionElement.textContent = versionData.js_version.substring(0, 8);
-            }
-            
-            addDebug('VERSION_LOADED', {
-                api: versionData.api_version, 
-                js: versionData.js_version.substring(0, 8),
-                title: versionData.title
-            });
-        } else {
-            addDebug('VERSION_ERROR', {status: response.status});
+            // Stop polling after 30 seconds
+            setTimeout(() => {
+                clearInterval(pollInterval);
+            }, 30000);
         }
-    } catch (error) {
-        addDebug('VERSION_FAIL', {error: error.message});
-        // Keep fallback values if version endpoint fails
+    }
+
+    /**
+     * Setup inter-module communication
+     */
+    setupModuleCommunication() {
+        // WebSocket message routing
+        const wsManager = this.getModule('websocket');
+        if (wsManager) {
+            // Route WebSocket messages to appropriate modules
+            wsManager.on('channel_update', (message) => {
+                const channelManager = this.getModule('channel');
+                if (channelManager && channelManager.handleChannelUpdate) {
+                    channelManager.handleChannelUpdate(message);
+                }
+            });
+        }
+
+        // Channel changes update stats
+        const channelManager = this.getModule('channel');
+        if (channelManager) {
+            // Hook into channel switching to update UI
+            const originalSwitchChannel = channelManager.switchChannel.bind(channelManager);
+            channelManager.switchChannel = async (channelId) => {
+                const result = await originalSwitchChannel(channelId);
+                if (result) {
+                    // Notify other modules of channel change
+                    this.notifyModules('channel_changed', { channelId });
+                }
+                return result;
+            };
+        }
+    }
+
+    /**
+     * Notify all modules of an event
+     */
+    notifyModules(eventType, data) {
+        this.modules.forEach((module, name) => {
+            try {
+                if (module.handleEvent && typeof module.handleEvent === 'function') {
+                    module.handleEvent(eventType, data);
+                }
+            } catch (error) {
+                console.error(`[HD1-Console] Module ${name} failed to handle event ${eventType}:`, error);
+            }
+        });
+    }
+
+    /**
+     * Get module instance
+     */
+    getModule(name) {
+        return this.modules.get(name) || null;
+    }
+
+    /**
+     * Check if module is ready
+     */
+    isModuleReady(name) {
+        const module = this.modules.get(name);
+        return module && module.ready === true;
+    }
+
+    /**
+     * Handle module load errors with graceful degradation
+     */
+    handleModuleLoadError(moduleName, error) {
+        console.error(`[HD1-Console] Module load error: ${moduleName}`, error);
+        
+        // Some modules are critical, others can be gracefully degraded
+        const criticalModules = ['dom'];
+        
+        if (criticalModules.includes(moduleName)) {
+            throw new Error(`Critical module failed to load: ${moduleName}`);
+        }
+        
+        // Log non-critical module failure
+        this.logDebug('MODULE_LOAD_ERROR', {
+            module: moduleName,
+            error: error.message,
+            graceful: true
+        });
+    }
+
+    /**
+     * Handle module runtime errors
+     */
+    handleModuleError(moduleName, error) {
+        console.error(`[HD1-Console] Module runtime error: ${moduleName}`, error);
+        
+        this.errorCount++;
+        
+        // Log error
+        this.logDebug('MODULE_ERROR', {
+            module: moduleName,
+            error: error.message,
+            errorCount: this.errorCount
+        });
+        
+        // If too many errors, trigger recovery
+        if (this.errorCount > this.maxErrors) {
+            this.triggerErrorRecovery();
+        }
+    }
+
+    /**
+     * Handle global errors
+     */
+    handleGlobalError(error, event) {
+        console.error('[HD1-Console] Global error:', error);
+        
+        this.errorCount++;
+        
+        // Log error through DOM module if available
+        this.logDebug('GLOBAL_ERROR', {
+            error: error.message || error,
+            stack: error.stack,
+            errorCount: this.errorCount
+        });
+    }
+
+    /**
+     * Handle critical errors that prevent system startup
+     */
+    handleCriticalError(error) {
+        console.error('[HD1-Console] CRITICAL ERROR - System cannot continue:', error);
+        
+        // Attempt basic fallback console
+        this.initializeFallbackConsole();
+    }
+
+    /**
+     * Initialize fallback console with minimal functionality
+     */
+    initializeFallbackConsole() {
+        console.log('[HD1-Console] Initializing fallback console');
+        
+        // Create basic debug output
+        const fallbackDiv = document.createElement('div');
+        fallbackDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: cyan; padding: 10px; font-family: monospace; z-index: 10000; max-width: 300px;';
+        fallbackDiv.innerHTML = `
+            <div>HD1 Console - Fallback Mode</div>
+            <div>Critical error occurred</div>
+            <div>Limited functionality available</div>
+            <div onclick="window.location.reload()" style="cursor: pointer; color: yellow;">Click to reload</div>
+        `;
+        document.body.appendChild(fallbackDiv);
+    }
+
+    /**
+     * Trigger error recovery
+     */
+    triggerErrorRecovery() {
+        console.log('[HD1-Console] Triggering error recovery');
+        
+        // Reset error count
+        this.errorCount = 0;
+        
+        // Attempt to reinitialize critical modules
+        this.recoverCriticalModules();
+    }
+
+    /**
+     * Recover critical modules
+     */
+    async recoverCriticalModules() {
+        const criticalModules = ['dom', 'ui-state'];
+        
+        for (const moduleName of criticalModules) {
+            try {
+                const module = this.modules.get(moduleName);
+                if (module && module.initialize) {
+                    console.log(`[HD1-Console] Recovering module: ${moduleName}`);
+                    await module.initialize();
+                }
+            } catch (error) {
+                console.error(`[HD1-Console] Failed to recover module ${moduleName}:`, error);
+            }
+        }
+    }
+
+    /**
+     * Log debug message through appropriate module
+     */
+    logDebug(command, data = null) {
+        const domModule = this.getModule('dom');
+        if (domModule && domModule.addDebugEntry) {
+            domModule.addDebugEntry(command, data);
+        } else {
+            // Fallback to console
+            console.log(`[HD1-Debug] ${command}${data ? ' ' + JSON.stringify(data, null, 0) : ''}`);
+        }
+    }
+
+    /**
+     * Hot reload module (development feature)
+     */
+    async hotReloadModule(moduleName) {
+        console.log(`[HD1-Console] Hot reloading module: ${moduleName}`);
+        
+        try {
+            // Cleanup existing module
+            const existingModule = this.modules.get(moduleName);
+            if (existingModule && existingModule.cleanup) {
+                existingModule.cleanup();
+            }
+            
+            // Remove from modules
+            this.modules.delete(moduleName);
+            
+            // Reload and reinitialize
+            // Implementation would go here for development
+            
+        } catch (error) {
+            console.error(`[HD1-Console] Hot reload failed for ${moduleName}:`, error);
+        }
+    }
+
+    /**
+     * Get system status
+     */
+    getSystemStatus() {
+        const status = {
+            ready: this.ready,
+            version: this.version,
+            errorCount: this.errorCount,
+            modules: {}
+        };
+
+        // Get status from each module
+        this.modules.forEach((module, name) => {
+            status.modules[name] = {
+                ready: module.ready || false,
+                loadStatus: this.loadingProgress.get(name) || 'unknown'
+            };
+        });
+
+        return status;
+    }
+
+    /**
+     * Cleanup entire console system
+     */
+    cleanup() {
+        console.log('[HD1-Console] Cleaning up console system');
+        
+        // Cleanup all modules
+        this.modules.forEach((module, name) => {
+            try {
+                if (module.cleanup && typeof module.cleanup === 'function') {
+                    module.cleanup();
+                }
+            } catch (error) {
+                console.error(`[HD1-Console] Error cleaning up module ${name}:`, error);
+            }
+        });
+        
+        this.modules.clear();
+        this.loadingProgress.clear();
+        this.ready = false;
     }
 }
 
-// Initialize debug panel state from cookie (don't save back to cookie)
-setDebugState(debugCollapsed, false);
+// Global console manager instance
+window.hd1ConsoleManager = new HD1ConsoleManager();
 
-// Load version information
-loadVersionInfo();
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await window.hd1ConsoleManager.initialize();
+    } catch (error) {
+        console.error('[HD1-Console] Failed to initialize console manager:', error);
+    }
+});
 
-// Initialize hardware monitoring and objects observer
-initializeHardwareMonitoring();
-initializeObjectsObserver();
+// Expose for debugging
+window.HD1 = {
+    console: window.hd1ConsoleManager,
+    getModule: (name) => window.hd1ConsoleManager.getModule(name),
+    getStatus: () => window.hd1ConsoleManager.getSystemStatus(),
+    version: window.hd1ConsoleManager.version
+};
 
-// Start connection
-connectWebSocket();
+console.log('🚀 HD1 Console Manager v3.0.0 - Ultimate Modular Architecture Loaded');

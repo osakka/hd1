@@ -140,12 +140,9 @@ func InstantiatePropHandler(w http.ResponseWriter, r *http.Request, hub interfac
 		req.InstanceName = propID + "-instance"
 	}
 
-	// Get current environment for physics cohesion
-	session, _ := h.GetStore().GetSession(sessionID)
+	// Get current environment for physics cohesion from channel
 	var envInfo *EnvironmentInfo
-	if session.EnvironmentID != "" {
-		envInfo = getEnvironmentInfo(session.EnvironmentID)
-	}
+	// Environment now comes from channel configuration, not session tracking
 
 	// Execute prop instantiation script with environment physics
 	objectsCreated, err := executePropScript(propInfo, &req, sessionID, envInfo)

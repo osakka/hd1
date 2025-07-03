@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -143,6 +144,33 @@ func (c *Client) handleClientMessage(message []byte) {
 				"capabilities": info.Capabilities,
 			})
 		}
+		
+	case "ping":
+		// Handle client ping for latency measurement
+		pongMsg := map[string]interface{}{
+			"type": "pong",
+		}
+		
+		// Copy ping_id and timestamp for round-trip calculation
+		if pingID, ok := msg["ping_id"]; ok {
+			pongMsg["ping_id"] = pingID
+		}
+		if timestamp, ok := msg["timestamp"]; ok {
+			pongMsg["timestamp"] = timestamp
+		}
+		
+		// Send pong response immediately
+		if jsonData, err := json.Marshal(pongMsg); err == nil {
+			select {
+			case c.send <- jsonData:
+			default:
+				// Client channel blocked, don't wait
+			}
+		}
+		
+		logging.Trace("websocket", "ping pong latency", map[string]interface{}{
+			"ping_id": msg["ping_id"],
+		})
 
 	case "session_associate":
 		// Associate this client with a specific HD1 session
@@ -152,101 +180,15 @@ func (c *Client) handleClientMessage(message []byte) {
 				"session_id": sessionID,
 			})
 			
-			// SURGICAL FIX: Send existing session objects to EVERY connecting client
 			if c.hub.store != nil {
-				existingObjects := c.hub.store.ListObjects(sessionID)
-				if len(existingObjects) > 0 {
-					// Format objects for canvas control message (EXACT same format as normal object creation)
-					var objectsData []map[string]interface{}
-					for _, obj := range existingObjects {
-						// Parse color string back to RGBA object (if stored as JSON string)
-						var colorObj map[string]interface{}
-						if obj.Color != "" {
-							// Try to parse as JSON first, fallback to default red if parsing fails
-							var parsedColor map[string]interface{}
-							if err := json.Unmarshal([]byte(obj.Color), &parsedColor); err == nil {
-								colorObj = parsedColor
-							} else {
-								// Default red color if parsing fails
-								colorObj = map[string]interface{}{"r": 1.0, "g": 0.2, "b": 0.2, "a": 1.0}
-							}
-						} else {
-							// Default red color if no color stored
-							colorObj = map[string]interface{}{"r": 1.0, "g": 0.2, "b": 0.2, "a": 1.0}
-						}
-						
-						// Use EXACT same format as normal object creation (/opt/hd1/src/api/objects/create.go)
-						objectData := map[string]interface{}{
-							"id":   obj.Name,
-							"name": obj.Name,
-							"type": obj.Type,
-							"transform": map[string]interface{}{
-								"position": map[string]interface{}{
-									"x": obj.X,
-									"y": obj.Y,
-									"z": obj.Z,
-								},
-								"scale": map[string]interface{}{
-									"x": obj.Scale,
-									"y": obj.Scale,
-									"z": obj.Scale,
-								},
-								"rotation": map[string]interface{}{
-									"x": 0,
-									"y": 0,
-									"z": 0,
-								},
-							},
-							"color": colorObj,
-							"material": map[string]interface{}{
-								"shader":      "standard",
-								"metalness":   0.1,
-								"roughness":   0.7,
-								"transparent": false,
-							},
-							"physics": map[string]interface{}{
-								"enabled": false,
-								"mass":    1.0,
-								"type":    "static",
-							},
-							"lighting": map[string]interface{}{
-								"castShadow":    true,
-								"receiveShadow": true,
-							},
-							"visible":   true,
-							"wireframe": false,
-							"text":      "",
-							"lightType": "",
-							"intensity": 1,
-						}
-						objectsData = append(objectsData, objectData)
-					}
-					
-					// Send session restoration message to this client only
-					message := map[string]interface{}{
-						"type": "canvas_control",
-						"data": map[string]interface{}{
-							"command": "create",
-							"objects": objectsData,
-						},
-						"timestamp": time.Now().Unix(),
-					}
-					
-					if jsonData, err := json.Marshal(message); err == nil {
-						select {
-						case c.send <- jsonData:
-						default:
-							// Client channel blocked, don't wait
-						}
-					}
-					
-					logging.Info("session objects restored to client", map[string]interface{}{
-						"session_id": sessionID,
-						"object_count": len(existingObjects),
-					})
-					
-					// Session objects sent to this client - no global lock needed
-				}
+				// Join the session room (this handles duplicate prevention)
+				_, _, _ = c.hub.JoinSessionChannel(sessionID, fmt.Sprintf("%p", c), false)
+				
+				// Legacy object loading removed - entities now managed via channels/PlayCanvas
+				// Session restoration handled by channel manager when switching channels
+				logging.Info("session connected, entities managed via channels", map[string]interface{}{
+					"session_id": sessionID,
+				})
 			}
 		}
 		

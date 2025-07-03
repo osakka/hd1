@@ -27,6 +27,421 @@ servers:
 
 paths:
   # ========================================
+  # CHANNELS MANAGEMENT
+  # ========================================
+  /channels:
+    get:
+      operationId: listChannels
+      summary: List available collaboration channels
+      description: |
+        Returns a list of all available collaboration channels with their
+        configurations, environments, and capacity information.
+      responses:
+        '200':
+          description: Available channels retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Available channels retrieved successfully"
+                  channels:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "channel_one"
+                        name:
+                          type: string
+                          example: "Channel One - Main Collaboration"
+                        description:
+                          type: string
+                          example: "Primary collaborative environment for general holodeck activities"
+                        environment:
+                          type: string
+                          example: "earth-surface"
+                        max_clients:
+                          type: integer
+                          example: 100
+      x-handler: "api/channels/list_channels.go"
+      x-function: "ListChannels"
+
+    post:
+      operationId: createChannel
+      summary: Create a new collaboration channel
+      description: |
+        Creates a new collaboration channel with specified configuration.
+        Channel ID will be auto-generated if not provided.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Channel ID (auto-generated if not provided)
+                  example: "channel_custom"
+                name:
+                  type: string
+                  description: Human-readable channel name
+                  example: "Custom Collaboration Channel"
+                description:
+                  type: string
+                  description: Channel description and purpose
+                  example: "Custom environment for specialized workflows"
+                environment:
+                  type: string
+                  description: Environment ID to apply to channel
+                  example: "earth-surface"
+                max_clients:
+                  type: integer
+                  description: Maximum concurrent clients allowed
+                  example: 50
+                enabled:
+                  type: boolean
+                  description: Whether channel is active
+                  default: true
+                priority:
+                  type: integer
+                  description: Channel priority for display ordering
+                  default: 100
+              required: [name, environment]
+      responses:
+        '201':
+          description: Channel created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Channel created successfully"
+                  channel:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "channel_custom"
+                      name:
+                        type: string
+                        example: "Custom Collaboration Channel"
+                      description:
+                        type: string
+                        example: "Custom environment for specialized workflows"
+                      environment:
+                        type: string
+                        example: "earth-surface"
+                      max_clients:
+                        type: integer
+                        example: 50
+                      enabled:
+                        type: boolean
+                        example: true
+                      created_at:
+                        type: string
+                        format: date-time
+        '400':
+          description: Invalid channel configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Invalid channel configuration"
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '409':
+          description: Channel ID already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Channel ID already exists"
+      x-handler: "api/channels/create_channel.go"
+      x-function: "CreateChannel"
+
+  /channels/{channelId}:
+    get:
+      operationId: getChannel
+      summary: Get channel configuration
+      description: |
+        Returns detailed configuration for a specific channel including
+        current client count and channel statistics.
+      parameters:
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "channel_one"
+      responses:
+        '200':
+          description: Channel configuration retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  channel:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "channel_one"
+                      name:
+                        type: string
+                        example: "Channel One - Main Collaboration"
+                      description:
+                        type: string
+                        example: "Primary collaborative environment for general holodeck activities"
+                      environment:
+                        type: string
+                        example: "earth-surface"
+                      max_clients:
+                        type: integer
+                        example: 100
+                      enabled:
+                        type: boolean
+                        example: true
+                      current_clients:
+                        type: integer
+                        example: 5
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+        '404':
+          description: Channel not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Channel not found"
+      x-handler: "api/channels/get_channel.go"
+      x-function: "GetChannel"
+
+    put:
+      operationId: updateChannel
+      summary: Update channel configuration
+      description: |
+        Updates configuration for an existing channel. Only provided fields
+        will be updated. Cannot change channel ID.
+      parameters:
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "channel_one"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Human-readable channel name
+                  example: "Updated Channel Name"
+                description:
+                  type: string
+                  description: Channel description and purpose
+                  example: "Updated channel description"
+                environment:
+                  type: string
+                  description: Environment ID to apply to channel
+                  example: "molecular-scale"
+                max_clients:
+                  type: integer
+                  description: Maximum concurrent clients allowed
+                  example: 75
+                enabled:
+                  type: boolean
+                  description: Whether channel is active
+                  example: true
+                priority:
+                  type: integer
+                  description: Channel priority for display ordering
+                  example: 50
+      responses:
+        '200':
+          description: Channel updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Channel updated successfully"
+                  channel:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "channel_one"
+                      name:
+                        type: string
+                        example: "Updated Channel Name"
+                      description:
+                        type: string
+                        example: "Updated channel description"
+                      environment:
+                        type: string
+                        example: "molecular-scale"
+                      max_clients:
+                        type: integer
+                        example: 75
+                      enabled:
+                        type: boolean
+                        example: true
+                      updated_at:
+                        type: string
+                        format: date-time
+        '400':
+          description: Invalid channel configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Invalid channel configuration"
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Channel not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Channel not found"
+      x-handler: "api/channels/update_channel.go"
+      x-function: "UpdateChannel"
+
+    delete:
+      operationId: deleteChannel
+      summary: Delete a collaboration channel
+      description: |
+        Deletes an existing channel. Will disconnect all current clients
+        and remove channel configuration. Cannot delete default channel.
+      parameters:
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "channel_custom"
+        - name: force
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Force deletion even if clients are connected
+      responses:
+        '200':
+          description: Channel deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Channel deleted successfully"
+                  disconnected_clients:
+                    type: integer
+                    example: 3
+        '400':
+          description: Cannot delete channel
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Cannot delete default channel or channel has active clients"
+                  current_clients:
+                    type: integer
+                    example: 5
+        '404':
+          description: Channel not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Channel not found"
+      x-handler: "api/channels/delete_channel.go"
+      x-function: "DeleteChannel"
+
+  # ========================================
   # API INFORMATION
   # ========================================
   /version:
@@ -164,6 +579,286 @@ paths:
           $ref: '#/components/responses/NotFound'
       x-handler: "api/sessions/delete.go"
       x-function: "DeleteSession"
+
+  # ========================================
+  # SESSION GRAPH SESSION GRAPH & ROOM MANAGEMENT CHANNEL MANAGEMENT
+  # TCP-level reliability with channel-based architecture
+  # ========================================
+  /sessions/{sessionId}/channel/join:
+    post:
+      operationId: joinSessionChannel
+      tags: [Session Graph]
+      summary: Join persistent session channel
+      description: |
+        Join a session channel for real-time graph collaboration.
+        Session channels provide TCP-level reliability with automatic state sync.
+        Multiple clients can join the same channel to share session state.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                  description: Unique client identifier for channel membership
+                channel_id:
+                  type: string
+                  description: Named channel to join (e.g., channel_one, channel_two)
+                  example: "channel_one"
+                reconnect:
+                  type: boolean
+                  default: false
+                  description: Whether this is a reconnection (preserves state)
+      responses:
+        '200':
+          description: Successfully joined session channel
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  channel_id:
+                    type: string
+                  session_id:
+                    type: string
+                  client_count:
+                    type: integer
+                  graph_state:
+                    type: object
+                    description: Current session graph state
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/sessions/join_channel.go"
+      x-function: "JoinSessionChannel"
+
+  /sessions/{sessionId}/channel/leave:
+    post:
+      operationId: leaveSessionChannel
+      tags: [Session Graph]
+      summary: Leave session channel
+      description: |
+        Leave a session channel while preserving the channel for other clients.
+        Room persists even when all clients leave (TCP-level persistence).
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                  description: Client ID to remove from room
+      responses:
+        '200':
+          description: Successfully left session channel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/sessions/leave_channel.go"
+      x-function: "LeaveSessionChannel"
+
+  /sessions/{sessionId}/channel/graph:
+    get:
+      operationId: getSessionGraph
+      tags: [Session Graph]
+      summary: Get session graph state
+      description: |
+        Retrieve the complete session graph state.
+        Returns all objects, properties, and real-time state in the session.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session graph state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  session_id:
+                    type: string
+                  graph_state:
+                    type: object
+                    properties:
+                      objects:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Object'
+                      properties:
+                        type: object
+                      last_updated:
+                        type: string
+                        format: date-time
+                  client_count:
+                    type: integer
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/sessions/get_graph.go"
+      x-function: "GetSessionGraph"
+
+    put:
+      operationId: updateSessionGraph
+      tags: [Session Graph]
+      summary: Update session graph state
+      description: |
+        Update the session graph state and broadcast changes to all channel members.
+        Provides atomic updates with rollback protection.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                graph_updates:
+                  type: object
+                  description: Graph state updates to apply
+                client_id:
+                  type: string
+                  description: Client making the update
+                atomic:
+                  type: boolean
+                  default: true
+                  description: Whether update should be atomic
+      responses:
+        '200':
+          description: Graph state updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  updated_at:
+                    type: string
+                    format: date-time
+                  broadcast_count:
+                    type: integer
+                    description: Number of clients notified
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/sessions/update_graph.go"
+      x-function: "UpdateSessionGraph"
+
+  /sessions/{sessionId}/channel/sync:
+    post:
+      operationId: syncSessionState
+      tags: [Session Graph]
+      summary: Force session state synchronization
+      description: |
+        Force synchronization of session state across all channel members.
+        Used for recovery after network issues or connection problems.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                force_full_sync:
+                  type: boolean
+                  default: false
+                  description: Force complete state resynchronization
+      responses:
+        '200':
+          description: Synchronization completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  synced_clients:
+                    type: integer
+                  sync_timestamp:
+                    type: string
+                    format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/sessions/sync_state.go"
+      x-function: "SyncSessionState"
+
+  /sessions/{sessionId}/channel/status:
+    get:
+      operationId: getSessionChannelStatus
+      tags: [Session Graph]
+      summary: Get session channel status
+      description: |
+        Get detailed status of session channel including connected clients,
+        graph state summary, and connection health metrics.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session room status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  session_id:
+                    type: string
+                  channel_active:
+                    type: boolean
+                  connected_clients:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        client_id:
+                          type: string
+                        connected_at:
+                          type: string
+                          format: date-time
+                        last_activity:
+                          type: string
+                          format: date-time
+                  graph_summary:
+                    type: object
+                    properties:
+                      object_count:
+                        type: integer
+                      last_updated:
+                        type: string
+                        format: date-time
+                  health_metrics:
+                    type: object
+                    properties:
+                      uptime:
+                        type: string
+                      message_count:
+                        type: integer
+                      last_sync:
+                        type: string
+                        format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/sessions/channel_status.go"
+      x-function: "GetSessionChannelStatus"
 
   # ========================================
   # ENVIRONMENT MANAGEMENT
@@ -403,6 +1098,1626 @@ paths:
       x-function: "InstantiateProp"
 
   # ========================================
+  # ENTITY MANAGEMENT (PLAYCANVAS GAME ENGINE)
+  # ========================================
+  /sessions/{sessionId}/entities:
+    get:
+      operationId: listEntities
+      tags: [Entities]
+      summary: List all entities in session
+      description: |
+        Returns all PlayCanvas entities within the specified session.
+        Entities are the fundamental building blocks of the game engine.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: tag
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter entities by tag
+          example: "player"
+        - name: enabled
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by enabled state
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+          description: Maximum number of entities to return
+      responses:
+        '200':
+          description: Entities list retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entities:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EntitySummary'
+                  total:
+                    type: integer
+                    example: 1
+                  timestamp:
+                    type: string
+                    format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/entities/list.go"
+      x-function: "ListEntities"
+
+    post:
+      operationId: createEntity
+      tags: [Entities]
+      summary: Create new PlayCanvas entity
+      description: |
+        Creates a new PlayCanvas entity in the specified session.
+        Entities are containers for components in the game engine.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  description: Human-readable entity name
+                  example: "PlayerCharacter"
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 10
+                  description: Entity tags for categorization
+                  example: ["player", "dynamic"]
+                enabled:
+                  type: boolean
+                  default: true
+                  description: Whether entity is active
+                position:
+                  $ref: '#/components/schemas/Coordinate3D'
+                rotation:
+                  $ref: '#/components/schemas/Rotation'
+                scale:
+                  $ref: '#/components/schemas/Scale3D'
+      responses:
+        '201':
+          description: Entity created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  name:
+                    type: string
+                    example: "PlayerCharacter"
+                  playcanvas_guid:
+                    type: string
+                    description: PlayCanvas internal GUID
+                    example: "pc-guid-xyz789"
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/entities/create.go"
+      x-function: "CreateEntity"
+
+  /sessions/{sessionId}/entities/{entityId}:
+    get:
+      operationId: getEntity
+      tags: [Entities]
+      summary: Get entity details
+      description: |
+        Retrieves detailed information about a specific PlayCanvas entity,
+        including all components, transform data, and hierarchy relationships.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      responses:
+        '200':
+          description: Entity details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/entities/get.go"
+      x-function: "GetEntity"
+
+    put:
+      operationId: updateEntity
+      tags: [Entities]
+      summary: Update entity properties
+      description: |
+        Updates entity properties including name, tags, enabled state,
+        and transform (position, rotation, scale).
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  example: "UpdatedPlayerCharacter"
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 10
+                  example: ["player", "static"]
+                enabled:
+                  type: boolean
+                  example: false
+                position:
+                  $ref: '#/components/schemas/Coordinate3D'
+                rotation:
+                  $ref: '#/components/schemas/Rotation'
+                scale:
+                  $ref: '#/components/schemas/Scale3D'
+      responses:
+        '200':
+          description: Entity updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  updated_at:
+                    type: string
+                    format: date-time
+                  changes:
+                    type: array
+                    items:
+                      type: string
+                    example: ["name", "enabled", "position"]
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/entities/update.go"
+      x-function: "UpdateEntity"
+
+    delete:
+      operationId: deleteEntity
+      tags: [Entities]
+      summary: Delete entity
+      description: |
+        Permanently removes a PlayCanvas entity from the session.
+        Optionally cascades deletion to child entities.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+        - name: cascade
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Delete child entities recursively
+      responses:
+        '204':
+          description: Entity deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/entities/delete.go"
+      x-function: "DeleteEntity"
+
+  # ========================================
+  # COMPONENT MANAGEMENT (PLAYCANVAS v3.0)
+  # ========================================
+  /sessions/{sessionId}/entities/{entityId}/components:
+    get:
+      operationId: listEntityComponents
+      tags: [Components]
+      summary: List all components on entity
+      description: |
+        Returns all PlayCanvas components attached to the specified entity.
+        Components define entity capabilities like rendering, physics, audio, etc.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [model, camera, light, rigidbody, script, sound, animation, collision, element, particlesystem, render, sprite]
+          description: Filter components by type
+      responses:
+        '200':
+          description: Entity components list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  components:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ComponentSummary'
+                  total:
+                    type: integer
+                    example: 3
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/components/list.go"
+      x-function: "ListEntityComponents"
+
+    post:
+      operationId: addComponent
+      tags: [Components]
+      summary: Add component to entity
+      description: |
+        Adds a new PlayCanvas component to the specified entity.
+        Components provide functionality like rendering, physics, audio, etc.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type]
+              properties:
+                type:
+                  type: string
+                  enum: [model, camera, light, rigidbody, script, sound, animation, collision, element, particlesystem, render, sprite]
+                  description: Component type to add
+                  example: "model"
+                properties:
+                  type: object
+                  description: Component-specific configuration properties
+                  example:
+                    type: "box"
+                    castShadows: true
+                    receiveShadows: true
+                enabled:
+                  type: boolean
+                  default: true
+                  description: Whether component is initially enabled
+      responses:
+        '201':
+          description: Component added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  component_id:
+                    type: string
+                    example: "comp-model-xyz789"
+                  type:
+                    type: string
+                    example: "model"
+                  enabled:
+                    type: boolean
+                    example: true
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Component type already exists on entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/components/add.go"
+      x-function: "AddComponent"
+
+  /sessions/{sessionId}/entities/{entityId}/components/{componentType}:
+    get:
+      operationId: getComponent
+      tags: [Components]
+      summary: Get component details
+      description: |
+        Retrieves detailed information about a specific component,
+        including all properties, configuration, and current state.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+        - name: componentType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [model, camera, light, rigidbody, script, sound, animation, collision, element, particlesystem, render, sprite]
+          example: "model"
+      responses:
+        '200':
+          description: Component details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/components/get.go"
+      x-function: "GetComponent"
+
+    put:
+      operationId: updateComponent
+      tags: [Components]
+      summary: Update component properties
+      description: |
+        Updates component properties and configuration.
+        Only specified properties are modified, others remain unchanged.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+        - name: componentType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [model, camera, light, rigidbody, script, sound, animation, collision, element, particlesystem, render, sprite]
+          example: "model"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  type: object
+                  description: Component properties to update
+                  example:
+                    castShadows: false
+                    material: "material-asset-id"
+                enabled:
+                  type: boolean
+                  description: Enable/disable component
+      responses:
+        '200':
+          description: Component updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  component_type:
+                    type: string
+                    example: "model"
+                  updated_properties:
+                    type: array
+                    items:
+                      type: string
+                    example: ["castShadows", "material"]
+                  updated_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/components/update.go"
+      x-function: "UpdateComponent"
+
+    delete:
+      operationId: removeComponent
+      tags: [Components]
+      summary: Remove component from entity
+      description: |
+        Permanently removes a component from the entity.
+        All component data and functionality will be lost.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+        - name: componentType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [model, camera, light, rigidbody, script, sound, animation, collision, element, particlesystem, render, sprite]
+          example: "model"
+      responses:
+        '204':
+          description: Component removed successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/components/remove.go"
+      x-function: "RemoveComponent"
+
+  /sessions/{sessionId}/entities/{entityId}/components/bulk:
+    post:
+      operationId: bulkComponentOperation
+      tags: [Components]
+      summary: Bulk component operations
+      description: |
+        Performs multiple component operations in a single atomic transaction.
+        Useful for complex entity setup or batch modifications.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [operations]
+              properties:
+                operations:
+                  type: array
+                  items:
+                    type: object
+                    required: [action, component_type]
+                    properties:
+                      action:
+                        type: string
+                        enum: [add, remove, update, enable, disable]
+                        description: Operation to perform
+                      component_type:
+                        type: string
+                        enum: [model, camera, light, rigidbody, script, sound, animation, collision, element, particlesystem, render, sprite]
+                        description: Component type
+                      properties:
+                        type: object
+                        description: Component properties (for add/update operations)
+                  example:
+                    - action: "add"
+                      component_type: "model"
+                      properties:
+                        type: "box"
+                        castShadows: true
+                    - action: "add"
+                      component_type: "rigidbody"
+                      properties:
+                        type: "dynamic"
+                        mass: 1.0
+                atomic:
+                  type: boolean
+                  default: true
+                  description: All operations succeed or all fail
+      responses:
+        '200':
+          description: Bulk operations completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        action:
+                          type: string
+                          example: "add"
+                        component_type:
+                          type: string
+                          example: "model"
+                        success:
+                          type: boolean
+                          example: true
+                        error:
+                          type: string
+                          example: null
+                  completed:
+                    type: integer
+                    example: 2
+                  failed:
+                    type: integer
+                    example: 0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/components/bulk.go"
+      x-function: "BulkComponentOperation"
+
+  # ========================================
+  # ENTITY HIERARCHY MANAGEMENT (PLAYCANVAS v3.0)
+  # ========================================
+  /sessions/{sessionId}/entities/{entityId}/hierarchy/parent:
+    get:
+      operationId: getEntityParent
+      tags: [EntityHierarchy]
+      summary: Get entity parent relationship
+      description: |
+        Retrieves the parent entity of the specified entity.
+        Returns null if entity is a root-level entity.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      responses:
+        '200':
+          description: Parent entity information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  parent:
+                    type: object
+                    nullable: true
+                    properties:
+                      entity_id:
+                        type: string
+                        example: "entity-parent-123"
+                      name:
+                        type: string
+                        example: "ParentEntity"
+                      depth:
+                        type: integer
+                        description: Hierarchy depth from root
+                        example: 1
+                  is_root:
+                    type: boolean
+                    description: Whether this entity is a root entity
+                    example: false
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/hierarchy/parent.go"
+      x-function: "GetEntityParent"
+
+    put:
+      operationId: setEntityParent
+      tags: [EntityHierarchy]
+      summary: Set entity parent relationship
+      description: |
+        Sets the parent entity for the specified entity.
+        Automatically updates transforms to maintain world positions.
+        Use null parent_id to make entity a root-level entity.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parent_id:
+                  type: string
+                  nullable: true
+                  description: New parent entity ID (null for root)
+                  example: "entity-parent-456"
+                maintain_world_transform:
+                  type: boolean
+                  default: true
+                  description: Keep world position when changing parent
+              example:
+                parent_id: "entity-parent-456"
+                maintain_world_transform: true
+      responses:
+        '200':
+          description: Parent relationship updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  old_parent:
+                    type: string
+                    nullable: true
+                    example: "entity-parent-123"
+                  new_parent:
+                    type: string
+                    nullable: true
+                    example: "entity-parent-456"
+                  transform_adjusted:
+                    type: boolean
+                    description: Whether local transform was adjusted
+                    example: true
+                  updated_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: Invalid parent relationship (would create cycle)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/hierarchy/parent.go"
+      x-function: "SetEntityParent"
+
+  /sessions/{sessionId}/entities/{entityId}/hierarchy/children:
+    get:
+      operationId: getEntityChildren
+      tags: [EntityHierarchy]
+      summary: Get entity children list
+      description: |
+        Retrieves all direct child entities of the specified entity.
+        Returns empty array if entity has no children.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+        - name: recursive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include grandchildren and deeper descendants
+        - name: enabled_only
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Only return enabled child entities
+      responses:
+        '200':
+          description: Child entities list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  children:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EntityHierarchyNode'
+                  direct_children_count:
+                    type: integer
+                    example: 3
+                  total_descendants:
+                    type: integer
+                    description: Total count including grandchildren (if recursive=true)
+                    example: 7
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/hierarchy/children.go"
+      x-function: "GetEntityChildren"
+
+  /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms:
+    get:
+      operationId: getEntityTransforms
+      tags: [EntityHierarchy]
+      summary: Get entity local and world transforms
+      description: |
+        Retrieves both local (relative to parent) and world (absolute) transforms.
+        Essential for understanding entity positioning in hierarchy.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      responses:
+        '200':
+          description: Entity transform information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  local_transform:
+                    $ref: '#/components/schemas/Transform3D'
+                  world_transform:
+                    $ref: '#/components/schemas/Transform3D'
+                  parent_id:
+                    type: string
+                    nullable: true
+                    example: "entity-parent-123"
+                  hierarchy_depth:
+                    type: integer
+                    example: 2
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/hierarchy/transforms.go"
+      x-function: "GetEntityTransforms"
+
+    put:
+      operationId: setEntityTransforms
+      tags: [EntityHierarchy]
+      summary: Set entity local or world transforms
+      description: |
+        Updates entity transforms in either local or world coordinate space.
+        Automatically calculates other coordinate space values.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                coordinate_space:
+                  type: string
+                  enum: [local, world]
+                  description: Which coordinate space to update
+                  example: "world"
+                transform:
+                  $ref: '#/components/schemas/Transform3D'
+                animate:
+                  type: boolean
+                  default: false
+                  description: Smoothly animate to new transform
+                animation_duration:
+                  type: number
+                  minimum: 0.1
+                  maximum: 10.0
+                  default: 1.0
+                  description: Animation duration in seconds
+              required: [coordinate_space, transform]
+      responses:
+        '200':
+          description: Entity transforms updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  coordinate_space:
+                    type: string
+                    example: "world"
+                  local_transform:
+                    $ref: '#/components/schemas/Transform3D'
+                  world_transform:
+                    $ref: '#/components/schemas/Transform3D'
+                  animated:
+                    type: boolean
+                    example: false
+                  updated_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: Invalid transform values or coordinate space
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/hierarchy/transforms.go"
+      x-function: "SetEntityTransforms"
+
+  /sessions/{sessionId}/entities/hierarchy/tree:
+    get:
+      operationId: getHierarchyTree
+      tags: [EntityHierarchy]
+      summary: Get complete entity hierarchy tree
+      description: |
+        Returns the complete entity hierarchy as a tree structure.
+        Useful for scene graph visualization and bulk operations.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: root_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Start tree from specific entity (defaults to all root entities)
+          example: "entity-root-123"
+        - name: max_depth
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 10
+          description: Maximum hierarchy depth to traverse
+        - name: include_transforms
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include transform data for each entity
+        - name: include_components
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include component information for each entity
+      responses:
+        '200':
+          description: Complete hierarchy tree
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  session_id:
+                    type: string
+                    example: "session_a1b2c3d4"
+                  tree:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EntityHierarchyTree'
+                  root_entities:
+                    type: integer
+                    description: Number of root-level entities
+                    example: 2
+                  total_entities:
+                    type: integer
+                    description: Total entities in tree
+                    example: 15
+                  max_depth:
+                    type: integer
+                    description: Deepest hierarchy level found
+                    example: 4
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/hierarchy/tree.go"
+      x-function: "GetHierarchyTree"
+
+  # ========================================
+  # ENTITY LIFECYCLE MANAGEMENT (PLAYCANVAS v3.0)
+  # ========================================
+  /sessions/{sessionId}/entities/{entityId}/lifecycle/enable:
+    put:
+      operationId: enableEntity
+      tags: [EntityLifecycle]
+      summary: Enable entity rendering and updates
+      description: |
+        Enables an entity, making it visible and active in the scene.
+        Affects rendering, script execution, and physics simulation.
+        PlayCanvas equivalent: entity.enabled = true
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      responses:
+        '200':
+          description: Entity enabled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity:
+                    type: object
+                    properties:
+                      entityId:
+                        type: string
+                        example: "entity-abc123"
+                      enabled:
+                        type: boolean
+                        example: true
+                      activated:
+                        type: boolean
+                        example: true
+                      visible:
+                        type: boolean
+                        example: true
+                  message:
+                    type: string
+                    example: "Entity enabled successfully"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/lifecycle/enable.go"
+      x-function: "EnableEntity"
+
+  /sessions/{sessionId}/entities/{entityId}/lifecycle/disable:
+    put:
+      operationId: disableEntity
+      tags: [EntityLifecycle]
+      summary: Disable entity rendering and updates
+      description: |
+        Disables an entity, making it invisible and inactive in the scene.
+        Stops rendering, script execution, and physics simulation.
+        PlayCanvas equivalent: entity.enabled = false
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      responses:
+        '200':
+          description: Entity disabled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity:
+                    type: object
+                    properties:
+                      entityId:
+                        type: string
+                        example: "entity-abc123"
+                      enabled:
+                        type: boolean
+                        example: false
+                      activated:
+                        type: boolean
+                        example: false
+                      visible:
+                        type: boolean
+                        example: false
+                  message:
+                    type: string
+                    example: "Entity disabled successfully"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/lifecycle/enable.go"
+      x-function: "DisableEntity"
+
+  /sessions/{sessionId}/entities/{entityId}/lifecycle/activate:
+    post:
+      operationId: activateEntity
+      tags: [EntityLifecycle]
+      summary: Activate entity with full initialization
+      description: |
+        Activates an entity, performing full initialization including
+        component setup, script loading, and resource allocation.
+        More comprehensive than just enabling.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                initializeComponents:
+                  type: boolean
+                  default: true
+                  description: Whether to initialize all components
+                executeScripts:
+                  type: boolean
+                  default: true
+                  description: Whether to execute entity scripts
+                activateChildren:
+                  type: boolean
+                  default: false
+                  description: Whether to activate child entities
+      responses:
+        '201':
+          description: Entity activated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity:
+                    $ref: '#/components/schemas/EntityLifecycleState'
+                  activation:
+                    type: object
+                    properties:
+                      componentsInitialized:
+                        type: integer
+                        example: 5
+                      scriptsExecuted:
+                        type: integer
+                        example: 2
+                      childrenActivated:
+                        type: integer
+                        example: 0
+                  message:
+                    type: string
+                    example: "Entity activated with 5 components and 2 scripts"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/lifecycle/activate.go"
+      x-function: "ActivateEntity"
+
+  /sessions/{sessionId}/entities/{entityId}/lifecycle/deactivate:
+    post:
+      operationId: deactivateEntity
+      tags: [EntityLifecycle]
+      summary: Deactivate entity with cleanup
+      description: |
+        Deactivates an entity, performing cleanup including
+        component shutdown, script stopping, and resource deallocation.
+        More comprehensive than just disabling.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cleanupComponents:
+                  type: boolean
+                  default: true
+                  description: Whether to cleanup all components
+                stopScripts:
+                  type: boolean
+                  default: true
+                  description: Whether to stop entity scripts
+                deactivateChildren:
+                  type: boolean
+                  default: false
+                  description: Whether to deactivate child entities
+      responses:
+        '200':
+          description: Entity deactivated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity:
+                    $ref: '#/components/schemas/EntityLifecycleState'
+                  deactivation:
+                    type: object
+                    properties:
+                      componentsCleanedUp:
+                        type: integer
+                        example: 5
+                      scriptsStopped:
+                        type: integer
+                        example: 2
+                      childrenDeactivated:
+                        type: integer
+                        example: 0
+                  message:
+                    type: string
+                    example: "Entity deactivated - 5 components cleaned up"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/lifecycle/activate.go"
+      x-function: "DeactivateEntity"
+
+  /sessions/{sessionId}/entities/{entityId}/lifecycle/destroy:
+    delete:
+      operationId: destroyEntity
+      tags: [EntityLifecycle]
+      summary: Permanently destroy entity
+      description: |
+        Permanently destroys an entity, removing it from the scene graph,
+        cleaning up all resources, and freeing memory.
+        This operation cannot be undone.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destroyChildren:
+                  type: boolean
+                  default: false
+                  description: Whether to destroy child entities
+                forceDestroy:
+                  type: boolean
+                  default: false
+                  description: Force destruction even if entity has dependencies
+      responses:
+        '204':
+          description: Entity destroyed successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Cannot destroy entity with dependencies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Cannot destroy entity with active children"
+                  dependencies:
+                    type: array
+                    items:
+                      type: string
+                    example: ["child_entity_123", "child_entity_456"]
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/lifecycle/destroy.go"
+      x-function: "DestroyEntity"
+
+  /sessions/{sessionId}/entities/{entityId}/lifecycle/status:
+    get:
+      operationId: getEntityLifecycleStatus
+      tags: [EntityLifecycle]
+      summary: Get entity lifecycle status
+      description: |
+        Retrieves the current lifecycle status of an entity including
+        enabled state, activation status, and component information.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+        - name: includeComponents
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include component status in response
+        - name: includeChildren
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include children lifecycle status
+      responses:
+        '200':
+          description: Entity lifecycle status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity:
+                    $ref: '#/components/schemas/EntityLifecycleState'
+                  components:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: "model"
+                        enabled:
+                          type: boolean
+                          example: true
+                        initialized:
+                          type: boolean
+                          example: true
+                  children:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EntityLifecycleState'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/lifecycle/status.go"
+      x-function: "GetEntityLifecycleStatus"
+
+  /sessions/{sessionId}/entities/lifecycle/bulk:
+    post:
+      operationId: bulkEntityLifecycleOperation
+      tags: [EntityLifecycle]
+      summary: Perform bulk lifecycle operations
+      description: |
+        Performs lifecycle operations on multiple entities simultaneously.
+        Useful for activating/deactivating large numbers of entities efficiently.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [operation, entities]
+              properties:
+                operation:
+                  type: string
+                  enum: [enable, disable, activate, deactivate, destroy]
+                  description: Lifecycle operation to perform
+                  example: "activate"
+                entities:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of entity IDs
+                  example: ["entity-123", "entity-456", "entity-789"]
+                options:
+                  type: object
+                  properties:
+                    includeChildren:
+                      type: boolean
+                      default: false
+                    forceOperation:
+                      type: boolean
+                      default: false
+                    stopOnError:
+                      type: boolean
+                      default: true
+      responses:
+        '200':
+          description: Bulk operation completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  operation:
+                    type: string
+                    example: "activate"
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        entityId:
+                          type: string
+                          example: "entity-123"
+                        success:
+                          type: boolean
+                          example: true
+                        error:
+                          type: string
+                          nullable: true
+                          example: null
+                  summary:
+                    type: object
+                    properties:
+                      totalEntities:
+                        type: integer
+                        example: 3
+                      successful:
+                        type: integer
+                        example: 2
+                      failed:
+                        type: integer
+                        example: 1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/lifecycle/bulk.go"
+      x-function: "BulkEntityLifecycleOperation"
+
+  # ========================================
   # SCENE MANAGEMENT
   # ========================================
   /scenes:
@@ -621,6 +2936,1396 @@ paths:
                 $ref: '#/components/schemas/Error'
       x-handler: "api/scenes/fork.go"  
       x-function: "ForkScene"
+
+  # ========================================
+  # SCENE GRAPH MANAGEMENT - PLAYCANVAS
+  # ========================================
+  /sessions/{sessionId}/scene/hierarchy:
+    get:
+      operationId: getSceneHierarchy
+      tags: [SceneGraph]
+      summary: Get complete scene hierarchy
+      description: |
+        Returns the complete scene hierarchy tree including all entities,
+        their parent-child relationships, and hierarchy metadata.
+        PlayCanvas scene graph structure exposed via REST API.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Session identifier
+      responses:
+        '200':
+          description: Scene hierarchy retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  hierarchy:
+                    $ref: '#/components/schemas/SceneHierarchy'
+                  metadata:
+                    $ref: '#/components/schemas/HierarchyMetadata'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      x-handler: "api/scenegraph/hierarchy.go"
+      x-function: "GetSceneHierarchy"
+
+    put:
+      operationId: updateSceneHierarchy
+      tags: [SceneGraph]
+      summary: Update scene hierarchy structure
+      description: |
+        Updates the scene hierarchy by rearranging parent-child relationships
+        between entities. Supports bulk hierarchy reorganization operations.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/HierarchyOperation'
+                validate:
+                  type: boolean
+                  description: Validate hierarchy before applying changes
+                  default: true
+              required: [operations]
+      responses:
+        '200':
+          description: Hierarchy updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  operations_applied:
+                    type: integer
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid hierarchy operations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/hierarchy.go"
+      x-function: "UpdateSceneHierarchy"
+
+  /sessions/{sessionId}/scene/state:
+    get:
+      operationId: getSceneState
+      tags: [SceneGraph]
+      summary: Get current scene state
+      description: |
+        Returns the current scene state including lighting, physics,
+        rendering settings, and entity count summary.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scene state retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  state:
+                    $ref: '#/components/schemas/SceneState'
+                  statistics:
+                    $ref: '#/components/schemas/SceneStatistics'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/state.go"
+      x-function: "GetSceneState"
+
+    put:
+      operationId: updateSceneState
+      tags: [SceneGraph]
+      summary: Update scene state
+      description: |
+        Updates scene-level configuration including lighting, physics,
+        and rendering settings. Does not affect individual entities.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SceneStateUpdate'
+      responses:
+        '200':
+          description: Scene state updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  updated_properties:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid scene state values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/state.go"
+      x-function: "UpdateSceneState"
+
+  /sessions/{sessionId}/scene/state/save:
+    post:
+      operationId: saveSceneState
+      tags: [SceneGraph]
+      summary: Save scene state snapshot
+      description: |
+        Creates a named snapshot of the current scene state for later restoration.
+        Includes entity hierarchy, scene settings, and asset references.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                snapshot_name:
+                  type: string
+                  description: Name for the scene state snapshot
+                description:
+                  type: string
+                  description: Optional description of the snapshot
+                include_assets:
+                  type: boolean
+                  description: Include asset references in snapshot
+                  default: true
+              required: [snapshot_name]
+      responses:
+        '200':
+          description: Scene state snapshot saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  snapshot_id:
+                    type: string
+                  entities_saved:
+                    type: integer
+                  timestamp:
+                    type: string
+        '400':
+          description: Invalid snapshot parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/state.go"
+      x-function: "SaveSceneState"
+
+  /sessions/{sessionId}/scene/state/load:
+    post:
+      operationId: loadSceneState
+      tags: [SceneGraph]
+      summary: Load scene state snapshot
+      description: |
+        Restores a previously saved scene state snapshot, replacing
+        current scene with the saved configuration.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                snapshot_id:
+                  type: string
+                  description: ID of snapshot to load
+                clear_existing:
+                  type: boolean
+                  description: Clear existing entities before loading
+                  default: true
+                merge_mode:
+                  type: string
+                  enum: [replace, merge, append]
+                  description: How to handle existing entities
+                  default: replace
+              required: [snapshot_id]
+      responses:
+        '200':
+          description: Scene state loaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  entities_loaded:
+                    type: integer
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid snapshot or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/state.go"
+      x-function: "LoadSceneState"
+
+  /sessions/{sessionId}/scene/state/reset:
+    post:
+      operationId: resetSceneState
+      tags: [SceneGraph]
+      summary: Reset scene to initial state
+      description: |
+        Resets the scene to its initial empty state, removing all entities
+        and restoring default scene settings.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preserve_camera:
+                  type: boolean
+                  description: Keep current camera position
+                  default: false
+                preserve_lighting:
+                  type: boolean
+                  description: Keep current lighting settings
+                  default: false
+      responses:
+        '200':
+          description: Scene reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  entities_removed:
+                    type: integer
+                  settings_reset:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/state.go"
+      x-function: "ResetSceneState"
+
+  /sessions/{sessionId}/scenes:
+    get:
+      operationId: listSessionScenes
+      tags: [SceneGraph]
+      summary: List all scenes in session
+      description: |
+        Returns all scene instances within a session for multi-scene
+        composition scenarios.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session scenes listed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  scenes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SessionScene'
+                  active_scene:
+                    type: string
+                    description: ID of currently active scene
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/scenes.go"
+      x-function: "ListSessionScenes"
+
+    post:
+      operationId: createSessionScene
+      tags: [SceneGraph]
+      summary: Create new scene in session
+      description: |
+        Creates a new scene instance within the session for multi-scene
+        composition workflows.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scene_name:
+                  type: string
+                  description: Name for the new scene
+                template:
+                  type: string
+                  description: Scene template to use
+                  enum: [empty, basic, lighting, physics]
+                  default: empty
+                set_active:
+                  type: boolean
+                  description: Set as active scene after creation
+                  default: true
+              required: [scene_name]
+      responses:
+        '201':
+          description: Scene created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  scene_id:
+                    type: string
+                  scene_name:
+                    type: string
+                  is_active:
+                    type: boolean
+        '400':
+          description: Invalid scene parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/scenes.go"
+      x-function: "CreateSessionScene"
+
+  /sessions/{sessionId}/scenes/{sceneId}/activate:
+    post:
+      operationId: activateSessionScene
+      tags: [SceneGraph]
+      summary: Set scene as active
+      description: |
+        Sets the specified scene as the active scene in the session.
+        Only one scene can be active at a time.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: sceneId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scene activated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  active_scene:
+                    type: string
+                  previous_scene:
+                    type: string
+        '404':
+          description: Session or scene not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-handler: "api/scenegraph/scenes.go"
+      x-function: "ActivateSessionScene"
+
+  /sessions/{sessionId}/scene/export:
+    get:
+      operationId: exportSceneDefinition
+      tags: [SceneGraph]
+      summary: Export scene definition
+      description: |
+        Exports the complete scene definition including hierarchy,
+        entities, components, and settings in a portable format.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, gltf, playcanvas]
+            default: json
+          description: Export format
+        - name: include_assets
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Include asset data in export
+      responses:
+        '200':
+          description: Scene exported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  export_data:
+                    type: object
+                    description: Scene definition in requested format
+                  metadata:
+                    $ref: '#/components/schemas/ExportMetadata'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/export.go"
+      x-function: "ExportSceneDefinition"
+
+  /sessions/{sessionId}/scene/import:
+    post:
+      operationId: importSceneDefinition
+      tags: [SceneGraph]
+      summary: Import scene definition
+      description: |
+        Imports a scene definition, creating entities and setting up
+        the scene hierarchy according to the imported data.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scene_data:
+                  type: object
+                  description: Scene definition data
+                format:
+                  type: string
+                  enum: [json, gltf, playcanvas]
+                  default: json
+                merge_mode:
+                  type: string
+                  enum: [replace, merge, append]
+                  default: replace
+                validate:
+                  type: boolean
+                  description: Validate scene data before import
+                  default: true
+              required: [scene_data]
+      responses:
+        '200':
+          description: Scene imported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  entities_created:
+                    type: integer
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid scene data or format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/scenegraph/import.go"
+      x-function: "ImportSceneDefinition"
+
+  # ========================================
+  # ANIMATION SYSTEM - HD1 v3.0 GAME ENGINE
+  # ========================================
+  /sessions/{sessionId}/animations:
+    get:
+      operationId: listAnimations
+      tags: [Animation]
+      summary: List all animations in session
+      description: |
+        Returns all animation clips loaded in the session with their current state.
+        Provides real-time animation status and playback information.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      responses:
+        '200':
+          description: Animation list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  animations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "anim-spaceship-thrust"
+                        name:
+                          type: string
+                          example: "Spaceship Thrust"
+                        entity_id:
+                          type: string
+                          example: "entity-abc123"
+                        duration:
+                          type: number
+                          example: 2.5
+                        loop:
+                          type: boolean
+                          example: true
+                        playing:
+                          type: boolean
+                          example: false
+                        current_time:
+                          type: number
+                          example: 1.2
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/animation/list.go"
+      x-function: "ListAnimations"
+
+    post:
+      operationId: createAnimation
+      tags: [Animation]
+      summary: Create animation clip
+      description: |
+        Creates a new animation clip for an entity. Supports position, rotation, 
+        scale animations with keyframes and curves.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Spaceship Rotation"
+                entity_id:
+                  type: string
+                  example: "entity-abc123"
+                duration:
+                  type: number
+                  example: 3.0
+                loop:
+                  type: boolean
+                  example: true
+                keyframes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      time:
+                        type: number
+                        example: 0.0
+                      transform:
+                        type: object
+                        properties:
+                          position:
+                            type: array
+                            items:
+                              type: number
+                            example: [0, 0, 0]
+                          rotation:
+                            type: array
+                            items:
+                              type: number
+                            example: [0, 0, 0]
+                          scale:
+                            type: array
+                            items:
+                              type: number
+                            example: [1, 1, 1]
+              required: [name, entity_id, duration, keyframes]
+      responses:
+        '201':
+          description: Animation created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  animation_id:
+                    type: string
+                    example: "anim-abc123"
+                  name:
+                    type: string
+                    example: "Spaceship Rotation"
+                  duration:
+                    type: number
+                    example: 3.0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/animation/create.go"
+      x-function: "CreateAnimation"
+
+  /sessions/{sessionId}/animations/{animationId}/play:
+    post:
+      operationId: playAnimation
+      tags: [Animation]
+      summary: Play animation
+      description: |
+        Starts playback of an animation clip. Supports various playback options
+        including speed, start time, and blend modes.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: animationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "anim-abc123"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                speed:
+                  type: number
+                  example: 1.0
+                  description: Playback speed multiplier
+                start_time:
+                  type: number
+                  example: 0.0
+                  description: Start time in seconds
+                blend_mode:
+                  type: string
+                  enum: [replace, add, multiply]
+                  example: "replace"
+                fade_in:
+                  type: number
+                  example: 0.5
+                  description: Fade in duration in seconds
+      responses:
+        '200':
+          description: Animation playback started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  animation_id:
+                    type: string
+                    example: "anim-abc123"
+                  playing:
+                    type: boolean
+                    example: true
+                  start_time:
+                    type: number
+                    example: 0.0
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/animation/play.go"
+      x-function: "PlayAnimation"
+
+  /sessions/{sessionId}/animations/{animationId}/stop:
+    post:
+      operationId: stopAnimation
+      tags: [Animation]
+      summary: Stop animation
+      description: |
+        Stops playback of an animation clip with optional fade out.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: animationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "anim-abc123"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fade_out:
+                  type: number
+                  example: 0.5
+                  description: Fade out duration in seconds
+      responses:
+        '200':
+          description: Animation stopped
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  animation_id:
+                    type: string
+                    example: "anim-abc123"
+                  playing:
+                    type: boolean
+                    example: false
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/animation/stop.go"
+      x-function: "StopAnimation"
+
+  # ========================================
+  # PHYSICS SYSTEM - HD1 v3.0 GAME ENGINE
+  # ========================================
+  /sessions/{sessionId}/physics/world:
+    get:
+      operationId: getPhysicsWorld
+      tags: [Physics]
+      summary: Get physics world configuration
+      description: |
+        Returns current physics world settings including gravity, timestep,
+        and simulation parameters.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      responses:
+        '200':
+          description: Physics world configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  physics_world:
+                    type: object
+                    properties:
+                      gravity:
+                        type: array
+                        items:
+                          type: number
+                        example: [0, -9.8, 0]
+                      timestep:
+                        type: number
+                        example: 0.016
+                      enabled:
+                        type: boolean
+                        example: true
+                      solver_iterations:
+                        type: integer
+                        example: 10
+                      active_bodies:
+                        type: integer
+                        example: 15
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/physics/world.go"
+      x-function: "GetPhysicsWorld"
+
+    put:
+      operationId: updatePhysicsWorld
+      tags: [Physics]
+      summary: Update physics world configuration
+      description: |
+        Updates physics world settings including gravity, timestep, and simulation parameters.
+        Changes take effect immediately for all rigid bodies in the session.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gravity:
+                  type: array
+                  items:
+                    type: number
+                  example: [0, -9.8, 0]
+                  description: Gravity vector in world space
+                timestep:
+                  type: number
+                  example: 0.016
+                  description: Physics simulation timestep
+                enabled:
+                  type: boolean
+                  example: true
+                  description: Enable/disable physics simulation
+                solver_iterations:
+                  type: integer
+                  example: 10
+                  description: Physics solver iterations per step
+      responses:
+        '200':
+          description: Physics world updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  updated_properties:
+                    type: array
+                    items:
+                      type: string
+                    example: ["gravity", "timestep"]
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/physics/world.go"
+      x-function: "UpdatePhysicsWorld"
+
+  /sessions/{sessionId}/physics/rigidbodies:
+    get:
+      operationId: listRigidBodies
+      tags: [Physics]
+      summary: List all rigid bodies in session
+      description: |
+        Returns all entities with rigid body components including their
+        physics properties and current state.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      responses:
+        '200':
+          description: Rigid bodies list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  rigid_bodies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        entity_id:
+                          type: string
+                          example: "entity-abc123"
+                        name:
+                          type: string
+                          example: "Spaceship"
+                        mass:
+                          type: number
+                          example: 100.0
+                        velocity:
+                          type: array
+                          items:
+                            type: number
+                          example: [0, 0, 5.2]
+                        angular_velocity:
+                          type: array
+                          items:
+                            type: number
+                          example: [0, 0.1, 0]
+                        body_type:
+                          type: string
+                          enum: [static, kinematic, dynamic]
+                          example: "dynamic"
+                        sleeping:
+                          type: boolean
+                          example: false
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/physics/rigidbodies.go"
+      x-function: "ListRigidBodies"
+
+  /sessions/{sessionId}/physics/rigidbodies/{entityId}/force:
+    post:
+      operationId: applyForce
+      tags: [Physics]
+      summary: Apply force to rigid body
+      description: |
+        Applies a force vector to a rigid body entity. Force can be applied
+        at the center of mass or at a specific world position.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "entity-abc123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                force:
+                  type: array
+                  items:
+                    type: number
+                  example: [0, 1000, 0]
+                  description: Force vector in Newtons
+                position:
+                  type: array
+                  items:
+                    type: number
+                  example: [0, 0, 0]
+                  description: World position to apply force (optional)
+                mode:
+                  type: string
+                  enum: [force, impulse, velocity_change, acceleration]
+                  example: "force"
+                  description: Force application mode
+              required: [force]
+      responses:
+        '200':
+          description: Force applied successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+                  force_applied:
+                    type: array
+                    items:
+                      type: number
+                    example: [0, 1000, 0]
+                  new_velocity:
+                    type: array
+                    items:
+                      type: number
+                    example: [0, 15.2, 0]
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/physics/force.go"
+      x-function: "ApplyForce"
+
+  # ========================================
+  # AUDIO SYSTEM - HD1 v3.0 GAME ENGINE
+  # ========================================
+  /sessions/{sessionId}/audio/sources:
+    get:
+      operationId: listAudioSources
+      tags: [Audio]
+      summary: List all audio sources in session
+      description: |
+        Returns all 3D audio sources with their current playback state
+        and spatial audio properties.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      responses:
+        '200':
+          description: Audio sources retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  audio_sources:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "audio-engine-hum"
+                        entity_id:
+                          type: string
+                          example: "entity-abc123"
+                        name:
+                          type: string
+                          example: "Engine Hum"
+                        playing:
+                          type: boolean
+                          example: true
+                        volume:
+                          type: number
+                          example: 0.8
+                        pitch:
+                          type: number
+                          example: 1.0
+                        loop:
+                          type: boolean
+                          example: true
+                        positional:
+                          type: boolean
+                          example: true
+                        max_distance:
+                          type: number
+                          example: 50.0
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/audio/sources.go"
+      x-function: "ListAudioSources"
+
+    post:
+      operationId: createAudioSource
+      tags: [Audio]
+      summary: Create 3D audio source
+      description: |
+        Creates a new 3D audio source attached to an entity. Supports
+        positional audio with distance attenuation and doppler effects.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Laser Shot"
+                entity_id:
+                  type: string
+                  example: "entity-abc123"
+                audio_clip:
+                  type: string
+                  example: "laser-sound"
+                  description: Audio asset ID or URL
+                volume:
+                  type: number
+                  example: 1.0
+                  minimum: 0.0
+                  maximum: 1.0
+                pitch:
+                  type: number
+                  example: 1.0
+                loop:
+                  type: boolean
+                  example: false
+                positional:
+                  type: boolean
+                  example: true
+                  description: Enable 3D positional audio
+                max_distance:
+                  type: number
+                  example: 100.0
+                  description: Maximum audible distance
+                auto_play:
+                  type: boolean
+                  example: true
+              required: [name, entity_id, audio_clip]
+      responses:
+        '201':
+          description: Audio source created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  audio_id:
+                    type: string
+                    example: "audio-abc123"
+                  name:
+                    type: string
+                    example: "Laser Shot"
+                  entity_id:
+                    type: string
+                    example: "entity-abc123"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/SessionNotFound'
+      x-handler: "api/audio/sources.go"
+      x-function: "CreateAudioSource"
+
+  /sessions/{sessionId}/audio/sources/{audioId}/play:
+    post:
+      operationId: playAudio
+      tags: [Audio]
+      summary: Play audio source
+      description: |
+        Starts playback of an audio source with optional fade-in and
+        playback customization.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: audioId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "audio-abc123"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                volume:
+                  type: number
+                  example: 0.8
+                  minimum: 0.0
+                  maximum: 1.0
+                pitch:
+                  type: number
+                  example: 1.0
+                fade_in:
+                  type: number
+                  example: 0.5
+                  description: Fade in duration in seconds
+                start_time:
+                  type: number
+                  example: 0.0
+                  description: Start position in audio clip
+      responses:
+        '200':
+          description: Audio playback started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  audio_id:
+                    type: string
+                    example: "audio-abc123"
+                  playing:
+                    type: boolean
+                    example: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/audio/play.go"
+      x-function: "PlayAudio"
+
+  /sessions/{sessionId}/audio/sources/{audioId}/stop:
+    post:
+      operationId: stopAudio
+      tags: [Audio]
+      summary: Stop audio source
+      description: |
+        Stops playback of an audio source with optional fade-out.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^session_[a-f0-9]{8}$'
+          example: "session_a1b2c3d4"
+        - name: audioId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "audio-abc123"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fade_out:
+                  type: number
+                  example: 0.5
+                  description: Fade out duration in seconds
+      responses:
+        '200':
+          description: Audio stopped
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  audio_id:
+                    type: string
+                    example: "audio-abc123"
+                  playing:
+                    type: boolean
+                    example: false
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/audio/stop.go"
+      x-function: "StopAudio"
 
   # ========================================
   # SESSION RECORDING (VIDEO)
@@ -850,167 +4555,6 @@ paths:
       x-handler: "api/recording/status.go"
       x-function: "GetRecordingStatus"
 
-  # ========================================
-  # OBJECT MANAGEMENT
-  # ========================================
-  /sessions/{sessionId}/objects:
-    post:
-      operationId: createObject
-      tags: [Objects]
-      summary: Create named 3D object
-      description: |
-        Creates object by connecting grid points within world boundaries.
-        All coordinates must be within [-12, +12] range.
-        Objects are built by connecting specific grid intersection points.
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ObjectCreate'
-            example:
-              name: "my_cube"
-              type: "cube"
-              position: [0, 0, 0]
-              scale: [2, 2, 2]
-              color: [1.0, 0.0, 0.0]
-      responses:
-        '201':
-          description: Object created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ObjectCreated'
-        '400':
-          description: Invalid coordinates or object data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error: "Coordinates (15, 0, 0) outside world bounds [-12, +12]"
-      x-handler: "api/objects/create.go"
-      x-function: "CreateObject"
-
-    get:
-      operationId: listObjects
-      tags: [Objects]
-      summary: List all objects in session
-      description: Get all named objects with their current properties
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Objects list
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ObjectsList'
-      x-handler: "api/objects/list.go"
-      x-function: "ListObjects"
-
-  /sessions/{sessionId}/objects/{objectName}:
-    get:
-      operationId: getObject
-      tags: [Objects]
-      summary: Get object details
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: objectName
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Object details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ObjectDetail'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-handler: "api/objects/get.go"
-      x-function: "GetObject"
-
-    put:
-      operationId: updateObject
-      tags: [Objects]
-      summary: Update object properties
-      description: |
-        Move, scale, or change object color.
-        New coordinates must still be within world boundaries.
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: objectName
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ObjectUpdate'
-      responses:
-        '200':
-          description: Object updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ObjectUpdated'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-handler: "api/objects/update.go"
-      x-function: "UpdateObject"
-
-    delete:
-      operationId: deleteObject
-      tags: [Objects]
-      summary: Delete named object
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: objectName
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Object deleted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Success'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      x-handler: "api/objects/delete.go"
-      x-function: "DeleteObject"
 
   # ========================================
   # LOGGING CONFIGURATION
@@ -1632,123 +5176,6 @@ components:
           example: ["seating", "wooden", "indoor"]
           description: "Categorization and search tags"
 
-    # Object Schemas
-    ObjectCreate:
-      type: object
-      required: [name, type, position]
-      properties:
-        name:
-          type: string
-          pattern: '^[a-zA-Z0-9_-]+$'
-          example: "my_cube"
-        type:
-          type: string
-          enum: [cube, sphere, plane, line, light]
-        position:
-          $ref: '#/components/schemas/Coordinate3D'
-        scale:
-          $ref: '#/components/schemas/Scale3D'
-        color:
-          $ref: '#/components/schemas/ColorRGB'
-        visible:
-          type: boolean
-          default: true
-          description: "Whether the object is visible in the scene"
-        lightType:
-          type: string
-          enum: [point, directional, ambient, spot]
-          description: "Light type (only for type: light)"
-        intensity:
-          type: number
-          minimum: 0
-          maximum: 10
-          default: 1.0
-          description: "Light intensity (only for type: light)"
-
-    ObjectCreated:
-      type: object
-      required: [success, object_id, name, position]
-      properties:
-        success:
-          type: boolean
-        object_id:
-          type: string
-        name:
-          type: string
-        position:
-          $ref: '#/components/schemas/Coordinate3D'
-        message:
-          type: string
-
-    ObjectsList:
-      type: object
-      required: [objects, total]
-      properties:
-        objects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectSummary'
-        total:
-          type: integer
-
-    ObjectSummary:
-      type: object
-      required: [name, type, position, visible]
-      properties:
-        name:
-          type: string
-        type:
-          type: string
-        position:
-          $ref: '#/components/schemas/Coordinate3D'
-        visible:
-          type: boolean
-          default: true
-          description: "Whether the object is visible in the scene"
-        created:
-          type: string
-          format: date-time
-
-    ObjectDetail:
-      allOf:
-        - $ref: '#/components/schemas/ObjectSummary'
-        - type: object
-          properties:
-            scale:
-              $ref: '#/components/schemas/Scale3D'
-            color:
-              $ref: '#/components/schemas/ColorRGB'
-            last_updated:
-              type: string
-              format: date-time
-
-    ObjectUpdate:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/Coordinate3D'
-        scale:
-          $ref: '#/components/schemas/Scale3D'
-        color:
-          $ref: '#/components/schemas/ColorRGB'
-        visible:
-          type: boolean
-          description: "Whether the object is visible in the scene"
-
-    ObjectUpdated:
-      type: object
-      required: [success, name, updated_fields]
-      properties:
-        success:
-          type: boolean
-        name:
-          type: string
-        updated_fields:
-          type: array
-          items:
-            type: string
-        message:
-          type: string
 
     # Camera Schemas
     CameraPosition:
@@ -1817,6 +5244,82 @@ components:
         - name
         - description
 
+    # Entity Schemas (PlayCanvas Game Engine)
+    EntitySummary:
+      type: object
+      required: [entity_id, name, enabled, transform]
+      properties:
+        entity_id:
+          type: string
+          description: HD1 entity identifier
+          example: "entity-abc123"
+        name:
+          type: string
+          description: Human-readable entity name
+          example: "PlayerCharacter"
+        enabled:
+          type: boolean
+          description: Whether entity is active
+          example: true
+        tags:
+          type: array
+          items:
+            type: string
+          description: Entity tags for categorization
+          example: ["player", "dynamic"]
+        transform:
+          type: object
+          properties:
+            position:
+              $ref: '#/components/schemas/Coordinate3D'
+            rotation:
+              $ref: '#/components/schemas/Rotation'
+            scale:
+              $ref: '#/components/schemas/Scale3D'
+        components:
+          type: array
+          items:
+            type: string
+          description: Attached component types
+          example: ["model", "rigidbody", "script"]
+        playcanvas_guid:
+          type: string
+          description: PlayCanvas internal GUID
+          example: "pc-guid-xyz789"
+
+    EntityDetail:
+      allOf:
+        - $ref: '#/components/schemas/EntitySummary'
+        - type: object
+          properties:
+            component_details:
+              type: object
+              description: Detailed component configurations
+              example:
+                model:
+                  asset: "model-asset-id"
+                  type: "asset"
+                  castShadows: true
+                rigidbody:
+                  type: "dynamic"
+                  mass: 1.0
+            children:
+              type: array
+              items:
+                type: string
+              description: Child entity IDs
+              example: ["entity-child-1", "entity-child-2"]
+            parent:
+              type: string
+              description: Parent entity ID
+              example: "entity-parent-1"
+            created_at:
+              type: string
+              format: date-time
+            last_updated:
+              type: string
+              format: date-time
+
     Coordinate3D:
       type: array
       items:
@@ -1839,6 +5342,111 @@ components:
       example: [1, 1, 1]
       default: [1, 1, 1]
 
+    # Component Schemas (PlayCanvas v3.0)
+    ComponentSummary:
+      type: object
+      required: [component_id, type, enabled]
+      properties:
+        component_id:
+          type: string
+          description: HD1 component identifier
+          example: "comp-model-xyz789"
+        type:
+          type: string
+          enum: [model, camera, light, rigidbody, script, sound, animation, collision, element, particlesystem, render, sprite]
+          description: PlayCanvas component type
+          example: "model"
+        enabled:
+          type: boolean
+          description: Whether component is active
+          example: true
+        playcanvas_id:
+          type: string
+          description: PlayCanvas internal component ID
+          example: "pc-comp-guid-123"
+        properties_count:
+          type: integer
+          description: Number of configured properties
+          example: 8
+        last_updated:
+          type: string
+          format: date-time
+
+    ComponentDetail:
+      allOf:
+        - $ref: '#/components/schemas/ComponentSummary'
+        - type: object
+          properties:
+            properties:
+              type: object
+              description: All component properties and values
+              example:
+                type: "box"
+                castShadows: true
+                receiveShadows: true
+                material: "material-asset-id"
+            schema:
+              type: object
+              description: Component property schema and validation rules
+              example:
+                type:
+                  type: "string"
+                  enum: ["asset", "box", "sphere"]
+                  default: "box"
+                castShadows:
+                  type: "boolean"
+                  default: true
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/ComponentEvent'
+              description: Recent component events
+            dependencies:
+              type: array
+              items:
+                type: string
+              description: Other component types this depends on
+              example: ["camera", "light"]
+
+    ComponentEvent:
+      type: object
+      required: [event_id, component_type, event_type, timestamp]
+      properties:
+        event_id:
+          type: string
+          example: "evt-comp-abc123"
+        component_type:
+          type: string
+          enum: [model, camera, light, rigidbody, script, sound, animation, collision, element, particlesystem, render, sprite]
+          example: "model"
+        event_type:
+          type: string
+          enum: [property_changed, enabled, disabled, asset_loaded, error]
+          example: "property_changed"
+        timestamp:
+          type: string
+          format: date-time
+        details:
+          type: object
+          description: Event-specific details
+          example:
+            property: "castShadows"
+            old_value: true
+            new_value: false
+        message:
+          type: string
+          description: Human-readable event description
+          example: "Model component shadow casting disabled"
+
+    Vector3D:
+      type: array
+      items:
+        type: number
+      minItems: 3
+      maxItems: 3
+      example: [0, 0, 0]
+      description: "3D vector [x, y, z]"
+
     ColorRGB:
       type: array
       items:
@@ -1850,6 +5458,520 @@ components:
       example: [1.0, 0.0, 0.0]
       default: [1.0, 1.0, 1.0]
       description: "RGB color values [r, g, b] from 0.0 to 1.0"
+
+    # ========================================
+    # ENTITY HIERARCHY SCHEMAS (PLAYCANVAS v3.0)
+    # ========================================
+    EntityHierarchyNode:
+      type: object
+      required: [entityId, name]
+      properties:
+        entityId:
+          type: string
+          description: "Unique entity identifier"
+          example: "entity_abc123"
+        name:
+          type: string
+          description: "Entity display name"
+          example: "PlayerCharacter"
+        parentId:
+          type: string
+          nullable: true
+          description: "Parent entity ID (null for root entities)"
+          example: "entity_def456"
+        children:
+          type: array
+          items:
+            type: string
+          description: "Array of child entity IDs"
+          example: ["entity_ghi789", "entity_jkl012"]
+        depth:
+          type: integer
+          minimum: 0
+          description: "Hierarchy depth (0 for root)"
+          example: 2
+        transform:
+          $ref: '#/components/schemas/Transform3D'
+          description: "Entity transform in local space"
+
+    EntityHierarchyTree:
+      type: object
+      required: [root, totalEntities, maxDepth]
+      properties:
+        root:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityHierarchyNode'
+          description: "Root level entities with full hierarchy"
+        totalEntities:
+          type: integer
+          minimum: 0
+          description: "Total entities in hierarchy"
+          example: 15
+        maxDepth:
+          type: integer
+          minimum: 0
+          description: "Maximum hierarchy depth"
+          example: 4
+
+    EntityHierarchySearchResult:
+      type: object
+      required: [entities, totalMatches]
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityHierarchyNode'
+          description: "Matching entities with hierarchy context"
+        totalMatches:
+          type: integer
+          minimum: 0
+          description: "Total number of matches"
+          example: 7
+        query:
+          type: string
+          description: "Original search query"
+          example: "Player"
+
+    Transform3D:
+      type: object
+      required: [position, rotation, scale]
+      properties:
+        position:
+          $ref: '#/components/schemas/Vector3D'
+          description: "Local position relative to parent"
+        rotation:
+          $ref: '#/components/schemas/Rotation'
+          description: "Local rotation relative to parent"
+        scale:
+          $ref: '#/components/schemas/Vector3D'
+          description: "Local scale relative to parent"
+          default: [1.0, 1.0, 1.0]
+
+    Rotation:
+      type: object
+      required: [x, y, z, w]
+      properties:
+        x:
+          type: number
+          description: "Quaternion X component"
+          example: 0.0
+        y:
+          type: number
+          description: "Quaternion Y component"  
+          example: 0.0
+        z:
+          type: number
+          description: "Quaternion Z component"
+          example: 0.0
+        w:
+          type: number
+          description: "Quaternion W component"
+          example: 1.0
+      description: "Quaternion rotation representation"
+
+    # ========================================
+    # ENTITY LIFECYCLE SCHEMAS (PLAYCANVAS v3.0)
+    # ========================================
+    EntityLifecycleState:
+      type: object
+      required: [entityId, enabled, activated]
+      properties:
+        entityId:
+          type: string
+          description: "Unique entity identifier"
+          example: "entity_abc123"
+        name:
+          type: string
+          description: "Entity display name"
+          example: "PlayerCharacter"
+        enabled:
+          type: boolean
+          description: "Whether entity is enabled for rendering and updates"
+          example: true
+        activated:
+          type: boolean
+          description: "Whether entity has been fully activated and initialized"
+          example: true
+        visible:
+          type: boolean
+          description: "Whether entity is visible in the scene"
+          example: true
+        destroyed:
+          type: boolean
+          description: "Whether entity has been destroyed"
+          example: false
+        componentCount:
+          type: integer
+          minimum: 0
+          description: "Number of components attached to entity"
+          example: 5
+        childCount:
+          type: integer
+          minimum: 0
+          description: "Number of child entities"
+          example: 2
+        parentId:
+          type: string
+          nullable: true
+          description: "Parent entity ID (null for root entities)"
+          example: "entity_def456"
+        lastModified:
+          type: string
+          format: date-time
+          description: "Timestamp of last lifecycle state change"
+          example: "2025-07-01T17:15:30.123Z"
+        position:
+          $ref: '#/components/schemas/Vector3D'
+          description: "Entity world position"
+        lifecycle:
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: "Entity creation timestamp"
+            activatedAt:
+              type: string
+              format: date-time
+              nullable: true
+              description: "Entity activation timestamp"
+            deactivatedAt:
+              type: string
+              format: date-time
+              nullable: true
+              description: "Entity deactivation timestamp"
+            enabledDuration:
+              type: number
+              description: "Total time entity has been enabled (seconds)"
+              example: 125.5
+
+    # ========================================
+    # SCENE GRAPH SCHEMAS (PLAYCANVAS v3.0)
+    # ========================================
+    SceneHierarchy:
+      type: object
+      required: [root, metadata]
+      properties:
+        root:
+          type: object
+          required: [id, name, children]
+          properties:
+            id:
+              type: string
+              description: "Scene root entity ID"
+              example: "scene-root"
+            name:
+              type: string
+              description: "Scene root name"
+              example: "Scene Root"
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/HierarchyNode'
+              description: "Root level entity nodes"
+        metadata:
+          $ref: '#/components/schemas/HierarchyMetadata'
+
+    HierarchyNode:
+      type: object
+      required: [id, name, type]
+      properties:
+        id:
+          type: string
+          description: "Entity identifier"
+          example: "entity_abc123"
+        name:
+          type: string
+          description: "Entity display name"
+          example: "Main Camera"
+        type:
+          type: string
+          description: "Entity type or primary component"
+          example: "camera"
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/HierarchyNode'
+          description: "Child entity nodes"
+        enabled:
+          type: boolean
+          description: "Whether entity is enabled"
+          example: true
+        transform:
+          $ref: '#/components/schemas/Transform3D'
+          description: "Entity transform in local space"
+
+    HierarchyMetadata:
+      type: object
+      required: [totalNodes, maxDepth, lastModified]
+      properties:
+        totalNodes:
+          type: integer
+          minimum: 0
+          description: "Total number of nodes in hierarchy"
+          example: 25
+        maxDepth:
+          type: integer
+          minimum: 0
+          description: "Maximum hierarchy depth"
+          example: 4
+        lastModified:
+          type: string
+          format: date-time
+          description: "Timestamp of last hierarchy change"
+          example: "2025-07-01T17:15:30.123Z"
+        rootEntities:
+          type: integer
+          minimum: 0
+          description: "Number of root level entities"
+          example: 3
+
+    HierarchyOperation:
+      type: object
+      required: [operation, entityId]
+      properties:
+        operation:
+          type: string
+          enum: [move, reparent, reorder, delete]
+          description: "Type of hierarchy operation"
+        entityId:
+          type: string
+          description: "Target entity ID"
+          example: "entity_abc123"
+        newParentId:
+          type: string
+          nullable: true
+          description: "New parent entity ID (for move/reparent operations)"
+          example: "entity_def456"
+        newIndex:
+          type: integer
+          minimum: 0
+          description: "New index position within parent (for reorder operations)"
+          example: 2
+        validate:
+          type: boolean
+          description: "Validate operation before applying"
+          default: true
+
+    SceneState:
+      type: object
+      required: [lighting, physics, rendering]
+      properties:
+        lighting:
+          type: object
+          properties:
+            ambientColor:
+              type: string
+              pattern: '^#[0-9a-fA-F]{6}$'
+              description: "Ambient light color in hex format"
+              example: "#404040"
+            skybox:
+              type: string
+              description: "Skybox asset reference"
+              example: "urban-environment"
+            shadows:
+              type: boolean
+              description: "Global shadow rendering enabled"
+              example: true
+            fog:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  example: false
+                color:
+                  type: string
+                  pattern: '^#[0-9a-fA-F]{6}$'
+                  example: "#888888"
+                density:
+                  type: number
+                  minimum: 0
+                  maximum: 1
+                  example: 0.01
+        physics:
+          type: object
+          properties:
+            gravity:
+              $ref: '#/components/schemas/Vector3D'
+              description: "World gravity vector"
+              example: [0, -9.8, 0]
+            enabled:
+              type: boolean
+              description: "Physics simulation enabled"
+              example: true
+            timeStep:
+              type: number
+              minimum: 0.001
+              maximum: 0.1
+              description: "Physics simulation time step"
+              example: 0.016
+        rendering:
+          type: object
+          properties:
+            shadows:
+              type: boolean
+              description: "Shadow rendering enabled"
+              example: true
+            antialiasing:
+              type: boolean
+              description: "Anti-aliasing enabled"
+              example: true
+            postProcessing:
+              type: array
+              items:
+                type: string
+              description: "Active post-processing effects"
+              example: ["bloom", "tonemapping"]
+
+    SceneStateUpdate:
+      type: object
+      properties:
+        lighting:
+          type: object
+          properties:
+            ambientColor:
+              type: string
+              pattern: '^#[0-9a-fA-F]{6}$'
+            skybox:
+              type: string
+            shadows:
+              type: boolean
+            fog:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                color:
+                  type: string
+                  pattern: '^#[0-9a-fA-F]{6}$'
+                density:
+                  type: number
+                  minimum: 0
+                  maximum: 1
+        physics:
+          type: object
+          properties:
+            gravity:
+              $ref: '#/components/schemas/Vector3D'
+            enabled:
+              type: boolean
+            timeStep:
+              type: number
+              minimum: 0.001
+              maximum: 0.1
+        rendering:
+          type: object
+          properties:
+            shadows:
+              type: boolean
+            antialiasing:
+              type: boolean
+            postProcessing:
+              type: array
+              items:
+                type: string
+
+    SceneStatistics:
+      type: object
+      required: [entities, assets, performance]
+      properties:
+        entities:
+          type: integer
+          minimum: 0
+          description: "Total number of entities in scene"
+          example: 45
+        assets:
+          type: array
+          items:
+            type: string
+          description: "Asset references used in scene"
+          example: ["model-1", "texture-2", "audio-3"]
+        performance:
+          type: object
+          properties:
+            drawCalls:
+              type: integer
+              description: "Current frame draw calls"
+              example: 25
+            triangles:
+              type: integer
+              description: "Total triangles in scene"
+              example: 15000
+            memoryUsage:
+              type: number
+              description: "Scene memory usage in MB"
+              example: 125.5
+
+    SessionScene:
+      type: object
+      required: [sceneId, sceneName, isActive, entities]
+      properties:
+        sceneId:
+          type: string
+          description: "Unique scene identifier"
+          example: "scene_abc123"
+        sceneName:
+          type: string
+          description: "Scene display name"
+          example: "Main Game Scene"
+        isActive:
+          type: boolean
+          description: "Whether this scene is currently active"
+          example: true
+        entities:
+          type: integer
+          minimum: 0
+          description: "Number of entities in this scene"
+          example: 15
+        template:
+          type: string
+          description: "Scene template used for creation"
+          example: "basic"
+        createdAt:
+          type: string
+          format: date-time
+          description: "Scene creation timestamp"
+          example: "2025-07-01T17:15:30.123Z"
+        lastModified:
+          type: string
+          format: date-time
+          description: "Last modification timestamp"
+          example: "2025-07-01T17:20:45.456Z"
+
+    ExportMetadata:
+      type: object
+      required: [format, version, timestamp]
+      properties:
+        format:
+          type: string
+          enum: [json, gltf, playcanvas]
+          description: "Export format used"
+          example: "json"
+        version:
+          type: string
+          description: "HD1 version used for export"
+          example: "3.0.0"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Export timestamp"
+          example: "2025-07-01T17:15:30.123Z"
+        entities:
+          type: integer
+          minimum: 0
+          description: "Number of entities exported"
+          example: 45
+        assets:
+          type: integer
+          minimum: 0
+          description: "Number of assets referenced"
+          example: 12
+        size:
+          type: integer
+          minimum: 0
+          description: "Export data size in bytes"
+          example: 524288
 
     Success:
       type: object
@@ -1887,6 +6009,13 @@ components:
 
     InternalError:
       description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    SessionNotFound:
+      description: Session not found
       content:
         application/json:
           schema:

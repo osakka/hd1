@@ -1,0 +1,863 @@
+/**
+ * HD1 v3.0 PlayCanvas Game Engine Integration
+ * Complete API-first 3D game development interface
+ */
+
+// Global HD1 PlayCanvas Game Engine
+let hd1GameEngine = null;
+let currentSession = null; // Will be set dynamically from active session
+
+// Get current active session ID
+function getCurrentSession() {
+    if (currentSession) return currentSession;
+    
+    // Try to get from local storage first (primary source)
+    const storedSession = localStorage.getItem('hd1_session_id');
+    if (storedSession) {
+        currentSession = storedSession;
+        console.log('[HD1] Found session in localStorage:', currentSession);
+        return currentSession;
+    }
+    
+    // Try to get from global console manager
+    if (window.hd1Console && window.hd1Console.sessionManager && window.hd1Console.sessionManager.sessionId) {
+        currentSession = window.hd1Console.sessionManager.sessionId;
+        console.log('[HD1] Found session from console manager:', currentSession);
+        return currentSession;
+    }
+    
+    // Try to get from global variable if set by console
+    if (window.activeSessionId) {
+        currentSession = window.activeSessionId;
+        console.log('[HD1] Found session from global variable:', currentSession);
+        return currentSession;
+    }
+    
+    // Try to get from console display elements
+    const sessionElement = document.getElementById('session-id-tag-status');
+    if (sessionElement && sessionElement.textContent && sessionElement.textContent.startsWith('session-')) {
+        currentSession = sessionElement.textContent;
+        console.log('[HD1] Found session from UI element:', currentSession);
+        return currentSession;
+    }
+    
+    console.warn('[HD1] No active session found, API calls may fail');
+    return null;
+}
+
+// Initialize PlayCanvas engine on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializePlayCanvasEngine();
+    setupGameEngineControls();
+    updateGameStats();
+});
+
+/**
+ * Initialize PlayCanvas Engine with HD1 configuration
+ */
+function initializePlayCanvasEngine() {
+    console.log('[HD1] Starting PlayCanvas initialization...');
+    
+    // Check if PlayCanvas is available
+    if (typeof pc === 'undefined') {
+        console.error('[HD1] PlayCanvas library not loaded! Check if playcanvas.min.js is included.');
+        return;
+    }
+    
+    const canvas = document.getElementById('hd1-playcanvas-canvas');
+    if (!canvas) {
+        console.error('[HD1] PlayCanvas canvas not found');
+        return;
+    }
+    
+    console.log('[HD1] Canvas found, creating PlayCanvas application...');
+
+    try {
+        // Create PlayCanvas application
+        const app = new pc.Application(canvas, {
+            mouse: new pc.Mouse(canvas),
+            keyboard: new pc.Keyboard(window),
+            touch: new pc.TouchDevice(canvas),
+            elementInput: new pc.ElementInput(canvas)
+        });
+
+        console.log('[HD1] PlayCanvas application created, configuring...');
+
+        // Configure rendering settings
+        app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
+        app.setCanvasResolution(pc.RESOLUTION_AUTO);
+
+        // Start the application
+        app.start();
+        console.log('[HD1] PlayCanvas application started');
+
+        // Create empty scene - content loaded from channels/scenes
+        createEmptyScene(app);
+
+        // Store globally
+        hd1GameEngine = app;
+        window.hd1GameEngine = app;
+
+        console.log('[HD1] PlayCanvas engine fully initialized and ready');
+    } catch (error) {
+        console.error('[HD1] Failed to initialize PlayCanvas:', error);
+        return;
+    }
+    
+    // Update status if element exists
+    const statusElement = document.getElementById('playcanvas-status');
+    if (statusElement) {
+        statusElement.textContent = 'PlayCanvas Active';
+    }
+    
+    // Load any existing objects for the current session
+    setTimeout(() => {
+        loadExistingSessionObjects();
+    }, 500); // Small delay to ensure other systems are ready
+}
+
+/**
+ * Create empty 3D scene with camera only - content loaded from channels
+ */
+function createEmptyScene(app) {
+    // Create camera entity
+    const camera = new pc.Entity('camera');
+    camera.addComponent('camera', {
+        clearColor: new pc.Color(0.1, 0.1, 0.1),
+        farClip: 1000
+    });
+    camera.setPosition(0, 5, 15);
+    camera.lookAt(0, 0, 0);
+    
+    app.root.addChild(camera);
+    
+    // Store camera reference globally
+    app.camera = camera;
+    
+    // Setup manual camera controls
+    setupCameraControls(app, camera);
+    
+    console.log('[HD1] Empty PlayCanvas scene created - ready for channel content');
+}
+
+
+/**
+ * Setup camera controls for mouse look and WASD movement
+ */
+function setupCameraControls(app, camera) {
+    let pitch = 0;
+    let yaw = 0;
+    let moveSpeed = 10;
+    let lookSpeed = 0.2;
+    let isMouseDown = false;
+    
+    // Mouse look controls
+    app.mouse.on(pc.EVENT_MOUSEDOWN, function(event) {
+        if (event.button === pc.MOUSEBUTTON_LEFT) {
+            // Check if mouse is over console panel
+            const debugPanel = document.getElementById('debug-panel');
+            const rect = debugPanel.getBoundingClientRect();
+            const mouseX = event.x;
+            const mouseY = event.y;
+            
+            // Don't enable camera controls if clicking on console
+            if (mouseX >= rect.left && mouseX <= rect.right && 
+                mouseY >= rect.top && mouseY <= rect.bottom) {
+                return;
+            }
+            
+            isMouseDown = true;
+            app.mouse.enablePointerLock();
+        }
+    });
+    
+    app.mouse.on(pc.EVENT_MOUSEUP, function(event) {
+        if (event.button === pc.MOUSEBUTTON_LEFT) {
+            isMouseDown = false;
+            app.mouse.disablePointerLock();
+        }
+    });
+    
+    app.mouse.on(pc.EVENT_MOUSEMOVE, function(event) {
+        if (isMouseDown && document.pointerLockElement) {
+            yaw -= event.dx * lookSpeed;
+            pitch -= event.dy * lookSpeed;
+            pitch = pc.math.clamp(pitch, -90, 90);
+            
+            camera.setEulerAngles(pitch, yaw, 0);
+        }
+    });
+    
+    // WASD movement controls
+    app.on('update', function(dt) {
+        const forward = camera.forward;
+        const right = camera.right;
+        const pos = camera.getPosition();
+        
+        if (app.keyboard.isPressed(pc.KEY_W)) {
+            pos.add(forward.clone().scale(moveSpeed * dt));
+        }
+        if (app.keyboard.isPressed(pc.KEY_S)) {
+            pos.add(forward.clone().scale(-moveSpeed * dt));
+        }
+        if (app.keyboard.isPressed(pc.KEY_A)) {
+            pos.add(right.clone().scale(-moveSpeed * dt));
+        }
+        if (app.keyboard.isPressed(pc.KEY_D)) {
+            pos.add(right.clone().scale(moveSpeed * dt));
+        }
+        if (app.keyboard.isPressed(pc.KEY_Q)) {
+            pos.y -= moveSpeed * dt;
+        }
+        if (app.keyboard.isPressed(pc.KEY_E)) {
+            pos.y += moveSpeed * dt;
+        }
+        
+        camera.setPosition(pos);
+    });
+    
+    // Object interaction - right click to select (only if not over console)
+    document.addEventListener('mousedown', function(event) {
+        if (event.button === 2) { // Right mouse button
+            // Check if mouse is over console panel
+            const debugPanel = document.getElementById('debug-panel');
+            const rect = debugPanel.getBoundingClientRect();
+            
+            // Don't handle object selection if clicking on console
+            if (event.clientX >= rect.left && event.clientX <= rect.right && 
+                event.clientY >= rect.top && event.clientY <= rect.bottom) {
+                return;
+            }
+            
+            // Simple object highlighting (since proper ray casting would be complex)
+            if (hd1GameEngine) {
+                hd1GameEngine.root.children.forEach(entity => {
+                    if (entity.hd1Id && entity.model && entity.model.meshInstances[0]) {
+                        // Toggle highlight on all objects (simplified interaction)
+                        const material = entity.model.meshInstances[0].material;
+                        if (material.emissive && material.emissive.r > 0) {
+                            material.emissive = new pc.Color(0, 0, 0); // Remove highlight
+                        } else {
+                            material.emissive = new pc.Color(0.3, 0.3, 0.3); // Add highlight
+                        }
+                        material.update();
+                        
+                        console.log('[HD1] Toggled highlight on object:', entity.name);
+                    }
+                });
+            }
+        }
+    });
+    
+    console.log('[HD1] Camera controls enabled: Mouse to look, WASD to move, QE for up/down, Right-click to select objects');
+}
+
+/**
+ * Setup game engine control buttons
+ */
+function setupGameEngineControls() {
+    // Bind control functions to global scope
+    window.createEntity = createEntity;
+    window.startAnimation = startAnimation;
+    window.playAudio = playAudio;
+    window.applyPhysics = applyPhysics;
+    window.loadDemoScene = loadDemoScene;
+
+    // Setup dropdown event listeners
+    setupDropdownControls();
+}
+
+/**
+ * Create holodeck entity via HD1 API
+ */
+async function createEntity() {
+    try {
+        const sessionId = getCurrentSession();
+        if (!sessionId) {
+            console.error('[HD1] Cannot create entity: no active session');
+            return;
+        }
+        
+        const response = await hd1API.createEntity(sessionId, {
+            name: `entity_${Date.now()}`,
+            components: {
+                transform: {
+                    position: { x: Math.random() * 10 - 5, y: 0, z: Math.random() * 10 - 5 },
+                    rotation: { x: 0, y: 0, z: 0 }
+                }
+            }
+        });
+
+        if (response.success) {
+            // Add model component
+            await hd1API.addComponent(sessionId, response.entity_id, {
+                type: 'model',
+                properties: {
+                    type: 'box',
+                    material: { 
+                        color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
+                        metalness: 0.8,
+                        roughness: 0.2
+                    }
+                }
+            });
+
+            // Create visual representation in PlayCanvas
+            createPlayCanvasEntity(response.entity_id, response.name);
+            updateGameStats();
+            console.log('[HD1] Entity created:', response.entity_id);
+        }
+    } catch (error) {
+        console.error('[HD1] Failed to create entity:', error);
+    }
+}
+
+/**
+ * Create PlayCanvas visual entity
+ */
+function createPlayCanvasEntity(entityId, name) {
+    if (!hd1GameEngine) return;
+
+    const entity = new pc.Entity(name);
+    entity.hd1Id = entityId;
+
+    // Add model component
+    entity.addComponent('model', {
+        type: 'box'
+    });
+
+    // Random position
+    entity.setPosition(
+        Math.random() * 10 - 5,
+        0,
+        Math.random() * 10 - 5
+    );
+
+    // Random color material
+    const material = new pc.StandardMaterial();
+    material.diffuse = new pc.Color(Math.random(), Math.random(), Math.random());
+    material.metalness = 0.8;
+    material.shininess = 80;
+    material.update();
+
+    entity.model.meshInstances[0].material = material;
+
+    hd1GameEngine.root.addChild(entity);
+}
+
+/**
+ * Start animation via HD1 API
+ */
+async function startAnimation() {
+    try {
+        const sessionId = getCurrentSession();
+        if (!sessionId) {
+            console.error('[HD1] Cannot start animation: no active session');
+            return;
+        }
+        
+        const response = await hd1API.createAnimation(sessionId, {
+            name: `rotation_${Date.now()}`,
+            targets: [{
+                entity_id: 'all',
+                property: 'rotation.y',
+                from: 0,
+                to: 360,
+                duration: 3000,
+                loop: true
+            }]
+        });
+
+        if (response.success) {
+            await hd1API.playAnimation(sessionId, response.animation_id, {});
+            
+            // Start PlayCanvas rotation for all entities
+            startPlayCanvasRotation();
+            updateGameStats();
+            console.log('[HD1] Animation started:', response.animation_id);
+        }
+    } catch (error) {
+        console.error('[HD1] Failed to start animation:', error);
+    }
+}
+
+/**
+ * Start PlayCanvas rotation animation
+ */
+function startPlayCanvasRotation() {
+    if (!hd1GameEngine) return;
+
+    hd1GameEngine.root.children.forEach(entity => {
+        if (entity.hd1Id) {
+            entity.rotationSpeed = 30; // degrees per second
+        }
+    });
+
+    // Add rotation update to app loop
+    if (!hd1GameEngine.rotationHandler) {
+        hd1GameEngine.rotationHandler = hd1GameEngine.on('update', function(dt) {
+            hd1GameEngine.root.children.forEach(entity => {
+                if (entity.rotationSpeed) {
+                    entity.rotateLocal(0, entity.rotationSpeed * dt, 0);
+                }
+            });
+        });
+    }
+}
+
+/**
+ * Play audio via HD1 API
+ */
+async function playAudio() {
+    try {
+        const sessionId = getCurrentSession();
+        if (!sessionId) {
+            console.error('[HD1] Cannot play audio: no active session');
+            return;
+        }
+        
+        const response = await hd1API.createAudioSource(sessionId, {
+            name: `audio_${Date.now()}`,
+            type: 'positional',
+            url: 'game_sound.ogg',
+            loop: false,
+            volume: 0.7
+        });
+
+        if (response.success) {
+            await hd1API.playAudio(sessionId, response.audio_id, {});
+            updateGameStats();
+            console.log('[HD1] Audio playing:', response.audio_id);
+        }
+    } catch (error) {
+        console.error('[HD1] Failed to play audio:', error);
+    }
+}
+
+/**
+ * Apply physics via HD1 API
+ */
+async function applyPhysics() {
+    try {
+        const sessionId = getCurrentSession();
+        if (!sessionId) {
+            console.error('[HD1] Cannot apply physics: no active session');
+            return;
+        }
+        
+        // Configure physics world
+        await hd1API.updatePhysicsWorld(sessionId, {
+            gravity: { x: 0, y: -9.8, z: 0 },
+            timeStep: 0.016
+        });
+
+        // Get all entities and add physics
+        const entities = await hd1API.listEntities(sessionId);
+        
+        for (const entity of entities.entities || []) {
+            await hd1API.addComponent(sessionId, entity.entity_id, {
+                type: 'rigidbody',
+                properties: {
+                    type: 'dynamic',
+                    mass: 1.0
+                }
+            });
+        }
+
+        updateGameStats();
+        console.log('[HD1] Physics applied to all entities');
+    } catch (error) {
+        console.error('[HD1] Failed to apply physics:', error);
+    }
+}
+
+/**
+ * Load demo holodeck experience
+ */
+async function loadDemoScene() {
+    try {
+        const sessionId = getCurrentSession();
+        if (!sessionId) {
+            console.error('[HD1] Cannot load demo scene: no active session');
+            return;
+        }
+        
+        // Create presentation screen
+        const screenResponse = await hd1API.createEntity(sessionId, {
+            name: 'presentation_screen',
+            components: {
+                transform: { position: { x: 0, y: 2, z: -5 } }
+            }
+        });
+
+        if (screenResponse.success) {
+            await hd1API.addComponent(sessionId, screenResponse.entity_id, {
+                type: 'model',
+                properties: { type: 'plane', material: { color: '#ffffff' } }
+            });
+
+            createPlayCanvasEntity(screenResponse.entity_id, 'presentation_screen');
+        }
+
+        // Create interactive objects
+        for (let i = 0; i < 3; i++) {
+            const objectResponse = await hd1API.createEntity(sessionId, {
+                name: `interactive_${i}`,
+                components: {
+                    transform: { 
+                        position: { 
+                            x: (i - 1) * 3, 
+                            y: 0, 
+                            z: 0 
+                        } 
+                    }
+                }
+            });
+
+            if (objectResponse.success) {
+                await hd1API.addComponent(sessionId, objectResponse.entity_id, {
+                    type: 'model',
+                    properties: { type: 'box', material: { color: `#${Math.floor(Math.random()*16777215).toString(16)}` } }
+                });
+
+                createPlayCanvasEntity(objectResponse.entity_id, `interactive_${i}`);
+            }
+        }
+
+        // Create ambient audio
+        await hd1API.createAudioSource(sessionId, {
+            name: 'ambient_sound',
+            type: 'background',
+            loop: true,
+            volume: 0.2
+        });
+
+        updateGameStats();
+        document.getElementById('content-experience').textContent = 'Interactive Demo';
+        console.log('[HD1] Demo holodeck experience loaded');
+    } catch (error) {
+        console.error('[HD1] Failed to load demo:', error);
+    }
+}
+
+/**
+ * Setup dropdown control event listeners
+ */
+function setupDropdownControls() {
+    // Scene selection (only if element exists)
+    const sceneSelect = document.getElementById('debug-scene-select');
+    if (sceneSelect) {
+        sceneSelect.addEventListener('change', async function(e) {
+            const scene = e.target.value;
+            if (scene === 'interactive-demo') {
+                await loadDemoScene();
+            }
+            e.target.value = '';
+        });
+    }
+
+    // Object creation (only if element exists)
+    const objectSelect = document.getElementById('debug-object-select');
+    if (objectSelect) {
+        objectSelect.addEventListener('change', async function(e) {
+            const objectType = e.target.value;
+            if (objectType) {
+                await createEntity();
+            }
+            e.target.value = '';
+        });
+    }
+
+    // Interaction control (removed during UI consolidation)
+    // Previously debug-interaction-select - functionality moved to other controls
+}
+
+/**
+ * Update holodeck statistics display
+ */
+function updateGameStats() {
+    if (hd1GameEngine) {
+        const entities = hd1GameEngine.root.children.filter(e => e.hd1Id);
+        // Update consolidated panel (performance-entities was removed during UI consolidation)
+        const objectsDisplay = document.getElementById('content-objects');
+        if (objectsDisplay) {
+            objectsDisplay.textContent = entities.length;
+            // Check for overflow if checkTextOverflow function exists
+            if (typeof checkTextOverflow === 'function') {
+                checkTextOverflow(objectsDisplay);
+            }
+        }
+    }
+
+    // Update FPS in consolidated panel
+    const fpsDisplay = document.getElementById('performance-fps');
+    if (fpsDisplay) {
+        fpsDisplay.textContent = hd1GameEngine ? Math.round(1000 / hd1GameEngine.stats.frame.ms) : 60;
+    }
+}
+
+// Update stats every second
+setInterval(updateGameStats, 1000);
+
+/**
+ * Create PlayCanvas object directly from server data
+ * This method is called by the console when objects are received from the server
+ */
+function createObjectFromData(objectData) {
+    console.log('[HD1] createObjectFromData called with:', objectData);
+    
+    if (!hd1GameEngine) {
+        console.warn('[HD1] PlayCanvas engine not ready, storing object for later');
+        return;
+    }
+
+    // Check if object already exists to prevent duplicates
+    const entityId = objectData.entity_id || objectData.id;
+    const existingEntity = hd1GameEngine.root.children.find(entity => 
+        entity.name === objectData.name || entity.hd1Id === entityId
+    );
+    
+    if (existingEntity) {
+        console.log('[HD1] Object already exists, skipping:', objectData.name);
+        return;
+    }
+
+    // Get model type from components
+    const modelType = objectData.components?.model?.type || objectData.type || 'box';
+    console.log('[HD1] Creating PlayCanvas object:', objectData.name, 'type:', modelType);
+
+    const entity = new pc.Entity(objectData.name);
+    entity.hd1Id = entityId;
+
+    // Add model component (only if not a light)
+    if (!objectData.components?.light) {
+        entity.addComponent('model', {
+            type: modelType
+        });
+    }
+    
+    // Add light component if entity has light
+    if (objectData.components?.light) {
+        const lightConfig = objectData.components.light;
+        entity.addComponent('light', {
+            type: lightConfig.type || 'directional',
+            color: Array.isArray(lightConfig.color) ? 
+                new pc.Color(lightConfig.color[0] || 1, lightConfig.color[1] || 1, lightConfig.color[2] || 1) :
+                new pc.Color(1, 1, 1),
+            intensity: lightConfig.intensity || 1,
+            castShadows: lightConfig.castShadows || false
+        });
+        console.log('[HD1] Added light component:', lightConfig.type, 'intensity:', lightConfig.intensity);
+    }
+
+    // Set position from HD1 v3.0 API format
+    const transform = objectData.components?.transform;
+    if (transform?.position && Array.isArray(transform.position)) {
+        entity.setPosition(
+            transform.position[0] || 0,
+            transform.position[1] || 0, 
+            transform.position[2] || 0
+        );
+        console.log('[HD1] Setting position from v3.0 API:', transform.position);
+    } else if (objectData.transform && objectData.transform.position) {
+        // Legacy format support
+        entity.setPosition(
+            objectData.transform.position.x || 0,
+            objectData.transform.position.y || 0,
+            objectData.transform.position.z || 0
+        );
+    } else if (objectData.x !== undefined || objectData.y !== undefined || objectData.z !== undefined) {
+        entity.setPosition(
+            objectData.x || 0,
+            objectData.y || 0,
+            objectData.z || 0
+        );
+        console.log('[HD1] Setting position from legacy API format:', objectData.x, objectData.y, objectData.z);
+    }
+
+    // Set scale from HD1 v3.0 API format
+    if (transform?.scale && Array.isArray(transform.scale)) {
+        entity.setLocalScale(
+            transform.scale[0] || 1,
+            transform.scale[1] || 1,
+            transform.scale[2] || 1
+        );
+        console.log('[HD1] Setting scale from v3.0 API:', transform.scale);
+    } else if (objectData.transform && objectData.transform.scale) {
+        // Legacy format support
+        entity.setLocalScale(
+            objectData.transform.scale.x || 1,
+            objectData.transform.scale.y || 1,
+            objectData.transform.scale.z || 1
+        );
+    } else {
+        // Default scale for entities without scale data
+        entity.setLocalScale(1, 1, 1);
+    }
+
+    // Set rotation from HD1 v3.0 API format
+    if (transform?.rotation && Array.isArray(transform.rotation)) {
+        entity.setEulerAngles(
+            transform.rotation[0] || 0,
+            transform.rotation[1] || 0,
+            transform.rotation[2] || 0
+        );
+        console.log('[HD1] Setting rotation from v3.0 API:', transform.rotation);
+    } else if (objectData.transform && objectData.transform.rotation) {
+        // Legacy format support
+        entity.setEulerAngles(
+            objectData.transform.rotation.x || 0,
+            objectData.transform.rotation.y || 0,
+            objectData.transform.rotation.z || 0
+        );
+    }
+
+    // Create material with color (only for model entities, not lights)
+    if (!objectData.components?.light && entity.model) {
+        const material = new pc.StandardMaterial();
+        const materialConfig = objectData.components?.material;
+        
+        if (materialConfig?.diffuse) {
+            // Parse hex color to RGB
+            const hexColor = materialConfig.diffuse;
+            if (hexColor.startsWith('#')) {
+                const r = parseInt(hexColor.substr(1, 2), 16) / 255;
+                const g = parseInt(hexColor.substr(3, 2), 16) / 255;
+                const b = parseInt(hexColor.substr(5, 2), 16) / 255;
+                material.diffuse = new pc.Color(r, g, b);
+            }
+        } else if (objectData.color) {
+            // Legacy format support
+            material.diffuse = new pc.Color(
+                objectData.color.r || 0.5,
+                objectData.color.g || 0.5,
+                objectData.color.b || 0.5
+            );
+        } else {
+            material.diffuse = new pc.Color(0.5, 0.5, 0.5);
+        }
+
+        // Set material properties from HD1 v3.0 API
+        material.metalness = materialConfig?.metalness || 0.3;
+        material.shininess = materialConfig?.shininess || 40;
+        material.wireframe = objectData.wireframe || false;
+        material.update();
+
+        // Apply material to mesh instances
+        entity.model.meshInstances.forEach(meshInstance => {
+            meshInstance.material = material;
+        });
+    }
+
+    hd1GameEngine.root.addChild(entity);
+    updateGameStats();
+    
+    console.log('[HD1] PlayCanvas object created:', objectData.name);
+}
+
+/**
+ * Delete PlayCanvas object by name
+ */
+function deleteObjectByName(objectName) {
+    if (!hd1GameEngine) {
+        console.warn('[HD1] PlayCanvas engine not ready, cannot delete object:', objectName);
+        return;
+    }
+
+    console.log('[HD1] Deleting PlayCanvas object:', objectName);
+    
+    // Find and remove the entity
+    const entityToRemove = hd1GameEngine.root.children.find(entity => 
+        entity.name === objectName || entity.hd1Id === objectName
+    );
+    
+    if (entityToRemove) {
+        hd1GameEngine.root.removeChild(entityToRemove);
+        entityToRemove.destroy();
+        updateGameStats();
+        console.log('[HD1] PlayCanvas object deleted:', objectName);
+    } else {
+        console.warn('[HD1] PlayCanvas object not found for deletion:', objectName);
+    }
+}
+
+// Add the createObject and deleteObject methods to the engine
+if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            if (window.hd1GameEngine) {
+                window.hd1GameEngine.createObject = createObjectFromData;
+                window.hd1GameEngine.deleteObject = deleteObjectByName;
+                console.log('[HD1] Added createObject and deleteObject methods to PlayCanvas engine');
+                
+                // Process any pending objects
+                if (window.pendingObjects && window.pendingObjects.length > 0) {
+                    console.log('[HD1] Processing', window.pendingObjects.length, 'pending objects');
+                    window.pendingObjects.forEach(obj => {
+                        createObjectFromData(obj);
+                    });
+                    window.pendingObjects = null;
+                }
+            }
+        }, 100);
+    });
+}
+
+/**
+ * Load existing objects from the current session into PlayCanvas
+ */
+async function loadExistingSessionObjects() {
+    console.log('[HD1] loadExistingSessionObjects() called');
+    
+    const sessionId = getCurrentSession();
+    if (!sessionId) {
+        console.warn('[HD1] No active session found - skipping object loading');
+        console.log('[HD1] localStorage hd1_session_id:', localStorage.getItem('hd1_session_id'));
+        return;
+    }
+    
+    if (!hd1GameEngine) {
+        console.warn('[HD1] PlayCanvas engine not ready - deferring object loading');
+        return;
+    }
+    
+    try {
+        console.log(`[HD1] Loading existing entities from session: ${sessionId}`);
+        
+        // Fetch entities from the current session
+        const response = await fetch(`/api/sessions/${sessionId}/entities`);
+        const data = await response.json();
+        
+        if (data.entities && Array.isArray(data.entities)) {
+            console.log(`[HD1] Found ${data.entities.length} existing entities to load`);
+            
+            data.entities.forEach(entity => {
+                console.log('[HD1] Loading existing entity:', entity.name, 'position:', entity.position);
+                createObjectFromData(entity);
+            });
+            
+            if (data.entities.length > 0) {
+                updateGameStats();
+                console.log(`[HD1] Successfully loaded ${data.entities.length} existing entities into PlayCanvas`);
+            }
+        } else {
+            console.log('[HD1] No existing entities found in session');
+        }
+    } catch (error) {
+        console.error('[HD1] Failed to load existing session entities:', error);
+    }
+}
+
+// Add rebootstrap and manual object loading functions to global scope
+window.triggerRebootstrap = function() {
+    console.log('[HD1] Triggering rebootstrap...');
+    localStorage.removeItem('hd1_session_id');
+    setTimeout(() => {
+        window.location.reload(true);
+    }, 1000);
+};
+
+// Allow manual triggering of object loading
+window.loadSessionObjects = loadExistingSessionObjects;
+
+console.log('[HD1] PlayCanvas integration loaded');

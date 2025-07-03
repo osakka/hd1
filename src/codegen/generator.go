@@ -409,16 +409,16 @@ func main() {
 		fmt.Printf("Warning: Enhanced generation failed: %v\n", err)
 	} else {
 		fmt.Printf("A-Frame integration generated successfully\n")
-		fmt.Printf("Shell: A-Frame shell integration: /opt/hd1/lib/downstream/aframelib.sh\n")
-		fmt.Printf("JavaScript: A-Frame JavaScript bridge: /opt/hd1/lib/downstream/aframelib.js\n")
+		fmt.Printf("Shell: PlayCanvas shell integration: /opt/hd1/lib/downstream/playcanvaslib.sh\n")
+		fmt.Printf("JavaScript: PlayCanvas JavaScript bridge: /opt/hd1/lib/downstream/playcanvaslib.js\n")
 	}
 
 	fmt.Println("\nCode generation complete")
 	fmt.Println("   • Standard generation: API specification drives all routing")
 	fmt.Println("   • Core shell functions: Auto-generated from API spec (SINGLE SOURCE)")
-	fmt.Println("   • Enhanced generation: A-Frame schemas drive function bridge")
+	fmt.Println("   • Enhanced generation: PlayCanvas schemas drive function bridge")
 	fmt.Println("   • Upstream APIs: Shell + JavaScript + CLI identical signatures")
-	fmt.Println("   • Downstream APIs: A-Frame + WebXR seamless integration")
+	fmt.Println("   • Downstream APIs: PlayCanvas + WebGL seamless integration")
 	fmt.Println("   • Zero manual route configuration needed")
 	fmt.Println("   • Web UI client auto-generated from spec")
 	fmt.Println("   • Change spec = change API + UI + shell functions automatically")
@@ -1050,12 +1050,12 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 		"physics_bodies": []string{"dynamic", "static", "kinematic"},
 	}
 	
-	tmpl, err := loadTemplate("templates/shell/aframe-functions.tmpl")
+	tmpl, err := loadTemplate("templates/shell/playcanvas-functions.tmpl")
 	if err != nil {
-		return fmt.Errorf("failed to load A-Frame shell template: %w", err)
+		return fmt.Errorf("failed to load PlayCanvas shell template: %w", err)
 	}
 
-	outputPath := filepath.Join(outputDir, "downstream/aframelib.sh")
+	outputPath := filepath.Join(outputDir, "downstream/playcanvaslib.sh")
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to create enhanced shell functions file: %w", err)
@@ -1063,7 +1063,7 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 	defer outputFile.Close()
 
 	if err := tmpl.Execute(outputFile, nil); err != nil {
-		return fmt.Errorf("failed to execute A-Frame shell template: %w", err)
+		return fmt.Errorf("failed to execute PlayCanvas shell template: %w", err)
 	}
 	
 	// Set executable permissions
@@ -1073,7 +1073,7 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 	
 	logging.Info("enhanced shell functions generated", map[string]interface{}{
 		"output_path": outputPath,
-		"aframe_integration": true,
+		"playcanvas_integration": true,
 	})
 	
 	return nil
@@ -1083,12 +1083,12 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
 	outputDir := "/opt/hd1/lib"
 	
-	tmpl, err := loadTemplate("templates/javascript/aframe-bridge.tmpl")
+	tmpl, err := loadTemplate("templates/javascript/playcanvas-bridge.tmpl")
 	if err != nil {
-		return fmt.Errorf("failed to load A-Frame bridge template: %w", err)
+		return fmt.Errorf("failed to load PlayCanvas bridge template: %w", err)
 	}
 
-	outputPath := filepath.Join(outputDir, "downstream/aframelib.js")
+	outputPath := filepath.Join(outputDir, "downstream/playcanvaslib.js")
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to create JavaScript bridge file: %w", err)
@@ -1096,7 +1096,7 @@ func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
 	defer outputFile.Close()
 
 	if err := tmpl.Execute(outputFile, nil); err != nil {
-		return fmt.Errorf("failed to execute A-Frame bridge template: %w", err)
+		return fmt.Errorf("failed to execute PlayCanvas bridge template: %w", err)
 	}
 	
 	logging.Info("JavaScript function bridge generated", map[string]interface{}{

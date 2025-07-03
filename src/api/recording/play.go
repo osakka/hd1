@@ -74,10 +74,8 @@ func PlayRecordingHandler(w http.ResponseWriter, r *http.Request, hub interface{
 
 	// Clear existing objects if requested
 	if req.ClearBeforePlay {
-		objects := store.ListObjects(sessionID)
-		for _, obj := range objects {
-			store.DeleteObject(sessionID, obj.Name)
-		}
+		// Recording playback now works with channel entities, not session objects
+		// Clear handled via PlayCanvas/channels
 		
 		// Broadcast clear message
 		clearMessage := map[string]interface{}{

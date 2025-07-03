@@ -18,6 +18,17 @@ generate:
 	@echo "GENERATING CODE FROM SPECIFICATION..."
 	go run codegen/generator.go
 	@echo "Auto-router generated from api.yaml"
+	@echo "COPYING PLAYCANVAS TO STATIC DIRECTORY..."
+	@mkdir -p $(SHARE_DIR)/htdocs/static/vendor/playcanvas
+	@if [ -d ../vendor/playcanvas/build ]; then \
+		cp -r ../vendor/playcanvas/build/* $(SHARE_DIR)/htdocs/static/vendor/playcanvas/; \
+		echo "PlayCanvas library copied to static directory"; \
+	elif [ -d ../vendor/playcanvas/src ]; then \
+		cp -r ../vendor/playcanvas/src $(SHARE_DIR)/htdocs/static/vendor/playcanvas/; \
+		echo "PlayCanvas source copied to static directory"; \
+	else \
+		echo "WARNING: PlayCanvas not found in vendor directory"; \
+	fi
 
 # Validate specification
 validate:

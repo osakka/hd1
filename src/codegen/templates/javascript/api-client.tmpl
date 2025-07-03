@@ -20,7 +20,7 @@
 // ===================================================================
 
 class HD1APIClient {
-    constructor(baseURL = window.HD1_API_BASE || 'http://localhost:8080/api') {
+    constructor(baseURL = window.HD1_API_BASE || `${window.location.protocol}//${window.location.host}/api`) {
         this.baseURL = baseURL;
         this.defaultHeaders = {
             'Content-Type': 'application/json',

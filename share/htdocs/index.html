@@ -1,60 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>HD1 Holodeck - A-Frame VR</title>
-    <script src="/static/js/vendor/aframe.min.js"></script>
-    <script src="/static/js/vendor/aframe-environment-component.min.js"></script>
-    <script src="/static/js/vendor/aframe-teleport-controls.min.js"></script>
-    <script src="/static/js/vendor/aframe-event-set-component.min.js"></script>
-    <script src="/static/js/vendor/aframe-look-at-component.min.js"></script>
-    <script src="/static/js/vendor/aframe-orbit-controls.min.js"></script>
-    <!-- Removed problematic components:
-         - aframe-animation-component.min.js (conflicts with core A-Frame animation)
-         - aframe-particle-system.js (uses Node.js require())
-         - aframe-text-geometry-component.min.js (THREE.FontLoader constructor error)
-         - aframe-state-component.min.js (not essential for core functionality)
-         - aframe-controller-cursor-component.min.js (VR-specific, not needed for holodeck)
-         - aframe-forcegraph-component.min.js (complex, not used yet)
-    -->
-    <script src="/static/js/hd1-aframe.js"></script>
+    <title>HD1 v3.0 - Holodeck One</title>
+    <script src="/static/js/vendor/playcanvas.min.js"></script>
+    <script src="/static/js/hd1lib.js"></script>
+    <script src="/static/js/hd1-ui-components.js"></script>
+    <script src="/static/js/hd1-form-system.js"></script>
     <link rel="stylesheet" href="/static/css/hd1-console.css">
 </head>
 <body>
-    <a-scene 
-        id="holodeck-scene" 
-        hd1-holodeck
-        holodeck-environment="scaleUnit: m; gravity: 9.8; atmosphere: air"
-        embedded
-        style="height: 100vh; width: 100vw;"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false">
-        
-        <!-- HD1 Holodeck Environment -->
-        <a-assets>
-            <!-- Asset preloading will go here -->
-        </a-assets>
-        
-        <!-- Default holodeck setup -->
-        <a-entity id="holodeck-camera" 
-                  camera 
-                  look-controls="enabled: true; pointerLockEnabled: true" 
-                  wasd-controls="acceleration: 20; fly: false; enabled: true"
-                  hd1-keyboard-controls=""
-                  hd1-sprint-controls=""
-                  holodeck-boundaries=""
-                  position="0 1.7 5">
-        </a-entity>
-        
-        <!-- Default lighting -->
-        <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
-        <a-light type="directional" position="10 10 5" color="#ffffff" intensity="0.8"></a-light>
-        
-        <!-- Holodeck coordinate system grid -->
-        <a-entity id="holodeck-grid"></a-entity>
-        
-        <!-- Dynamic objects container -->
-        <a-entity id="holodeck-objects"></a-entity>
-    </a-scene>
+    <!-- PlayCanvas Game Engine Canvas -->
+    <canvas id="hd1-playcanvas-canvas" 
+            style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1;">
+    </canvas>
+    
     
     <div id="text-overlay"></div>
     
@@ -66,122 +25,118 @@
                 <span class="js-version-text" id="js-version">loading...</span>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
+                <span id="refresh-timer" style="background: rgba(0, 255, 255, 0.02); color: rgba(0, 255, 255, 0.3); border: 1px solid transparent; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: normal; cursor: pointer; margin-left: 6px; transition: all 0.2s ease; user-select: none;" title="Time since last refresh - Click to rebootstrap system">0:00</span>
                 <span id="debug-collapse-icon">&#8681;</span>
             </div>
         </div>
-        <div id="debug-content">
-            <div id="debug-scene-bar">
-                <div style="width: 100%; display: flex; gap: 4px; margin-bottom: 4px;">
-                    <select id="debug-scene-select" style="flex: 2;" title="Load a complete scene with multiple objects">
-                        <option value="">Select Scene...</option>
-                        <option value="empty-grid">Empty Grid</option>
-                        <option value="anime-ui">Anime UI Demo</option>
-                        <option value="ultimate">Ultimate Demo</option>
-                        <option value="basic-shapes">Basic Shapes</option>
-                    </select>
-                    <select id="debug-environment-select" style="flex: 2;" title="Change physics context (gravity, atmosphere, scale)">
-                        <option value="">Select Environment...</option>
-                    </select>
-                </div>
+        
+        <!-- Always visible channel and stats -->
+        <div id="debug-persistent-content">
+            <div id="debug-channel-bar" style="background: rgba(0, 255, 255, 0.12); padding: 6px 8px; border-bottom: 1px solid rgba(0, 255, 255, 0.15); margin-bottom: 4px;">
                 <div style="width: 100%; display: flex; gap: 4px;">
-                    <select id="debug-props-select" style="flex: 1;" title="Add multi-component props (furniture, electronics, tools)">
-                        <option value="">Add Prop...</option>
-                    </select>
-                    <select id="debug-lighting-select" style="flex: 1;" title="Add lighting systems (bulbs, ambient, directional)">
-                        <option value="">Add Lighting...</option>
+                    <select id="channel-selector" style="flex: 1;" title="Switch collaboration channels">
+                        <option value="">Loading channels...</option>
                     </select>
                 </div>
             </div>
-            <div id="debug-info-panels">
-                <div class="info-panel" id="environment-panel">
-                    <div class="panel-title">ENVIRONMENT</div>
-                    <div class="panel-content">
-                        <div class="info-row">
-                            <span class="info-label">Scale:</span>
-                            <span class="info-value" id="environment-scale">Human Scale (m)</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Gravity:</span>
-                            <span class="info-value" id="environment-gravity">9.81 m/s²</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Temperature:</span>
-                            <span class="info-value" id="environment-temperature">20°C</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Atmosphere:</span>
-                            <span class="info-value" id="environment-atmosphere">Earth Surface</span>
-                        </div>
+            <!-- Graph panels (hidden when collapsed) -->
+            <div id="debug-info-panels" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 4px;">
+                <div class="info-panel" id="fps-graph-panel">
+                    <div class="panel-title">FPS</div>
+                    <div class="panel-content" style="padding: 4px;">
+                        <canvas id="fps-graph-canvas"></canvas>
                     </div>
                 </div>
-                <div class="info-panel" id="hardware-panel">
-                    <div class="panel-title">HARDWARE</div>
+                <div class="info-panel" id="memory-graph-panel">
+                    <div class="panel-title">MEMORY</div>
                     <div class="panel-content">
-                        <div class="info-row">
-                            <span class="info-label">FPS:</span>
-                            <span class="info-value" id="hardware-fps">60</span>
+                        <canvas id="memory-graph-canvas"></canvas>
+                    </div>
+                </div>
+                <div class="info-panel" id="latency-graph-panel">
+                    <div class="panel-title">LATENCY</div>
+                    <div class="panel-content">
+                        <canvas id="latency-graph-canvas"></canvas>
+                    </div>
+                </div>
+                <div class="info-panel" id="websocket-graph-panel">
+                    <div class="panel-title">WEBSOCKET</div>
+                    <div class="panel-content">
+                        <canvas id="websocket-graph-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Collapsed stats tiles (shown when collapsed) -->
+            <div id="debug-collapsed-stats" style="display: none; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 6px; height: 40px; margin: 8px;">
+                <div class="collapsed-stat-tile">
+                    <div class="collapsed-stat-value" id="collapsed-fps-value">--</div>
+                    <div class="collapsed-stat-label">FPS</div>
+                </div>
+                <div class="collapsed-stat-tile">
+                    <div class="collapsed-stat-value" id="collapsed-memory-value">--%</div>
+                    <div class="collapsed-stat-label">MEM</div>
+                </div>
+                <div class="collapsed-stat-tile">
+                    <div class="collapsed-stat-value" id="collapsed-latency-value">--ms</div>
+                    <div class="collapsed-stat-label">LAT</div>
+                </div>
+                <div class="collapsed-stat-tile">
+                    <div class="collapsed-stat-value" id="collapsed-rx-value">--</div>
+                    <div class="collapsed-stat-label">RX</div>
+                </div>
+                <div class="collapsed-stat-tile">
+                    <div class="collapsed-stat-value" id="collapsed-tx-value">--</div>
+                    <div class="collapsed-stat-label">TX</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Collapsible content -->
+        <div id="debug-content">
+            <div id="playcanvas-container">
+                <!-- PlayCanvas Controls (hidden until engine ready) -->
+                <div id="playcanvas-controls" style="display: none;">
+                    
+                    <div style="border-top: 1px solid rgba(0, 255, 255, 0.2); margin: 8px 0 0 0;"></div>
+                    <!-- Native PlayCanvas Stats Panel -->
+                    <div id="playcanvas-stats-panel">
+                        <div class="panel-title">
+                            PLAYCANVAS SCENE
+                            <span class="js-version-text" id="pc-scene-name" style="margin-left: 6px;">loading...</span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">GPU:</span>
-                            <span class="info-value" id="hardware-gpu">WebGL Ready</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Memory:</span>
-                            <span class="info-value" id="hardware-memory">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Renderer:</span>
-                            <span class="info-value" id="hardware-renderer">A-Frame</span>
+                        <div class="panel-content" style="padding: 6px;">
+                            <div class="playcanvas-stats-grid">
+                                <div class="stat-group">
+                                    <div class="stat-label">Entities:</div>
+                                    <div class="stat-value" id="pc-entities-count">--</div>
+                                </div>
+                                <div class="stat-group">
+                                    <div class="stat-label">Lights:</div>
+                                    <div class="stat-value" id="pc-lights-count">--</div>
+                                </div>
+                                <div class="stat-group">
+                                    <div class="stat-label">Models:</div>
+                                    <div class="stat-value" id="pc-models-count">--</div>
+                                </div>
+                                <div class="stat-group">
+                                    <div class="stat-label">Physics:</div>
+                                    <div class="stat-value" id="pc-physics-count">--</div>
+                                </div>
+                                <div class="stat-group">
+                                    <div class="stat-label">Ambient:</div>
+                                    <div class="stat-value" id="pc-ambient-light">--</div>
+                                </div>
+                                <div class="stat-group">
+                                    <div class="stat-label">Gravity:</div>
+                                    <div class="stat-value" id="pc-gravity">--</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="debug-objects-panel">
-                <div class="info-panel info-panel-wide" id="objects-panel">
-                    <div class="panel-title">OBJECTS</div>
-                    <div class="panel-content">
-                        <div class="info-row" title="Total A-Frame entities in scene container">
-                            <span class="info-label">Raw Objects:</span>
-                            <span class="info-value" id="objects-raw-total">0</span>
-                        </div>
-                        <div class="info-row" title="Multi-component instantiated props (lightbulb = fixture + bulb + filament + light)">
-                            <span class="info-label">Props:</span>
-                            <span class="info-value" id="objects-props">0</span>
-                        </div>
-                        <div class="info-row" title="Objects currently visible in scene">
-                            <span class="info-label">Visible:</span>
-                            <span class="info-value" id="objects-visible">0</span>
-                        </div>
-                        <div class="info-row" title="All light sources (standalone + prop lights)">
-                            <span class="info-label">Lights:</span>
-                            <span class="info-value" id="objects-lights">0</span>
-                        </div>
-                        <div class="info-row" title="Standalone objects created via API (not part of props)">
-                            <span class="info-label">Objects:</span>
-                            <span class="info-value" id="objects-standalone">0</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Last Update:</span>
-                            <span class="info-value" id="objects-last-update">Never</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Scene:</span>
-                            <span class="info-value" id="objects-scene">None</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Environment:</span>
-                            <span class="info-value" id="objects-environment">Earth Surface</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="debug-controls-bar">
-                <div class="control-buttons-container">
-                    <button id="photo-btn" class="control-btn photo-btn" title="Freeze-Frame Mode: Save current session state as new scene">FREEZE-FRAME</button>
-                    <button id="video-btn" class="control-btn video-btn" title="Temporal Sequence Mode: Start/Stop temporal recording">TEMPORAL SEQUENCE</button>
-                </div>
-                <span id="recording-status" class="recording-status"></span>
-            </div>
+            <div style="border-top: 1px solid rgba(0, 255, 255, 0.2); margin: 8px 0 0 0;"></div>
             <div id="debug-log"></div>
         </div>
         <div id="debug-status-bar">
@@ -197,6 +152,14 @@
         </div>
     </div>
     
+    <!-- Animated Notification Panel (slides from under console) -->
+    <div id="status-notification-panel" class="status-panel-hidden">
+        <div class="status-panel-content">
+            <div id="status-message-text"></div>
+        </div>
+    </div>
+    
+    <script src="/static/js/hd1-playcanvas.js"></script>
     <script src="/static/js/hd1-console.js?v=${JS_VERSION}"></script>
 </body>
 </html>

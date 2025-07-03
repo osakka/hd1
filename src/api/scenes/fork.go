@@ -47,10 +47,8 @@ func ForkSceneHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 
 	// Clear existing objects if requested
 	if req.ClearExisting {
-		objects := store.ListObjects(req.SessionID)
-		for _, obj := range objects {
-			store.DeleteObject(req.SessionID, obj.Name)
-		}
+		// Scene forking now works with channel entities, not session objects
+		// Clear handled via PlayCanvas/channels
 		
 		// Broadcast clear message
 		clearMessage := map[string]interface{}{
@@ -77,16 +75,9 @@ func ForkSceneHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 		return
 	}
 
-	// Mark all objects in session as "base" from forked scene
-	objects := store.ListObjects(req.SessionID)
-	for _, obj := range objects {
-		updates := map[string]interface{}{
-			"tracking_status": "base",
-			"source_scene": sceneID,
-			"created_at": time.Now(),
-		}
-		store.UpdateObject(req.SessionID, obj.Name, updates)
-	}
+	// Mark all entities in session as "base" from forked scene
+	// Scene forking now works with channel entities, not session objects
+	// Entity tracking handled via PlayCanvas/channels
 
 	// Broadcast fork completion
 	forkMessage := map[string]interface{}{

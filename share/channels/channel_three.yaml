@@ -1,0 +1,64 @@
+# HD1 Channel Three - Minimalist Green Pyramid Scene
+# Scene 3: Green Pyramid + Overhead Light + Earth Environment
+
+channel:
+  id: "channel_three"
+  name: "Scene 3 - Green Pyramid"
+  description: "Minimalist scene with green pyramid and overhead lighting"
+  max_clients: 100
+
+# Native PlayCanvas Scene Configuration
+playcanvas:
+  # Global scene settings - Earth-like environment
+  scene:
+    ambientLight: [0.3, 0.3, 0.3]  # RGB values 0-1 (soft ambient)
+    gravity: [0, -9.81, 0]          # Earth gravity
+    
+  # Minimal entities: green pyramid + overhead light + floor
+  entities:
+    - name: "floor"
+      components:
+        model:
+          type: "plane"
+        transform:
+          position: [0, -0.1, 0]  # Slightly below origin
+          rotation: [0, 0, 0]     # No rotation - flat horizontal
+          scale: [10, 1, 10]      # 10x1x10 floor (10 wide, 1 tall, 10 deep)
+        material:
+          diffuse: "#cccccc"      # Light gray floor
+          metalness: 0.1
+          roughness: 0.8
+        rigidbody:
+          type: "static"
+        collision:
+          type: "box"
+          
+    - name: "green_pyramid"
+      components:
+        model:
+          type: "cone"  # Using cone as pyramid approximation
+        transform:
+          position: [0, 1, 0]     # 1 unit above floor
+          scale: [1, 1, 1]        # 1 meter pyramid
+        material:
+          diffuse: "#00cc44"     # Pure green
+          metalness: 0.0         # Non-metallic for better color
+          roughness: 0.6
+          shininess: 50
+        rigidbody:
+          type: "dynamic"
+          mass: 1.0
+        collision:
+          type: "cone"
+          
+    - name: "overhead_light"
+      components:
+        light:
+          type: "directional"
+          color: [1.0, 1.0, 1.0]  # RGB values 0-1 (white)
+          intensity: 3.0          # Intensity 0-10 range
+          castShadows: true
+          enabled: true           # Explicitly enable
+        transform:
+          position: [0, 10, 5]    # Position for reference
+          rotation: [60, 30, 0]   # More direct downward angle

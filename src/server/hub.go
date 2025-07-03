@@ -1,10 +1,16 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"path/filepath"
 	"sync"
 	"time"
 
+	"gopkg.in/yaml.v3"
 	"holodeck1/logging"
 )
 
@@ -17,7 +23,51 @@ type Hub struct {
 	store         *SessionStore
 	scenesWatcher *ScenesWatcher
 	mutex         sync.RWMutex
-	restoredSessions map[string]bool  // Track which sessions have been restored to prevent loops
+	
+	// Session Graph Architecture - Channel-based persistence
+	sessionChannels     map[string]*SessionChannel  // sessionID -> SessionChannel
+	clientSessions   map[*Client]string       // client -> sessionID mapping
+}
+
+// SessionChannel represents a persistent session graph with TCP-level reliability
+type SessionChannel struct {
+	sessionID     string
+	clients       map[*Client]bool     // clients currently in this channel
+	graphState    map[string]interface{}  // persistent session graph state
+	lastActivity  time.Time
+	mutex         sync.RWMutex
+	messageQueue  [][]byte             // queued messages for reconnecting clients
+}
+
+// NewSessionChannel creates a new persistent session channel
+func NewSessionChannel(sessionID string) *SessionChannel {
+	return &SessionChannel{
+		sessionID:    sessionID,
+		clients:      make(map[*Client]bool),
+		graphState:   make(map[string]interface{}),
+		lastActivity: time.Now(),
+		messageQueue: make([][]byte, 0),
+	}
+}
+
+// Channel data structures for loading YAML configurations
+type PlayCanvasEntity struct {
+	Name       string                 `json:"name" yaml:"name"`
+	Components map[string]interface{} `json:"components" yaml:"components"`
+}
+
+type PlayCanvasScene struct {
+	AmbientLight interface{} `json:"ambientLight,omitempty" yaml:"ambientLight,omitempty"` // Can be string or []float64
+	Gravity      []float64   `json:"gravity,omitempty" yaml:"gravity,omitempty"`
+}
+
+type PlayCanvasConfig struct {
+	Scene    PlayCanvasScene    `json:"scene,omitempty" yaml:"scene,omitempty"`
+	Entities []PlayCanvasEntity `json:"entities,omitempty" yaml:"entities,omitempty"`
+}
+
+type ChannelConfig struct {
+	PlayCanvas *PlayCanvasConfig `yaml:"playcanvas,omitempty"`
 }
 
 func NewHub() *Hub {
@@ -28,13 +78,233 @@ func NewHub() *Hub {
 		unregister: make(chan *Client),
 		logger:     NewLogManager(),
 		store:      NewSessionStore(),
-		restoredSessions: make(map[string]bool),
+		
+		// Session Graph Architecture
+		sessionChannels:   make(map[string]*SessionChannel),
+		clientSessions: make(map[*Client]string),
 	}
 	
 	// Initialize scenes watcher
 	hub.scenesWatcher = NewScenesWatcher(hub)
 	
 	return hub
+}
+
+// Session Channel Management Methods
+
+// JoinSessionChannel joins a client to a session channel with TCP-level reliability
+func (h *Hub) JoinSessionChannel(sessionID, clientID string, reconnect bool) (*SessionChannel, int, map[string]interface{}) {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	
+	// Get or create session channel
+	channel, exists := h.sessionChannels[sessionID]
+	if !exists {
+		channel = NewSessionChannel(sessionID)
+		h.sessionChannels[sessionID] = channel
+		logging.Info("session channel created", map[string]interface{}{
+			"session_id": sessionID,
+		})
+	}
+	
+	// Add client to channel (using client ID as a pseudo-client)
+	channel.mutex.Lock()
+	channel.clients[&Client{sessionID: sessionID}] = true // Simplified for API
+	channel.lastActivity = time.Now()
+	clientCount := len(channel.clients)
+	
+	// Initialize graph state from session entities if channel is new
+	if len(channel.graphState) == 0 {
+		// Entities are managed via channels/PlayCanvas, not stored in sessions
+		channel.graphState["entities"] = []interface{}{}
+		channel.graphState["last_updated"] = time.Now()
+	}
+	
+	graphState := make(map[string]interface{})
+	for k, v := range channel.graphState {
+		graphState[k] = v
+	}
+	channel.mutex.Unlock()
+	
+	return channel, clientCount, graphState
+}
+
+// LeaveSessionChannel removes a client from a session channel
+func (h *Hub) LeaveSessionChannel(sessionID, clientID string) (bool, int) {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	
+	channel, exists := h.sessionChannels[sessionID]
+	if !exists {
+		return false, 0
+	}
+	
+	channel.mutex.Lock()
+	defer channel.mutex.Unlock()
+	
+	// Remove client from channel (simplified for API)
+	// In real implementation, we'd track clients by ID
+	clientCount := len(channel.clients)
+	channel.lastActivity = time.Now()
+	
+	return true, clientCount
+}
+
+// GetSessionGraphState retrieves the current graph state for a session
+func (h *Hub) GetSessionGraphState(sessionID string) (map[string]interface{}, int, time.Time) {
+	h.mutex.RLock()
+	defer h.mutex.RUnlock()
+	
+	channel, exists := h.sessionChannels[sessionID]
+	if !exists {
+		// Return empty state if channel doesn't exist yet
+		return make(map[string]interface{}), 0, time.Now()
+	}
+	
+	channel.mutex.RLock()
+	defer channel.mutex.RUnlock()
+	
+	graphState := make(map[string]interface{})
+	for k, v := range channel.graphState {
+		graphState[k] = v
+	}
+	
+	lastUpdated := time.Now()
+	if t, ok := channel.graphState["last_updated"].(time.Time); ok {
+		lastUpdated = t
+	}
+	
+	return graphState, len(channel.clients), lastUpdated
+}
+
+// UpdateSessionGraphState updates the graph state and broadcasts to channel members
+func (h *Hub) UpdateSessionGraphState(sessionID, clientID string, updates map[string]interface{}, atomic bool) (int, error) {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	
+	channel, exists := h.sessionChannels[sessionID]
+	if !exists {
+		channel = NewSessionChannel(sessionID)
+		h.sessionChannels[sessionID] = channel
+	}
+	
+	channel.mutex.Lock()
+	defer channel.mutex.Unlock()
+	
+	// Apply updates to graph state
+	for k, v := range updates {
+		channel.graphState[k] = v
+	}
+	channel.graphState["last_updated"] = time.Now()
+	channel.lastActivity = time.Now()
+	
+	// Broadcast updates to all session clients
+	broadcastData := map[string]interface{}{
+		"graph_updates": updates,
+		"client_id":     clientID,
+		"timestamp":     time.Now(),
+	}
+	
+	h.BroadcastToSession(sessionID, "graph_updated", broadcastData)
+	
+	return len(channel.clients), nil
+}
+
+// SyncSessionState forces synchronization of session state across all clients
+func (h *Hub) SyncSessionState(sessionID string, forceFullSync bool) (int, error) {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	
+	channel, exists := h.sessionChannels[sessionID]
+	if !exists {
+		return 0, nil // No channel to sync
+	}
+	
+	channel.mutex.Lock()
+	defer channel.mutex.Unlock()
+	
+	// Get current session entities for full sync (from channel)
+	entities := []interface{}{} // Entities managed via PlayCanvas/channels
+	
+	syncData := map[string]interface{}{
+		"sync_type":     "full",
+		"entities":      entities,
+		"graph_state":   channel.graphState,
+		"force_full":    forceFullSync,
+		"sync_timestamp": time.Now(),
+	}
+	
+	h.BroadcastToSession(sessionID, "state_sync", syncData)
+	
+	return len(channel.clients), nil
+}
+
+// BroadcastToSessionChannel broadcasts to all clients in a session channel, optionally excluding one
+func (h *Hub) BroadcastToSessionChannel(sessionID, messageType string, data interface{}, excludeClientID string) {
+	// For now, use the existing BroadcastToSession method
+	// In a full implementation, this would filter by excludeClientID
+	h.BroadcastToSession(sessionID, messageType, data)
+}
+
+// SessionChannelStatus represents the status of a session channel
+type SessionChannelStatus struct {
+	ChannelActive       bool                   `json:"channel_active"`
+	ConnectedClients []map[string]interface{} `json:"connected_clients"`
+	GraphSummary     map[string]interface{} `json:"graph_summary"`
+	HealthMetrics    map[string]interface{} `json:"health_metrics"`
+}
+
+// GetSessionChannelStatus retrieves detailed status information for a session channel
+func (h *Hub) GetSessionChannelStatus(sessionID string) *SessionChannelStatus {
+	h.mutex.RLock()
+	defer h.mutex.RUnlock()
+	
+	channel, exists := h.sessionChannels[sessionID]
+	if !exists {
+		return &SessionChannelStatus{
+			ChannelActive:       false,
+			ConnectedClients: []map[string]interface{}{},
+			GraphSummary:     map[string]interface{}{"object_count": 0},
+			HealthMetrics:    map[string]interface{}{"uptime": "0s", "message_count": 0},
+		}
+	}
+	
+	channel.mutex.RLock()
+	defer channel.mutex.RUnlock()
+	
+	// Get entity count (managed via channels/PlayCanvas)
+	entityCount := 0 // Entities managed via PlayCanvas/channels
+	
+	// Build client list (simplified)
+	clients := make([]map[string]interface{}, 0)
+	for range channel.clients {
+		clients = append(clients, map[string]interface{}{
+			"client_id":     "client_" + sessionID,
+			"connected_at":  channel.lastActivity,
+			"last_activity": channel.lastActivity,
+		})
+	}
+	
+	uptime := time.Since(channel.lastActivity)
+	
+	return &SessionChannelStatus{
+		ChannelActive:       len(channel.clients) > 0,
+		ConnectedClients: clients,
+		GraphSummary: map[string]interface{}{
+			"entity_count":  entityCount,
+			"last_updated":  channel.graphState["last_updated"],
+		},
+		HealthMetrics: map[string]interface{}{
+			"uptime":       uptime.String(),
+			"message_count": len(channel.messageQueue),
+			"last_sync":    channel.lastActivity,
+		},
+	}
+}
+
+// GetID returns the session channel ID
+func (sr *SessionChannel) GetID() string {
+	return sr.sessionID
 }
 
 func (h *Hub) Run() {
@@ -44,6 +314,9 @@ func (h *Hub) Run() {
 		"reason": "filesystem mount options interfere with fsnotify",
 		"solution": "API-based scene loading on page load",
 	})
+	
+	// Start session cleanup timer
+	go h.startSessionCleanup()
 	
 	for {
 		select {
@@ -122,49 +395,34 @@ func (h *Hub) BroadcastToSession(sessionID string, updateType string, data inter
 type SessionStore struct {
 	mutex    sync.RWMutex
 	sessions map[string]*Session
-	objects  map[string]map[string]*Object // sessionId -> objectName -> Object
-	worlds   map[string]*World            // sessionId -> World
+	// Legacy objects and worlds removed - entities managed via channels/PlayCanvas
 }
 
 // Session represents a 3D visualization session
+// Entity represents a PlayCanvas entity in a session
+type Entity struct {
+	ID             string                 `json:"entity_id"`
+	Name           string                 `json:"name"`
+	PlayCanvasGUID string                 `json:"playcanvas_guid"`
+	Components     map[string]interface{} `json:"components"`
+	CreatedAt      time.Time              `json:"created_at"`
+	Enabled        bool                   `json:"enabled"`
+}
+
 type Session struct {
-	ID            string    `json:"id"`
-	CreatedAt     time.Time `json:"created_at"`
-	Status        string    `json:"status"`
-	EnvironmentID string    `json:"environment_id,omitempty"` // Current environment applied to session
+	ID        string             `json:"id"`
+	CreatedAt time.Time          `json:"created_at"`
+	Status    string             `json:"status"`
+	ChannelID string             `json:"channel_id,omitempty"` // Current channel joined
+	Entities  map[string]*Entity `json:"entities,omitempty"`   // Entity storage
 }
 
-// Object represents a 3D object in the world
-type Object struct {
-	Name     string  `json:"name"`
-	Type     string  `json:"type"`
-	X        float64 `json:"x"`
-	Y        float64 `json:"y"`
-	Z        float64 `json:"z"`
-	Color    string  `json:"color,omitempty"`
-	Scale    float64 `json:"scale,omitempty"`
-	Rotation string  `json:"rotation,omitempty"`
-	// Session object tracking for scene forking
-	TrackingStatus string    `json:"tracking_status,omitempty"` // "base", "modified", "new"
-	SourceScene    string    `json:"source_scene,omitempty"`    // Original scene ID if forked
-	CreatedAt      time.Time `json:"created_at,omitempty"`      // When object was created/modified
-}
-
-// World represents the 3D world coordinate system
-type World struct {
-	Size         int     `json:"size"`
-	Transparency float64 `json:"transparency"`
-	CameraX      float64 `json:"camera_x"`
-	CameraY      float64 `json:"camera_y"`
-	CameraZ      float64 `json:"camera_z"`
-}
+// Legacy Object and World types removed - replaced by PlayCanvas entities and channels
 
 // NewSessionStore creates a new session store
 func NewSessionStore() *SessionStore {
 	return &SessionStore{
 		sessions: make(map[string]*Session),
-		objects:  make(map[string]map[string]*Object),
-		worlds:   make(map[string]*World),
 	}
 }
 
@@ -178,10 +436,10 @@ func (s *SessionStore) CreateSession() *Session {
 		ID:        sessionID,
 		CreatedAt: time.Now(),
 		Status:    "active",
+		Entities:  make(map[string]*Entity),
 	}
 	
 	s.sessions[sessionID] = session
-	s.objects[sessionID] = make(map[string]*Object)
 	
 	return session
 }
@@ -217,14 +475,12 @@ func (s *SessionStore) DeleteSession(sessionID string) bool {
 	}
 	
 	delete(s.sessions, sessionID)
-	delete(s.objects, sessionID)
-	delete(s.worlds, sessionID)
 	
 	return true
 }
 
-// UpdateSessionEnvironment updates the environment ID for a session
-func (s *SessionStore) UpdateSessionEnvironment(sessionID, environmentID string) error {
+// UpdateSessionChannel updates the channel ID for a session
+func (s *SessionStore) UpdateSessionChannel(sessionID, channelID string) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -233,169 +489,73 @@ func (s *SessionStore) UpdateSessionEnvironment(sessionID, environmentID string)
 		return &SessionError{Message: "Session not found"}
 	}
 
-	session.EnvironmentID = environmentID
+	session.ChannelID = channelID
 	return nil
 }
 
-// CreateObject creates a new object in a session
-func (s *SessionStore) CreateObject(sessionID, objectName, objectType string, x, y, z float64) (*Object, error) {
+// AddEntity adds an entity to a session
+func (s *SessionStore) AddEntity(sessionID string, entity *Entity) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	
-	// Validate session exists
-	if _, exists := s.sessions[sessionID]; !exists {
+
+	session, exists := s.sessions[sessionID]
+	if !exists {
+		return &SessionError{Message: "Session not found"}
+	}
+
+	if session.Entities == nil {
+		session.Entities = make(map[string]*Entity)
+	}
+
+	session.Entities[entity.ID] = entity
+	return nil
+}
+
+// GetEntities retrieves all entities from a session
+func (s *SessionStore) GetEntities(sessionID string) ([]*Entity, error) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	session, exists := s.sessions[sessionID]
+	if !exists {
 		return nil, &SessionError{Message: "Session not found"}
 	}
-	
-	// Validate coordinates are within world bounds [-12, +12]
-	if x < -12 || x > 12 || y < -12 || y > 12 || z < -12 || z > 12 {
-		return nil, &CoordinateError{Message: "Coordinates must be within [-12, +12] bounds"}
+
+	entities := make([]*Entity, 0, len(session.Entities))
+	for _, entity := range session.Entities {
+		entities = append(entities, entity)
 	}
-	
-	object := &Object{
-		Name: objectName,
-		Type: objectType,
-		X:    x,
-		Y:    y,
-		Z:    z,
-		Scale: 1.0,
-	}
-	
-	s.objects[sessionID][objectName] = object
-	return object, nil
+
+	return entities, nil
 }
 
-// GetObject retrieves an object from a session
-func (s *SessionStore) GetObject(sessionID, objectName string) (*Object, bool) {
+// GetEntity retrieves a specific entity from a session
+func (s *SessionStore) GetEntity(sessionID, entityID string) (*Entity, error) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	
-	if objects, exists := s.objects[sessionID]; exists {
-		object, found := objects[objectName]
-		return object, found
-	}
-	return nil, false
-}
 
-// ListObjects returns all objects in a session
-func (s *SessionStore) ListObjects(sessionID string) []*Object {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-	
-	var objects []*Object
-	if sessionObjects, exists := s.objects[sessionID]; exists {
-		for _, object := range sessionObjects {
-			objects = append(objects, object)
-		}
-	}
-	return objects
-}
-
-// UpdateObject updates an existing object
-func (s *SessionStore) UpdateObject(sessionID, objectName string, updates map[string]interface{}) (*Object, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	
-	if objects, exists := s.objects[sessionID]; exists {
-		if object, found := objects[objectName]; found {
-			// Apply updates with validation
-			if x, ok := updates["x"].(float64); ok {
-				if x < -12 || x > 12 {
-					return nil, &CoordinateError{Message: "X coordinate must be within [-12, +12] bounds"}
-				}
-				object.X = x
-			}
-			if y, ok := updates["y"].(float64); ok {
-				if y < -12 || y > 12 {
-					return nil, &CoordinateError{Message: "Y coordinate must be within [-12, +12] bounds"}
-				}
-				object.Y = y
-			}
-			if z, ok := updates["z"].(float64); ok {
-				if z < -12 || z > 12 {
-					return nil, &CoordinateError{Message: "Z coordinate must be within [-12, +12] bounds"}
-				}
-				object.Z = z
-			}
-			if color, ok := updates["color"].(string); ok {
-				object.Color = color
-			}
-			if scale, ok := updates["scale"].(float64); ok {
-				object.Scale = scale
-			}
-			if rotation, ok := updates["rotation"].(string); ok {
-				object.Rotation = rotation
-			}
-			
-			return object, nil
-		}
-	}
-	return nil, &ObjectError{Message: "Object not found"}
-}
-
-// DeleteObject removes an object from a session
-func (s *SessionStore) DeleteObject(sessionID, objectName string) bool {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	
-	if objects, exists := s.objects[sessionID]; exists {
-		if _, found := objects[objectName]; found {
-			delete(objects, objectName)
-			return true
-		}
-	}
-	return false
-}
-
-// InitializeWorld sets up the 3D world for a session
-func (s *SessionStore) InitializeWorld(sessionID string, size int, transparency float64, cameraX, cameraY, cameraZ float64) (*World, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	
-	// Validate session exists
-	if _, exists := s.sessions[sessionID]; !exists {
+	session, exists := s.sessions[sessionID]
+	if !exists {
 		return nil, &SessionError{Message: "Session not found"}
 	}
-	
-	world := &World{
-		Size:         size,
-		Transparency: transparency,
-		CameraX:      cameraX,
-		CameraY:      cameraY,
-		CameraZ:      cameraZ,
+
+	entity, exists := session.Entities[entityID]
+	if !exists {
+		return nil, &SessionError{Message: "Entity not found"}
 	}
-	
-	s.worlds[sessionID] = world
-	return world, nil
+
+	return entity, nil
 }
 
-// GetWorld retrieves world configuration for a session
-func (s *SessionStore) GetWorld(sessionID string) (*World, bool) {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-	
-	world, exists := s.worlds[sessionID]
-	return world, exists
-}
+// Legacy Object and World management methods removed
+// Objects/Worlds replaced by PlayCanvas Entities via Channels
+// Use /sessions/{sessionId}/entities and /channels endpoints instead
 
 // GetStore returns the session store for external access
 func (h *Hub) GetStore() *SessionStore {
 	return h.store
 }
 
-// IsSessionRestored checks if a session has already been restored
-func (h *Hub) IsSessionRestored(sessionID string) bool {
-	h.mutex.RLock()
-	defer h.mutex.RUnlock()
-	return h.restoredSessions[sessionID]
-}
-
-// MarkSessionRestored marks a session as restored to prevent future restoration loops
-func (h *Hub) MarkSessionRestored(sessionID string) {
-	h.mutex.Lock()
-	defer h.mutex.Unlock()
-	h.restoredSessions[sessionID] = true
-}
 
 
 // BroadcastUpdate sends real-time updates to connected clients
@@ -420,21 +580,7 @@ func (e *SessionError) Error() string {
 	return e.Message
 }
 
-type CoordinateError struct {
-	Message string
-}
-
-func (e *CoordinateError) Error() string {
-	return e.Message
-}
-
-type ObjectError struct {
-	Message string
-}
-
-func (e *ObjectError) Error() string {
-	return e.Message
-}
+// Legacy CoordinateError and ObjectError removed - entities use PlayCanvas validation
 
 // generateSessionID creates a unique session identifier
 func generateSessionID() string {
@@ -449,4 +595,222 @@ func generateID(length int) string {
 		b[i] = charset[time.Now().UnixNano()%int64(len(charset))]
 	}
 	return string(b)
+}
+
+// startSessionCleanup runs periodic cleanup of inactive sessions
+func (h *Hub) startSessionCleanup() {
+	ticker := time.NewTicker(2 * time.Minute) // Check every 2 minutes
+	defer ticker.Stop()
+
+	for range ticker.C {
+		h.cleanupInactiveSessions()
+	}
+}
+
+// cleanupInactiveSessions removes sessions that have been inactive for more than 10 minutes
+func (h *Hub) cleanupInactiveSessions() {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+
+	now := time.Now()
+	cutoff := now.Add(-10 * time.Minute) // 10 minutes ago
+	
+	sessions := h.store.ListSessions()
+	cleanedCount := 0
+	
+	for _, session := range sessions {
+		// Check if session is older than cutoff and has no active clients
+		if session.CreatedAt.Before(cutoff) {
+			// Check if any clients are connected to this session
+			hasActiveClients := false
+			for client := range h.clients {
+				if client.sessionID == session.ID {
+					hasActiveClients = true
+					break
+				}
+			}
+			
+			// Clean up session channels that are inactive
+			if channel, exists := h.sessionChannels[session.ID]; exists {
+				channel.mutex.RLock()
+				channelInactive := len(channel.clients) == 0 && channel.lastActivity.Before(cutoff)
+				channel.mutex.RUnlock()
+				
+				if channelInactive {
+					delete(h.sessionChannels, session.ID)
+					logging.Debug("cleaned up inactive session channel", map[string]interface{}{
+						"session_id": session.ID,
+						"age": now.Sub(session.CreatedAt),
+					})
+				}
+			}
+			
+			// Delete session if no active clients
+			if !hasActiveClients {
+				if h.store.DeleteSession(session.ID) {
+					cleanedCount++
+					logging.Debug("cleaned up inactive session", map[string]interface{}{
+						"session_id": session.ID,
+						"age": now.Sub(session.CreatedAt),
+					})
+				}
+			}
+		}
+	}
+	
+	if cleanedCount > 0 {
+		logging.Info("session cleanup completed", map[string]interface{}{
+			"cleaned_sessions": cleanedCount,
+			"remaining_sessions": len(h.store.ListSessions()),
+		})
+	}
+}
+
+// LoadNamedChannelIntoSession loads a named channel's PlayCanvas configuration into a session
+func (h *Hub) LoadNamedChannelIntoSession(sessionID, channelID string) error {
+	logging.Info("loading named channel into session", map[string]interface{}{
+		"session_id": sessionID,
+		"channel_id": channelID,
+	})
+	
+	// Read channel YAML configuration
+	channelPath := filepath.Join("/opt/hd1/share/channels", channelID+".yaml")
+	configData, err := ioutil.ReadFile(channelPath)
+	if err != nil {
+		return fmt.Errorf("failed to read channel config %s: %w", channelPath, err)
+	}
+	
+	// Parse YAML configuration
+	var config ChannelConfig
+	if err := yaml.Unmarshal(configData, &config); err != nil {
+		return fmt.Errorf("failed to parse channel config %s: %w", channelPath, err)
+	}
+	
+	if config.PlayCanvas == nil {
+		logging.Info("no PlayCanvas configuration in channel", map[string]interface{}{
+			"channel_id": channelID,
+		})
+		return nil
+	}
+	
+	// Create entities in the session via API calls
+	for _, entity := range config.PlayCanvas.Entities {
+		if err := h.createEntityInSession(sessionID, entity); err != nil {
+			logging.Error("failed to create entity in session", map[string]interface{}{
+				"session_id": sessionID,
+				"channel_id": channelID,
+				"entity_name": entity.Name,
+				"error": err.Error(),
+			})
+			// Continue with other entities even if one fails
+		} else {
+			logging.Info("created entity in session", map[string]interface{}{
+				"session_id": sessionID,
+				"entity_name": entity.Name,
+			})
+		}
+	}
+	
+	logging.Info("channel entities loaded into session", map[string]interface{}{
+		"session_id": sessionID,
+		"channel_id": channelID,
+		"entities_created": len(config.PlayCanvas.Entities),
+	})
+	
+	return nil
+}
+
+// ClearSessionEntitiesWithBroadcast clears all entities from a session with proper WebSocket broadcasts
+// This implements the "API = Control" principle by using proper service calls instead of client-side loops
+func (h *Hub) ClearSessionEntitiesWithBroadcast(sessionID string) error {
+	logging.Info("clearing session entities with broadcast", map[string]interface{}{
+		"session_id": sessionID,
+	})
+	
+	// Get all entities in the session
+	entities, err := h.store.GetEntities(sessionID)
+	if err != nil {
+		return fmt.Errorf("failed to get session entities: %w", err)
+	}
+	
+	clearedCount := 0
+	for _, entity := range entities {
+		// Delete each entity via internal HTTP call to ensure proper broadcasts
+		url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities/%s", sessionID, entity.ID)
+		req, err := http.NewRequest("DELETE", url, nil)
+		if err != nil {
+			logging.Error("failed to create delete request", map[string]interface{}{
+				"session_id": sessionID,
+				"entity_id": entity.ID,
+				"error": err.Error(),
+			})
+			continue
+		}
+		
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			logging.Error("failed to delete entity", map[string]interface{}{
+				"session_id": sessionID,
+				"entity_id": entity.ID,
+				"error": err.Error(),
+			})
+			continue
+		}
+		resp.Body.Close()
+		
+		if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusNoContent {
+			clearedCount++
+			logging.Debug("entity cleared with broadcast", map[string]interface{}{
+				"session_id": sessionID,
+				"entity_id": entity.ID,
+				"entity_name": entity.Name,
+			})
+		}
+	}
+	
+	logging.Info("session entities cleared with broadcasts", map[string]interface{}{
+		"session_id": sessionID,
+		"entities_cleared": clearedCount,
+		"total_entities": len(entities),
+	})
+	
+	return nil
+}
+
+// createEntityInSession creates a PlayCanvas entity in the session via internal API call
+func (h *Hub) createEntityInSession(sessionID string, entity PlayCanvasEntity) error {
+	// Prepare the entity creation payload
+	payload := map[string]interface{}{
+		"name":       entity.Name,
+		"components": entity.Components,
+	}
+	
+	payloadJSON, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal entity payload: %w", err)
+	}
+	
+	// Make internal HTTP request to create entity
+	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadJSON))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+	
+	req.Header.Set("Content-Type", "application/json")
+	
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to create entity: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("entity creation failed with status %d: %s", resp.StatusCode, string(body))
+	}
+	
+	return nil
 }

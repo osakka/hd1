@@ -67,15 +67,24 @@ func SaveSceneFromSessionHandler(w http.ResponseWriter, r *http.Request, hub int
 		return
 	}
 
-	// Get current session objects (PHOTO - current state snapshot)
-	objects := store.ListObjects(sessionID)
-	if len(objects) == 0 {
-		http.Error(w, "No objects in session to save", http.StatusBadRequest)
+	// HD1 v3.0: Get session's current channel to extract entities
+	session, exists := store.GetSession(sessionID)
+	if !exists {
+		http.Error(w, "Session not found", http.StatusNotFound)
 		return
 	}
+	
+	// Check if session is joined to a channel
+	if session.ChannelID == "" {
+		http.Error(w, "Session must be joined to a channel to save scene", http.StatusBadRequest)
+		return
+	}
+	
+	// In HD1 v3.0, entities are defined in channel YAML, not stored in session
+	// This API creates a script that references the channel configuration
 
-	// Generate scene script from current session state
-	scriptContent := generateSceneScript(req.SceneID, req.Name, req.Description, convertObjectPointers(objects))
+	// Generate scene script that references the channel configuration
+	scriptContent := generateSceneScript(req.SceneID, req.Name, req.Description, session.ChannelID)
 	
 	// Ensure directory exists
 	if err := os.MkdirAll(filepath.Dir(scenePath), 0755); err != nil {
@@ -94,7 +103,7 @@ func SaveSceneFromSessionHandler(w http.ResponseWriter, r *http.Request, hub int
 		"type": "scene_saved",
 		"scene_id": req.SceneID,
 		"session_id": sessionID,
-		"objects_exported": len(objects),
+		"channel_id": session.ChannelID,
 		"timestamp": time.Now().Format(time.RFC3339),
 	}
 	if _, err := json.Marshal(saveMessage); err == nil {
@@ -109,12 +118,12 @@ func SaveSceneFromSessionHandler(w http.ResponseWriter, r *http.Request, hub int
 		"message": fmt.Sprintf("Scene '%s' saved successfully", req.Name),
 		"scene_id": req.SceneID,
 		"scene_path": scenePath,
-		"objects_exported": len(objects),
+		"channel_id": session.ChannelID,
 	})
 }
 
-// generateSceneScript creates a bash script from session objects
-func generateSceneScript(sceneID, name, description string, objects []server.Object) string {
+// generateSceneScript creates a bash script that references channel configuration
+func generateSceneScript(sceneID, name, description, channelID string) string {
 	script := fmt.Sprintf(`#!/bin/bash
 
 # =========================================================================
@@ -124,7 +133,7 @@ func generateSceneScript(sceneID, name, description string, objects []server.Obj
 # %s
 #
 # Usage: ./%s.sh [SESSION_ID]
-# Auto-generated from session state on %s
+# Auto-generated from channel %s configuration on %s
 # =========================================================================
 
 set -euo pipefail
@@ -132,6 +141,7 @@ set -euo pipefail
 # Scene configuration
 SCENE_NAME="%s"
 SCENE_DESCRIPTION="%s"
+CHANNEL_ID="%s"
 
 # Get session ID from argument or use active session
 SESSION_ID="${1:-${HD1_SESSION:-}}"
@@ -144,53 +154,24 @@ fi
 # Path to auto-generated HD1 client
 HD1_CLIENT="/opt/hd1/build/bin/hd1-client"
 
-echo "Creating %s scene..."
+echo "Creating %s scene from channel %s..."
 
-`, name, description, description, sceneID, time.Now().Format("2006-01-02 15:04:05"), name, description, strings.ToLower(name))
+# Join session to channel to load entities
+"$HD1_CLIENT" join-session-channel --session-id "$SESSION_ID" --channel-id "$CHANNEL_ID"
 
-	// Add object creation commands
-	for _, obj := range objects {
-		// Convert object to JSON for hd1-client
-		objectJSON := fmt.Sprintf(`{
-    "name": "%s",
-    "type": "%s",
-    "x": %v, "y": %v, "z": %v,
-    "scale": %v`, obj.Name, obj.Type, obj.X, obj.Y, obj.Z, obj.Scale)
+`, name, description, description, sceneID, channelID, time.Now().Format("2006-01-02 15:04:05"), name, description, channelID, strings.ToLower(name), channelID)
 
-		// Add color if present (Color is stored as string in current Object struct)
-		if obj.Color != "" {
-			objectJSON += fmt.Sprintf(`,
-    "color": "%s"`, obj.Color)
-		}
-
-		// Note: Wireframe property not in current Object struct
-		// TODO: Add wireframe support to Object struct
-
-		objectJSON += "\n}"
-
-		script += fmt.Sprintf(`
-# %s - %s
-$HD1_CLIENT create-object "$SESSION_ID" '%s' > /dev/null
-`, strings.Title(strings.ReplaceAll(obj.Name, "_", " ")), obj.Type, objectJSON)
-	}
-
+	// HD1 v3.0: Entities are defined in channel YAML configuration
+	// The scene script simply joins the session to the channel
+	
 	// Add footer
 	script += fmt.Sprintf(`
 echo "HD1 Scene '$SCENE_NAME' loaded successfully"
-echo "Objects created: %d"
+echo "Channel: $CHANNEL_ID entities loaded"
 echo "Session: $SESSION_ID"
-`, len(objects))
+`)
 
 	return script
-}
-
-// convertObjectPointers converts []*Object to []Object for generateSceneScript
-func convertObjectPointers(objects []*server.Object) []server.Object {
-	result := make([]server.Object, len(objects))
-	for i, obj := range objects {
-		result[i] = *obj
-	}
-	return result
 }
 
 // isValidSceneID validates scene ID format

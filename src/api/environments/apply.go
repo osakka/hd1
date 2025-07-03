@@ -127,15 +127,11 @@ func ApplyEnvironmentHandler(w http.ResponseWriter, r *http.Request, hub interfa
 		"session_id":     req.SessionID,
 	})
 
-	// Update session with current environment ID for props physics cohesion
-	if err := h.GetStore().UpdateSessionEnvironment(req.SessionID, environmentID); err != nil {
-		logging.Warn("session environment tracking update failed", map[string]interface{}{
-			"environment_id": environmentID,
-			"session_id":     req.SessionID,
-			"error":          err.Error(),
-		})
-		// Don't fail the request for this warning, environment is still applied
-	}
+	// Environments are now applied via channels, not session tracking
+	logging.Info("environment applied via channel configuration", map[string]interface{}{
+		"environment_id": environmentID,
+		"session_id":     req.SessionID,
+	})
 
 	// Return success response
 	response := ApplyEnvironmentResponse{

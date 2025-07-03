@@ -30,22 +30,12 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{}) 
 		return
 	}
 	
-	// Get related data
-	objects := h.GetStore().ListObjects(sessionID)
-	world, worldExists := h.GetStore().GetWorld(sessionID)
-	
-	// Build comprehensive session response
+	// Build session response with current architecture
 	sessionData := map[string]interface{}{
-		"id":                session.ID,
-		"created_at":        session.CreatedAt,
-		"status":           session.Status,
-		"object_count":     len(objects),
-		"world_initialized": worldExists,
-		"objects":          objects,
-	}
-	
-	if worldExists {
-		sessionData["world"] = world
+		"id":         session.ID,
+		"created_at": session.CreatedAt,
+		"status":     session.Status,
+		"channel_id": session.ChannelID, // Current channel joined
 	}
 	
 	w.Header().Set("Content-Type", "application/json")
