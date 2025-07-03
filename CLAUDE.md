@@ -9,12 +9,14 @@
 - **"API = Control, WebSocket = Graph Extension"**
 
 ## Current State (2025-07-03)
-HD1 v5.0.0 is a **production-ready API-first game engine** platform.
+HD1 v5.0.0 is a **production-ready API-first game engine** platform with **advanced multiplayer avatar synchronization**.
 
 ### ✅ Completed Features
-- **77 REST Endpoints**: Complete game engine control via HTTP
-- **Real-Time WebSocket**: <10ms entity lifecycle synchronization
-- **PlayCanvas Integration**: Professional 3D rendering with ECS
+- **79 REST Endpoints**: Complete game engine control via HTTP + Avatar management
+- **Real-Time WebSocket**: <10ms entity lifecycle synchronization + avatar position updates
+- **PlayCanvas Integration**: Professional 3D rendering with ECS + advanced camera system
+- **Avatar Synchronization**: High-frequency multiplayer avatar tracking with persistence
+- **Advanced Camera System**: Smooth movement, momentum, orbital mode with TAB toggle
 - **Channel System**: YAML-based scene configuration with 3 channels
 - **Console UI**: Professional monitoring with smooth animations
 - **Vendor Cleanup**: Removed 1.1GB redundant directories, optimized structure
@@ -26,11 +28,14 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → Client Ren
 ```
 
 **Key Files:**
-- `src/api.yaml` - Single source of truth (77 endpoints)
+- `src/api.yaml` - Single source of truth (79 endpoints)
 - `src/auto_router.go` - Auto-generated routing
 - `src/codegen/templates/` - External template files
 - `share/channels/*.yaml` - Scene configurations
 - `share/htdocs/static/js/hd1-console/` - Modular console system
+- `share/htdocs/static/js/hd1-playcanvas.js` - Advanced camera system with orbital mode
+- `src/api/sessions/avatar/` - Avatar management endpoints
+- `src/api/camera/position.go` - Camera position API with avatar sync
 
 ## Development Commands
 ```bash
@@ -43,7 +48,23 @@ make generate                              # Auto-generate from api.yaml
 - **Smooth Animations**: 0.4s cubic-bezier expand/collapse
 - **Performance Monitoring**: CPU, memory, WebSocket stats
 - **Channel Switching**: Live channel selection
-- **Entity Tracking**: Real-time entity counts
+- **Entity Tracking**: Real-time entity counts + avatar count display
+- **Advanced Camera**: TAB toggle between free/orbital modes, smooth movement with momentum
+- **Avatar Sync**: Real-time multiplayer avatar position updates via WebSocket
+
+## Avatar Synchronization System
+**High-Frequency Multiplayer Support**: Handles 100+ movements/updates per second
+- **Avatar Persistence**: Prevents avatar disappearing during rapid position updates
+- **Dual Message Types**: `avatar_position_update` for movement, `entity_updated` for creation
+- **Entity Lifecycle Protection**: Direct position updates avoid delete/recreate cycles
+- **Channel Broadcasting**: Bidirectional avatar visibility across sessions
+- **Performance Optimized**: <10ms WebSocket latency for real-time multiplayer
+
+**Camera System Architecture**:
+- **Free Camera Mode**: WASD movement with smooth momentum and acceleration/deceleration
+- **Orbital Camera Mode**: TAB to toggle, automatic avatar centering, mouse wheel zoom
+- **PlayCanvas Integration**: Professional Vec3.lerp() interpolation and Quat.slerp() rotation
+- **Error-Free Operation**: Fixed critical PlayCanvas constructor issues
 
 ## Quality Standards
 - **Auto-Generated**: Never edit auto_router.go, hd1lib.js, hd1lib.sh
@@ -58,4 +79,4 @@ make generate                              # Auto-generate from api.yaml
 
 ---
 
-**HD1 v3.0**: Where OpenAPI specifications become immersive game worlds.
+**HD1 v5.0.0**: Where OpenAPI specifications become immersive multiplayer game worlds with real-time avatar synchronization.

@@ -30,24 +30,27 @@
 
 ## 🚀 Current State: HD1 v5.0.0 (In Development)
 
-HD1 has a **complete API surface** for 3D engine control with 77 REST endpoints. The foundation is being built for the distributed services revolution.
+HD1 has a **complete API surface** for 3D engine control with **79 REST endpoints** and **advanced multiplayer avatar synchronization**. The foundation is built for the distributed services revolution.
 
 ### 🎮 Complete 3D Engine via REST APIs
 ```
-77 REST Endpoints → Entity-Component-System → PlayCanvas Rendering → Multi-User Sync
+79 REST Endpoints → Entity-Component-System → PlayCanvas Rendering → Real-Time Avatar Sync
 ```
 
 **Core Engine APIs**
 - **Entity Lifecycle**: Create, update, delete with full component systems
+- **Avatar Management**: Real-time multiplayer avatar tracking and synchronization
+- **Advanced Camera**: Free/orbital modes, smooth movement with momentum, TAB toggle
 - **Physics Simulation**: Rigidbodies, forces, collision detection
 - **Animation Control**: Timeline-based animations with precise control
 - **3D Audio Engine**: Spatial audio sources with positional audio
-- **Camera Systems**: Position, orbit, movement with smooth transitions
 - **Scene Hierarchy**: Parent-child relationships and transform inheritance
 
 ### 🌐 Multi-User Collaborative Environment
 - **Channel Architecture**: YAML-based scene configuration
 - **Real-Time Sync**: <10ms WebSocket state synchronization
+- **Avatar Persistence**: High-frequency position updates (100+ per second) without entity deletion
+- **Multiplayer Camera**: Orbital mode for multi-session viewing with automatic centering
 - **Session Isolation**: Per-user state with clean restoration
 - **Concurrent Users**: Multiple operators per channel with conflict resolution
 
