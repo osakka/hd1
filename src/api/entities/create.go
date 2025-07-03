@@ -159,6 +159,7 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		Name:           req.Name,
 		PlayCanvasGUID: playcanvasGUID,
 		Components:     components,
+		Tags:           req.Tags,
 		CreatedAt:      time.Now(),
 		Enabled:        enabled,
 	}

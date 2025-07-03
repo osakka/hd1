@@ -2,6 +2,7 @@ package entities
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -71,9 +72,27 @@ func UpdateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 	
-	// Parse request body
+	// Read request body for both specific and generic updates
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logging.Error("failed to read request body", map[string]interface{}{
+			"session_id": sessionID,
+			"entity_id":  entityID,
+			"error":      err.Error(),
+		})
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid request",
+			"message": "Could not read request body",
+		})
+		return
+	}
+
+	// Parse as specific UpdateEntityRequest first
 	var req UpdateEntityRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := json.Unmarshal(bodyBytes, &req); err != nil {
 		logging.Error("invalid JSON in request", map[string]interface{}{
 			"session_id": sessionID,
 			"entity_id":  entityID,
@@ -88,6 +107,10 @@ func UpdateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		})
 		return
 	}
+
+	// Also parse as generic map for component updates
+	var genericReq map[string]interface{}
+	json.Unmarshal(bodyBytes, &genericReq)
 	
 	// Validate position array if provided
 	if req.Position != nil && len(req.Position) != 3 {
@@ -141,26 +164,109 @@ func UpdateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 	
-	// TODO: Implement PlayCanvas entity updates
-	// For now, just track what would be changed
+	// Get the entity from storage to update it
+	entity, err := h.GetStore().GetEntity(sessionID, entityID)
+	if err != nil {
+		logging.Warn("entity not found in storage", map[string]interface{}{
+			"session_id": sessionID,
+			"entity_id":  entityID,
+			"error":      err.Error(),
+		})
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Entity not found",
+			"message": "Entity does not exist in session storage",
+		})
+		return
+	}
+
+	// Track actual changes made
 	changes := []string{}
+	
+	// Handle generic component updates from request body (for camera position updates)
+	if components, ok := genericReq["components"].(map[string]interface{}); ok {
+		if entity.Components == nil {
+			entity.Components = make(map[string]interface{})
+		}
+		
+		for componentType, componentData := range components {
+			entity.Components[componentType] = componentData
+			changes = append(changes, "components."+componentType)
+		}
+	}
+
+	// Apply specific field updates from parsed request
 	if req.Name != nil {
+		entity.Name = *req.Name
 		changes = append(changes, "name")
 	}
 	if req.Tags != nil {
+		entity.Tags = req.Tags
 		changes = append(changes, "tags")
 	}
 	if req.Enabled != nil {
+		entity.Enabled = *req.Enabled
 		changes = append(changes, "enabled")
 	}
 	if req.Position != nil {
+		if entity.Components == nil {
+			entity.Components = make(map[string]interface{})
+		}
+		if transform, ok := entity.Components["transform"].(map[string]interface{}); ok {
+			transform["position"] = req.Position
+		} else {
+			entity.Components["transform"] = map[string]interface{}{
+				"position": req.Position,
+			}
+		}
 		changes = append(changes, "position")
 	}
 	if req.Rotation != nil {
+		if entity.Components == nil {
+			entity.Components = make(map[string]interface{})
+		}
+		if transform, ok := entity.Components["transform"].(map[string]interface{}); ok {
+			transform["rotation"] = req.Rotation
+		} else {
+			entity.Components["transform"] = map[string]interface{}{
+				"rotation": req.Rotation,
+			}
+		}
 		changes = append(changes, "rotation")
 	}
 	if req.Scale != nil {
+		if entity.Components == nil {
+			entity.Components = make(map[string]interface{})
+		}
+		if transform, ok := entity.Components["transform"].(map[string]interface{}); ok {
+			transform["scale"] = req.Scale
+		} else {
+			entity.Components["transform"] = map[string]interface{}{
+				"scale": req.Scale,
+			}
+		}
 		changes = append(changes, "scale")
+	}
+
+	// Save the updated entity back to storage
+	if len(changes) > 0 {
+		if err := h.GetStore().UpdateEntity(sessionID, entityID, entity); err != nil {
+			logging.Error("failed to save updated entity", map[string]interface{}{
+				"session_id": sessionID,
+				"entity_id":  entityID,
+				"error":      err.Error(),
+			})
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   "Failed to save entity updates",
+				"message": "Could not persist entity changes",
+			})
+			return
+		}
 	}
 	
 	logging.Info("entity updated", map[string]interface{}{

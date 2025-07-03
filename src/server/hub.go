@@ -388,6 +388,74 @@ func (h *Hub) BroadcastToSession(sessionID string, updateType string, data inter
 	}
 }
 
+// BroadcastAvatarPositionToChannel broadcasts avatar position updates to ALL sessions in the same channel
+// This enables bidirectional visibility - all participants see each other's avatars
+func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType string, data interface{}) {
+	// Get the current session to find which channel it's in
+	session, exists := h.GetStore().GetSession(sessionID)
+	if !exists {
+		logging.Warn("cannot broadcast avatar position - session not found", map[string]interface{}{
+			"session_id": sessionID,
+		})
+		return
+	}
+	
+	// If session is not in a named channel, fall back to session-only broadcast
+	if session.ChannelID == "" {
+		h.BroadcastToSession(sessionID, updateType, data)
+		return
+	}
+	
+	channelID := session.ChannelID
+	
+	// Find ALL sessions currently in the same channel
+	allSessions := h.GetStore().ListSessions()
+	channelSessions := make([]string, 0)
+	
+	for _, s := range allSessions {
+		if s.ChannelID == channelID {
+			channelSessions = append(channelSessions, s.ID)
+		}
+	}
+	
+	update := map[string]interface{}{
+		"type": updateType,
+		"data": data,
+		"timestamp": time.Now().Unix(),
+		"session_id": sessionID,  // Still identify the originating session
+		"channel_id": channelID,  // Add channel context
+	}
+	
+	if jsonData, err := json.Marshal(update); err == nil {
+		// Broadcast to ALL sessions in the channel for bidirectional visibility
+		totalClients := 0
+		for client := range h.clients {
+			// Send to clients in ANY session that's in this channel
+			for _, chanSessionID := range channelSessions {
+				if client.sessionID == chanSessionID {
+					select {
+					case client.send <- jsonData:
+						totalClients++
+					default:
+						close(client.send)
+						delete(h.clients, client)
+					}
+					break // Don't send duplicate to same client
+				}
+			}
+		}
+		
+		// Enhanced logging for channel broadcasts
+		logging.Info("avatar position broadcast to channel", map[string]interface{}{
+			"originating_session": sessionID,
+			"channel_id": channelID,
+			"channel_sessions": channelSessions,
+			"total_clients": totalClients,
+			"update_type": updateType,
+		})
+	}
+}
+
 // SessionStore provides persistence for 3D visualization sessions
 type SessionStore struct {
 	mutex    sync.RWMutex
@@ -402,6 +470,7 @@ type Entity struct {
 	Name           string                 `json:"name"`
 	PlayCanvasGUID string                 `json:"playcanvas_guid"`
 	Components     map[string]interface{} `json:"components"`
+	Tags           []string               `json:"tags,omitempty"`
 	CreatedAt      time.Time              `json:"created_at"`
 	Enabled        bool                   `json:"enabled"`
 }
@@ -542,6 +611,30 @@ func (s *SessionStore) GetEntity(sessionID, entityID string) (*Entity, error) {
 	}
 
 	return entity, nil
+}
+
+// UpdateEntity updates an existing entity in a session
+func (s *SessionStore) UpdateEntity(sessionID, entityID string, updatedEntity *Entity) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	session, exists := s.sessions[sessionID]
+	if !exists {
+		return &SessionError{Message: "Session not found"}
+	}
+
+	if session.Entities == nil {
+		return &SessionError{Message: "No entities found in session"}
+	}
+
+	_, exists = session.Entities[entityID]
+	if !exists {
+		return &SessionError{Message: "Entity not found"}
+	}
+
+	// Update the entity in the session's entities map
+	session.Entities[entityID] = updatedEntity
+	return nil
 }
 
 // Legacy Object and World management methods removed
@@ -810,4 +903,226 @@ func (h *Hub) createEntityInSession(sessionID string, entity PlayCanvasEntity) e
 	}
 	
 	return nil
+}
+
+// CreateEntityViaAPI creates an entity by making an HTTP call to HD1's own API
+// This maintains 100% API-first architecture - all entity creation goes through the API
+func (h *Hub) CreateEntityViaAPI(sessionID string, entityPayload map[string]interface{}) error {
+	payloadJSON, err := json.Marshal(entityPayload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal entity payload: %w", err)
+	}
+	
+	// Make internal HTTP request to HD1's create entity API
+	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadJSON))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+	
+	req.Header.Set("Content-Type", "application/json")
+	
+	client := &http.Client{Timeout: time.Second * 5}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to create entity via API: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("entity creation failed with status %d: %s", resp.StatusCode, string(body))
+	}
+	
+	return nil
+}
+
+// DeleteEntityByNameViaAPI finds an entity by name and deletes it via API
+// This maintains 100% API-first architecture - all entity operations go through the API
+func (h *Hub) DeleteEntityByNameViaAPI(sessionID, entityName string) error {
+	// First, get all entities to find the one with matching name
+	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create list entities request: %w", err)
+	}
+	
+	client := &http.Client{Timeout: time.Second * 5}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to list entities via API: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("list entities failed with status %d: %s", resp.StatusCode, string(body))
+	}
+	
+	var entitiesResponse struct {
+		Entities []struct {
+			ID   string `json:"entity_id"`
+			Name string `json:"name"`
+		} `json:"entities"`
+	}
+	
+	if err := json.NewDecoder(resp.Body).Decode(&entitiesResponse); err != nil {
+		return fmt.Errorf("failed to decode entities response: %w", err)
+	}
+	
+	// Find entity with matching name
+	var entityID string
+	for _, entity := range entitiesResponse.Entities {
+		if entity.Name == entityName {
+			entityID = entity.ID
+			break
+		}
+	}
+	
+	if entityID == "" {
+		return fmt.Errorf("entity with name '%s' not found", entityName)
+	}
+	
+	// Delete the entity via API
+	deleteURL := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities/%s", sessionID, entityID)
+	deleteReq, err := http.NewRequest("DELETE", deleteURL, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create delete request: %w", err)
+	}
+	
+	deleteResp, err := client.Do(deleteReq)
+	if err != nil {
+		return fmt.Errorf("failed to delete entity via API: %w", err)
+	}
+	defer deleteResp.Body.Close()
+	
+	if deleteResp.StatusCode != http.StatusOK && deleteResp.StatusCode != http.StatusNoContent {
+		body, _ := ioutil.ReadAll(deleteResp.Body)
+		return fmt.Errorf("entity deletion failed with status %d: %s", deleteResp.StatusCode, string(body))
+	}
+	
+	return nil
+}
+
+// UpdateEntityByNameViaAPI finds an entity by name and updates it via API
+// This maintains 100% API-first architecture - all entity operations go through the API
+func (h *Hub) UpdateEntityByNameViaAPI(sessionID, entityName string, updatePayload map[string]interface{}) error {
+	// First, get all entities to find the one with matching name
+	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create list entities request: %w", err)
+	}
+	
+	client := &http.Client{Timeout: time.Second * 5}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to list entities via API: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("list entities failed with status %d: %s", resp.StatusCode, string(body))
+	}
+	
+	var entitiesResponse struct {
+		Entities []struct {
+			ID   string `json:"entity_id"`
+			Name string `json:"name"`
+		} `json:"entities"`
+	}
+	
+	if err := json.NewDecoder(resp.Body).Decode(&entitiesResponse); err != nil {
+		return fmt.Errorf("failed to decode entities response: %w", err)
+	}
+	
+	// Find entity with matching name
+	var entityID string
+	for _, entity := range entitiesResponse.Entities {
+		if entity.Name == entityName {
+			entityID = entity.ID
+			break
+		}
+	}
+	
+	if entityID == "" {
+		return fmt.Errorf("entity with name '%s' not found", entityName)
+	}
+	
+	// Prepare update payload
+	payloadJSON, err := json.Marshal(updatePayload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal update payload: %w", err)
+	}
+	
+	// Update the entity via API
+	updateURL := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities/%s", sessionID, entityID)
+	updateReq, err := http.NewRequest("PUT", updateURL, bytes.NewBuffer(payloadJSON))
+	if err != nil {
+		return fmt.Errorf("failed to create update request: %w", err)
+	}
+	
+	updateReq.Header.Set("Content-Type", "application/json")
+	
+	updateResp, err := client.Do(updateReq)
+	if err != nil {
+		return fmt.Errorf("failed to update entity via API: %w", err)
+	}
+	defer updateResp.Body.Close()
+	
+	if updateResp.StatusCode != http.StatusOK && updateResp.StatusCode != http.StatusNoContent {
+		body, _ := ioutil.ReadAll(updateResp.Body)
+		return fmt.Errorf("entity update failed with status %d: %s", updateResp.StatusCode, string(body))
+	}
+	
+	return nil
+}
+
+// GetEntityByNameViaAPI finds an entity by name and returns its data via API
+// This maintains 100% API-first architecture - all entity operations go through the API
+func (h *Hub) GetEntityByNameViaAPI(sessionID, entityName string) (map[string]interface{}, error) {
+	// First, get all entities to find the one with matching name
+	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create list entities request: %w", err)
+	}
+	
+	client := &http.Client{Timeout: time.Second * 5}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list entities via API: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return nil, fmt.Errorf("list entities failed with status %d: %s", resp.StatusCode, string(body))
+	}
+	
+	var entitiesResponse struct {
+		Entities []struct {
+			ID         string                 `json:"entity_id"`
+			Name       string                 `json:"name"`
+			Components map[string]interface{} `json:"components"`
+		} `json:"entities"`
+	}
+	
+	if err := json.NewDecoder(resp.Body).Decode(&entitiesResponse); err != nil {
+		return nil, fmt.Errorf("failed to decode entities response: %w", err)
+	}
+	
+	// Find entity with matching name and return its full data
+	for _, entity := range entitiesResponse.Entities {
+		if entity.Name == entityName {
+			return map[string]interface{}{
+				"entity_id":  entity.ID,
+				"name":       entity.Name,
+				"components": entity.Components,
+			}, nil
+		}
+	}
+	
+	return nil, fmt.Errorf("entity with name '%s' not found", entityName)
 }

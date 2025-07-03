@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -93,6 +94,46 @@ func JoinSessionChannelHandler(w http.ResponseWriter, r *http.Request, hub inter
 	
 	// Join the session channel (create channel if it doesn't exist)
 	channel, clientCount, graphState := h.JoinSessionChannel(sessionID, request.ClientID, request.Reconnect)
+	
+	// Create session avatar entity via API (100% API-first approach)
+	avatarName := fmt.Sprintf("session_%s", request.ClientID)
+	avatarPayload := map[string]interface{}{
+		"name": avatarName,
+		"tags": []string{"session-avatar", "user-representation"},
+		"components": map[string]interface{}{
+			"transform": map[string]interface{}{
+				"position": []float64{0, 1.5, 0}, // Default spawn position
+			},
+			"render": map[string]interface{}{
+				"geometry": "capsule",
+				"material": map[string]interface{}{
+					"color": "#00FFFF", // Teal color for session avatar
+				},
+			},
+			"text": map[string]interface{}{
+				"text": request.ClientID,
+				"offset": []float64{0, 1, 0}, // Float above avatar
+				"color": "#FFFFFF",
+				"size": 0.3,
+			},
+		},
+	}
+	
+	// Use HD1's API to create the avatar entity
+	if err := h.CreateEntityViaAPI(sessionID, avatarPayload); err != nil {
+		logging.Warn("failed to create session avatar via API", map[string]interface{}{
+			"session_id": sessionID,
+			"client_id": request.ClientID,
+			"error": err.Error(),
+		})
+		// Continue - avatar creation failure shouldn't block channel join
+	} else {
+		logging.Info("session avatar created via API", map[string]interface{}{
+			"session_id": sessionID,
+			"client_id": request.ClientID,
+			"avatar_name": avatarName,
+		})
+	}
 	
 	logging.Info("client joined session channel", map[string]interface{}{
 		"session_id": sessionID,

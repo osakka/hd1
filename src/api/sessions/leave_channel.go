@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -51,6 +52,24 @@ func LeaveSessionChannelHandler(w http.ResponseWriter, r *http.Request, hub inte
 	if !success {
 		http.Error(w, "Client not found in channel or channel does not exist", http.StatusNotFound)
 		return
+	}
+	
+	// Remove session avatar entity via API (100% API-first approach)
+	avatarName := fmt.Sprintf("session_%s", request.ClientID)
+	if err := h.DeleteEntityByNameViaAPI(sessionID, avatarName); err != nil {
+		logging.Warn("failed to delete session avatar via API", map[string]interface{}{
+			"session_id": sessionID,
+			"client_id": request.ClientID,
+			"avatar_name": avatarName,
+			"error": err.Error(),
+		})
+		// Continue - avatar deletion failure shouldn't block channel leave
+	} else {
+		logging.Info("session avatar deleted via API", map[string]interface{}{
+			"session_id": sessionID,
+			"client_id": request.ClientID,
+			"avatar_name": avatarName,
+		})
 	}
 	
 	logging.Info("client left session channel", map[string]interface{}{

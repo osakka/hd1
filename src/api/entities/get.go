@@ -61,11 +61,9 @@ func GetEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 		return
 	}
 	
-	// TODO: Implement PlayCanvas entity retrieval
-	// For now, return mock entity data for demonstration
-	
-	// Check if entity exists (mock implementation)
-	if !strings.HasPrefix(entityID, "entity-") {
+	// Get entity from hub storage
+	entity, err := h.GetStore().GetEntity(sessionID, entityID)
+	if err != nil {
 		logging.Warn("entity not found", map[string]interface{}{
 			"session_id": sessionID,
 			"entity_id":  entityID,
@@ -83,27 +81,21 @@ func GetEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 	logging.Info("entity retrieved", map[string]interface{}{
 		"session_id": sessionID,
 		"entity_id":  entityID,
+		"name":       entity.Name,
 	})
 	
-	// Return mock entity details
+	// Return real entity details
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":   true,
-		"entity_id": entityID,
-		"name":      "MockEntity",
-		"enabled":   true,
-		"tags":      []string{"mock", "demo"},
-		"transform": map[string]interface{}{
-			"position": []float64{0, 0, 0},
-			"rotation": []float64{0, 0, 0, 1},
-			"scale":    []float64{1, 1, 1},
-		},
-		"components": []string{},
-		"component_details": map[string]interface{}{},
-		"children":    []string{},
-		"parent":      nil,
-		"playcanvas_guid": "pc-guid-mock-" + entityID,
-		"created_at":      time.Now().Add(-time.Hour).Format(time.RFC3339),
-		"last_updated":    time.Now().Format(time.RFC3339),
+		"success":           true,
+		"entity":            entity,
+		"entity_id":         entity.ID,
+		"name":              entity.Name,
+		"enabled":           entity.Enabled,
+		"tags":              entity.Tags,
+		"components":        entity.Components,
+		"playcanvas_guid":   entity.PlayCanvasGUID,
+		"created_at":        entity.CreatedAt.Format(time.RFC3339),
+		"last_updated":      time.Now().Format(time.RFC3339),
 	})
 }

@@ -581,6 +581,221 @@ paths:
       x-function: "DeleteSession"
 
   # ========================================
+  # AVATAR MANAGEMENT (HD1 v5.0)
+  # Specification-driven avatar system with real-time sync
+  # ========================================
+  /avatars:
+    get:
+      operationId: listAvatars
+      tags: [Avatars]
+      summary: List available avatar types
+      description: |
+        Returns all available avatar types with their specifications.
+        Each avatar type includes metadata, asset references, and configuration.
+      responses:
+        '200':
+          description: Available avatar types retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  avatars:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AvatarType'
+                  message:
+                    type: string
+                    example: "Avatar types retrieved successfully"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-handler: "api/avatars/list.go"
+      x-function: "ListAvatars"
+
+  /avatars/{avatarType}:
+    get:
+      operationId: getAvatarSpecification
+      tags: [Avatars]
+      summary: Get specific avatar specification
+      description: |
+        Returns the complete specification for a specific avatar type.
+        Includes all asset references, component definitions, and configuration.
+      parameters:
+        - name: avatarType
+          in: path
+          required: true
+          description: Avatar type identifier (default, business, casual)
+          schema:
+            type: string
+            enum: [default, business, casual]
+            example: default
+      responses:
+        '200':
+          description: Avatar specification retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  avatar:
+                    $ref: '#/components/schemas/AvatarSpecification'
+                  message:
+                    type: string
+                    example: "Avatar specification retrieved successfully"
+        '404':
+          description: Avatar type not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-handler: "api/avatars/get.go"
+      x-function: "GetAvatarSpecification"
+
+  /sessions/{sessionId}/avatar:
+    get:
+      operationId: getSessionAvatar
+      tags: [Session Avatars]
+      summary: Get current session avatar
+      description: |
+        Returns the current avatar configuration for the specified session.
+        Includes avatar type, entity ID, and current state.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session avatar retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  avatar:
+                    $ref: '#/components/schemas/SessionAvatar'
+                  message:
+                    type: string
+                    example: "Session avatar retrieved successfully"
+        '404':
+          description: Session not found or no avatar assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-handler: "api/sessions/avatar/get.go"
+      x-function: "GetSessionAvatar"
+
+    post:
+      operationId: setSessionAvatar
+      tags: [Session Avatars]
+      summary: Set or update session avatar
+      description: |
+        Sets or updates the avatar for a session based on avatar type.
+        Creates avatar entity automatically with proper tags and components.
+        Broadcasts avatar change to all session participants via WebSocket.
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                avatar_type:
+                  type: string
+                  enum: [default, business, casual]
+                  description: Avatar type to assign to session
+                  example: business
+                spawn_position:
+                  type: object
+                  properties:
+                    x:
+                      type: number
+                      format: float
+                      minimum: -12
+                      maximum: 12
+                      example: 0
+                    y:
+                      type: number
+                      format: float
+                      minimum: -12
+                      maximum: 12
+                      example: 0
+                    z:
+                      type: number
+                      format: float
+                      minimum: -12
+                      maximum: 12
+                      example: 0
+                  description: Optional spawn position (defaults to avatar spec)
+              required:
+                - avatar_type
+      responses:
+        '200':
+          description: Avatar set successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  avatar:
+                    $ref: '#/components/schemas/SessionAvatar'
+                  entity_id:
+                    type: string
+                    description: Created avatar entity ID
+                    example: "avatar-session-123-user-456"
+                  message:
+                    type: string
+                    example: "Avatar set successfully"
+        '400':
+          description: Invalid avatar type or position
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-handler: "api/sessions/avatar/set.go"
+      x-function: "SetSessionAvatar"
+
+  # ========================================
   # SESSION GRAPH SESSION GRAPH & ROOM MANAGEMENT CHANNEL MANAGEMENT
   # TCP-level reliability with channel-based architecture
   # ========================================
@@ -4435,6 +4650,57 @@ paths:
   # CAMERA CONTROL
   # ========================================
   /sessions/{sessionId}/camera/position:
+    get:
+      operationId: getCameraPosition
+      tags: [Camera]
+      summary: Get current camera coordinates
+      description: Retrieve current camera position and avatar location
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Camera position retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  camera_position:
+                    type: object
+                    properties:
+                      x:
+                        type: number
+                        example: 0.0
+                      y:
+                        type: number  
+                        example: 1.6
+                      z:
+                        type: number
+                        example: 5.0
+                  avatar_position:
+                    type: object
+                    properties:
+                      x:
+                        type: number
+                        example: 0.0
+                      y:
+                        type: number
+                        example: 3.1
+                      z:
+                        type: number
+                        example: 5.0
+                  avatar_name:
+                    type: string
+                    example: "session_a1b2c3d4"
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-handler: "api/camera/position.go"
+      x-function: "GetCameraPosition"
+    
     put:
       operationId: setCameraPosition
       tags: [Camera]
@@ -5494,6 +5760,211 @@ components:
           example: true
         message:
           type: string
+
+    # Avatar Management Schemas
+    AvatarType:
+      type: object
+      required: [name, type, description, contexts]
+      properties:
+        name:
+          type: string
+          description: Human-readable avatar name
+          example: "Business Avatar"
+        type:
+          type: string
+          enum: [default, business, casual]
+          description: Avatar type identifier
+          example: "business"
+        description:
+          type: string
+          description: Avatar description and purpose
+          example: "Professional avatar with business attire for corporate sessions"
+        contexts:
+          type: array
+          items:
+            type: string
+          description: Contexts where this avatar is appropriate
+          example: ["meeting", "presentation", "corporate"]
+        asset_path:
+          type: string
+          description: Path to avatar specification file
+          example: "business/avatar.yaml"
+
+    AvatarSpecification:
+      type: object
+      required: [metadata, assets, physical, entity, movement, animations, network]
+      properties:
+        metadata:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "Business Avatar"
+            description:
+              type: string
+              example: "Professional avatar for corporate sessions"
+            version:
+              type: string
+              example: "1.0.0"
+            type:
+              type: string
+              example: "session-avatar"
+            created:
+              type: string
+              format: date
+              example: "2025-07-03"
+        assets:
+          type: object
+          properties:
+            model:
+              type: string
+              example: "business_model.glb"
+            textures:
+              type: array
+              items:
+                type: string
+              example: ["textures/business_skin.png", "textures/business_suit.png"]
+            animations:
+              type: array
+              items:
+                type: string
+              example: ["animations/professional_idle.glb", "animations/confident_walk.glb"]
+        physical:
+          type: object
+          properties:
+            default_transforms:
+              $ref: '#/components/schemas/Transform'
+            camera_offset:
+              $ref: '#/components/schemas/Vector3'
+            camera_follow_distance:
+              type: number
+              format: float
+              example: 2.5
+            physics:
+              type: object
+              properties:
+                mass:
+                  type: number
+                  format: float
+                  example: 75.0
+                height:
+                  type: number
+                  format: float
+                  example: 1.75
+                collision_radius:
+                  type: number
+                  format: float
+                  example: 0.35
+        entity:
+          type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+              example: ["session-avatar", "avatar", "business", "professional"]
+            name_template:
+              type: string
+              example: "business-avatar-{session_id}-{user_id}"
+            components:
+              type: object
+              description: PlayCanvas component definitions
+        movement:
+          type: object
+          properties:
+            walk_speed:
+              type: number
+              format: float
+              example: 1.5
+            run_speed:
+              type: number
+              format: float
+              example: 3.5
+            turn_speed:
+              type: number
+              format: float
+              example: 120.0
+            acceleration:
+              type: number
+              format: float
+              example: 6.0
+            deceleration:
+              type: number
+              format: float
+              example: 10.0
+        animations:
+          type: object
+          properties:
+            states:
+              type: object
+              description: Animation state machine configuration
+        network:
+          type: object
+          properties:
+            sync_frequency:
+              type: integer
+              example: 30
+            position_threshold:
+              type: number
+              format: float
+              example: 0.01
+            rotation_threshold:
+              type: number
+              format: float
+              example: 1.0
+            interpolation:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  example: true
+                method:
+                  type: string
+                  enum: [linear, cubic]
+                  example: "linear"
+                time:
+                  type: number
+                  format: float
+                  example: 0.15
+
+    SessionAvatar:
+      type: object
+      required: [avatar_type, entity_id, created, position, status]
+      properties:
+        avatar_type:
+          type: string
+          enum: [default, business, casual]
+          description: Currently assigned avatar type
+          example: "business"
+        entity_id:
+          type: string
+          description: Avatar entity identifier
+          example: "avatar-session-123-user-456"
+        created:
+          type: string
+          format: date-time
+          description: When avatar was assigned
+        position:
+          $ref: '#/components/schemas/Vector3'
+        rotation:
+          $ref: '#/components/schemas/Vector3'
+        status:
+          type: string
+          enum: [active, inactive, syncing]
+          description: Current avatar status
+          example: "active"
+        last_update:
+          type: string
+          format: date-time
+          description: Last position/rotation update
+        session_id:
+          type: string
+          description: Associated session ID
+          example: "session_a1b2c3d4"
+        user_id:
+          type: string
+          description: Associated user ID (if available)
+          example: "user-456"
 
     Error:
       type: object

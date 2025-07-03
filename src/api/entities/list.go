@@ -95,8 +95,16 @@ func ListEntitiesHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	for _, entity := range storedEntities {
 		// Apply filters
 		if tagFilter != "" {
-			// Tag filtering not implemented yet
-			continue
+			hasTag := false
+			for _, tag := range entity.Tags {
+				if tag == tagFilter {
+					hasTag = true
+					break
+				}
+			}
+			if !hasTag {
+				continue
+			}
 		}
 		
 		if enabledFilter != "" {
@@ -113,6 +121,7 @@ func ListEntitiesHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 			"name":             entity.Name,
 			"playcanvas_guid":  entity.PlayCanvasGUID,
 			"components":       entity.Components,
+			"tags":             entity.Tags,
 			"created_at":       entity.CreatedAt,
 			"enabled":          entity.Enabled,
 		}
