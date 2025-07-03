@@ -66,7 +66,7 @@ paths:
                           example: "Primary collaborative environment for general holodeck activities"
                         environment:
                           type: string
-                          example: "earth-surface"
+                          example: "channel_one"
                         max_clients:
                           type: integer
                           example: 100
@@ -101,7 +101,7 @@ paths:
                 environment:
                   type: string
                   description: Environment ID to apply to channel
-                  example: "earth-surface"
+                  example: "channel_one"
                 max_clients:
                   type: integer
                   description: Maximum concurrent clients allowed
@@ -143,7 +143,7 @@ paths:
                         example: "Custom environment for specialized workflows"
                       environment:
                         type: string
-                        example: "earth-surface"
+                        example: "channel_one"
                       max_clients:
                         type: integer
                         example: 50
@@ -225,7 +225,7 @@ paths:
                         example: "Primary collaborative environment for general holodeck activities"
                       environment:
                         type: string
-                        example: "earth-surface"
+                        example: "channel_one"
                       max_clients:
                         type: integer
                         example: 100
@@ -861,242 +861,6 @@ paths:
       x-function: "GetSessionChannelStatus"
 
   # ========================================
-  # ENVIRONMENT MANAGEMENT
-  # ========================================
-  /environments:
-    get:
-      operationId: listEnvironments
-      tags: [Environments]
-      summary: List available environments
-      description: |
-        Returns all available HD1 environments with their physics settings.
-        Environments define scale, gravity, atmosphere, and world physics parameters.
-      responses:
-        '200':
-          description: Available environments
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  environments:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/EnvironmentInfo'
-              example:
-                success: true
-                environments:
-                  - id: "earth-surface"
-                    name: "Earth Surface"
-                    description: "Standard terrestrial environment"
-                    scale_unit: "m"
-                    gravity: 9.8
-                    atmosphere: "air"
-                  - id: "molecular-scale"
-                    name: "Molecular Scale"
-                    description: "Nanometer-scale molecular environment"
-                    scale_unit: "nm"
-                    gravity: 0.0
-                    atmosphere: "vacuum"
-      x-handler: "api/environments/list.go"
-      x-function: "ListEnvironments"
-
-  /environments/{environmentId}:
-    post:
-      operationId: applyEnvironment
-      tags: [Environments]
-      summary: Apply environment to session
-      description: |
-        Applies environment settings (scale, gravity, atmosphere) to specified session.
-        Environment settings affect all objects and physics in the session.
-      parameters:
-        - name: environmentId
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: '^[a-z][a-z0-9\-]*[a-z0-9]$'
-          example: "earth-surface"
-          description: Environment identifier
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - session_id
-              properties:
-                session_id:
-                  type: string
-                  pattern: '^session_[a-f0-9]{8}$'
-                  description: Target session for environment application
-                  example: "session_a1b2c3d4"
-            example:
-              session_id: "session_a1b2c3d4"
-      responses:
-        '200':
-          description: Environment applied successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  environment_id:
-                    type: string
-                  session_id:
-                    type: string
-                  message:
-                    type: string
-              example:
-                success: true
-                environment_id: "earth-surface"
-                session_id: "session_a1b2c3d4"
-                message: "Environment 'Earth Surface' applied successfully"
-        '404':
-          description: Environment or session not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '400':
-          description: Invalid environment or session
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-handler: "api/environments/apply.go"
-      x-function: "ApplyEnvironment"
-
-  # ========================================
-  # PROPS MANAGEMENT
-  # ========================================
-  /props:
-    get:
-      operationId: listProps
-      tags: [Props]
-      summary: List available props
-      description: |
-        Returns all available props in the system. Props are reusable objects
-        with predefined physics properties, materials, and behavior.
-        
-        Props automatically adapt to the current environment's scale and physics.
-      responses:
-        '200':
-          description: List of available props
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  props:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/PropInfo'
-                    example:
-                      - id: "wooden-chair"
-                        name: "Wooden Chair"
-                        description: "Standard wooden chair with realistic physics"
-                        category: "furniture"
-                        scale_compatible: ["mm", "cm", "m"]
-                        mass: 5.5
-                        material: "wood"
-                        dimensions: {width: 0.6, height: 0.8, depth: 0.6}
-      x-handler: "api/props/list.go"
-      x-function: "ListProps"
-
-  /sessions/{sessionId}/props/{propId}:
-    post:
-      operationId: instantiateProp
-      tags: [Props]
-      summary: Instantiate prop in session
-      description: |
-        Creates an instance of a prop in the specified session. The prop
-        will be automatically scaled and physics-adjusted to match the 
-        current environment.
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "session-abc123"
-        - name: propId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "wooden-chair"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [position]
-              properties:
-                position:
-                  $ref: '#/components/schemas/Position'
-                rotation:
-                  $ref: '#/components/schemas/Rotation'
-                scale:
-                  type: number
-                  minimum: 0.1
-                  maximum: 10.0
-                  default: 1.0
-                  description: "Scale multiplier relative to prop's base size"
-                instance_name:
-                  type: string
-                  description: "Custom name for this prop instance"
-                  example: "chair-01"
-      responses:
-        '200':
-          description: Prop instantiated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  prop_id:
-                    type: string
-                    example: "wooden-chair"
-                  instance_name:
-                    type: string
-                    example: "chair-01"
-                  session_id:
-                    type: string
-                    example: "session-abc123"
-                  objects_created:
-                    type: integer
-                    example: 5
-                  message:
-                    type: string
-                    example: "Prop 'Wooden Chair' instantiated as 'chair-01'"
-        '400':
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Session or prop not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-handler: "api/props/instantiate.go"
-      x-function: "InstantiateProp"
-
   # ========================================
   # ENTITY MANAGEMENT (PLAYCANVAS GAME ENGINE)
   # ========================================
@@ -2717,225 +2481,6 @@ paths:
       x-handler: "api/lifecycle/bulk.go"
       x-function: "BulkEntityLifecycleOperation"
 
-  # ========================================
-  # SCENE MANAGEMENT
-  # ========================================
-  /scenes:
-    get:
-      operationId: listScenes
-      tags: [Scenes]
-      summary: List available scenes
-      description: |
-        Returns all available HD1 scenes for holodeck environments.
-        Scenes are predefined HD1 scripts that create specific environments.
-      responses:
-        '200':
-          description: Available scenes
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  scenes:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/SceneInfo'
-      x-handler: "api/scenes/list.go"
-      x-function: "ListScenes"
-
-  /scenes/{sceneId}:
-    post:
-      operationId: loadScene
-      tags: [Scenes]
-      summary: Load scene into session
-      description: |
-        Loads a predefined scene (HD1 script) into the specified session.
-        Clears existing objects and applies scene configuration.
-      parameters:
-        - name: sceneId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Scene identifier (empty, anime-ui, ultimate, basic-shapes)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                session_id:
-                  type: string
-                  description: Target session for scene loading
-              required:
-                - session_id
-      responses:
-        '200':
-          description: Scene loaded successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  scene_id:
-                    type: string
-                  session_id:
-                    type: string
-                  objects_created:
-                    type: integer
-                  message:
-                    type: string
-        '404':
-          description: Scene not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '400':
-          description: Invalid session or request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-handler: "api/scenes/load.go"
-      x-function: "LoadScene"
-
-  # ========================================
-  # SCENE FORKING & MANAGEMENT
-  # ========================================
-  /sessions/{sessionId}/scenes/save:
-    post:
-      operationId: saveSceneFromSession
-      tags: [Scenes]
-      summary: Save session state as new scene
-      description: |
-        Creates a new scene script from current session objects.
-        Generates a .sh script in share/glibsh/scenes/ with all session objects.
-      parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                scene_id:
-                  type: string
-                  description: ID for new scene (becomes filename)
-                  example: "my-custom-scene"
-                name:
-                  type: string
-                  description: Human-readable scene name
-                  example: "My Custom Scene"
-                description:
-                  type: string
-                  description: Scene description
-                  example: "Custom scene with modified objects"
-                overwrite:
-                  type: boolean
-                  description: Allow overwriting existing scene
-                  default: false
-              required: [scene_id, name, description]
-      responses:
-        '201':
-          description: Scene saved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-                  scene_id:
-                    type: string
-                  scene_path:
-                    type: string
-                  objects_exported:
-                    type: integer
-        '400':
-          description: Invalid request or scene already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Scene already exists (use overwrite=true)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-handler: "api/scenes/save.go"
-      x-function: "SaveSceneFromSession"
-
-  /scenes/{sceneId}/fork:
-    post:
-      operationId: forkScene
-      tags: [Scenes]
-      summary: Fork scene to session for editing
-      description: |
-        Loads a scene into session and marks objects as "base" for tracking changes.
-        Enables sandbox editing while preserving original scene integrity.
-      parameters:
-        - name: sceneId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                session_id:
-                  type: string
-                  description: Target session for forked scene
-                clear_existing:
-                  type: boolean
-                  description: Clear existing objects before fork
-                  default: true
-              required: [session_id]
-      responses:
-        '200':
-          description: Scene forked to session
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-                  scene_id:
-                    type: string
-                  session_id:
-                    type: string
-                  objects_forked:
-                    type: integer
-                  fork_timestamp:
-                    type: string
-        '400':
-          description: Invalid scene or session
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-handler: "api/scenes/fork.go"  
-      x-function: "ForkScene"
 
   # ========================================
   # SCENE GRAPH MANAGEMENT - PLAYCANVAS
@@ -5024,7 +4569,7 @@ components:
         id:
           type: string
           pattern: '^[a-z][a-z0-9\-]*[a-z0-9]$'
-          example: "earth-surface"
+          example: "channel_one"
           description: "Environment identifier"
         name:
           type: string
@@ -5210,39 +4755,6 @@ components:
           description: "Angular speed"
 
     # Common Schemas
-    SceneInfo:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique scene identifier
-          example: "anime-ui"
-        name:
-          type: string
-          description: Human-readable scene name
-          example: "Anime UI Demo"
-        description:
-          type: string
-          description: Scene description
-          example: "Interactive anime-style holodeck with floating UI elements"
-        object_count:
-          type: integer
-          description: Number of objects this scene creates
-          example: 25
-        complexity:
-          type: string
-          enum: [simple, moderate, complex]
-          description: Scene complexity level
-        tags:
-          type: array
-          items:
-            type: string
-          description: Scene tags for categorization
-          example: ["ui", "interactive", "demo"]
-      required:
-        - id
-        - name
-        - description
 
     # Entity Schemas (PlayCanvas Game Engine)
     EntitySummary:

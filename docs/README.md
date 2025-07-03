@@ -22,7 +22,7 @@
 
 ### 🔧 **API Design Documentation**
 - **[Complete API Interfaces](HD1-v3-Complete-API-Interfaces.md)** - Comprehensive API documentation
-- **[OpenAPI Specification](../src/api.yaml)** - Single source of truth (85 endpoints)
+- **[OpenAPI Specification](../src/api.yaml)** - Single source of truth (77 endpoints)
 
 ## 🎯 **HD1 v3.0 Overview**
 
@@ -111,7 +111,7 @@ WebSocket events for instant updates:
 
 ### **Single Source of Truth**
 Everything auto-generated from `src/api.yaml`:
-- Go router with 85 endpoints
+- Go router with 77 endpoints
 - JavaScript API client
 - Shell function library
 - UI components and forms

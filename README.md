@@ -109,7 +109,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 ```
 
 ### Key Components
-- **API Specification**: `src/api.yaml` - Single source of truth (85 endpoints)
+- **API Specification**: `src/api.yaml` - Single source of truth (77 endpoints)
 - **Auto-Generated Router**: `src/auto_router.go` - HTTP routing from specification
 - **PlayCanvas Engine**: Professional 3D rendering with ECS architecture
 - **WebSocket Hub**: Real-time state synchronization across clients

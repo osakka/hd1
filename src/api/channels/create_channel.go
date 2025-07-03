@@ -162,40 +162,6 @@ created_via: "api"
 		return
 	}
 
-	// Create basic channel script
-	scriptContent := fmt.Sprintf(`#!/bin/bash
-# HD1 Channel Script - %s
-# Auto-generated channel initialization script
-
-# Load HD1 environment
-source "/opt/hd1/lib/hd1lib.sh" 2>/dev/null || {
-    echo "ERROR: HD1 library not found"
-    exit 1
-}
-
-# Channel initialization
-echo "CHANNEL: Initializing %s"
-echo "ENVIRONMENT: %s"
-
-# Apply channel environment
-hd1::api_call "POST" "/environments/%s" "{\"session_id\": \"$HD1_SESSION_ID\"}"
-
-# Channel-specific setup can be added here
-echo "CHANNEL: %s ready for collaboration"
-`, req.Name, req.ID, req.Environment, req.Environment, req.ID)
-
-	scriptPath := filepath.Join(channelPath, "channel.sh")
-	if err := os.WriteFile(scriptPath, []byte(scriptContent), 0755); err != nil {
-		logging.Error("failed to write channel script", map[string]interface{}{
-			"error": err.Error(),
-			"path":  scriptPath,
-		})
-		
-		// Clean up directory on failure
-		os.RemoveAll(channelPath)
-		http.Error(w, `{"success": false, "message": "Failed to create channel script"}`, http.StatusInternalServerError)
-		return
-	}
 
 	logging.Info("channel created successfully", map[string]interface{}{
 		"channel_id":   req.ID,

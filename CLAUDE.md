@@ -1,7 +1,7 @@
 # HD1 (Holodeck One) - Development Context
 
 ## Core Principles
-- **API-First**: HD1 exposes everything via unified API surface (85 endpoints)
+- **API-First**: HD1 exposes everything via unified API surface (77 endpoints)
 - **Specification-Driven**: 100% auto-generated from api.yaml
 - **Real-Time Sync**: WebSocket for state sync, API for commands
 - **Single Source of Truth**: No parallel implementations
@@ -26,7 +26,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → Client Ren
 ```
 
 **Key Files:**
-- `src/api.yaml` - Single source of truth (85 endpoints)
+- `src/api.yaml` - Single source of truth (77 endpoints)
 - `src/auto_router.go` - Auto-generated routing
 - `src/codegen/templates/` - External template files
 - `share/channels/*.yaml` - Scene configurations

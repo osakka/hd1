@@ -16,7 +16,7 @@ This revolutionary release transforms HD1 into the world's first **API-first gam
 ### **Added - Revolutionary Game Engine Architecture**
 
 #### **🎮 Complete API-First Game Engine**
-- **85 REST Endpoints**: Complete game engine control via HTTP APIs
+- **77 REST Endpoints**: Complete game engine control via HTTP APIs
 - **PlayCanvas Integration**: Professional 3D rendering replacing A-Frame
 - **Entity-Component-System**: Full ECS architecture with lifecycle management
 - **Real-Time Synchronization**: <10ms WebSocket state sync across all clients
@@ -52,7 +52,7 @@ This revolutionary release transforms HD1 into the world's first **API-first gam
 - **Component System**: Dynamic component attachment/detachment capabilities
 
 #### **BREAKING: API Architecture Expansion**
-- **31 → 85 Endpoints**: Complete API surface expansion for game engine features
+- **31 → 77 Endpoints**: Complete API surface expansion for game engine features
 - **Entity APIs**: Full CRUD operations with component management
 - **Physics APIs**: Rigidbody simulation and force application
 - **Animation APIs**: Timeline-based animation control system
@@ -115,7 +115,7 @@ This revolutionary release transforms HD1 into the world's first **API-first gam
 ### **Breaking Changes**
 
 #### **API Structure Changes**
-- **Endpoint Expansion**: 31 → 85 endpoints with new structure
+- **Endpoint Expansion**: 31 → 77 endpoints with new structure
 - **Entity System**: Object APIs replaced with entity-component APIs
 - **Channel Configuration**: Scene management via YAML instead of scripts
 - **Component Architecture**: Dynamic component system replacing fixed objects
@@ -181,7 +181,7 @@ src/codegen/templates/
 - ✅ **Clean Build**: Zero warnings or errors
 - ✅ **Single Source of Truth**: 100% compliance validated
 - ✅ **Performance**: Production-grade response times
-- ✅ **API Coverage**: All 85 endpoints functional
+- ✅ **API Coverage**: All 77 endpoints functional
 - ✅ **Template System**: Identical output validation achieved
 
 #### **Enterprise Standards**

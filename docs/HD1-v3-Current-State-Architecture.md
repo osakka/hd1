@@ -173,7 +173,7 @@ Server State Change → WebSocket Message → Client Handler → PlayCanvas Upda
 ## Current Operational Status
 
 ### **✅ Fully Functional Features**
-1. **API Surface**: All 85 endpoints operational
+1. **API Surface**: All 77 endpoints operational
 2. **WebSocket System**: Real-time entity synchronization
 3. **Channel Management**: YAML-based scene switching
 4. **Entity System**: Complete lifecycle with components

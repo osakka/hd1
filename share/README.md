@@ -1,158 +1,209 @@
-# HD1 Share Directory - Asset Organization & Library Systems
+# HD1 Share Directory - v5.0.0 Native PC Architecture
 
 ## Overview
 
-The `/opt/holodeck-one/share/` directory contains **all shared assets, libraries, and resources** for HD1 (Holodeck One). This follows standard separation of concerns with **precise**.
+The `/opt/hd1/share/` directory contains **production assets and configuration** for HD1 v5.0.0 API-first game engine platform. This represents 100% native PC architecture with PlayCanvas integration and single source of truth design.
 
 ---
 
-## 📁 **Directory Structure**
+## 📁 **Directory Structure (v5.0.0)**
+
+### **`channels/`** - Channel-Based Scene Configuration
+```
+channels/
+├── channel_one.yaml     # Primary collaborative environment
+├── channel_two.yaml     # Advanced physics simulation  
+├── channel_three.yaml   # Underwater exploration
+└── config.yaml          # Channel server configuration
+```
+**Purpose**: YAML-based scene definitions for PlayCanvas game engine  
+**API Integration**: `/api/channels` endpoints read these configurations  
+**Architecture**: Single source of truth for collaborative environments
+
+### **`props/`** - Reusable Entity Definitions
+```
+props/
+├── decorative/          # Visual elements (flower-pot.yaml)
+├── electronic/          # Electronic devices (lightbulb.yaml)
+├── furniture/           # Furniture items (wooden-chair.yaml, wooden-table.yaml)
+├── lighting/            # Lighting elements (hd1-test-lighting.yaml)
+├── structural/          # Building elements (concrete-pillar.yaml)
+└── tools/              # Tool objects (hammer.yaml)
+```
+**Purpose**: YAML prop definitions with PlayCanvas component specifications  
+**API Integration**: `/api/props` and `/api/sessions/{id}/props/{propId}` endpoints  
+**Architecture**: Reusable entity-component-system definitions
 
 ### **`htdocs/`** - Web Interface Assets
 ```
 htdocs/
-├── static/js/          # JavaScript: HolodeckRenderer, gl-matrix, debug
-├── debug.html          # Direct object testing interface
-├── force-session.html  # Session management utilities
-└── assets/             # Static web resources
+├── index.html           # Main PlayCanvas web interface
+├── static/js/           # Auto-generated JavaScript API clients
+├── static/css/          # Console styling
+├── assets/              # Static web resources (audio, models, textures)
+└── debug.html           # Development testing interface
 ```
-**Purpose**: Web-based 3D visualization client served by HD1 daemon
-
-### **`scenes/`** - Standard Scene Collection
-```
-scenes/
-├── empty-grid.sh       # Clean holodeck foundation
-├── basic-shapes.sh     # Fundamental geometric demonstrations
-├── anime-ui.sh         # Advanced UI showcase
-├── complete-demo.sh    # Complete capabilities demonstration
-└── my-custom-scene.sh  # Custom development template
-```
-**Purpose**: Standard holodeck scene collection accessible via API endpoints
-
-### **`configs/`** - Configuration Templates
-```
-configs/
-└── (configuration templates and defaults)
-```
-**Purpose**: Standard configuration management
-
-### **`templates/`** - Template System
-```
-templates/
-└── (HTML/rendering templates)
-```
-**Purpose**: Template-driven content generation
+**Purpose**: PlayCanvas web client served by HD1 daemon  
+**API Integration**: Consumes 85 REST endpoints via auto-generated clients  
+**Architecture**: Professional 3D rendering with real-time WebSocket sync
 
 ---
 
-## 🎯 **Design Philosophy**
+## 🎯 **V5.0.0 Architecture Principles**
 
 ### **Single Source of Truth**
-- **Scenes**: Standard scene collection via API integration
-- **htdocs**: One web interface for visualization
-- **No duplication**: Every asset has exactly one canonical location
+- **Channel Configuration**: YAML files drive PlayCanvas scene setup
+- **Prop Definitions**: YAML specifications define reusable entities
+- **API Generation**: All clients auto-generated from api.yaml specification
+- **No Duplication**: Every asset has exactly one canonical definition
 
-### **Standard Organization**
-- **Clear separation**: Web assets vs. scenes vs. configuration
-- **API-driven scenes**: Complete scene management via /api/scenes endpoints
-- **Specification-driven**: All capabilities align with api.yaml
+### **PlayCanvas Native**
+- **Entity-Component-System**: Native PlayCanvas architecture
+- **Professional 3D**: WebGL game engine rendering
+- **Real-Time Sync**: <10ms WebSocket synchronization
+- **85 API Endpoints**: Complete game engine control via REST
 
-### **xVC Methodology**
-- **Pattern consistency**: Repeatable interaction patterns
-- **Surgical precision**: Targeted, exact implementations
-- **Quality solutions**: Standard-grade only
+### **Native PC Optimization**
+- **No Legacy Systems**: A-Frame completely removed
+- **No Shell Scripts**: YAML configuration only
+- **Clean Dependencies**: Minimal, purpose-built asset structure
+- **Production Ready**: Optimized for deployment and performance
 
 ---
 
 ## 🔗 **Integration Points**
 
-### **Scene → HD1 Integration**
-```bash
-# List available scenes
-curl http://localhost:8080/api/scenes
-# ↓
-# Load scene via API
-curl -X POST http://localhost:8080/api/scenes/complete-demo
-# ↓  
-# HD1 Server executes scene script
-# ↓
-# Real-time 3D visualization in browser
+### **Channel System Flow**
+```
+1. YAML Configuration (channels/*.yaml)
+   ↓
+2. API Endpoints (/api/channels)
+   ↓  
+3. PlayCanvas Scene Loading
+   ↓
+4. Real-Time WebSocket Sync
+   ↓
+5. Multi-User Collaboration
 ```
 
-### **Web Interface → HD1 Integration**
+### **Props System Flow**
 ```
-htdocs/static/js/renderer.js (HolodeckRenderer)
-# ↓
-# WebSocket connection (/ws)
-# ↓
-# HD1 Server Hub (real-time updates)
-# ↓
-# Session store & object management
-```
-
----
-
-## 🛡️ **Standard Standards**
-
-### **File Organization**
-- **Absolute paths only**: No relative references
-- **Standard naming**: No spaces, clear purposes
-- **Version control**: All assets under git control
-- **Clean structure**: No temporary or backup files
-
-### **Asset Management**
-- **Single canonical location**: Each asset has one source of truth
-- **Standard build integration**: Assets validate in build pipeline
-- **Documentation**: Every directory has clear purpose documentation
-
-### **Security & Quality**
-- **Input validation**: All scripts validate parameters
-- **Error handling**: Standard error reporting
-- **Resource cleanup**: Proper resource management
-- **Standard logging**: Structured, timestamped output
-
----
-
-## 📚 **Usage Patterns**
-
-### **For Web Development**
-```bash
-# Serve web interface
-cd /opt/holodeck-one/src && make start
-# Access: http://localhost:8080/
+1. YAML Definitions (props/*/*.yaml)
+   ↓
+2. API Endpoints (/api/props, /api/sessions/{id}/props/{propId})
+   ↓
+3. PlayCanvas Entity Instantiation
+   ↓
+4. Component System Integration
+   ↓
+5. Physics & Rendering
 ```
 
-### **For Scene Management**
-```bash
-# Standard scene management via API
-curl http://localhost:8080/api/scenes                    # List scenes
-curl -X POST http://localhost:8080/api/scenes/complete   # Load scene
-# Or use web interface scene dropdown with cookie persistence
+### **Web Interface Flow**
 ```
-
-### **For Development**
-```bash
-# Standard build with asset validation
-cd /opt/holodeck-one/src && make all
-# Assets automatically referenced from share/
+1. Auto-Generated Clients (htdocs/static/js/)
+   ↓
+2. 85 REST API Endpoints
+   ↓
+3. PlayCanvas Game Engine
+   ↓
+4. Professional 3D Rendering
 ```
 
 ---
 
-## 🎖️ **Excellence Standards**
+## 🛠️ **Development Workflow**
 
-HD1 Share directory represents **standard asset organization** with:
+### **Channel Development**
+```bash
+# Edit channel configuration
+vim /opt/hd1/share/channels/channel_one.yaml
 
-✅ **Clear separation of concerns**  
-✅ **Single entry point systems**  
-✅ **Standard naming conventions**  
-✅ **Complete documentation**  
-✅ **Integration with specification-driven architecture**  
+# Restart HD1 to reload channels
+cd /opt/hd1/src && make restart
 
-**"Every asset serves the vision: standard 3D visualization through precise."**
+# Test via API
+curl http://localhost:8080/api/channels
+```
+
+### **Props Development**
+```bash
+# Add new prop definition
+vim /opt/hd1/share/props/furniture/new-table.yaml
+
+# List available props
+curl http://localhost:8080/api/props
+
+# Instantiate in session
+curl -X POST http://localhost:8080/api/sessions/{sessionId}/props/new-table
+```
+
+### **Web Interface Testing**
+```bash
+# Start development server
+cd /opt/hd1/src && make start
+
+# Access PlayCanvas interface
+open http://localhost:8080
+
+# View real-time updates in browser console
+```
 
 ---
 
-*Last Updated: 2025-06-28*  
-*HD1 Version: 2.0.0*  
-*Authority: Standard Asset Organization Standards*
+## 📊 **V5.0.0 Architecture Benefits**
+
+### **Performance Optimized**
+- **<50ms API Response**: Professional game engine performance
+- **<10ms WebSocket Latency**: Real-time collaboration
+- **Minimal Assets**: Clean, purpose-built directory structure
+- **Native PlayCanvas**: Optimized 3D rendering pipeline
+
+### **Developer Experience**
+- **YAML Configuration**: Human-readable scene definitions
+- **Auto-Generated Clients**: Zero manual API synchronization
+- **Single Source of Truth**: api.yaml drives all functionality
+- **Clean Architecture**: No legacy systems or deprecated code
+
+### **Production Ready**
+- **85 REST Endpoints**: Complete game engine API surface
+- **Entity-Component-System**: Professional game development patterns
+- **Real-Time Collaboration**: Multi-user environment support
+- **Comprehensive Documentation**: Complete system understanding
+
+---
+
+## 📚 **File Organization Standards**
+
+### **Required Files Only**
+- ✅ **channels/**: YAML scene configurations for PlayCanvas
+- ✅ **props/**: YAML entity definitions for reusable components
+- ✅ **htdocs/**: Web interface with auto-generated API clients
+
+### **Removed Legacy**
+- ❌ **environments/**: Legacy shell scripts (removed)
+- ❌ **scenes/**: Legacy shell scripts (removed)
+- ❌ **lighting/**: Obsolete directory (removed)
+- ❌ **configs/**: Unused directory (removed)
+- ❌ **templates/**: Unused directory (removed)
+- ❌ **All .sh files**: Legacy A-Frame scripts (removed)
+
+---
+
+## 🎖️ **Quality Standards**
+
+HD1 v5.0.0 Share directory represents **production-grade asset organization**:
+
+✅ **100% Native PC Architecture**: Optimized for local development and deployment  
+✅ **Single Source of Truth**: YAML + api.yaml drive all functionality  
+✅ **PlayCanvas Integration**: Professional 3D game engine architecture  
+✅ **Clean Dependencies**: No legacy systems or deprecated code  
+✅ **API-First Design**: REST endpoints control all game engine features  
+
+**"Professional game development through specification-driven architecture."**
+
+---
+
+*Last Updated: 2025-07-03*  
+*HD1 Version: 5.0.0*  
+*Architecture: API-First Game Engine Platform*

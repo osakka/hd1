@@ -1,7 +1,8 @@
 # ADR-014: Three-Layer Architecture - Environment + Props System
 
 ## Status
-**ACCEPTED** - Implemented and Tested (2025-06-30)
+**SUPERSEDED** - Replaced by Channel Architecture in v5.0.0 (see ADR-022)
+**Original implementation**: 2025-06-30 to 2025-07-03
 
 ## Context
 Following game engine architecture patterns (Unity, Unreal), HD1 required a scalable three-layer system to manage complex 3D scenes with realistic physics. The original single-layer approach couldn't handle environment-specific physics or reusable props efficiently.

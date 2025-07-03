@@ -3,11 +3,11 @@
 **Status**: ACCEPTED  
 **Date**: 2025-07-03  
 **Decision Makers**: HD1 Core Team  
-**Technical Story**: Comprehensive architecture documentation for HD1 v3.0 production state
+**Technical Story**: Comprehensive architecture documentation for HD1 v5.0.0 production state
 
 ## Context
 
-HD1 v3.0 has completed its transformation from a 3D visualization platform to a production-ready, API-first game engine platform. This ADR documents the current architectural decisions, implementation details, and strategic direction that have established HD1 as the world's first "Game Engine as a Service" platform.
+HD1 v5.0.0 has completed its transformation from a 3D visualization platform to a production-ready, API-first game engine platform. This ADR documents the current architectural decisions, implementation details, and strategic direction that have established HD1 as the world's first "Game Engine as a Service" platform.
 
 ## Decision
 
@@ -34,7 +34,7 @@ We have implemented and standardized a comprehensive API-first game engine archi
 
 ## Technical Implementation
 
-### API Surface (85 Endpoints)
+### API Surface (77 Endpoints)
 
 #### Entity Management
 ```
@@ -357,7 +357,7 @@ curl -X POST /api/admin/logging/trace -d '{"modules": ["sessions", "entities"]}'
 4. **Clean Cutover**: No deprecated functionality, clean architecture decisions
 
 ### Testing Strategy
-1. **API Testing**: All 85 endpoints tested via curl and automated tests
+1. **API Testing**: All 77 endpoints tested via curl and automated tests
 2. **WebSocket Testing**: Real-time message flow verification
 3. **Integration Testing**: End-to-end entity lifecycle testing
 4. **Performance Testing**: Load testing with 100+ concurrent connections

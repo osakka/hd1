@@ -21,7 +21,6 @@ type Hub struct {
 	unregister    chan *Client
 	logger        *LogManager
 	store         *SessionStore
-	scenesWatcher *ScenesWatcher
 	mutex         sync.RWMutex
 	
 	// Session Graph Architecture - Channel-based persistence
@@ -84,8 +83,6 @@ func NewHub() *Hub {
 		clientSessions: make(map[*Client]string),
 	}
 	
-	// Initialize scenes watcher
-	hub.scenesWatcher = NewScenesWatcher(hub)
 	
 	return hub
 }
