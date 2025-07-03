@@ -10,10 +10,13 @@
 # HD1 (Holodeck One)
 ## The API-First 3D Engine for Distributed Services
 
-> **Where REST APIs meet immersive 3D worlds**  
-> Holodeck One transforms any service into a visual, interactive experience through 77 REST endpoints and real-time synchronization.
+> **⚠️ DEVELOPMENT & EXPERIMENTAL SOFTWARE**  
+> **HD1 is active development code and serves as an experiment in the efficacy of [XVC (Extended Version Control)](https://github.com/osakka/xvc). This is NOT production-ready software. Use for development, research, and experimentation only.**
 
 ---
+
+> **Where REST APIs meet immersive 3D worlds**  
+> Holodeck One transforms any service into a visual, interactive experience through 77 REST endpoints and real-time synchronization.
 
 **🎯 Vision**: HD1 enables **any distributed service** to integrate visual representation, animation, and interaction through a unified API surface. As authentication, operator profiles, and service keys mature, HD1 becomes the **visual interface layer** for the distributed service ecosystem.
 
