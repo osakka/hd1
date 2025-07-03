@@ -25,9 +25,9 @@
 **WebGL/3D Native** → Professional PlayCanvas rendering engine  
 **Specification-Driven** → 100% auto-generated from OpenAPI specification
 
-## 🚀 Current State: HD1 v5.0.0
+## 🚀 Current State: HD1 v5.0.0 (In Development)
 
-HD1 is **production-ready** with a complete API surface for 3D engine control. The foundation is built - now comes the distributed services revolution.
+HD1 has a **complete API surface** for 3D engine control with 77 REST endpoints. The foundation is being built for the distributed services revolution.
 
 ### 🎮 Complete 3D Engine via REST APIs
 ```
@@ -135,15 +135,17 @@ src/codegen/templates/
 HD1 draws inspiration from Star Trek's **Holodeck** - a space where any scenario can be created, experienced, and interacted with through technology. In our case, **distributed services** become the scenarios.
 
 ### From Concept to Reality
-**Today**: HD1 provides 77 REST endpoints for complete 3D engine control  
+**Today**: HD1 provides 77 REST endpoints for 3D engine control (in development)  
 **Tomorrow**: Any distributed service integrates visual representation through HD1's API surface  
 **Future**: The **visual interface layer** for the entire distributed service ecosystem
 
-### Logo Concept
-```
-🏗️ HD Base: Concrete foundation, compact and cracked under computational weight
-🔷 Wireframe "1": Teal/blue wireframe floating above, representing the first platform
-```
+### Logo Design
+
+![HD1 Logo](docs/assets/hd1-logo.svg)
+
+**Design Concept**: 
+- **HD Base**: Concrete foundation, compact and cracked under computational weight
+- **Wireframe "1"**: Teal/blue wireframe floating above, representing the first platform
 
 *Symbolizing the solid foundation (HD) supporting the innovative interface layer (1)*
 
@@ -174,7 +176,7 @@ make stop        # Stop daemon
 - **Specification-Driven**: All code auto-generated from `api.yaml`
 - **Zero Regressions**: Surgical precision in all changes
 - **Template Architecture**: 8 externalized templates for maintainability  
-- **Production Ready**: <50ms API response, <10ms WebSocket sync
+- **Performance Target**: <50ms API response, <10ms WebSocket sync
 
 ---
 
@@ -196,7 +198,7 @@ make stop        # Stop daemon
 ## 🤝 Contributing & Community
 
 ### Project Status
-**HD1 v5.0.0**: Production-ready API-first 3D engine platform  
+**HD1 v5.0.0**: API-first 3D engine platform in active development  
 **Next Phase**: Service integration layer and distributed service ecosystem
 
 ### Architecture Philosophy
