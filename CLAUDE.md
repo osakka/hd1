@@ -9,7 +9,7 @@
 - **"API = Control, WebSocket = Graph Extension"**
 
 ## Current State (2025-07-03)
-HD1 v3.0 is a **production-ready API-first game engine** platform.
+HD1 v5.0.0 is a **production-ready API-first game engine** platform.
 
 ### ✅ Completed Features
 - **85 REST Endpoints**: Complete game engine control via HTTP
@@ -17,7 +17,7 @@ HD1 v3.0 is a **production-ready API-first game engine** platform.
 - **PlayCanvas Integration**: Professional 3D rendering with ECS
 - **Channel System**: YAML-based scene configuration with 3 channels
 - **Console UI**: Professional monitoring with smooth animations
-- **Floor Fix**: All channels now have 10×1×10 flat floors
+- **Vendor Cleanup**: Removed 1.1GB redundant directories, optimized structure
 - **Template Architecture**: 8 externalized templates for maintainable code generation
 
 ### Architecture
