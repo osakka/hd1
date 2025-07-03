@@ -43,6 +43,19 @@ class HD1StatsManager {
         this.wsOutBytes = 0;
         this.wsLastSample = { in: 0, out: 0 };
         
+        // PlayCanvas entity tracking
+        this.playcanvasStats = {
+            totalEntities: 0,
+            activeEntities: 0,
+            avatarEntities: 0,
+            syncEvents: 0,
+            lastCameraPosition: null,
+            lastPositionUpdate: null,
+            syncLatency: 0
+        };
+        this.playcanvasHistory = [];
+        this.entityPositions = new Map(); // Track entity positions for movement detection
+        
         // Update intervals
         this.updateInterval = null;
         this.fpsUpdateInterval = null;
@@ -254,6 +267,7 @@ class HD1StatsManager {
      */
     collectMetrics() {
         this.collectMemoryMetrics();
+        this.collectPlayCanvasMetrics();
         // FPS is collected in startFpsMonitoring automatically
         // Latency is updated via trackLatency method from WebSocket pongs
         // WebSocket metrics are updated via trackWebSocketTraffic method
@@ -296,6 +310,110 @@ class HD1StatsManager {
                 this.memoryHistory.shift();
             }
         }
+    }
+
+    /**
+     * Collect PlayCanvas metrics
+     */
+    collectPlayCanvasMetrics() {
+        try {
+            if (window.hd1GameEngine && window.hd1GameEngine.root) {
+                const root = window.hd1GameEngine.root;
+                
+                // Count total entities
+                const allEntities = root.children || [];
+                this.playcanvasStats.totalEntities = allEntities.length;
+                
+                // Count active entities (enabled)
+                this.playcanvasStats.activeEntities = allEntities.filter(entity => entity.enabled).length;
+                
+                // Count avatar entities (entities with hd1Tags containing 'session-avatar')
+                this.playcanvasStats.avatarEntities = allEntities.filter(entity => 
+                    entity.hd1Tags && entity.hd1Tags.includes('session-avatar')).length;
+                
+                // Track entity positions for movement detection
+                allEntities.forEach(entity => {
+                    if (entity.hd1Id && entity.getPosition) {
+                        const pos = entity.getPosition();
+                        const currentPos = `${pos.x.toFixed(2)},${pos.y.toFixed(2)},${pos.z.toFixed(2)}`;
+                        const lastPos = this.entityPositions.get(entity.hd1Id);
+                        
+                        if (lastPos && lastPos !== currentPos) {
+                            this.playcanvasStats.syncEvents++;
+                        }
+                        
+                        this.entityPositions.set(entity.hd1Id, currentPos);
+                    }
+                });
+                
+                // Add to history
+                this.playcanvasHistory.push({
+                    timestamp: Date.now(),
+                    totalEntities: this.playcanvasStats.totalEntities,
+                    activeEntities: this.playcanvasStats.activeEntities,
+                    avatarEntities: this.playcanvasStats.avatarEntities,
+                    syncEvents: this.playcanvasStats.syncEvents
+                });
+                
+                // Trim history
+                if (this.playcanvasHistory.length > this.graphConfig.historyLength) {
+                    this.playcanvasHistory.shift();
+                }
+                
+                // Update UI elements
+                this.updatePlayCanvasUI();
+                
+                console.log(`[HD1-Stats] PlayCanvas - Total: ${this.playcanvasStats.totalEntities}, Active: ${this.playcanvasStats.activeEntities}, Avatars: ${this.playcanvasStats.avatarEntities}, Sync Events: ${this.playcanvasStats.syncEvents}`);
+            }
+        } catch (error) {
+            console.error('[HD1-Stats] PlayCanvas collection failed:', error);
+        }
+    }
+
+    /**
+     * Update PlayCanvas UI elements
+     */
+    updatePlayCanvasUI() {
+        // Update entity counts
+        this.dom.setText('pc-entities-count', this.playcanvasStats.totalEntities.toString());
+        this.dom.setText('pc-active-entities', this.playcanvasStats.activeEntities.toString());
+        this.dom.setText('pc-avatar-entities', this.playcanvasStats.avatarEntities.toString());
+        this.dom.setText('pc-sync-events', this.playcanvasStats.syncEvents.toString());
+        
+        // Update camera position
+        if (this.playcanvasStats.lastCameraPosition) {
+            const pos = this.playcanvasStats.lastCameraPosition;
+            const posStr = `${pos.x.toFixed(1)},${pos.y.toFixed(1)},${pos.z.toFixed(1)}`;
+            this.dom.setText('pc-camera-position', posStr);
+        } else {
+            this.dom.setText('pc-camera-position', '--');
+        }
+        
+        // Update last update timestamp
+        if (this.playcanvasStats.lastPositionUpdate) {
+            const now = Date.now();
+            const timeDiff = Math.floor((now - this.playcanvasStats.lastPositionUpdate) / 1000);
+            this.dom.setText('pc-last-update', `${timeDiff}s ago`);
+        } else {
+            this.dom.setText('pc-last-update', '--');
+        }
+    }
+
+    /**
+     * Track camera position update (called from PlayCanvas sync)
+     */
+    trackCameraPosition(position) {
+        this.playcanvasStats.lastCameraPosition = position;
+        this.playcanvasStats.lastPositionUpdate = Date.now();
+        console.log(`[HD1-Stats] Camera position tracked:`, position);
+    }
+
+    /**
+     * Track entity sync event (called when entities are updated)
+     */
+    trackEntitySync(entityId, type = 'position') {
+        this.playcanvasStats.syncEvents++;
+        console.log(`[HD1-Stats] Entity sync: ${entityId} (${type})`);
     }
 
     /**

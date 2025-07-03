@@ -264,10 +264,25 @@ class HD1ChannelManager {
         
         const app = window.hd1GameEngine;
         
-        // Clear existing entities (except camera)
+        // 🛡️ PRESERVE avatars before clearing scene
+        let preservedAvatars = [];
+        if (window.hd1ConsoleManager) {
+            const wsManager = window.hd1ConsoleManager.getModule('websocket');
+            if (wsManager && wsManager.preserveAvatarsBeforeSceneClear) {
+                preservedAvatars = wsManager.preserveAvatarsBeforeSceneClear() || [];
+            }
+        }
+        
+        // Clear existing entities (except camera and protected avatars)
         const entitiesToRemove = app.root.children.filter(entity => 
-            entity.name !== 'camera' && entity.hd1Entity !== false
+            entity.name !== 'camera' && 
+            entity.hd1Entity !== false &&
+            !entity.hd1Protected &&
+            !(entity.hd1Tags && entity.hd1Tags.includes('session-avatar'))
         );
+        
+        console.log(`[HD1-Channel] Clearing ${entitiesToRemove.length} entities, preserving ${preservedAvatars.length} avatars`);
+        
         entitiesToRemove.forEach(entity => {
             app.root.removeChild(entity);
             entity.destroy();
@@ -280,6 +295,14 @@ class HD1ChannelManager {
         // Create each entity
         for (const entityConfig of entitiesConfig) {
             await this.createNativePlayCanvasEntity(entityConfig, app);
+        }
+        
+        // 🔄 RESTORE preserved avatars after scene creation
+        if (preservedAvatars.length > 0 && window.hd1ConsoleManager) {
+            const wsManager = window.hd1ConsoleManager.getModule('websocket');
+            if (wsManager && wsManager.restoreAvatarsAfterSceneClear) {
+                wsManager.restoreAvatarsAfterSceneClear();
+            }
         }
     }
 

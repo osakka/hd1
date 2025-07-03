@@ -1,0 +1,118 @@
+# HD1 Avatar Specification - Business Avatar
+# Professional appearance for corporate/meeting contexts
+
+metadata:
+  name: "Business Avatar"
+  description: "Professional avatar with business attire for corporate sessions"
+  version: "1.0.0"
+  type: "session-avatar"
+  created: "2025-07-03"
+
+# Asset References
+assets:
+  model: "business_model.glb"
+  textures:
+    - "textures/business_skin.png"
+    - "textures/business_suit.png"
+    - "textures/business_accessories.png"
+  animations:
+    - "animations/professional_idle.glb"
+    - "animations/confident_walk.glb"
+    - "animations/presentation_gesture.glb"
+
+# Avatar Physical Properties
+physical:
+  default_transforms:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  
+  camera_offset: {x: 0, y: 1.75, z: 0}  # Slightly lower for formal posture
+  camera_follow_distance: 2.5           # Closer for meeting contexts
+  
+  physics:
+    mass: 75.0
+    height: 1.75
+    collision_radius: 0.35
+
+# HD1 Entity Definition
+entity:
+  tags: ['session-avatar', 'avatar', 'business', 'professional']
+  name_template: "business-avatar-{session_id}-{user_id}"
+  
+  components:
+    transform:
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    
+    model:
+      type: "asset"
+      asset_path: "business_model.glb"
+      cast_shadows: true
+      receive_shadows: true
+    
+    animation:
+      assets:
+        idle: "animations/professional_idle.glb"
+        walk: "animations/confident_walk.glb"
+        gesture: "animations/presentation_gesture.glb"
+      default_state: "idle"
+      transition_time: 0.3             # Slower, more professional transitions
+    
+    rigidbody:
+      type: "kinematic"
+      mass: 75.0
+      restitution: 0.0
+      friction: 0.6                    # More grounded movement
+    
+    collision:
+      type: "capsule"
+      radius: 0.35
+      height: 1.75
+    
+    script:
+      avatar_controller: true
+      network_sync: true
+      business_behaviors: true         # Professional gesture system
+
+# Movement Configuration (More conservative)
+movement:
+  walk_speed: 1.5                      # Slower, professional pace
+  run_speed: 3.5                       # No running in meetings
+  turn_speed: 120.0                    # Measured turns
+  acceleration: 6.0
+  deceleration: 10.0
+
+# Animation State Machine
+animations:
+  states:
+    idle:
+      clip: "professional_idle"
+      loop: true
+      transition_triggers:
+        - {to: "walk", condition: "speed > 0.1"}
+        - {to: "gesture", condition: "presenting"}
+    
+    walk:
+      clip: "confident_walk"
+      loop: true
+      transition_triggers:
+        - {to: "idle", condition: "speed < 0.1"}
+    
+    gesture:
+      clip: "presentation_gesture"
+      loop: false
+      duration: 3.0
+      transition_triggers:
+        - {to: "idle", condition: "gesture_complete"}
+
+# Network sync (same as default)
+network:
+  sync_frequency: 30
+  position_threshold: 0.01
+  rotation_threshold: 1.0
+  interpolation:
+    enabled: true
+    method: "linear"
+    time: 0.15                         # Slightly slower for professional feel

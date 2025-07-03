@@ -1,0 +1,129 @@
+# HD1 Avatar Specification - Casual Avatar
+# Relaxed appearance for informal/creative sessions
+
+metadata:
+  name: "Casual Avatar"
+  description: "Relaxed avatar with casual attire for informal collaboration"
+  version: "1.0.0"
+  type: "session-avatar"
+  created: "2025-07-03"
+
+# Asset References
+assets:
+  model: "casual_model.glb"
+  textures:
+    - "textures/casual_skin.png"
+    - "textures/casual_clothing.png"
+    - "textures/casual_accessories.png"
+  animations:
+    - "animations/relaxed_idle.glb"
+    - "animations/casual_walk.glb"
+    - "animations/energetic_run.glb"
+    - "animations/creative_gesture.glb"
+
+# Avatar Physical Properties
+physical:
+  default_transforms:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  
+  camera_offset: {x: 0, y: 1.8, z: 0}
+  camera_follow_distance: 3.5           # More dynamic camera distance
+  
+  physics:
+    mass: 65.0                          # Lighter, more agile
+    height: 1.8
+    collision_radius: 0.4
+
+# HD1 Entity Definition
+entity:
+  tags: ['session-avatar', 'avatar', 'casual', 'creative']
+  name_template: "casual-avatar-{session_id}-{user_id}"
+  
+  components:
+    transform:
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    
+    model:
+      type: "asset"
+      asset_path: "casual_model.glb"
+      cast_shadows: true
+      receive_shadows: true
+    
+    animation:
+      assets:
+        idle: "animations/relaxed_idle.glb"
+        walk: "animations/casual_walk.glb"
+        run: "animations/energetic_run.glb"
+        gesture: "animations/creative_gesture.glb"
+      default_state: "idle"
+      transition_time: 0.1             # Quick, responsive transitions
+    
+    rigidbody:
+      type: "kinematic"
+      mass: 65.0
+      restitution: 0.1                 # Slight bounce for energy
+      friction: 0.4
+    
+    collision:
+      type: "capsule"
+      radius: 0.4
+      height: 1.8
+    
+    script:
+      avatar_controller: true
+      network_sync: true
+      creative_behaviors: true         # Expressive gesture system
+
+# Movement Configuration (More dynamic)
+movement:
+  walk_speed: 2.5                      # Energetic pace
+  run_speed: 6.0                       # Fast running
+  turn_speed: 200.0                    # Quick turns
+  acceleration: 10.0                   # Responsive
+  deceleration: 15.0                   # Quick stops
+
+# Animation State Machine
+animations:
+  states:
+    idle:
+      clip: "relaxed_idle"
+      loop: true
+      variations: 3                    # Multiple idle variations
+      transition_triggers:
+        - {to: "walk", condition: "speed > 0.1"}
+        - {to: "gesture", condition: "expressing"}
+    
+    walk:
+      clip: "casual_walk"
+      loop: true
+      transition_triggers:
+        - {to: "idle", condition: "speed < 0.1"}
+        - {to: "run", condition: "speed > 3.5"}
+    
+    run:
+      clip: "energetic_run"
+      loop: true
+      transition_triggers:
+        - {to: "walk", condition: "speed < 3.5"}
+        - {to: "idle", condition: "speed < 0.1"}
+    
+    gesture:
+      clip: "creative_gesture"
+      loop: false
+      duration: 2.0
+      transition_triggers:
+        - {to: "idle", condition: "gesture_complete"}
+
+# Network sync (more frequent for dynamic movement)
+network:
+  sync_frequency: 60                   # Higher frequency for responsive feel
+  position_threshold: 0.005            # More sensitive position tracking
+  rotation_threshold: 0.5              # More sensitive rotation tracking
+  interpolation:
+    enabled: true
+    method: "cubic"                    # Smoother interpolation
+    time: 0.05                         # Very responsive

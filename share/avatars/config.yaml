@@ -1,0 +1,93 @@
+# HD1 Avatar System Configuration
+# Single Source of Truth for Avatar Management
+
+system:
+  name: "HD1 Avatar System"
+  version: "1.0.0"
+  description: "Specification-driven avatar management for HD1 sessions"
+
+# Default avatar selection
+defaults:
+  avatar_type: "default"              # Fallback avatar
+  spawn_position: {x: 0, y: 0, z: 0}  # Default spawn location
+  camera_mode: "third_person"         # first_person | third_person | free
+
+# Available avatar types
+avatar_types:
+  default:
+    path: "default/avatar.yaml"
+    description: "Standard HD1 session avatar"
+    contexts: ["general", "collaboration", "gaming"]
+    
+  business:
+    path: "business/avatar.yaml" 
+    description: "Professional avatar for business contexts"
+    contexts: ["meeting", "presentation", "corporate"]
+    
+  casual:
+    path: "casual/avatar.yaml"
+    description: "Relaxed avatar for informal sessions"
+    contexts: ["creative", "social", "brainstorm"]
+
+# Channel-specific avatar defaults
+channel_defaults:
+  channel_one: "default"             # General purpose
+  channel_two: "business"            # Business channel
+  channel_three: "casual"            # Creative channel
+
+# Avatar loading configuration
+loading:
+  preload_on_session_start: true    # Load avatar assets immediately
+  cache_duration: 3600               # Cache assets for 1 hour
+  max_concurrent_loads: 5            # Limit simultaneous asset loading
+  
+  # Asset optimization
+  compression:
+    models: "draco"                  # Draco compression for GLB
+    textures: "basis"                # Basis Universal textures
+    
+  # LOD (Level of Detail) settings
+  lod:
+    distances: [10, 25, 50]          # Switch distances in meters
+    model_quality: ["high", "medium", "low"]
+
+# Network sync optimization
+network:
+  avatar_sync_priority: "high"      # Prioritize avatar updates
+  batch_updates: true               # Batch multiple avatar updates
+  compression: "gzip"               # Compress WebSocket messages
+  
+  # Culling for performance
+  culling:
+    max_visible_avatars: 20          # Limit visible avatars
+    cull_distance: 100               # Hide avatars beyond 100m
+    update_frequency_by_distance:
+      near: 60                       # 60 Hz for close avatars
+      medium: 30                     # 30 Hz for medium distance
+      far: 10                        # 10 Hz for distant avatars
+
+# Integration with HD1 systems
+integration:
+  # API endpoints (to be added to api.yaml)
+  api_endpoints:
+    - "GET /avatars"                 # List available avatars
+    - "GET /avatars/{type}"          # Get specific avatar spec
+    - "POST /sessions/{id}/avatar"   # Set session avatar
+    - "GET /sessions/{id}/avatar"    # Get current session avatar
+  
+  # Channel integration
+  channels:
+    auto_select_by_context: true     # Auto-select based on channel
+    allow_user_override: true        # User can override channel default
+  
+  # Session integration
+  sessions:
+    create_avatar_on_join: true      # Auto-create avatar when joining
+    destroy_avatar_on_leave: true    # Clean up when leaving
+    persist_avatar_choice: true      # Remember user's avatar preference
+
+# Performance monitoring
+monitoring:
+  track_loading_times: true         # Monitor asset loading performance
+  track_sync_latency: true          # Monitor avatar sync performance
+  log_level: "INFO"                 # DEBUG | INFO | WARN | ERROR

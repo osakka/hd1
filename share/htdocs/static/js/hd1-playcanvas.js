@@ -142,6 +142,141 @@ function createEmptyScene(app) {
 
 
 /**
+ * 🎮 ORBITAL CAMERA: Enhanced camera system with multiple modes
+ */
+class HD1CameraController {
+    constructor(app, camera) {
+        this.app = app;
+        this.camera = camera;
+        this.mode = 'free'; // 'free', 'orbit'
+        
+        // Orbital camera properties
+        this.orbitTarget = new pc.Vec3(0, 0, 0);
+        this.orbitDistance = 15;
+        this.orbitHeight = 5;
+        this.orbitAngle = 0;
+        this.orbitSpeed = 1.0;
+        this.orbitAutoRotate = false;
+        
+        // Smooth transitions
+        this.targetPosition = camera.getPosition().clone();
+        this.targetRotation = camera.getRotation().clone();
+        this.smoothFactor = 0.1;
+        
+        console.log('[HD1] 🎮 Camera Controller initialized');
+    }
+    
+    // Switch to orbital camera mode
+    setOrbitMode(center = new pc.Vec3(0, 0, 0), distance = 15, height = 5) {
+        this.mode = 'orbit';
+        this.orbitTarget.copy(center);
+        this.orbitDistance = distance;
+        this.orbitHeight = height;
+        this.orbitAngle = 0;
+        
+        console.log('[HD1] 🎮 Switched to Orbital Camera Mode');
+        this.updateOrbitPosition();
+    }
+    
+    // Switch to free camera mode
+    setFreeMode() {
+        this.mode = 'free';
+        console.log('[HD1] 🎮 Switched to Free Camera Mode');
+    }
+    
+    // Toggle between camera modes
+    toggleMode() {
+        if (this.mode === 'free') {
+            // Calculate center point of all avatars for orbiting
+            const avatarCenter = this.calculateAvatarCenter();
+            this.setOrbitMode(avatarCenter, 20, 8);
+        } else {
+            this.setFreeMode();
+        }
+    }
+    
+    // Calculate center point of all visible avatars
+    calculateAvatarCenter() {
+        const avatars = this.app.root.children.filter(entity => 
+            entity.hd1Tags && entity.hd1Tags.includes('session-avatar')
+        );
+        
+        if (avatars.length === 0) {
+            return new pc.Vec3(0, 0, 0);
+        }
+        
+        const center = new pc.Vec3(0, 0, 0);
+        avatars.forEach(avatar => {
+            center.add(avatar.getPosition());
+        });
+        center.scale(1 / avatars.length);
+        
+        console.log(`[HD1] 🎮 Calculated avatar center for ${avatars.length} avatars:`, center);
+        return center;
+    }
+    
+    // Update orbital camera position
+    updateOrbitPosition() {
+        if (this.mode !== 'orbit') return;
+        
+        const x = this.orbitTarget.x + Math.cos(this.orbitAngle) * this.orbitDistance;
+        const z = this.orbitTarget.z + Math.sin(this.orbitAngle) * this.orbitDistance;
+        const y = this.orbitTarget.y + this.orbitHeight;
+        
+        this.targetPosition.set(x, y, z);
+        
+        // Calculate look-at rotation
+        const lookDirection = new pc.Vec3();
+        lookDirection.sub2(this.orbitTarget, this.targetPosition).normalize();
+        const lookAtMatrix = new pc.Mat4();
+        lookAtMatrix.setLookAt(this.targetPosition, this.orbitTarget, pc.Vec3.UP);
+        this.targetRotation.setFromMat4(lookAtMatrix);
+    }
+    
+    // Update camera (called every frame)
+    update(dt) {
+        if (this.mode === 'orbit') {
+            // Auto-rotate if enabled
+            if (this.orbitAutoRotate) {
+                this.orbitAngle += this.orbitSpeed * dt;
+            }
+            
+            this.updateOrbitPosition();
+            
+            // Smooth interpolation to target position/rotation
+            const currentPos = this.camera.getPosition();
+            const currentRot = this.camera.getRotation();
+            
+            const newPos = new pc.Vec3();
+            const newRot = new pc.Quat();
+            
+            newPos.lerp(currentPos, this.targetPosition, this.smoothFactor);
+            newRot.slerp(currentRot, this.targetRotation, this.smoothFactor);
+            
+            this.camera.setPosition(newPos);
+            this.camera.setRotation(newRot);
+        }
+    }
+    
+    // Handle mouse input for orbital camera
+    handleOrbitInput(deltaX, deltaY) {
+        if (this.mode === 'orbit') {
+            this.orbitAngle -= deltaX * 0.01;
+            this.orbitHeight = pc.math.clamp(this.orbitHeight + deltaY * 0.1, 2, 50);
+            this.updateOrbitPosition();
+        }
+    }
+    
+    // Handle scroll wheel for zoom
+    handleZoom(delta) {
+        if (this.mode === 'orbit') {
+            this.orbitDistance = pc.math.clamp(this.orbitDistance + delta * 2, 5, 100);
+            this.updateOrbitPosition();
+        }
+    }
+}
+
+/**
  * Setup camera controls for mouse look and WASD movement
  */
 function setupCameraControls(app, camera) {
@@ -150,6 +285,18 @@ function setupCameraControls(app, camera) {
     let moveSpeed = 10;
     let lookSpeed = 0.2;
     let isMouseDown = false;
+    
+    // 🎮 SMOOTH MOVEMENT: Add interpolation and momentum variables
+    let targetPosition = camera.getPosition().clone();
+    let currentVelocity = new pc.Vec3(0, 0, 0);
+    let targetVelocity = new pc.Vec3(0, 0, 0);
+    const smoothingFactor = 0.15; // Higher = snappier, Lower = smoother
+    const momentumDecay = 0.85; // How quickly momentum fades
+    const accelerationRate = 0.2; // How quickly we reach target speed
+    
+    // 🎮 ORBITAL CAMERA: Initialize camera controller
+    const cameraController = new HD1CameraController(app, camera);
+    window.hd1CameraController = cameraController; // Make it globally accessible
     
     // Mouse look controls
     app.mouse.on(pc.EVENT_MOUSEDOWN, function(event) {
@@ -180,40 +327,130 @@ function setupCameraControls(app, camera) {
     
     app.mouse.on(pc.EVENT_MOUSEMOVE, function(event) {
         if (isMouseDown && document.pointerLockElement) {
-            yaw -= event.dx * lookSpeed;
-            pitch -= event.dy * lookSpeed;
-            pitch = pc.math.clamp(pitch, -90, 90);
-            
-            camera.setEulerAngles(pitch, yaw, 0);
+            // 🎮 ORBITAL CAMERA: Handle different camera modes
+            if (cameraController.mode === 'orbit') {
+                cameraController.handleOrbitInput(event.dx, event.dy);
+            } else {
+                // Free camera mode
+                yaw -= event.dx * lookSpeed;
+                pitch -= event.dy * lookSpeed;
+                pitch = pc.math.clamp(pitch, -90, 90);
+                
+                camera.setEulerAngles(pitch, yaw, 0);
+            }
         }
     });
     
-    // WASD movement controls
+    // 🎮 ORBITAL CAMERA: Add mouse wheel zoom support
+    app.mouse.on(pc.EVENT_MOUSEWHEEL, function(event) {
+        if (cameraController.mode === 'orbit') {
+            cameraController.handleZoom(event.wheel);
+        }
+    });
+    
+    // WASD movement controls with HD1 API synchronization
+    let lastCameraUpdate = 0;
+    const cameraUpdateThrottle = 100; // Update camera position via API every 100ms
+    
+    // 🎮 ORBITAL CAMERA: Keyboard shortcuts
+    let lastKeyTime = 0;
+    app.keyboard.on(pc.EVENT_KEYDOWN, function(event) {
+        const now = Date.now();
+        
+        // Prevent rapid key presses
+        if (now - lastKeyTime < 200) return;
+        lastKeyTime = now;
+        
+        switch(event.key) {
+            case pc.KEY_TAB: // Toggle camera mode
+                event.event.preventDefault();
+                cameraController.toggleMode();
+                break;
+            case pc.KEY_R: // Auto-rotate in orbit mode
+                if (cameraController.mode === 'orbit') {
+                    cameraController.orbitAutoRotate = !cameraController.orbitAutoRotate;
+                    console.log('[HD1] 🎮 Auto-rotate:', cameraController.orbitAutoRotate ? 'ON' : 'OFF');
+                }
+                break;
+            case pc.KEY_C: // Center on avatars
+                if (cameraController.mode === 'orbit') {
+                    const center = cameraController.calculateAvatarCenter();
+                    cameraController.setOrbitMode(center, cameraController.orbitDistance, cameraController.orbitHeight);
+                }
+                break;
+        }
+    });
+    
     app.on('update', function(dt) {
-        const forward = camera.forward;
-        const right = camera.right;
-        const pos = camera.getPosition();
+        // 🎮 ORBITAL CAMERA: Update camera controller first
+        cameraController.update(dt);
         
-        if (app.keyboard.isPressed(pc.KEY_W)) {
-            pos.add(forward.clone().scale(moveSpeed * dt));
+        // Only process WASD movement in free camera mode
+        if (cameraController.mode === 'free') {
+            const forward = camera.forward;
+            const right = camera.right;
+            const up = pc.Vec3.UP;
+            
+            // 🎮 SMOOTH MOVEMENT: Calculate target velocity based on input
+            targetVelocity.set(0, 0, 0);
+            let hasInput = false;
+            
+            if (app.keyboard.isPressed(pc.KEY_W)) {
+                targetVelocity.add(forward.clone().scale(moveSpeed));
+                hasInput = true;
+            }
+            if (app.keyboard.isPressed(pc.KEY_S)) {
+                targetVelocity.add(forward.clone().scale(-moveSpeed));
+                hasInput = true;
+            }
+            if (app.keyboard.isPressed(pc.KEY_A)) {
+                targetVelocity.add(right.clone().scale(-moveSpeed));
+                hasInput = true;
+            }
+            if (app.keyboard.isPressed(pc.KEY_D)) {
+                targetVelocity.add(right.clone().scale(moveSpeed));
+                hasInput = true;
+            }
+            if (app.keyboard.isPressed(pc.KEY_Q)) {
+                targetVelocity.add(up.clone().scale(-moveSpeed));
+                hasInput = true;
+            }
+            if (app.keyboard.isPressed(pc.KEY_E)) {
+                targetVelocity.add(up.clone().scale(moveSpeed));
+                hasInput = true;
+            }
+            
+            // 🎮 MOMENTUM: Apply acceleration/deceleration
+            if (hasInput) {
+                // Accelerate towards target velocity
+                currentVelocity.lerp(currentVelocity, targetVelocity, accelerationRate);
+            } else {
+                // Apply momentum decay when no input
+                currentVelocity.scale(momentumDecay);
+            }
+            
+            // 🎮 SMOOTH MOVEMENT: Calculate target position
+            if (currentVelocity.length() > 0.01) { // Only move if velocity is significant
+                targetPosition.add(currentVelocity.clone().scale(dt));
+                
+                // Smoothly interpolate to target position
+                const currentPos = camera.getPosition();
+                const newPos = new pc.Vec3();
+                newPos.lerp(currentPos, targetPosition, smoothingFactor);
+                
+                camera.setPosition(newPos);
+                
+                // Throttled camera position sync to HD1 API for avatar updates
+                const now = Date.now();
+                if (now - lastCameraUpdate > cameraUpdateThrottle) {
+                    lastCameraUpdate = now;
+                    syncCameraPositionToAPI(newPos);
+                }
+            }
+            
+            // Update target position to current position (for smooth catch-up)
+            targetPosition.copy(camera.getPosition());
         }
-        if (app.keyboard.isPressed(pc.KEY_S)) {
-            pos.add(forward.clone().scale(-moveSpeed * dt));
-        }
-        if (app.keyboard.isPressed(pc.KEY_A)) {
-            pos.add(right.clone().scale(-moveSpeed * dt));
-        }
-        if (app.keyboard.isPressed(pc.KEY_D)) {
-            pos.add(right.clone().scale(moveSpeed * dt));
-        }
-        if (app.keyboard.isPressed(pc.KEY_Q)) {
-            pos.y -= moveSpeed * dt;
-        }
-        if (app.keyboard.isPressed(pc.KEY_E)) {
-            pos.y += moveSpeed * dt;
-        }
-        
-        camera.setPosition(pos);
     });
     
     // Object interaction - right click to select (only if not over console)
@@ -250,6 +487,49 @@ function setupCameraControls(app, camera) {
     });
     
     console.log('[HD1] Camera controls enabled: Mouse to look, WASD to move, QE for up/down, Right-click to select objects');
+}
+
+/**
+ * Sync camera position to HD1 API for avatar updates and participant synchronization
+ */
+async function syncCameraPositionToAPI(position) {
+    try {
+        const sessionId = getCurrentSession();
+        if (!sessionId) {
+            console.warn('[HD1] ❌ No session ID found - cannot sync camera position!');
+            console.log('[HD1] localStorage hd1_session_id:', localStorage.getItem('hd1_session_id'));
+            return;
+        }
+        
+        // DEBUG: Log API call to verify it's happening
+        console.log('[HD1] 🎯 Syncing camera position to API:', { sessionId, position: { x: position.x, y: position.y, z: position.z } });
+        
+        // Call HD1 API to update camera position (which updates avatar and broadcasts to participants)
+        const result = await window.hd1API.setCameraPosition(sessionId, {
+            x: position.x,
+            y: position.y, 
+            z: position.z
+        });
+        
+        console.log('[HD1] ✅ Camera position sync successful:', result);
+        
+        // Track camera position in stats manager
+        if (window.hd1ConsoleManager) {
+            const statsManager = window.hd1ConsoleManager.getModule('stats');
+            if (statsManager && statsManager.trackCameraPosition) {
+                statsManager.trackCameraPosition(position);
+            }
+        }
+        
+    } catch (error) {
+        // LOG ALL ERRORS to debug the issue
+        console.error('[HD1] ❌ Camera position sync failed:', error);
+        console.log('[HD1] Error details:', {
+            message: error.message,
+            sessionId: getCurrentSession(),
+            position: position
+        });
+    }
 }
 
 /**
@@ -628,6 +908,7 @@ function createObjectFromData(objectData) {
 
     const entity = new pc.Entity(objectData.name);
     entity.hd1Id = entityId;
+    entity.hd1Tags = objectData.tags || []; // Store HD1 tags for WebSocket handler lookup
 
     // Add model component (only if not a light)
     if (!objectData.components?.light) {
@@ -764,6 +1045,12 @@ function deleteObjectByName(objectName) {
         return;
     }
 
+    // 🛡️  AVATAR PROTECTION: Don't allow direct avatar deletion
+    if (objectName && (objectName.includes('session_client_') || objectName.includes('session_'))) {
+        console.warn(`[HD1] 🛡️  AVATAR PROTECTION: Blocked direct deletion of avatar object: ${objectName}`);
+        return;
+    }
+
     console.log('[HD1] Deleting PlayCanvas object:', objectName);
     
     // Find and remove the entity
@@ -804,7 +1091,7 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Load existing objects from the current session into PlayCanvas
+ * Load existing objects from the current session and all channel participants into PlayCanvas
  */
 async function loadExistingSessionObjects() {
     console.log('[HD1] loadExistingSessionObjects() called');
@@ -824,24 +1111,73 @@ async function loadExistingSessionObjects() {
     try {
         console.log(`[HD1] Loading existing entities from session: ${sessionId}`);
         
-        // Fetch entities from the current session
+        // Load entities from current session
         const response = await fetch(`/api/sessions/${sessionId}/entities`);
         const data = await response.json();
         
+        let totalEntitiesLoaded = 0;
+        
         if (data.entities && Array.isArray(data.entities)) {
-            console.log(`[HD1] Found ${data.entities.length} existing entities to load`);
+            console.log(`[HD1] Found ${data.entities.length} existing entities in current session`);
             
             data.entities.forEach(entity => {
-                console.log('[HD1] Loading existing entity:', entity.name, 'position:', entity.position);
+                console.log('[HD1] Loading existing entity:', entity.name);
                 createObjectFromData(entity);
             });
             
-            if (data.entities.length > 0) {
-                updateGameStats();
-                console.log(`[HD1] Successfully loaded ${data.entities.length} existing entities into PlayCanvas`);
+            totalEntitiesLoaded += data.entities.length;
+        }
+        
+        // Load avatars from ALL sessions in the same channel for multi-user visibility
+        try {
+            // Get current session info to find its channel
+            const sessionResponse = await fetch(`/api/sessions/${sessionId}`);
+            const sessionData = await sessionResponse.json();
+            
+            if (sessionData.channel_id) {
+                console.log(`[HD1] Loading avatars from all sessions in channel: ${sessionData.channel_id}`);
+                
+                // Get all sessions in the same channel
+                const allSessionsResponse = await fetch('/api/sessions');
+                const allSessionsData = await allSessionsResponse.json();
+                
+                if (allSessionsData.sessions && Array.isArray(allSessionsData.sessions)) {
+                    const channelSessions = allSessionsData.sessions.filter(session => 
+                        session.channel_id === sessionData.channel_id && session.id !== sessionId
+                    );
+                    
+                    console.log(`[HD1] Found ${channelSessions.length} other sessions in channel ${sessionData.channel_id}`);
+                    
+                    // Load avatars from each session in the channel
+                    for (const session of channelSessions) {
+                        try {
+                            const otherSessionResponse = await fetch(`/api/sessions/${session.id}/entities?tag=session-avatar`);
+                            const otherSessionData = await otherSessionResponse.json();
+                            
+                            if (otherSessionData.entities && Array.isArray(otherSessionData.entities)) {
+                                otherSessionData.entities.forEach(avatar => {
+                                    console.log(`[HD1] Loading avatar from session ${session.id}:`, avatar.name);
+                                    createObjectFromData(avatar);
+                                    totalEntitiesLoaded++;
+                                });
+                            }
+                        } catch (error) {
+                            console.warn(`[HD1] Failed to load avatars from session ${session.id}:`, error);
+                        }
+                    }
+                }
+            } else {
+                console.log('[HD1] Session not in a channel, skipping cross-session avatar loading');
             }
+        } catch (error) {
+            console.warn('[HD1] Failed to load cross-session avatars:', error);
+        }
+        
+        if (totalEntitiesLoaded > 0) {
+            updateGameStats();
+            console.log(`[HD1] Successfully loaded ${totalEntitiesLoaded} total entities/avatars into PlayCanvas`);
         } else {
-            console.log('[HD1] No existing entities found in session');
+            console.log('[HD1] No existing entities found to load');
         }
     } catch (error) {
         console.error('[HD1] Failed to load existing session entities:', error);

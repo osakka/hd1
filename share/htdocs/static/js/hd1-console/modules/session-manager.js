@@ -52,6 +52,10 @@ class HD1SessionManager {
                 this.sessionId = existingSessionId;
                 await this.loadSessionDetails();
                 this.updateSessionDisplay();
+                
+                // CRITICAL: Associate existing session with WebSocket for proper broadcasting
+                this.associateWebSocketSession();
+                
                 console.log(`[HD1-Session] Loaded existing session: ${existingSessionId}`);
                 return;
             } else {
@@ -197,12 +201,44 @@ class HD1SessionManager {
      * Notify other modules of session creation
      */
     notifySessionCreated() {
+        // CRITICAL: Associate WebSocket with session for proper broadcasting
+        this.associateWebSocketSession();
+        
         // Notify via console manager if available
         if (window.hd1ConsoleManager) {
             window.hd1ConsoleManager.notifyModules('session_created', {
                 sessionId: this.sessionId,
                 session: this.currentSession
             });
+        }
+    }
+    
+    /**
+     * Associate the WebSocket connection with this session for proper message broadcasting
+     */
+    associateWebSocketSession() {
+        if (!this.sessionId) {
+            console.warn('[HD1-Session] Cannot associate WebSocket: no session ID');
+            return;
+        }
+        
+        // Get WebSocket manager and send session association message
+        if (window.hd1ConsoleManager) {
+            const wsManager = window.hd1ConsoleManager.getModule('websocket');
+            if (wsManager && wsManager.send) {
+                const associationMessage = {
+                    type: 'session_associate',
+                    session_id: this.sessionId
+                };
+                
+                if (wsManager.send(associationMessage)) {
+                    console.log(`[HD1-Session] ✅ WebSocket associated with session: ${this.sessionId}`);
+                } else {
+                    console.warn(`[HD1-Session] ❌ Failed to associate WebSocket with session: ${this.sessionId}`);
+                    // Retry association after WebSocket connects
+                    setTimeout(() => this.associateWebSocketSession(), 1000);
+                }
+            }
         }
     }
 

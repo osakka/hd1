@@ -1,0 +1,125 @@
+# HD1 Avatar Specification - Default Avatar
+# Single Source of Truth for Avatar Assets
+# Auto-generated entity creation via API specification
+
+metadata:
+  name: "Default Avatar"
+  description: "Standard HD1 session avatar with basic humanoid appearance"
+  version: "1.0.0"
+  type: "session-avatar"
+  created: "2025-07-03"
+
+# Asset References (relative to avatar directory)
+assets:
+  model: "model.glb"           # 3D model file
+  textures:
+    - "textures/skin.png"      # Character skin texture
+    - "textures/clothing.png"  # Clothing texture
+  animations:
+    - "animations/idle.glb"    # Idle animation
+    - "animations/walk.glb"    # Walking animation
+    - "animations/run.glb"     # Running animation
+
+# Avatar Physical Properties
+physical:
+  # Default spawn transform
+  default_transforms:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}  
+    scale: {x: 1, y: 1, z: 1}
+  
+  # Camera positioning relative to avatar
+  camera_offset: {x: 0, y: 1.8, z: 0}  # Head height
+  camera_follow_distance: 3.0           # Third-person distance
+  
+  # Physics properties
+  physics:
+    mass: 70.0                          # kg
+    height: 1.8                         # meters
+    collision_radius: 0.4               # meters
+
+# HD1 Entity Definition (API-compatible)
+entity:
+  # HD1 tagging system
+  tags: ['session-avatar', 'avatar', 'default']
+  
+  # Entity name pattern
+  name_template: "avatar-{session_id}-{user_id}"
+  
+  # PlayCanvas components
+  components:
+    transform:
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0}
+      scale: {x: 1, y: 1, z: 1}
+    
+    model:
+      type: "asset"
+      asset_path: "model.glb"
+      cast_shadows: true
+      receive_shadows: true
+    
+    animation:
+      assets:
+        idle: "animations/idle.glb"
+        walk: "animations/walk.glb" 
+        run: "animations/run.glb"
+      default_state: "idle"
+      transition_time: 0.2
+    
+    rigidbody:
+      type: "kinematic"              # Controlled movement
+      mass: 70.0
+      restitution: 0.0
+      friction: 0.5
+    
+    collision:
+      type: "capsule"
+      radius: 0.4
+      height: 1.8
+    
+    script:
+      avatar_controller: true        # Enable avatar movement script
+      network_sync: true             # Enable WebSocket sync
+
+# Movement Configuration
+movement:
+  walk_speed: 2.0                    # m/s
+  run_speed: 5.0                     # m/s
+  turn_speed: 180.0                  # degrees/s
+  acceleration: 8.0                  # m/s²
+  deceleration: 12.0                 # m/s²
+
+# Animation State Machine
+animations:
+  states:
+    idle:
+      clip: "idle"
+      loop: true
+      transition_triggers:
+        - {to: "walk", condition: "speed > 0.1"}
+    
+    walk:
+      clip: "walk" 
+      loop: true
+      transition_triggers:
+        - {to: "idle", condition: "speed < 0.1"}
+        - {to: "run", condition: "speed > 3.0"}
+    
+    run:
+      clip: "run"
+      loop: true
+      transition_triggers:
+        - {to: "walk", condition: "speed < 3.0"}
+
+# WebSocket Sync Configuration
+network:
+  sync_frequency: 30                 # Hz (30 FPS sync)
+  position_threshold: 0.01           # meters (sync only if moved > 1cm)
+  rotation_threshold: 1.0            # degrees
+  
+  # Interpolation for smooth movement
+  interpolation:
+    enabled: true
+    method: "linear"
+    time: 0.1                        # seconds
