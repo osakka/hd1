@@ -79,7 +79,7 @@ cd src && make clean && make && make start
 
 **🎯 Access Points**:
 - **Visual Console**: http://localhost:8080 (Professional monitoring interface)
-- **API Explorer**: Interactive testing of all 59 endpoints
+- **API Explorer**: Interactive testing of all 82 endpoints
 - **WebSocket Feed**: Real-time entity updates and state synchronization
 
 ### Your First 3D Scene via API
@@ -129,7 +129,7 @@ src/codegen/templates/
 **8 External Templates** → **100% Generated Code** → **Zero Manual Synchronization**
 
 ### System Performance
-- **API Response**: Efficient response handling for all 59 endpoints
+- **API Response**: Efficient response handling for all 82 endpoints
 - **WebSocket**: Real-time synchronization  
 - **Entity Operations**: Efficient create/update/delete operations
 - **Memory**: Scales with entity count
@@ -141,7 +141,7 @@ src/codegen/templates/
 HD1 draws inspiration from Star Trek's **Holodeck** - a space where any scenario can be created, experienced, and interacted with through technology. In our case, **distributed services** become the scenarios.
 
 ### From Concept to Reality
-**Today**: HD1 provides 59 REST endpoints for 3D engine control (in development)  
+**Today**: HD1 provides 82 REST endpoints for 3D engine control (in development)  
 **Tomorrow**: Any distributed service integrates visual representation through HD1's API surface  
 **Future**: The **visual interface layer** for the entire distributed service ecosystem
 

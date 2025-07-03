@@ -62,7 +62,7 @@ HD1 v5.0.1 provides **82 REST endpoints** covering complete game engine function
 
 | Category | Documentation | Description |
 |----------|---------------|-------------|
-| **Complete API** | [API Specification](api-specification.md) | All 59 endpoints documented |
+| **Complete API** | [API Specification](API-Specification.md) | All 82 endpoints documented |
 | **Getting Started** | [User Guide](../user-guide/README.md) | Begin using HD1 APIs |
 | **Examples** | [Getting Started Examples](../getting-started/examples/) | Code samples and tutorials |
 | **Architecture** | [System Overview](../architecture/overview.md) | Technical architecture |
@@ -87,4 +87,4 @@ This reference documentation follows strict accuracy standards:
 
 **HD1 v5.0.1** - API-First Game Engine Platform  
 **Reference Version**: 5.0.1 (Updated: 2025-07-03)  
-**API Status**: Production Ready (59 endpoints)
+**API Status**: Production Ready (82 endpoints)

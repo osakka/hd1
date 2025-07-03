@@ -21,7 +21,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 
 ### **WebSocket Hub**
 - **Purpose**: Real-time bidirectional communication
-- **Performance**: <10ms message latency
+- **Performance**: Real-time message processing
 - **Capacity**: 100+ clients per channel, 500+ total connections
 
 ### **Entity-Component System (ECS)**
@@ -35,7 +35,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 
 ## 📊 **Performance Characteristics**
 - **API Response Time**: Optimized for entity operations
-- **WebSocket Latency**: <10ms for state synchronization
+- **WebSocket Latency**: Real-time state synchronization
 - **Memory Usage**: <100MB for typical sessions (10-50 entities)
 - **Concurrent Capacity**: 100+ clients per channel
 

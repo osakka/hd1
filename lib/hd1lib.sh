@@ -40,22 +40,6 @@ hd1::api_call() {
 }
 
 
-# Auto-generated from GET /sessions
-hd1::list_sessions() {
-    hd1::api_call "GET" "/sessions"
-}
-
-# Auto-generated from POST /sessions
-hd1::create_session() {
-    hd1::api_call "POST" "/sessions"
-}
-
-# Auto-generated from GET /sessions/{sessionId}
-hd1::get_session() {
-    local session_id="${1:-$HD1_SESSION_ID}"
-    hd1::api_call "GET" "/sessions/$session_id"
-}
-
 # Auto-generated from PUT /sessions/{sessionId}/camera/position
 hd1::camera() {
     local x="$1" y="$2" z="$3"
@@ -76,6 +60,12 @@ EOF
     
     hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
     echo "CAMERA: Positioned at ($x,$y,$z)"
+}
+
+# Auto-generated from GET /sessions/{sessionId}
+hd1::get_session() {
+    local session_id="${1:-$HD1_SESSION_ID}"
+    hd1::api_call "GET" "/sessions/$session_id"
 }
 
 # Auto-generated from POST /browser/canvas
@@ -104,6 +94,16 @@ EOF
 hd1::clear() {
     echo "CLEAR: Clearing holodeck..."
     hd1::canvas_control "clear"
+}
+
+# Auto-generated from GET /sessions
+hd1::list_sessions() {
+    hd1::api_call "GET" "/sessions"
+}
+
+# Auto-generated from POST /sessions
+hd1::create_session() {
+    hd1::api_call "POST" "/sessions"
 }
 
 
