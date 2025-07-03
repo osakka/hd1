@@ -1,13 +1,13 @@
 # HD1 (Holodeck One) Documentation
 
-**HD1 v5.0.0 - API-First Game Engine Platform**
+**HD1 v5.0.1 - API-First Game Engine Platform**
 
 Welcome to the comprehensive documentation for HD1, the world's first API-first game engine platform. This documentation provides complete technical guidance for developers, operators, and users.
 
 ## 🚀 **Quick Start**
 
 - **[Getting Started Guide](getting-started/README.md)** - Installation, setup, and first steps
-- **[API Reference](reference/api-specification.md)** - Complete API documentation (82 endpoints)
+- **[API Reference](reference/api-specification.md)** - Complete API documentation (59 endpoints)
 - **[Examples](getting-started/examples/)** - Code samples and tutorials
 
 ## 📚 **Documentation Categories**
@@ -54,12 +54,12 @@ Welcome to the comprehensive documentation for HD1, the world's first API-first 
 
 - **[Decisions](decisions/README.md)** - Architectural Decision Records (ADRs)
   - [ADR Process](decisions/README.md#adr-process) - How architectural decisions are made
-  - [All ADRs](decisions/adr/) - Complete decision history (23 ADRs)
+  - [All ADRs](decisions/adr/) - Complete decision history (25 ADRs)
 
-## 🎯 **HD1 v5.0.0 Key Features**
+## 🎯 **HD1 v5.0.1 Key Features**
 
 ### **Professional Game Engine**
-- **82 REST Endpoints** - Complete game engine control via HTTP APIs
+- **59 REST Endpoints** - Complete game engine control via HTTP APIs
 - **PlayCanvas Integration** - Professional 3D rendering engine
 - **Entity-Component-System** - Modern game architecture
 - **Real-Time Synchronization** - WebSocket state sync across clients
@@ -75,7 +75,7 @@ Welcome to the comprehensive documentation for HD1, the world's first API-first 
 - **Enterprise Architecture** - Thread-safe, scalable, production-ready
 - **Comprehensive Logging** - Structured logging with dynamic control
 - **Quality Assurance** - Build system validation and testing
-- **Performance Optimized** - Sub-50ms API response times
+- **Performance Optimized** - Efficient API response handling
 
 ## 🔗 **Quick Links**
 
@@ -108,7 +108,7 @@ This documentation follows industry-standard technical writing practices:
 
 ---
 
-**HD1 v5.0.0** - The world's first API-first game engine platform  
-**Documentation Version**: 5.0.0 (Updated: 2025-07-03)  
-**API Surface**: 82 REST endpoints  
+**HD1 v5.0.1** - The world's first API-first game engine platform  
+**Documentation Version**: 5.0.1 (Updated: 2025-07-03)  
+**API Surface**: 59 REST endpoints  
 **Architecture**: Entity-Component-System with PlayCanvas rendering

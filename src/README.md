@@ -5,7 +5,7 @@
 ## 🎯 Architecture Overview
 
 **HD1 v5.0.1** transforms game development through **API-First Game Engine** architecture:
-- **82 REST Endpoints**: Complete game engine control via HTTP APIs
+- **59 REST Endpoints**: Complete game engine control via HTTP APIs
 - **Real-Time WebSocket**: Entity lifecycle synchronization  
 - **PlayCanvas Engine**: Professional 3D rendering with ECS
 - **Single Source of Truth**: 100% auto-generated from `api.yaml`

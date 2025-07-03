@@ -1,6 +1,6 @@
 # Getting Started with HD1
 
-**HD1 v5.0.0 - API-First Game Engine Platform**
+**HD1 v5.0.1 - API-First Game Engine Platform**
 
 This guide will help you quickly get started with HD1, from installation to creating your first entities and scenes.
 
@@ -123,7 +123,7 @@ Open http://localhost:8080 in your browser and you'll see:
 
 ### **Learn Core Concepts**
 - **[User Guide](../user-guide/README.md)** - Complete user documentation
-- **[API Reference](../reference/api-specification.md)** - All 82 endpoints documented
+- **[API Reference](../reference/api-specification.md)** - All 59 endpoints documented
 - **[Architecture Overview](../architecture/overview.md)** - System architecture
 
 ### **Build Something**
@@ -201,7 +201,7 @@ tail -f build/logs/hd1.log
 
 ## 📖 **Additional Resources**
 
-- **[Complete API Documentation](../reference/api-specification.md)** - All 82 endpoints
+- **[Complete API Documentation](../reference/api-specification.md)** - All 59 endpoints
 - **[Channel Configuration](../user-guide/channels.md)** - YAML-based scene management
 - **[Entity-Component System](../user-guide/entities-components.md)** - Game object architecture
 - **[Architectural Decisions](../decisions/README.md)** - Design rationale and history

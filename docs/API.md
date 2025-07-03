@@ -1,12 +1,12 @@
 # HD1 API Reference
 
-**HD1 v5.0.0 - Complete API-First Game Engine Platform**
+**HD1 v5.0.1 - Complete API-First Game Engine Platform**
 
-HD1 provides a comprehensive REST API for 3D game engine control with **82 endpoints** covering all aspects of entity management, physics simulation, audio systems, and real-time multiplayer capabilities.
+HD1 provides a comprehensive REST API for 3D game engine control with **59 endpoints** covering all aspects of entity management, physics simulation, audio systems, and real-time multiplayer capabilities.
 
 ## API Overview
 
-- **Total Endpoints**: 82 REST endpoints
+- **Total Endpoints**: 59 REST endpoints
 - **API Specification**: OpenAPI 3.0.3
 - **Base URL**: `http://localhost:8080/api`
 - **Response Format**: JSON
@@ -14,7 +14,7 @@ HD1 provides a comprehensive REST API for 3D game engine control with **82 endpo
 
 ## Endpoint Categories
 
-### Sessions (67 endpoints)
+### Sessions (Session-based endpoints)
 Core game engine functionality including entity management, physics, audio, and multiplayer features.
 
 #### Entity Management

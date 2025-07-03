@@ -1,7 +1,7 @@
 # HD1 (Holodeck One) - Development Context
 
 ## Core Principles
-- **API-First**: HD1 exposes everything via unified API surface (77 endpoints)
+- **API-First**: HD1 exposes everything via unified API surface (59 endpoints)
 - **Specification-Driven**: 100% auto-generated from api.yaml
 - **Real-Time Sync**: WebSocket for state sync, API for commands
 - **Single Source of Truth**: No parallel implementations
@@ -12,8 +12,8 @@
 HD1 v5.0.1 is a **production-ready API-first game engine** platform with **complete configuration management standardization**.
 
 ### ✅ Completed Features
-- **82 REST Endpoints**: Complete game engine control via HTTP + Avatar management
-- **Real-Time WebSocket**: <10ms entity lifecycle synchronization + avatar position updates
+- **59 REST Endpoints**: Complete game engine control via HTTP + Avatar management
+- **Real-Time WebSocket**: Entity lifecycle synchronization + avatar position updates
 - **PlayCanvas Integration**: Professional 3D rendering with ECS + advanced camera system
 - **Avatar Synchronization**: High-frequency multiplayer avatar tracking with persistence
 - **Advanced Camera System**: Smooth movement, momentum, orbital mode with TAB toggle
@@ -29,7 +29,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → Client Ren
 ```
 
 **Key Files:**
-- `src/api.yaml` - Single source of truth (82 endpoints)
+- `src/api.yaml` - Single source of truth (59 endpoints)
 - `src/auto_router.go` - Auto-generated routing
 - `src/codegen/templates/` - External template files
 - `share/channels/*.yaml` - Scene configurations
@@ -59,7 +59,7 @@ make generate                              # Auto-generate from api.yaml
 - **Dual Message Types**: `avatar_position_update` for movement, `entity_updated` for creation
 - **Entity Lifecycle Protection**: Direct position updates avoid delete/recreate cycles
 - **Channel Broadcasting**: Bidirectional avatar visibility across sessions
-- **Performance Optimized**: <10ms WebSocket latency for real-time multiplayer
+- **Performance Optimized**: Real-time WebSocket for multiplayer synchronization
 
 **Camera System Architecture**:
 - **Free Camera Mode**: WASD movement with smooth momentum and acceleration/deceleration

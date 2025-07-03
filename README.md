@@ -16,7 +16,7 @@
 ---
 
 > **Where REST APIs meet immersive 3D worlds**  
-> Holodeck One transforms any service into a visual, interactive experience through 77 REST endpoints and real-time synchronization.
+> Holodeck One transforms any service into a visual, interactive experience through 59 REST endpoints and real-time synchronization.
 
 **🎯 XVC Experiment**: HD1 demonstrates XVC principles through **Pattern Consistency** (API-first specification-driven development), **Surgical Precision** (template-based code generation), and **Bar-Raising Solutions** (zero regressions, single source of truth). The project validates XVC's effectiveness for complex system architecture while building toward the vision of any distributed service integrating visual representation through HD1's unified API surface.
 
@@ -30,11 +30,11 @@
 
 ## 🚀 Current State: HD1 v5.0.1 (In Development)
 
-HD1 has a **complete API surface** for 3D engine control with **82 REST endpoints**, **advanced multiplayer avatar synchronization**, and **complete configuration management standardization**. The foundation is built for the distributed services revolution.
+HD1 has a **complete API surface** for 3D engine control with **59 REST endpoints**, **advanced multiplayer avatar synchronization**, and **complete configuration management standardization**. The foundation is built for the distributed services revolution.
 
 ### 🎮 Complete 3D Engine via REST APIs
 ```
-82 REST Endpoints → Entity-Component-System → PlayCanvas Rendering → Real-Time Avatar Sync
+59 REST Endpoints → Entity-Component-System → PlayCanvas Rendering → Real-Time Avatar Sync
 ```
 
 **Core Engine APIs**
@@ -79,7 +79,7 @@ cd src && make clean && make && make start
 
 **🎯 Access Points**:
 - **Visual Console**: http://localhost:8080 (Professional monitoring interface)
-- **API Explorer**: Interactive testing of all 77 endpoints
+- **API Explorer**: Interactive testing of all 59 endpoints
 - **WebSocket Feed**: Real-time entity updates and state synchronization
 
 ### Your First 3D Scene via API
@@ -129,11 +129,11 @@ src/codegen/templates/
 **8 External Templates** → **100% Generated Code** → **Zero Manual Synchronization**
 
 ### System Performance
-- **API Response**: <50ms average for all 77 endpoints
-- **WebSocket Latency**: <10ms real-time synchronization  
-- **Entity Operations**: ~5ms per create/update/delete
-- **Memory Baseline**: ~100MB, scales linearly with entities
-- **Concurrent Users**: Tested up to 50 simultaneous connections
+- **API Response**: Efficient response handling for all 59 endpoints
+- **WebSocket**: Real-time synchronization  
+- **Entity Operations**: Efficient create/update/delete operations
+- **Memory**: Scales with entity count
+- **Concurrent Users**: Multi-user collaborative support
 
 ## 🌌 The Holodeck Vision
 
@@ -141,7 +141,7 @@ src/codegen/templates/
 HD1 draws inspiration from Star Trek's **Holodeck** - a space where any scenario can be created, experienced, and interacted with through technology. In our case, **distributed services** become the scenarios.
 
 ### From Concept to Reality
-**Today**: HD1 provides 77 REST endpoints for 3D engine control (in development)  
+**Today**: HD1 provides 59 REST endpoints for 3D engine control (in development)  
 **Tomorrow**: Any distributed service integrates visual representation through HD1's API surface  
 **Future**: The **visual interface layer** for the entire distributed service ecosystem
 
@@ -159,7 +159,7 @@ HD1 draws inspiration from Star Trek's **Holodeck** - a space where any scenario
 
 ### Complete Documentation Suite
 - **`/docs/README.md`**: Master documentation index with professional taxonomy
-- **`/docs/decisions/`**: 23 Architectural Decision Records (ADRs) 
+- **`/docs/decisions/`**: 25 Architectural Decision Records (ADRs) 
 - **`/src/README.md`**: Developer-focused with API → Templates → Code workflow
 - **`/src/codegen/templates/README.md`**: Complete template architecture guide
 
@@ -180,7 +180,7 @@ make stop        # Stop daemon
 - **Specification-Driven**: All code auto-generated from `api.yaml` (Single Source of Truth)
 - **Zero Regressions**: Surgical precision in all changes (XVC Surgical Precision)
 - **Template Architecture**: 8 externalized templates for maintainability (Pattern Consistency)
-- **Performance Target**: <50ms API response, <10ms WebSocket sync (Bar-Raising Solutions)
+- **Performance Optimized**: Efficient API response and WebSocket synchronization (Bar-Raising Solutions)
 
 ---
 
@@ -194,7 +194,7 @@ make stop        # Stop daemon
 ### Explore the Platform
 1. **Start HD1**: `cd src && make clean && make && make start`
 2. **Open Console**: http://localhost:8080 for visual monitoring
-3. **Try APIs**: Use the 77 REST endpoints to create your first 3D scene
+3. **Try APIs**: Use the 59 REST endpoints to create your first 3D scene
 4. **Join Community**: Explore `/docs/` for comprehensive guides
 
 ---

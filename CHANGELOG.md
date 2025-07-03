@@ -43,14 +43,14 @@ This revolutionary release transforms HD1 into the world's first **API-first gam
 ### **Added - Revolutionary Game Engine Architecture**
 
 #### **🎮 Complete API-First Game Engine**
-- **82 REST Endpoints**: Complete game engine control via HTTP APIs
+- **59 REST Endpoints**: Complete game engine control via HTTP APIs
 - **PlayCanvas Integration**: Professional 3D rendering replacing A-Frame
 - **Entity-Component-System**: Full ECS architecture with lifecycle management
-- **Real-Time Synchronization**: <10ms WebSocket state sync across all clients
+- **Real-Time Synchronization**: WebSocket state sync across all clients
 - **Single Source of Truth**: All functionality auto-generated from api.yaml specification
 
 #### **👥 Advanced Multiplayer Avatar Synchronization**
-- **High-Frequency Avatar Tracking**: Supports 100+ movements/updates per second
+- **High-Frequency Avatar Tracking**: Supports rapid movement updates for real-time multiplayer
 - **Avatar Persistence**: Prevents avatar disappearing during rapid position updates
 - **Dual Message Types**: `avatar_position_update` for movement, `entity_updated` for creation
 - **Entity Lifecycle Protection**: Direct position updates avoid delete/recreate cycles
@@ -87,7 +87,7 @@ This revolutionary release transforms HD1 into the world's first **API-first gam
 - **Component System**: Dynamic component attachment/detachment capabilities
 
 #### **BREAKING: API Architecture Expansion**
-- **31 → 82 Endpoints**: Complete API surface expansion for game engine features
+- **API Surface Expansion**: Complete API surface expansion for game engine features (59 endpoints)
 - **Entity APIs**: Full CRUD operations with component management
 - **Physics APIs**: Rigidbody simulation and force application
 - **Animation APIs**: Timeline-based animation control system
