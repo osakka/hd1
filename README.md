@@ -9,7 +9,7 @@ HD1 v5.0.0 is a production-ready **API-first game engine platform** that exposes
 ## Key Features
 
 ### 🎮 API-First Game Engine Architecture
-- **85 REST Endpoints**: Complete game engine control via HTTP APIs
+- **77 REST Endpoints**: Complete game engine control via HTTP APIs
 - **Professional 3D Rendering**: PlayCanvas integration with WebGL/WebXR support
 - **Entity-Component-System**: Full ECS architecture with lifecycle management
 - **Real-Time Synchronization**: <10ms WebSocket state sync across all clients
@@ -124,7 +124,7 @@ src/codegen/templates/
 └── shell/playcanvas-functions.tmpl   # Shell function library
 ```
 
-## API Endpoints (85 Total)
+## API Endpoints (77 Total)
 
 ### Core APIs
 - **Sessions**: Create, list, get, delete sessions

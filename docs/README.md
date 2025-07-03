@@ -1,215 +1,114 @@
-# HD1 v3.0 Documentation
+# HD1 (Holodeck One) Documentation
 
-**API-First Game Engine Platform** - Complete documentation suite for the world's first HTTP-controlled professional game engine.
+**HD1 v5.0.0 - API-First Game Engine Platform**
 
-## 📚 Documentation Index
-
-### 🎯 **Quick Start**
-- **[Quick Reference Guide](HD1-v3-Quick-Reference.md)** - Essential commands, API endpoints, and troubleshooting
-
-### 🏗️ **Architecture Documentation**
-- **[Current State Architecture](HD1-v3-Current-State-Architecture.md)** - Comprehensive system overview and technical details
-- **[ADR-019: Production-Ready API-First Game Engine](adr/ADR-019-Production-Ready-API-First-Game-Engine.md)** - Complete architectural decisions and implementation details
-
-### 📋 **Architecture Decision Records (ADRs)**
-- **[ADR-017: PlayCanvas Engine Integration Strategy](adr/ADR-017-PlayCanvas-Engine-Integration-Strategy.md)** - PlayCanvas integration approach
-- **[ADR-018: API-First Game Engine Architecture](adr/ADR-018-API-First-Game-Engine-Architecture.md)** - API-first design principles
-- **[ADR-019: Production-Ready API-First Game Engine](adr/ADR-019-Production-Ready-API-First-Game-Engine.md)** - Current production architecture
-
-### 🎮 **PlayCanvas Integration**
-- **[PlayCanvas Migration Tracker](HD1-v3-PlayCanvas-Migration-Tracker.md)** - Migration progress and status
-- **[PlayCanvas API Design](HD1-v3-PlayCanvas-API-Design.md)** - API integration patterns
-
-### 🔧 **API Design Documentation**
-- **[Complete API Interfaces](HD1-v3-Complete-API-Interfaces.md)** - Comprehensive API documentation
-- **[OpenAPI Specification](../src/api.yaml)** - Single source of truth (77 endpoints)
-
-## 🎯 **HD1 v3.0 Overview**
-
-### **What is HD1?**
-HD1 (Holodeck One) v3.0 is the world's first **"Game Engine as a Service"** platform - a production-ready, API-first game engine that provides professional game development capabilities through HTTP APIs with real-time WebSocket synchronization.
-
-### **Core Innovation**
-**API-First Game Engine Architecture**: "API = Control, WebSocket = Graph Extension"
-```
-HTTP APIs → Game Commands → Server State → WebSocket Events → Client Rendering
-```
-
-### **Key Features**
-- ✅ **85 REST Endpoints**: Complete game engine control via HTTP
-- ✅ **Real-Time WebSocket**: <10ms entity lifecycle synchronization
-- ✅ **PlayCanvas Engine**: Professional 3D rendering with ECS
-- ✅ **Channel System**: YAML-based scene configuration
-- ✅ **Auto-Generation**: 100% specification-driven development
-- ✅ **Production Ready**: Enterprise logging, monitoring, scalability
+Welcome to the comprehensive documentation for HD1, the world's first API-first game engine platform. This documentation provides complete technical guidance for developers, operators, and users.
 
 ## 🚀 **Quick Start**
 
-### **1. Start the Server**
-```bash
-cd /opt/hd1/src
-make clean && make && make start
-```
+- **[Getting Started Guide](getting-started/README.md)** - Installation, setup, and first steps
+- **[API Reference](reference/api-specification.md)** - Complete API documentation (77 endpoints)
+- **[Examples](getting-started/examples/)** - Code samples and tutorials
 
-### **2. Access the Interface**
-- **Web UI**: http://localhost:8080
-- **Console**: Click header to expand/collapse (smooth animations!)
-- **API Documentation**: Generated from OpenAPI specification
-
-### **3. Create Your First Entity**
-```bash
-# Create session
-curl -X POST http://localhost:8080/api/sessions
-
-# Create entity
-curl -X POST http://localhost:8080/api/sessions/{sessionId}/entities \
-  -H "Content-Type: application/json" \
-  -d '{"name": "my_box", "components": {
-    "model": {"type": "box"},
-    "transform": {"position": [0, 1, 0]},
-    "material": {"diffuse": "#ff0000"}
-  }}'
-```
-
-## 🎮 **Game Engine Capabilities**
-
-### **Entity Component System**
-Complete ECS implementation accessible via REST APIs:
-- **Entities**: Game objects with unique IDs
-- **Components**: Transform, Model, Material, Physics, Light, Audio
-- **Systems**: Physics, Rendering, Animation (handled by PlayCanvas)
-
-### **Channel-Based Scenes**
-YAML-configured scenes with hot-swapping:
-```yaml
-# /opt/hd1/share/channels/channel_one.yaml
-channel:
-  id: "channel_one"
-  name: "Scene 1 - Red Box"
-
-playcanvas:
-  entities:
-    - name: "floor"
-      components:
-        transform: {scale: [10, 1, 10]}  # 10×1×10 floor
-        material: {diffuse: "#cccccc"}
-```
-
-### **Real-Time Synchronization**
-WebSocket events for instant updates:
-```javascript
-{
-  "type": "entity_created",
-  "data": {
-    "entity_id": "entity-xyz789",
-    "components": {...}
-  }
-}
-```
-
-## 🏗️ **Architecture Highlights**
-
-### **Single Source of Truth**
-Everything auto-generated from `src/api.yaml`:
-- Go router with 77 endpoints
-- JavaScript API client
-- Shell function library
-- UI components and forms
-
-### **Professional Console**
-Real-time monitoring with smooth animations:
-- Performance graphs (CPU, memory)
-- WebSocket connection status
-- Entity count tracking
-- 0.4s cubic-bezier transitions
-
-### **Template Architecture**
-External templates for maintainable code generation:
-```
-src/codegen/templates/
-├── go/router.tmpl              # Auto-router generation
-├── javascript/api-client.tmpl  # JS API wrapper
-└── shell/core-functions.tmpl   # Shell API client
-```
-
-## 📊 **Performance Characteristics**
-
-- **API Response Time**: <50ms for entity operations
-- **WebSocket Latency**: <10ms for real-time synchronization
-- **Entity Capacity**: 1000+ entities per session at 60fps
-- **Concurrent Clients**: 100+ per channel
-- **API Throughput**: 1000+ requests/second
-
-## 🔧 **Development Workflow**
-
-### **Specification-Driven Development**
-```bash
-# 1. Edit API specification
-vim src/api.yaml
-
-# 2. Auto-generate all code
-make generate
-
-# 3. Build and deploy
-make clean && make && make start
-```
-
-### **Quality Standards**
-- **Zero Regressions**: All changes maintain backward compatibility
-- **API-First**: No functionality exists outside the specification
-- **Clean Architecture**: Separation of concerns maintained
-- **Comprehensive Testing**: API endpoints and WebSocket flows
-
-## 🎯 **Use Cases**
-
-### **Game Development**
-- Rapid prototyping with HTTP APIs
-- Real-time multiplayer games
-- Educational game development
-- VR/AR experiences
-
-### **Enterprise Applications**
-- 3D data visualization
-- Training simulations
-- Collaborative 3D environments
-- IoT device visualization
-
-### **Research & Education**
-- Game engine architecture study
-- API-first development patterns
-- Real-time systems research
-- Web-based 3D applications
-
-## 📖 **Documentation Guide**
-
-### **For Developers**
-1. Start with **[Quick Reference](HD1-v3-Quick-Reference.md)** for essential commands
-2. Read **[Current State Architecture](HD1-v3-Current-State-Architecture.md)** for system overview
-3. Explore **[ADR-019](adr/ADR-019-Production-Ready-API-First-Game-Engine.md)** for technical details
-
-### **For Architects**
-1. Review **[ADR-017](adr/ADR-017-PlayCanvas-Engine-Integration-Strategy.md)** for integration strategy
-2. Study **[ADR-018](adr/ADR-018-API-First-Game-Engine-Architecture.md)** for design principles
-3. Examine **[Complete API Interfaces](HD1-v3-Complete-API-Interfaces.md)** for full API coverage
+## 📚 **Documentation Categories**
 
 ### **For Users**
-1. Follow **[Quick Reference](HD1-v3-Quick-Reference.md)** for getting started
-2. Check **[PlayCanvas Migration Tracker](HD1-v3-PlayCanvas-Migration-Tracker.md)** for current status
-3. Use **[OpenAPI Specification](../src/api.yaml)** for API reference
+- **[User Guide](user-guide/README.md)** - Complete user documentation
+  - [Core Concepts](user-guide/concepts.md) - Understanding HD1 architecture
+  - [API Reference](user-guide/api-reference.md) - Using the 77 REST endpoints
+  - [Channels](user-guide/channels.md) - Scene management and collaboration
+  - [Entities & Components](user-guide/entities-components.md) - Game object system
+  - [Troubleshooting](user-guide/troubleshooting.md) - Common issues and solutions
 
-## 🌟 **Strategic Vision**
+### **For Developers**
+- **[Developer Guide](developer-guide/README.md)** - Development documentation
+  - [Architecture](developer-guide/architecture.md) - System architecture overview
+  - [Contributing](developer-guide/contributing.md) - Contribution guidelines
+  - [Development Environment](developer-guide/development-environment.md) - Setup and tools
+  - [Testing](developer-guide/testing.md) - Testing procedures and standards
+  - [Code Standards](developer-guide/code-standards.md) - Coding conventions
+  - [API Development](developer-guide/api-development.md) - Building with HD1 APIs
 
-HD1 v3.0 establishes the foundation for **Game Engine as a Service** - democratizing professional game development through standard web technologies and RESTful APIs. By making game engine capabilities accessible via HTTP, we're revolutionizing how games are developed, deployed, and scaled.
+### **For Operations**
+- **[Operations Guide](operations/README.md)** - Production deployment and operations
+  - [Deployment](operations/deployment.md) - Production deployment procedures
+  - [Monitoring](operations/monitoring.md) - System monitoring and observability
+  - [Performance](operations/performance.md) - Performance tuning and optimization
+  - [Security](operations/security.md) - Security configuration and best practices
+  - [Backup & Recovery](operations/backup-recovery.md) - Data management procedures
+  - [Troubleshooting](operations/troubleshooting.md) - Operational issue resolution
 
-### **Future Roadmap**
-- Advanced physics systems (constraints, joints)
-- Asset pipeline and management
-- Multi-server clustering
-- AI/ML integration for procedural content
-- Industry ecosystem integration (Unity/Unreal import/export)
+### **Technical Reference**
+- **[Architecture](architecture/README.md)** - System architecture documentation
+  - [Overview](architecture/overview.md) - High-level system architecture
+  - [Design Principles](architecture/design-principles.md) - Core architectural principles
+  - [API Design](architecture/api-design.md) - API architecture patterns
+  - [Data Flow](architecture/data-flow.md) - Data flow and state management
+  - [Technology Stack](architecture/technology-stack.md) - Technology choices and rationale
+
+- **[Reference](reference/README.md)** - Complete reference documentation
+  - [API Specification](reference/api-specification.md) - Auto-generated API documentation
+  - [Configuration](reference/configuration.md) - Configuration reference
+  - [CLI Reference](reference/cli-reference.md) - Command-line interface documentation
+  - [Glossary](reference/glossary.md) - Terms and definitions
+
+- **[Decisions](decisions/README.md)** - Architectural Decision Records (ADRs)
+  - [ADR Process](decisions/README.md#adr-process) - How architectural decisions are made
+  - [All ADRs](decisions/adr/) - Complete decision history (23 ADRs)
+
+## 🎯 **HD1 v5.0.0 Key Features**
+
+### **Professional Game Engine**
+- **77 REST Endpoints** - Complete game engine control via HTTP APIs
+- **PlayCanvas Integration** - Professional 3D rendering engine
+- **Entity-Component-System** - Modern game architecture
+- **Real-Time Synchronization** - WebSocket state sync across clients
+- **Channel-Based Architecture** - Multi-user collaborative environments
+
+### **API-First Architecture**
+- **Single Source of Truth** - All functionality auto-generated from `api.yaml`
+- **Specification-Driven Development** - OpenAPI 3.0.3 as system foundation
+- **Auto-Generated Clients** - JavaScript, Go CLI, and shell function libraries
+- **Template-Based Generation** - Maintainable code generation system
+
+### **Professional Standards**
+- **Enterprise Architecture** - Thread-safe, scalable, production-ready
+- **Comprehensive Logging** - Structured logging with dynamic control
+- **Quality Assurance** - Build system validation and testing
+- **Performance Optimized** - Sub-50ms API response times
+
+## 🔗 **Quick Links**
+
+| Category | Link | Description |
+|----------|------|-------------|
+| **Start Here** | [Getting Started](getting-started/README.md) | Begin using HD1 |
+| **Core Concepts** | [User Guide](user-guide/concepts.md) | Understand HD1 fundamentals |
+| **API Documentation** | [API Reference](reference/api-specification.md) | Complete API documentation |
+| **Architecture** | [System Overview](architecture/overview.md) | Technical architecture |
+| **Development** | [Developer Guide](developer-guide/README.md) | Build with HD1 |
+| **Operations** | [Deployment](operations/deployment.md) | Production deployment |
+| **Decisions** | [ADR Index](decisions/README.md) | Architectural decisions |
+
+## 📊 **Documentation Standards**
+
+This documentation follows industry-standard technical writing practices:
+
+1. **Factual Accuracy** - All technical claims verified against codebase
+2. **Single Source of Truth** - No duplicate content, clear authoritative sources
+3. **Consistent Structure** - Standardized formatting and organization
+4. **Audience-Specific** - Clear separation between user, developer, and operations content
+5. **Comprehensive Coverage** - Complete documentation of all system capabilities
+6. **Maintainable** - Version-agnostic structure with clear ownership
+
+## 🤝 **Contributing to Documentation**
+
+- **[Contributing Guide](developer-guide/contributing.md)** - How to contribute to HD1
+- **[Documentation Standards](developer-guide/code-standards.md#documentation)** - Writing and formatting guidelines
+- **[Issue Tracking](https://github.com/hd1/issues)** - Report documentation issues
 
 ---
 
-**HD1 v3.0 Documentation** - Comprehensive guide to the API-first game engine revolution.
-
-*Where OpenAPI specifications become immersive game worlds through specification-driven engineering.*
+**HD1 v5.0.0** - The world's first API-first game engine platform  
+**Documentation Version**: 5.0.0 (Updated: 2025-07-03)  
+**API Surface**: 77 REST endpoints  
+**Architecture**: Entity-Component-System with PlayCanvas rendering

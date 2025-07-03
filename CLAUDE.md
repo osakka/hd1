@@ -12,7 +12,7 @@
 HD1 v5.0.0 is a **production-ready API-first game engine** platform.
 
 ### ✅ Completed Features
-- **85 REST Endpoints**: Complete game engine control via HTTP
+- **77 REST Endpoints**: Complete game engine control via HTTP
 - **Real-Time WebSocket**: <10ms entity lifecycle synchronization
 - **PlayCanvas Integration**: Professional 3D rendering with ECS
 - **Channel System**: YAML-based scene configuration with 3 channels
