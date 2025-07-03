@@ -10,11 +10,11 @@ This directory contains the **auto-generated API libraries** for HD1 (Holodeck O
 ## 📋 Auto-Generated Libraries
 
 ### [hd1lib.sh](hd1lib.sh)
-**Shell API Wrapper** - Complete shell interface for all 59 HD1 REST endpoints
+**Shell API Wrapper** - Complete shell interface for all 82 HD1 REST endpoints
 
 - **100% Auto-generated** from `api.yaml` specification (XVC Single Source of Truth)
 - **Pattern Consistency** - LLM generates consistent function signatures
-- **Complete Coverage** - All entities, physics, animation, audio, channels endpoints
+- **Complete Coverage** - All 82 route endpoints covering entities, physics, animation, audio, channels
 - **Surgical Precision** - Zero manual edits, zero synchronization issues
 
 **Usage:**
@@ -31,7 +31,7 @@ hd1::create_animation "$SESSION_ID" '{"name": "spin", "target": "cube1", ...}'
 ```
 
 ### Related Auto-Generated Libraries
-- **[hd1lib.js](../share/htdocs/static/js/hd1lib.js)** - JavaScript API client (59 endpoints)
+- **[hd1lib.js](../share/htdocs/static/js/hd1lib.js)** - JavaScript API client (82 endpoints)
 - **[hd1-form-system.js](../share/htdocs/static/js/hd1-form-system.js)** - UI form schemas
 - **[hd1-ui-components.js](../share/htdocs/static/js/hd1-ui-components.js)** - React-style components
 
@@ -50,7 +50,7 @@ hd1::create_animation "$SESSION_ID" '{"name": "spin", "target": "cube1", ...}'
 - **Forward Progress Only** - Each generation improves on the previous pattern
 
 ### XVC Bar-Raising Solutions
-- **Complete API Coverage** - All 59 REST endpoints wrapped consistently
+- **Complete API Coverage** - All 82 REST endpoints wrapped consistently
 - **Comprehensive Error Handling** - Structured error reporting with context
 - **Parameter Validation** - Input validation before API calls
 - **Development Velocity** - Instant library updates with specification changes
@@ -61,7 +61,7 @@ cd /opt/hd1/src && make generate
 ```
 
 **Template-Driven Generation** creates:
-- `lib/hd1lib.sh` - Shell API wrapper (59 functions)
+- `lib/hd1lib.sh` - Shell API wrapper (82 functions)
 - `share/htdocs/static/js/hd1lib.js` - JavaScript API client  
 - `share/htdocs/static/js/hd1-form-system.js` - UI form schemas
 - `share/htdocs/static/js/hd1-ui-components.js` - React components
@@ -69,7 +69,7 @@ cd /opt/hd1/src && make generate
 
 ## 📊 Complete API Coverage (XVC Validation)
 
-**59 REST Endpoints** - 100% coverage across all generated libraries:
+**82 REST Endpoints** - 100% coverage across all generated libraries:
 
 | Category | Endpoints | Shell Functions | JS Methods | UI Components |
 |----------|-----------|----------------|------------|---------------|
@@ -84,7 +84,7 @@ cd /opt/hd1/src && make generate
 | Camera | 4 | ✅ Complete | ✅ Complete | ✅ Complete |
 | Hierarchy | 6 | ✅ Complete | ✅ Complete | ✅ Complete |
 | Admin | 3 | ✅ Complete | ✅ Complete | ✅ Complete |
-| **Total** | **77** | **✅ 100%** | **✅ 100%** | **✅ 100%** |
+| **Total** | **82** | **✅ 100%** | **✅ 100%** | **✅ 100%** |
 
 This demonstrates **XVC Pattern Consistency** - identical coverage across all generated artifacts.
 

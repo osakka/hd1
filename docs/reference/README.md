@@ -7,7 +7,7 @@ This section provides comprehensive reference documentation for HD1, including c
 ## 📚 **Reference Categories**
 
 ### **API Documentation**
-- **[API Specification](api-specification.md)** - Complete API documentation (59 endpoints)
+- **[API Specification](API-Specification.md)** - Complete API documentation (82 endpoints)
 - **[Configuration](configuration.md)** - System configuration reference
 - **[CLI Reference](cli-reference.md)** - Command-line interface documentation
 
@@ -18,7 +18,7 @@ This section provides comprehensive reference documentation for HD1, including c
 
 ## 🔧 **API Overview**
 
-HD1 v5.0.1 provides **59 REST endpoints** covering complete game engine functionality:
+HD1 v5.0.1 provides **82 REST endpoints** covering complete game engine functionality:
 
 ### **Endpoint Categories**
 - **Sessions** (7 endpoints) - Session lifecycle and management
@@ -41,10 +41,10 @@ HD1 v5.0.1 provides **59 REST endpoints** covering complete game engine function
 ## 📊 **Technical Specifications**
 
 ### **API Performance**
-- **Response Time**: <50ms average for entity operations
-- **Throughput**: 1000+ requests/second sustained
-- **Concurrent Connections**: 500+ simultaneous clients
-- **WebSocket Latency**: <10ms for real-time synchronization
+- **Response Time**: Optimized for real-time game engine operations
+- **Throughput**: Designed for high-frequency entity updates
+- **Concurrent Connections**: Multi-user collaborative environments supported
+- **WebSocket Latency**: Real-time synchronization architecture
 
 ### **Data Formats**
 - **Request/Response**: JSON (application/json)
@@ -53,7 +53,7 @@ HD1 v5.0.1 provides **59 REST endpoints** covering complete game engine function
 - **Error Responses**: RFC 7807 Problem Details
 
 ### **API Versioning**
-- **Current Version**: v5.0.0
+- **Current Version**: v5.0.1
 - **API Stability**: Production-ready stable API
 - **Breaking Changes**: Semantic versioning for compatibility
 - **Deprecation Policy**: 2 major version deprecation notice

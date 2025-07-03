@@ -1,6 +1,6 @@
 # HD1 Architectural Decision Records (ADRs)
 
-**HD1 v5.0.0 - Architectural Decision Documentation**
+**HD1 v5.0.1 - Architectural Decision Documentation**
 
 This section contains all architectural decision records (ADRs) that document the design decisions made throughout HD1's development. These decisions provide transparency into the technical choices and evolution of the system.
 
@@ -107,6 +107,6 @@ ADRs guide system evolution by:
 
 ---
 
-**HD1 v5.0.0** - API-First Game Engine Platform  
+**HD1 v5.0.1** - API-First Game Engine Platform  
 **ADR Collection**: 25 decisions spanning v1.0 through v5.0.0  
 **Last Updated**: 2025-07-03

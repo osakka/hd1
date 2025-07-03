@@ -2,210 +2,106 @@
 
 **HD1 v5.0.1 - API-First Game Engine Platform**
 
-This guide will help you quickly get started with HD1, from installation to creating your first entities and scenes.
+Welcome to HD1, the world's first API-first game engine platform! Get up and running with professional 3D game development through REST endpoints.
 
-## 🚀 **Quick Start**
+## 🎯 Getting Started Navigation
 
-### **Prerequisites**
-- Go 1.21+ (for building from source)
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Basic understanding of REST APIs and 3D concepts
+### **📥 Installation**
+- **[Installation Guide](Installation.md)** - Complete setup procedures
+  - System requirements and dependencies
+  - Binary installation and build from source
+  - Environment configuration
+  - Verification and testing
 
-### **Installation**
+### **🚀 Quick Start**
+- **[Quick Start Guide](Quick-Start.md)** - 5-minute HD1 tutorial
+  - Create your first 3D session
+  - Add objects and materials
+  - Position camera and view scene
+  - Real-time collaboration setup
 
-#### **Option 1: Build from Source**
-```bash
-# Clone the repository
-git clone https://git.uk.home.arpa/itdlabs/holo-deck.git
-cd holo-deck
+### **📖 Examples**
+- **[API Examples](examples/)** - Working code samples
+  - Complete API usage patterns
+  - Integration examples
+  - Common workflows
 
-# Build HD1
-cd src
-make clean && make
+## 🎮 What is HD1?
 
-# Start the server
-make start
-```
+**HD1 v5.0.1** is a revolutionary API-first game engine that exposes complete 3D game development capabilities through **82 REST endpoints**:
 
-#### **Option 2: Docker (Coming Soon)**
-```bash
-# Docker support planned for v5.1.0
-docker run -p 8080:8080 hd1/holodeck-one:latest
-```
+- **🎯 API-First**: Everything controllable via HTTP requests
+- **⚡ Real-Time**: WebSocket synchronization <10ms latency  
+- **🎮 Professional**: PlayCanvas-powered 3D rendering
+- **🤝 Collaborative**: Multi-user 3D environments
+- **📋 Complete**: Full Entity-Component-System architecture
 
-### **Verify Installation**
-1. **Check server status**:
-   ```bash
-   curl http://localhost:8080/api/system/version
-   ```
-
-2. **Open web interface**:
-   Navigate to http://localhost:8080 in your browser
-
-3. **Test API connectivity**:
-   ```bash
-   # Create a session
-   curl -X POST http://localhost:8080/api/sessions
-   ```
-
-## 🎯 **First Steps**
-
-### **1. Understanding HD1 Architecture**
-
-HD1 follows an **API-first** architecture where everything is controlled via REST endpoints:
-
+### **Core Architecture**
 ```
 HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas Rendering
 ```
 
-**Key Concepts:**
-- **Sessions**: Isolated game instances
-- **Channels**: Scene configurations and collaborative spaces
-- **Entities**: Game objects with components
-- **Components**: Behavior and properties (transform, model, physics, etc.)
+## 📊 Key Capabilities
 
-### **2. Create Your First Session**
+| Feature | Description | API Endpoints |
+|---------|-------------|---------------|
+| **Sessions** | 3D world management | 4 endpoints |
+| **Entities** | Object lifecycle | 14 endpoints |
+| **Components** | ECS system | 8 endpoints |
+| **Physics** | Rigidbody simulation | 6 endpoints |
+| **Animation** | Object animation | 6 endpoints |
+| **Audio** | 3D spatial audio | 8 endpoints |
+| **Channels** | Scene collaboration | 8 endpoints |
+| **Camera** | View controls | 4 endpoints |
+| **Hierarchy** | Object parenting | 6 endpoints |
+| **Admin** | System management | 3 endpoints |
+| **Total** | **Complete Coverage** | **82 endpoints** |
 
-```bash
-# Create a new session
-curl -X POST http://localhost:8080/api/sessions \
-  -H "Content-Type: application/json" \
-  -d '{}'
+## 🚀 Quick Start Path
 
-# Response: {"session_id": "session-abc123", "status": "active"}
-```
+### **5-Minute Tutorial**
+1. **[Install HD1](Installation.md)** - Get HD1 running
+2. **[Create Scene](Quick-Start.md)** - Build your first 3D world
+3. **[Add Objects](Quick-Start.md#step-4-add-3d-objects)** - Place 3D entities
+4. **[View Results](Quick-Start.md#step-6-join-channel-and-view-scene)** - See it in action
 
-### **3. Join a Channel**
+### **Learning Path**
+- **Beginners**: Start with [Quick Start Guide](Quick-Start.md)
+- **API Users**: See [API Usage Guide](../user-guides/API-Usage.md) 
+- **Developers**: Read [Developer Guide](../developer-guide/README.md)
+- **Operators**: Check [Operations Guide](../operations/README.md)
 
-Channels define the 3D scene configuration:
+## 🔧 Prerequisites
 
-```bash
-# Join channel_one (contains a red box on a floor)
-curl -X POST http://localhost:8080/api/sessions/session-abc123/channel/join \
-  -H "Content-Type: application/json" \
-  -d '{"channel_id": "channel_one"}'
-```
+### **System Requirements**
+- **OS**: Linux (Ubuntu 20.04+ recommended)
+- **Memory**: 4GB RAM minimum
+- **Storage**: 1GB available space
+- **Network**: Internet connection
 
-### **4. Create Your First Entity**
+### **Development (Optional)**
+- **Go**: 1.19+ for building from source
+- **Make**: Build system
+- **Git**: Source code access
 
-```bash
-# Create a blue cube entity
-curl -X POST http://localhost:8080/api/sessions/session-abc123/entities \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "blue_cube",
-    "components": {
-      "transform": {
-        "position": [2, 1, 0],
-        "rotation": [0, 45, 0],
-        "scale": [1, 1, 1]
-      },
-      "model": {
-        "type": "box"
-      },
-      "material": {
-        "diffuse": "#0000ff",
-        "metalness": 0.0,
-        "roughness": 0.7
-      }
-    }
-  }'
-```
+## 📚 Documentation Structure
 
-### **5. View Your Scene**
+- **[User Guides](../user-guides/README.md)** - End-user functionality
+- **[Developer Guide](../developer-guide/README.md)** - Development procedures
+- **[Architecture](../architecture/README.md)** - System design
+- **[Reference](../reference/README.md)** - Complete API documentation
+- **[Operations](../operations/README.md)** - Deployment and monitoring
 
-Open http://localhost:8080 in your browser and you'll see:
-- A gray floor
-- A red box (from channel configuration)
-- Your new blue cube at position [2, 1, 0]
+## 🆘 Need Help?
 
-## 📚 **Next Steps**
-
-### **Learn Core Concepts**
-- **[User Guide](../user-guide/README.md)** - Complete user documentation
-- **[API Reference](../reference/api-specification.md)** - All 59 endpoints documented
-- **[Architecture Overview](../architecture/overview.md)** - System architecture
-
-### **Build Something**
-- **[Examples](examples/)** - Code samples and tutorials
-- **[Developer Guide](../developer-guide/README.md)** - Development documentation
-- **[API Development](../developer-guide/api-development.md)** - Building with HD1 APIs
-
-### **Deploy to Production**
-- **[Operations Guide](../operations/README.md)** - Production deployment
-- **[Security](../operations/security.md)** - Security configuration
-- **[Monitoring](../operations/monitoring.md)** - System monitoring
-
-## 🛠️ **Development Workflow**
-
-### **Basic Development Commands**
-```bash
-# Build and start
-cd src && make clean && make && make start
-
-# Stop server
-make stop
-
-# Regenerate auto-generated code
-make generate
-
-# View logs
-tail -f build/logs/hd1.log
-```
-
-### **Testing Your Changes**
-```bash
-# Test with CLI client
-./build/bin/hd1-client --help
-
-# Test API endpoints
-curl http://localhost:8080/api/sessions
-
-# View real-time logs
-curl http://localhost:8080/api/admin/logging/level \
-  -X POST -d '{"level": "DEBUG"}'
-```
-
-## 🔍 **Troubleshooting**
-
-### **Common Issues**
-
-**Port already in use:**
-```bash
-# Find process using port 8080
-lsof -i :8080
-
-# Kill existing process
-pkill hd1
-```
-
-**Build failures:**
-```bash
-# Clean and rebuild
-cd src && make clean && make
-```
-
-**API not responding:**
-```bash
-# Check server status
-curl http://localhost:8080/api/system/version
-
-# Check logs
-tail -f build/logs/hd1.log
-```
-
-### **Getting Help**
-- **[User Troubleshooting](../user-guide/troubleshooting.md)** - User issues and solutions
-- **[Operations Troubleshooting](../operations/troubleshooting.md)** - Production issues
-- **[Issue Tracker](https://github.com/hd1/issues)** - Report bugs and request features
-
-## 📖 **Additional Resources**
-
-- **[Complete API Documentation](../reference/api-specification.md)** - All 59 endpoints
-- **[Channel Configuration](../user-guide/channels.md)** - YAML-based scene management
-- **[Entity-Component System](../user-guide/entities-components.md)** - Game object architecture
-- **[Architectural Decisions](../decisions/README.md)** - Design rationale and history
+- **[Troubleshooting](../troubleshooting/README.md)** - Common issues and solutions
+- **[Configuration Reference](../reference/Configuration.md)** - All configuration options
+- **[API Reference](../reference/API-Specification.md)** - Complete endpoint documentation
 
 ---
 
-**Next**: [User Guide](../user-guide/README.md) | **Back to**: [Documentation Home](../README.md)
+**Next**: [Installation Guide](Installation.md) | **Up**: [Documentation Home](../README.md)
+
+---
+
+**HD1 v5.0.1** - The world's first API-first game engine platform

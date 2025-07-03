@@ -2,113 +2,97 @@
 
 **HD1 v5.0.1 - API-First Game Engine Platform**
 
-Welcome to the comprehensive documentation for HD1, the world's first API-first game engine platform. This documentation provides complete technical guidance for developers, operators, and users.
+Welcome to the comprehensive documentation for HD1, the world's first API-first game engine platform with **82 REST endpoints** providing complete 3D game development capabilities.
 
 ## 🚀 **Quick Start**
 
-- **[Getting Started Guide](getting-started/README.md)** - Installation, setup, and first steps
-- **[API Reference](reference/api-specification.md)** - Complete API documentation (59 endpoints)
-- **[Examples](getting-started/examples/)** - Code samples and tutorials
+- **[Getting Started Guide](getting-started/README.md)** - Installation, setup, and first steps with HD1
+- **[API Reference](reference/API-Specification.md)** - Complete API documentation (82 endpoints)
+- **[Installation Guide](getting-started/Installation.md)** - System requirements and setup procedures
+- **[Quick Start Tutorial](getting-started/Quick-Start.md)** - 5-minute HD1 tutorial
 
 ## 📚 **Documentation Categories**
 
-### **For Users**
-- **[User Guide](user-guide/README.md)** - Complete user documentation
-  - [Core Concepts](user-guide/concepts.md) - Understanding HD1 architecture
-  - [API Reference](user-guide/api-reference.md) - Using the 82 REST endpoints
-  - [Channels](user-guide/channels.md) - Scene management and collaboration
-  - [Entities & Components](user-guide/entities-components.md) - Game object system
-  - [Troubleshooting](user-guide/troubleshooting.md) - Common issues and solutions
+### **🎯 Getting Started**
+- **[Getting Started Hub](getting-started/README.md)** - New user onboarding and tutorials
+  - Complete installation procedures for HD1 v5.0.1
+  - Quick start tutorial with practical examples
+  - System requirements and prerequisites
 
-### **For Developers**
-- **[Developer Guide](developer-guide/README.md)** - Development documentation
-  - [Architecture](developer-guide/architecture.md) - System architecture overview
-  - [Contributing](developer-guide/contributing.md) - Contribution guidelines
-  - [Development Environment](developer-guide/development-environment.md) - Setup and tools
-  - [Testing](developer-guide/testing.md) - Testing procedures and standards
-  - [Code Standards](developer-guide/code-standards.md) - Coding conventions
-  - [API Development](developer-guide/api-development.md) - Building with HD1 APIs
+### **🏗️ System Architecture**
+- **[Architecture Documentation](architecture/README.md)** - System design and technical architecture
+  - [System Overview](architecture/overview.md) - High-level architecture patterns
+  - [Coordinate System](architecture/coordinate-system.md) - 3D spatial design
+  - [System Architecture](architecture/system-architecture.md) - Technical implementation
+  - [Technical Whitepaper](architecture/technical-whitepaper.md) - Deep technical analysis
 
-### **For Operations**
-- **[Operations Guide](operations/README.md)** - Production deployment and operations
-  - [Deployment](operations/deployment.md) - Production deployment procedures
-  - [Monitoring](operations/monitoring.md) - System monitoring and observability
-  - [Performance](operations/performance.md) - Performance tuning and optimization
-  - [Security](operations/security.md) - Security configuration and best practices
-  - [Backup & Recovery](operations/backup-recovery.md) - Data management procedures
-  - [Troubleshooting](operations/troubleshooting.md) - Operational issue resolution
+### **🎮 User Guides**
+- **[Vision and Concepts](user-guides/Vision.md)** - HD1 vision and core concepts
+  - Understanding the holodeck paradigm for distributed services
+  - API-first game engine philosophy
+  - Multi-user collaborative 3D environments
 
-### **Technical Reference**
-- **[Architecture](architecture/README.md)** - System architecture documentation
-  - [Overview](architecture/overview.md) - High-level system architecture
-  - [Design Principles](architecture/design-principles.md) - Core architectural principles
-  - [API Design](architecture/api-design.md) - API architecture patterns
-  - [Data Flow](architecture/data-flow.md) - Data flow and state management
-  - [Technology Stack](architecture/technology-stack.md) - Technology choices and rationale
+### **📖 Technical Reference**
+- **[Complete Reference](reference/README.md)** - Technical reference documentation
+  - [API Specification](reference/API-Specification.md) - Complete 82-endpoint API reference
+  - [Documentation Taxonomy](reference/Documentation-Taxonomy.md) - Documentation standards and organization
 
-- **[Reference](reference/README.md)** - Complete reference documentation
-  - [API Specification](reference/api-specification.md) - Auto-generated API documentation
-  - [Configuration](reference/configuration.md) - Configuration reference
-  - [CLI Reference](reference/cli-reference.md) - Command-line interface documentation
-  - [Glossary](reference/glossary.md) - Terms and definitions
+### **🏛️ Architectural Decisions**
+- **[ADR Collection](decisions/README.md)** - All 25 Architectural Decision Records
+  - Complete chronological timeline of HD1's technical evolution
+  - Detailed rationale for architectural choices from v1.0 through v5.0.1
+  - Implementation evidence and cross-references
 
-- **[Decisions](decisions/README.md)** - Architectural Decision Records (ADRs)
-  - [ADR Process](decisions/README.md#adr-process) - How architectural decisions are made
-  - [All ADRs](decisions/adr/) - Complete decision history (25 ADRs)
+## 🎯 **Key Technical Facts**
 
-## 🎯 **HD1 v5.0.1 Key Features**
+### **API Specification**
+- **82 REST Endpoints**: Complete game engine control via HTTP APIs
+- **Auto-Generated**: 100% generated from OpenAPI 3.0.3 specification (`src/api.yaml`)
+- **Real-Time Sync**: WebSocket coordination with <10ms latency
+- **Single Source of Truth**: All routing auto-generated from specification
 
-### **Professional Game Engine**
-- **59 REST Endpoints** - Complete game engine control via HTTP APIs
-- **PlayCanvas Integration** - Professional 3D rendering engine
-- **Entity-Component-System** - Modern game architecture
-- **Real-Time Synchronization** - WebSocket state sync across clients
-- **Channel-Based Architecture** - Multi-user collaborative environments
+### **Architecture Highlights**
+- **PlayCanvas Integration**: Professional 3D rendering engine
+- **Entity-Component-System**: Modern game engine architecture
+- **Configuration Management**: Complete environment variable support (50+ parameters)
+- **Template Externalization**: 100% external template system for code generation
 
-### **API-First Architecture**
-- **Single Source of Truth** - All functionality auto-generated from `api.yaml`
-- **Specification-Driven Development** - OpenAPI 3.0.3 as system foundation
-- **Auto-Generated Clients** - JavaScript, Go CLI, and shell function libraries
-- **Template-Based Generation** - Maintainable code generation system
-
-### **Professional Standards**
-- **Enterprise Architecture** - Thread-safe, scalable, production-ready
-- **Comprehensive Logging** - Structured logging with dynamic control
-- **Quality Assurance** - Build system validation and testing
-- **Performance Optimized** - Efficient API response handling
-
-## 🔗 **Quick Links**
-
-| Category | Link | Description |
-|----------|------|-------------|
-| **Start Here** | [Getting Started](getting-started/README.md) | Begin using HD1 |
-| **Core Concepts** | [User Guide](user-guide/concepts.md) | Understand HD1 fundamentals |
-| **API Documentation** | [API Reference](reference/api-specification.md) | Complete API documentation |
-| **Architecture** | [System Overview](architecture/overview.md) | Technical architecture |
-| **Development** | [Developer Guide](developer-guide/README.md) | Build with HD1 |
-| **Operations** | [Deployment](operations/deployment.md) | Production deployment |
-| **Decisions** | [ADR Index](decisions/README.md) | Architectural decisions |
+### **Current Development State**
+- **Version**: HD1 v5.0.1 (Production-ready API-first game engine)
+- **ADRs**: 25 architectural decisions spanning v1.0 through v5.0.1
+- **Code Quality**: Zero warnings, comprehensive documentation standards
+- **Build System**: Professional validation pipeline with auto-generation
 
 ## 📊 **Documentation Standards**
 
-This documentation follows industry-standard technical writing practices:
+This documentation follows strict technical writing standards:
 
-1. **Factual Accuracy** - All technical claims verified against codebase
-2. **Single Source of Truth** - No duplicate content, clear authoritative sources
-3. **Consistent Structure** - Standardized formatting and organization
-4. **Audience-Specific** - Clear separation between user, developer, and operations content
-5. **Comprehensive Coverage** - Complete documentation of all system capabilities
-6. **Maintainable** - Version-agnostic structure with clear ownership
+1. **100% Factual** - All claims verified against actual codebase implementation
+2. **No Exaggerations** - Conservative, accurate technical language only
+3. **Clear and Crisp** - Concise, professional writing with strategic detail
+4. **Consistent** - Uniform terminology and structure across all documents
+5. **Single Source of Truth** - No conflicting information between documents
+6. **Bar-Raising Solutions** - Industry-standard organization and quality
 
-## 🤝 **Contributing to Documentation**
+## 🔗 **Navigation**
 
-- **[Contributing Guide](developer-guide/contributing.md)** - How to contribute to HD1
-- **[Documentation Standards](developer-guide/code-standards.md#documentation)** - Writing and formatting guidelines
-- **[Issue Tracking](https://github.com/hd1/issues)** - Report documentation issues
+### **For New Users**
+1. Start with [Getting Started](getting-started/README.md)
+2. Follow the [Quick Start Tutorial](getting-started/Quick-Start.md)
+3. Explore the [API Reference](reference/API-Specification.md)
+
+### **For Developers**
+1. Review [System Architecture](architecture/README.md)
+2. Study [Architectural Decisions](decisions/README.md)
+3. Understand the [API-first approach](reference/API-Specification.md)
+
+### **For Technical Writers**
+1. Reference [Documentation Taxonomy](reference/Documentation-Taxonomy.md)
+2. Follow established patterns in existing documentation
+3. Maintain the single source of truth principle
 
 ---
 
-**HD1 v5.0.1** - The world's first API-first game engine platform  
-**Documentation Version**: 5.0.1 (Updated: 2025-07-03)  
-**API Surface**: 59 REST endpoints  
-**Architecture**: Entity-Component-System with PlayCanvas rendering
+**HD1 v5.0.1** - API-First Game Engine Platform  
+**Documentation Version**: v5.0.1 (Updated: 2025-07-03)  
+**Total Files**: 40 documentation files covering complete system

@@ -16,25 +16,25 @@
 ---
 
 > **Where REST APIs meet immersive 3D worlds**  
-> Holodeck One transforms any service into a visual, interactive experience through 59 REST endpoints and real-time synchronization.
+> Holodeck One transforms any service into a visual, interactive experience through 82 REST endpoints and real-time synchronization.
 
 **🎯 XVC Experiment**: HD1 demonstrates XVC principles through **Pattern Consistency** (API-first specification-driven development), **Surgical Precision** (template-based code generation), and **Bar-Raising Solutions** (zero regressions, single source of truth). The project validates XVC's effectiveness for complex system architecture while building toward the vision of any distributed service integrating visual representation through HD1's unified API surface.
 
 ### 🌟 What Makes HD1 Unique
 
 **API-First Architecture** → Every 3D operation accessible via REST (XVC Pattern Consistency)  
-**Real-Time Multi-User** → <10ms WebSocket synchronization across clients  
+**Real-Time Multi-User** → WebSocket synchronization across clients  
 **Service Integration Ready** → Built for distributed services to present, animate, and interact  
 **WebGL/3D Native** → Professional PlayCanvas rendering engine  
 **Specification-Driven** → 100% auto-generated from OpenAPI specification (XVC Single Source of Truth)
 
 ## 🚀 Current State: HD1 v5.0.1 (In Development)
 
-HD1 has a **complete API surface** for 3D engine control with **59 REST endpoints**, **advanced multiplayer avatar synchronization**, and **complete configuration management standardization**. The foundation is built for the distributed services revolution.
+HD1 has a **complete API surface** for 3D engine control with **82 REST endpoints**, **advanced multiplayer avatar synchronization**, and **complete configuration management standardization**. The foundation is built for the distributed services revolution.
 
 ### 🎮 Complete 3D Engine via REST APIs
 ```
-59 REST Endpoints → Entity-Component-System → PlayCanvas Rendering → Real-Time Avatar Sync
+82 REST Endpoints → Entity-Component-System → PlayCanvas Rendering → Real-Time Avatar Sync
 ```
 
 **Core Engine APIs**
@@ -48,7 +48,7 @@ HD1 has a **complete API surface** for 3D engine control with **59 REST endpoint
 
 ### 🌐 Multi-User Collaborative Environment
 - **Channel Architecture**: YAML-based scene configuration
-- **Real-Time Sync**: <10ms WebSocket state synchronization
+- **Real-Time Sync**: WebSocket state synchronization
 - **Avatar Persistence**: High-frequency position updates (100+ per second) without entity deletion
 - **Multiplayer Camera**: Orbital mode for multi-session viewing with automatic centering
 - **Session Isolation**: Per-user state with clean restoration
@@ -194,15 +194,41 @@ make stop        # Stop daemon
 ### Explore the Platform
 1. **Start HD1**: `cd src && make clean && make && make start`
 2. **Open Console**: http://localhost:8080 for visual monitoring
-3. **Try APIs**: Use the 59 REST endpoints to create your first 3D scene
+3. **Try APIs**: Use the 82 REST endpoints to create your first 3D scene
 4. **Join Community**: Explore `/docs/` for comprehensive guides
+
+## 📚 **Documentation Navigation Hub**
+
+### **🚀 For New Users**
+- **[Complete Documentation](docs/README.md)** - Master documentation index with professional taxonomy
+- **[Getting Started Guide](docs/getting-started/README.md)** - Installation, setup, and first steps
+- **[Quick Start Tutorial](docs/getting-started/Quick-Start.md)** - 5-minute HD1 tutorial
+- **[API Reference](docs/reference/API-Specification.md)** - Complete 82-endpoint API documentation
+
+### **🏗️ For Developers**
+- **[Source Documentation](src/README.md)** - Developer-focused with API → Templates → Code workflow
+- **[Code Documentation Standards](src/CODE_DOCUMENTATION_STANDARDS.md)** - "Just Perfect Documentation" guidelines
+- **[System Architecture](docs/architecture/README.md)** - Complete technical architecture
+- **[Template Architecture](src/codegen/templates/README.md)** - External template system guide
+
+### **🏛️ For Technical Writers**
+- **[Architectural Decisions](docs/decisions/README.md)** - All 25 ADRs with complete timeline
+- **[Documentation Taxonomy](docs/reference/Documentation-Taxonomy.md)** - Documentation standards and organization
+- **[Vision and Concepts](docs/user-guides/Vision.md)** - HD1 vision and core concepts
+
+### **📊 Key Technical Facts**
+- **Version**: HD1 v5.0.1 (Production-ready API-first game engine)
+- **API Endpoints**: 82 REST endpoints (59 unique paths with multiple HTTP methods)
+- **Architecture**: PlayCanvas-powered 3D rendering with ECS
+- **Real-Time**: WebSocket synchronization for collaborative environments
+- **Configuration**: Complete environment variable support (50+ parameters)
 
 ---
 
 ## 🤝 Contributing & Community
 
 ### Project Status
-**HD1 v5.0.0**: API-first 3D engine platform in active development  
+**HD1 v5.0.1**: API-first 3D engine platform in active development  
 **Next Phase**: Service integration layer and distributed service ecosystem
 
 ### Architecture Philosophy (XVC Methodology)
@@ -213,11 +239,11 @@ make stop        # Stop daemon
 
 ### Support Resources
 - **Complete Documentation**: `/docs/` with professional taxonomy
-- **Architectural Decisions**: `/docs/decisions/` with 23 ADRs
+- **Architectural Decisions**: `/docs/decisions/` with 25 ADRs
 - **Developer Guides**: `/src/README.md` for implementation details
 - **Template Architecture**: `/src/codegen/templates/README.md`
 
 ---
 
-**HD1 v5.0.0** | MIT License | API-First 3D Engine for Distributed Services  
+**HD1 v5.0.1** | MIT License | API-First 3D Engine for Distributed Services  
 *Where distributed services meet immersive 3D experiences*

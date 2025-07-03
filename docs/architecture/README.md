@@ -1,6 +1,6 @@
 # HD1 Architecture Documentation
 
-**HD1 v5.0.0 - System Architecture and Design**
+**HD1 v5.0.1 - System Architecture and Design**
 
 This section provides comprehensive architectural documentation for HD1, covering system design, principles, and technical implementation details.
 
@@ -126,6 +126,6 @@ Multi-user collaboration through YAML-configured channels:
 
 ---
 
-**HD1 v5.0.0** - API-First Game Engine Platform  
+**HD1 v5.0.1** - API-First Game Engine Platform  
 **Architecture Version**: 5.0.0 (Updated: 2025-07-03)  
 **System Status**: Production Ready

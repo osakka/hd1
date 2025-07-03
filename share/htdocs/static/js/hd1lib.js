@@ -74,6 +74,11 @@ class HD1APIClient {
     }
 
 
+    // GET /admin/logging/logs - getLogs
+    getLogs() {
+        return this.request('GET', '/admin/logging/logs');
+    }
+
     // POST /channels - createChannel
     createChannel(data = null) {
         return this.request('POST', '/channels', data);
@@ -84,16 +89,14 @@ class HD1APIClient {
         return this.request('GET', '/channels');
     }
 
-    // POST /sessions/{sessionId}/scene/state/load - loadSceneState
-    loadSceneState(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/state/load', [param1]);
-        return this.request('POST', path, data);
+    // GET /sessions - listSessions
+    listSessions() {
+        return this.request('GET', '/sessions');
     }
 
-    // POST /sessions/{sessionId}/channel/leave - leaveSessionChannel
-    leaveSessionChannel(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/channel/leave', [param1]);
-        return this.request('POST', path, data);
+    // POST /sessions - createSession
+    createSession(data = null) {
+        return this.request('POST', '/sessions', data);
     }
 
     // GET /sessions/{sessionId}/channel/graph - getSessionGraph
@@ -108,282 +111,15 @@ class HD1APIClient {
         return this.request('PUT', path, data);
     }
 
-    // POST /sessions/{sessionId}/entities/lifecycle/bulk - bulkEntityLifecycleOperation
-    bulkEntityLifecycleOperation(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/lifecycle/bulk', [param1]);
+    // POST /sessions/{sessionId}/animations - createAnimation
+    createAnimation(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/animations', [param1]);
         return this.request('POST', path, data);
     }
 
-    // PUT /sessions/{sessionId}/scene/hierarchy - updateSceneHierarchy
-    updateSceneHierarchy(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/hierarchy', [param1]);
-        return this.request('PUT', path, data);
-    }
-
-    // GET /sessions/{sessionId}/scene/hierarchy - getSceneHierarchy
-    getSceneHierarchy(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/hierarchy', [param1]);
-        return this.request('GET', path);
-    }
-
-    // GET /admin/logging/logs - getLogs
-    getLogs() {
-        return this.request('GET', '/admin/logging/logs');
-    }
-
-    // POST /sessions/{sessionId}/scene/state/save - saveSceneState
-    saveSceneState(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/state/save', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/animations/{animationId}/play - playAnimation
-    playAnimation(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/animations/{animationId}/play', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /sessions/{sessionId}/audio/sources - listAudioSources
-    listAudioSources(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/audio/sources', [param1]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/audio/sources - createAudioSource
-    createAudioSource(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/audio/sources', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /admin/logging/level - setLogLevel
-    setLogLevel(data = null) {
-        return this.request('POST', '/admin/logging/level', data);
-    }
-
-    // GET /sessions/{sessionId}/entities/{entityId}/hierarchy/children - getEntityChildren
-    getEntityChildren(param1, param2) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/hierarchy/children', [param1, param2]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/entities/{entityId}/lifecycle/deactivate - deactivateEntity
-    deactivateEntity(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/deactivate', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/scene/import - importSceneDefinition
-    importSceneDefinition(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/import', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /avatars - listAvatars
-    listAvatars() {
-        return this.request('GET', '/avatars');
-    }
-
-    // POST /sessions/{sessionId}/scenes - createSessionScene
-    createSessionScene(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scenes', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /sessions/{sessionId}/scenes - listSessionScenes
-    listSessionScenes(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scenes', [param1]);
-        return this.request('GET', path);
-    }
-
-    // GET /sessions/{sessionId}/entities/{entityId}/components - listEntityComponents
-    listEntityComponents(param1, param2) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/components', [param1, param2]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/entities/{entityId}/components - addComponent
-    addComponent(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/components', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/animations/{animationId}/stop - stopAnimation
-    stopAnimation(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/animations/{animationId}/stop', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /browser/canvas - setCanvas
-    setCanvas(data = null) {
-        return this.request('POST', '/browser/canvas', data);
-    }
-
-    // GET /sessions/{sessionId}/camera/position - getCameraPosition
-    getCameraPosition(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/camera/position', [param1]);
-        return this.request('GET', path);
-    }
-
-    // PUT /sessions/{sessionId}/camera/position - setCameraPosition
-    setCameraPosition(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/camera/position', [param1]);
-        return this.request('PUT', path, data);
-    }
-
-    // POST /sessions/{sessionId}/camera/orbit - startCameraOrbit
-    startCameraOrbit(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/camera/orbit', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/scene/state/reset - resetSceneState
-    resetSceneState(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/state/reset', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/audio/sources/{audioId}/play - playAudio
-    playAudio(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/audio/sources/{audioId}/play', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /sessions - listSessions
-    listSessions() {
-        return this.request('GET', '/sessions');
-    }
-
-    // POST /sessions - createSession
-    createSession(data = null) {
-        return this.request('POST', '/sessions', data);
-    }
-
-    // POST /sessions/{sessionId}/channel/join - joinSessionChannel
-    joinSessionChannel(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/channel/join', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/channel/sync - syncSessionState
-    syncSessionState(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/channel/sync', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/entities/{entityId}/components/bulk - bulkComponentOperation
-    bulkComponentOperation(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/components/bulk', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /sessions/{sessionId}/entities/hierarchy/tree - getHierarchyTree
-    getHierarchyTree(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/hierarchy/tree', [param1]);
-        return this.request('GET', path);
-    }
-
-    // GET /sessions/{sessionId}/channel/status - getSessionChannelStatus
-    getSessionChannelStatus(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/channel/status', [param1]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/scenes/{sceneId}/activate - activateSessionScene
-    activateSessionScene(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scenes/{sceneId}/activate', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/recording/start - startRecording
-    startRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/start', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/recording/stop - stopRecording
-    stopRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/stop', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /admin/logging/config - getLoggingConfig
-    getLoggingConfig() {
-        return this.request('GET', '/admin/logging/config');
-    }
-
-    // POST /admin/logging/config - setLoggingConfig
-    setLoggingConfig(data = null) {
-        return this.request('POST', '/admin/logging/config', data);
-    }
-
-    // GET /channels/{channelId} - getChannel
-    getChannel(param1) {
-        const path = this.extractPathParams('/channels/{channelId}', [param1]);
-        return this.request('GET', path);
-    }
-
-    // PUT /channels/{channelId} - updateChannel
-    updateChannel(param1, data = null) {
-        const path = this.extractPathParams('/channels/{channelId}', [param1]);
-        return this.request('PUT', path, data);
-    }
-
-    // DELETE /channels/{channelId} - deleteChannel
-    deleteChannel(param1) {
-        const path = this.extractPathParams('/channels/{channelId}', [param1]);
-        return this.request('DELETE', path);
-    }
-
-    // DELETE /sessions/{sessionId}/entities/{entityId}/lifecycle/destroy - destroyEntity
-    destroyEntity(param1, param2) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/destroy', [param1, param2]);
-        return this.request('DELETE', path);
-    }
-
-    // POST /browser/refresh - forceRefresh
-    forceRefresh(data = null) {
-        return this.request('POST', '/browser/refresh', data);
-    }
-
-    // GET /avatars/{avatarType} - getAvatarSpecification
-    getAvatarSpecification(param1) {
-        const path = this.extractPathParams('/avatars/{avatarType}', [param1]);
-        return this.request('GET', path);
-    }
-
-    // PUT /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms - setEntityTransforms
-    setEntityTransforms(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/hierarchy/transforms', [param1, param2]);
-        return this.request('PUT', path, data);
-    }
-
-    // GET /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms - getEntityTransforms
-    getEntityTransforms(param1, param2) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/hierarchy/transforms', [param1, param2]);
-        return this.request('GET', path);
-    }
-
-    // GET /sessions/{sessionId}/physics/rigidbodies - listRigidBodies
-    listRigidBodies(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/physics/rigidbodies', [param1]);
-        return this.request('GET', path);
-    }
-
-    // GET /sessions/{sessionId}/recording/status - getRecordingStatus
-    getRecordingStatus(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/status', [param1]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/entities/{entityId}/lifecycle/activate - activateEntity
-    activateEntity(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/activate', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // GET /sessions/{sessionId}/entities/{entityId}/lifecycle/status - getEntityLifecycleStatus
-    getEntityLifecycleStatus(param1, param2) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/status', [param1, param2]);
+    // GET /sessions/{sessionId}/animations - listAnimations
+    listAnimations(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/animations', [param1]);
         return this.request('GET', path);
     }
 
@@ -399,46 +135,33 @@ class HD1APIClient {
         return this.request('POST', path, data);
     }
 
-    // GET /sessions/{sessionId}/scene/export - exportSceneDefinition
-    exportSceneDefinition(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/export', [param1]);
+    // GET /sessions/{sessionId}/entities/{entityId}/hierarchy/children - getEntityChildren
+    getEntityChildren(param1, param2) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/hierarchy/children', [param1, param2]);
         return this.request('GET', path);
     }
 
-    // PUT /sessions/{sessionId}/physics/world - updatePhysicsWorld
-    updatePhysicsWorld(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/physics/world', [param1]);
-        return this.request('PUT', path, data);
+    // DELETE /sessions/{sessionId}/entities/{entityId}/lifecycle/destroy - destroyEntity
+    destroyEntity(param1, param2) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/destroy', [param1, param2]);
+        return this.request('DELETE', path);
     }
 
-    // GET /sessions/{sessionId}/physics/world - getPhysicsWorld
-    getPhysicsWorld(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/physics/world', [param1]);
+    // POST /admin/logging/level - setLogLevel
+    setLogLevel(data = null) {
+        return this.request('POST', '/admin/logging/level', data);
+    }
+
+    // GET /avatars/{avatarType} - getAvatarSpecification
+    getAvatarSpecification(param1) {
+        const path = this.extractPathParams('/avatars/{avatarType}', [param1]);
         return this.request('GET', path);
     }
 
-    // GET /sessions/{sessionId}/entities - listEntities
-    listEntities(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities', [param1]);
-        return this.request('GET', path);
-    }
-
-    // POST /sessions/{sessionId}/entities - createEntity
-    createEntity(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities', [param1]);
+    // POST /sessions/{sessionId}/channel/join - joinSessionChannel
+    joinSessionChannel(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/channel/join', [param1]);
         return this.request('POST', path, data);
-    }
-
-    // PUT /sessions/{sessionId}/scene/state - updateSceneState
-    updateSceneState(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/state', [param1]);
-        return this.request('PUT', path, data);
-    }
-
-    // GET /sessions/{sessionId}/scene/state - getSceneState
-    getSceneState(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/scene/state', [param1]);
-        return this.request('GET', path);
     }
 
     // GET /sessions/{sessionId}/entities/{entityId} - getEntity
@@ -459,32 +182,52 @@ class HD1APIClient {
         return this.request('DELETE', path);
     }
 
-    // PUT /sessions/{sessionId}/entities/{entityId}/lifecycle/enable - enableEntity
-    enableEntity(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/enable', [param1, param2]);
+    // GET /sessions/{sessionId}/scene/hierarchy - getSceneHierarchy
+    getSceneHierarchy(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/hierarchy', [param1]);
+        return this.request('GET', path);
+    }
+
+    // PUT /sessions/{sessionId}/scene/hierarchy - updateSceneHierarchy
+    updateSceneHierarchy(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/hierarchy', [param1]);
         return this.request('PUT', path, data);
     }
 
-    // POST /sessions/{sessionId}/recording/play - playRecording
-    playRecording(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/recording/play', [param1]);
+    // POST /sessions/{sessionId}/audio/sources/{audioId}/stop - stopAudio
+    stopAudio(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/audio/sources/{audioId}/stop', [param1, param2]);
         return this.request('POST', path, data);
     }
 
-    // POST /admin/logging/trace - setTraceModules
-    setTraceModules(data = null) {
-        return this.request('POST', '/admin/logging/trace', data);
+    // POST /sessions/{sessionId}/recording/start - startRecording
+    startRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/start', [param1]);
+        return this.request('POST', path, data);
     }
 
-    // PUT /sessions/{sessionId}/entities/{entityId}/lifecycle/disable - disableEntity
-    disableEntity(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/disable', [param1, param2]);
-        return this.request('PUT', path, data);
+    // DELETE /sessions/{sessionId} - deleteSession
+    deleteSession(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+        return this.request('DELETE', path);
     }
 
-    // GET /version - getVersion
-    getVersion() {
-        return this.request('GET', '/version');
+    // GET /sessions/{sessionId} - getSession
+    getSession(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+        return this.request('GET', path);
+    }
+
+    // GET /sessions/{sessionId}/entities - listEntities
+    listEntities(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/entities - createEntity
+    createEntity(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities', [param1]);
+        return this.request('POST', path, data);
     }
 
     // GET /sessions/{sessionId}/entities/{entityId}/components/{componentType} - getComponent
@@ -505,15 +248,272 @@ class HD1APIClient {
         return this.request('DELETE', path);
     }
 
-    // DELETE /sessions/{sessionId} - deleteSession
-    deleteSession(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+    // POST /sessions/{sessionId}/scene/import - importSceneDefinition
+    importSceneDefinition(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/import', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/audio/sources - listAudioSources
+    listAudioSources(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/audio/sources', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/audio/sources - createAudioSource
+    createAudioSource(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/audio/sources', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /admin/logging/config - getLoggingConfig
+    getLoggingConfig() {
+        return this.request('GET', '/admin/logging/config');
+    }
+
+    // POST /admin/logging/config - setLoggingConfig
+    setLoggingConfig(data = null) {
+        return this.request('POST', '/admin/logging/config', data);
+    }
+
+    // POST /sessions/{sessionId}/entities/{entityId}/components - addComponent
+    addComponent(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/components', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/entities/{entityId}/components - listEntityComponents
+    listEntityComponents(param1, param2) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/components', [param1, param2]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/scene/state/load - loadSceneState
+    loadSceneState(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/state/load', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/recording/stop - stopRecording
+    stopRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/stop', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/camera/position - getCameraPosition
+    getCameraPosition(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/camera/position', [param1]);
+        return this.request('GET', path);
+    }
+
+    // PUT /sessions/{sessionId}/camera/position - setCameraPosition
+    setCameraPosition(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/camera/position', [param1]);
+        return this.request('PUT', path, data);
+    }
+
+    // POST /sessions/{sessionId}/channel/leave - leaveSessionChannel
+    leaveSessionChannel(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/channel/leave', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms - getEntityTransforms
+    getEntityTransforms(param1, param2) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/hierarchy/transforms', [param1, param2]);
+        return this.request('GET', path);
+    }
+
+    // PUT /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms - setEntityTransforms
+    setEntityTransforms(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/hierarchy/transforms', [param1, param2]);
+        return this.request('PUT', path, data);
+    }
+
+    // POST /sessions/{sessionId}/animations/{animationId}/stop - stopAnimation
+    stopAnimation(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/animations/{animationId}/stop', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // PUT /sessions/{sessionId}/physics/world - updatePhysicsWorld
+    updatePhysicsWorld(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/physics/world', [param1]);
+        return this.request('PUT', path, data);
+    }
+
+    // GET /sessions/{sessionId}/physics/world - getPhysicsWorld
+    getPhysicsWorld(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/physics/world', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/physics/rigidbodies/{entityId}/force - applyForce
+    applyForce(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/physics/rigidbodies/{entityId}/force', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /browser/refresh - forceRefresh
+    forceRefresh(data = null) {
+        return this.request('POST', '/browser/refresh', data);
+    }
+
+    // POST /browser/canvas - setCanvas
+    setCanvas(data = null) {
+        return this.request('POST', '/browser/canvas', data);
+    }
+
+    // GET /version - getVersion
+    getVersion() {
+        return this.request('GET', '/version');
+    }
+
+    // PUT /sessions/{sessionId}/entities/{entityId}/lifecycle/disable - disableEntity
+    disableEntity(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/disable', [param1, param2]);
+        return this.request('PUT', path, data);
+    }
+
+    // POST /sessions/{sessionId}/entities/{entityId}/lifecycle/deactivate - deactivateEntity
+    deactivateEntity(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/deactivate', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/entities/{entityId}/lifecycle/status - getEntityLifecycleStatus
+    getEntityLifecycleStatus(param1, param2) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/status', [param1, param2]);
+        return this.request('GET', path);
+    }
+
+    // POST /admin/logging/trace - setTraceModules
+    setTraceModules(data = null) {
+        return this.request('POST', '/admin/logging/trace', data);
+    }
+
+    // GET /sessions/{sessionId}/entities/hierarchy/tree - getHierarchyTree
+    getHierarchyTree(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/hierarchy/tree', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/entities/{entityId}/lifecycle/activate - activateEntity
+    activateEntity(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/activate', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/camera/orbit - startCameraOrbit
+    startCameraOrbit(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/camera/orbit', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/scene/state - getSceneState
+    getSceneState(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/state', [param1]);
+        return this.request('GET', path);
+    }
+
+    // PUT /sessions/{sessionId}/scene/state - updateSceneState
+    updateSceneState(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/state', [param1]);
+        return this.request('PUT', path, data);
+    }
+
+    // GET /sessions/{sessionId}/scenes - listSessionScenes
+    listSessionScenes(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scenes', [param1]);
+        return this.request('GET', path);
+    }
+
+    // POST /sessions/{sessionId}/scenes - createSessionScene
+    createSessionScene(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scenes', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/audio/sources/{audioId}/play - playAudio
+    playAudio(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/audio/sources/{audioId}/play', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/channel/sync - syncSessionState
+    syncSessionState(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/channel/sync', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // PUT /sessions/{sessionId}/entities/{entityId}/lifecycle/enable - enableEntity
+    enableEntity(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/lifecycle/enable', [param1, param2]);
+        return this.request('PUT', path, data);
+    }
+
+    // POST /sessions/{sessionId}/scene/state/save - saveSceneState
+    saveSceneState(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/state/save', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/scene/export - exportSceneDefinition
+    exportSceneDefinition(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/export', [param1]);
+        return this.request('GET', path);
+    }
+
+    // GET /avatars - listAvatars
+    listAvatars() {
+        return this.request('GET', '/avatars');
+    }
+
+    // POST /sessions/{sessionId}/entities/{entityId}/components/bulk - bulkComponentOperation
+    bulkComponentOperation(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/{entityId}/components/bulk', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/scenes/{sceneId}/activate - activateSessionScene
+    activateSessionScene(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scenes/{sceneId}/activate', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/recording/play - playRecording
+    playRecording(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/play', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/entities/lifecycle/bulk - bulkEntityLifecycleOperation
+    bulkEntityLifecycleOperation(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/entities/lifecycle/bulk', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /channels/{channelId} - getChannel
+    getChannel(param1) {
+        const path = this.extractPathParams('/channels/{channelId}', [param1]);
+        return this.request('GET', path);
+    }
+
+    // PUT /channels/{channelId} - updateChannel
+    updateChannel(param1, data = null) {
+        const path = this.extractPathParams('/channels/{channelId}', [param1]);
+        return this.request('PUT', path, data);
+    }
+
+    // DELETE /channels/{channelId} - deleteChannel
+    deleteChannel(param1) {
+        const path = this.extractPathParams('/channels/{channelId}', [param1]);
         return this.request('DELETE', path);
     }
 
-    // GET /sessions/{sessionId} - getSession
-    getSession(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}', [param1]);
+    // GET /sessions/{sessionId}/channel/status - getSessionChannelStatus
+    getSessionChannelStatus(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/channel/status', [param1]);
         return this.request('GET', path);
     }
 
@@ -529,28 +529,28 @@ class HD1APIClient {
         return this.request('PUT', path, data);
     }
 
-    // GET /sessions/{sessionId}/animations - listAnimations
-    listAnimations(param1) {
-        const path = this.extractPathParams('/sessions/{sessionId}/animations', [param1]);
+    // POST /sessions/{sessionId}/scene/state/reset - resetSceneState
+    resetSceneState(param1, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/scene/state/reset', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    // POST /sessions/{sessionId}/animations/{animationId}/play - playAnimation
+    playAnimation(param1, param2, data = null) {
+        const path = this.extractPathParams('/sessions/{sessionId}/animations/{animationId}/play', [param1, param2]);
+        return this.request('POST', path, data);
+    }
+
+    // GET /sessions/{sessionId}/physics/rigidbodies - listRigidBodies
+    listRigidBodies(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/physics/rigidbodies', [param1]);
         return this.request('GET', path);
     }
 
-    // POST /sessions/{sessionId}/animations - createAnimation
-    createAnimation(param1, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/animations', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/physics/rigidbodies/{entityId}/force - applyForce
-    applyForce(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/physics/rigidbodies/{entityId}/force', [param1, param2]);
-        return this.request('POST', path, data);
-    }
-
-    // POST /sessions/{sessionId}/audio/sources/{audioId}/stop - stopAudio
-    stopAudio(param1, param2, data = null) {
-        const path = this.extractPathParams('/sessions/{sessionId}/audio/sources/{audioId}/stop', [param1, param2]);
-        return this.request('POST', path, data);
+    // GET /sessions/{sessionId}/recording/status - getRecordingStatus
+    getRecordingStatus(param1) {
+        const path = this.extractPathParams('/sessions/{sessionId}/recording/status', [param1]);
+        return this.request('GET', path);
     }
 
 }

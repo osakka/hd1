@@ -1,6 +1,6 @@
 # HD1 System Architecture Overview
 
-**HD1 v5.0.0 - API-First Game Engine Platform**
+**HD1 v5.0.1 - API-First Game Engine Platform**
 
 ## 🏗️ **System Architecture**
 
@@ -17,7 +17,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 - **Source**: Auto-generated from `src/api.yaml` OpenAPI specification
 - **Endpoints**: 82 REST endpoints covering complete game engine functionality
 - **Methods**: GET (31), POST (34), PUT (12), DELETE (5)
-- **Performance**: <50ms average response time
+- **Performance**: Optimized for real-time game engine operations
 
 ### **WebSocket Hub**
 - **Purpose**: Real-time bidirectional communication
@@ -34,7 +34,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 - **Collaboration**: Multi-user environments with real-time sync
 
 ## 📊 **Performance Characteristics**
-- **API Response Time**: <50ms for entity operations
+- **API Response Time**: Optimized for entity operations
 - **WebSocket Latency**: <10ms for state synchronization
 - **Memory Usage**: <100MB for typical sessions (10-50 entities)
 - **Concurrent Capacity**: 100+ clients per channel

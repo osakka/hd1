@@ -1,12 +1,12 @@
-# HD1 Share Directory - v5.0.0 Native PC Architecture
+# HD1 Share Directory - v5.0.1 Native PC Architecture
 
 ## Overview
 
-The `/opt/hd1/share/` directory contains **production assets and configuration** for HD1 v5.0.0 API-first game engine platform. This represents 100% native PC architecture with PlayCanvas integration and single source of truth design.
+The `/opt/hd1/share/` directory contains **production assets and configuration** for HD1 v5.0.1 API-first game engine platform. This represents 100% native PC architecture with PlayCanvas integration and single source of truth design.
 
 ---
 
-## 📁 **Directory Structure (v5.0.0)**
+## 📁 **Directory Structure (v5.0.1)**
 
 ### **`channels/`** - Channel-Based Scene Configuration
 ```
@@ -192,7 +192,7 @@ open http://localhost:8080
 
 ## 🎖️ **Quality Standards**
 
-HD1 v5.0.0 Share directory represents **production-grade asset organization**:
+HD1 v5.0.1 Share directory represents **production-grade asset organization**:
 
 ✅ **100% Native PC Architecture**: Optimized for local development and deployment  
 ✅ **Single Source of Truth**: YAML + api.yaml drive all functionality  

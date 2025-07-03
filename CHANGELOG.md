@@ -43,7 +43,7 @@ This revolutionary release transforms HD1 into the world's first **API-first gam
 ### **Added - Revolutionary Game Engine Architecture**
 
 #### **🎮 Complete API-First Game Engine**
-- **59 REST Endpoints**: Complete game engine control via HTTP APIs
+- **82 REST Endpoints**: Complete game engine control via HTTP APIs
 - **PlayCanvas Integration**: Professional 3D rendering replacing A-Frame
 - **Entity-Component-System**: Full ECS architecture with lifecycle management
 - **Real-Time Synchronization**: WebSocket state sync across all clients
