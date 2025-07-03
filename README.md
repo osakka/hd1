@@ -141,8 +141,6 @@ HD1 draws inspiration from Star Trek's **Holodeck** - a space where any scenario
 
 ### Logo Design
 
-![HD1 Logo](docs/assets/hd1-logo.svg)
-
 **Design Concept**: 
 - **HD Base**: Concrete foundation, compact and cracked under computational weight
 - **Wireframe "1"**: Teal/blue wireframe floating above, representing the first platform
