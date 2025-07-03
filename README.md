@@ -11,22 +11,22 @@
 ## The API-First 3D Engine for Distributed Services
 
 > **⚠️ DEVELOPMENT & EXPERIMENTAL SOFTWARE**  
-> **HD1 is active development code and serves as an experiment in the efficacy of [XVC (Extended Version Control)](https://github.com/osakka/xvc). This is NOT production-ready software. Use for development, research, and experimentation only.**
+> **HD1 is active development code and serves as an experiment in the efficacy of [XVC (Extreme Vibe Coding)](https://github.com/osakka/xvc) - a methodology for human-LLM collaboration that treats LLMs as "pattern reflection engines" for systematic development. This is NOT production-ready software. Use for development, research, and experimentation only.**
 
 ---
 
 > **Where REST APIs meet immersive 3D worlds**  
 > Holodeck One transforms any service into a visual, interactive experience through 77 REST endpoints and real-time synchronization.
 
-**🎯 Vision**: HD1 enables **any distributed service** to integrate visual representation, animation, and interaction through a unified API surface. As authentication, operator profiles, and service keys mature, HD1 becomes the **visual interface layer** for the distributed service ecosystem.
+**🎯 XVC Experiment**: HD1 demonstrates XVC principles through **Pattern Consistency** (API-first specification-driven development), **Surgical Precision** (template-based code generation), and **Bar-Raising Solutions** (zero regressions, single source of truth). The project validates XVC's effectiveness for complex system architecture while building toward the vision of any distributed service integrating visual representation through HD1's unified API surface.
 
 ### 🌟 What Makes HD1 Unique
 
-**API-First Architecture** → Every 3D operation accessible via REST  
+**API-First Architecture** → Every 3D operation accessible via REST (XVC Pattern Consistency)  
 **Real-Time Multi-User** → <10ms WebSocket synchronization across clients  
 **Service Integration Ready** → Built for distributed services to present, animate, and interact  
 **WebGL/3D Native** → Professional PlayCanvas rendering engine  
-**Specification-Driven** → 100% auto-generated from OpenAPI specification
+**Specification-Driven** → 100% auto-generated from OpenAPI specification (XVC Single Source of Truth)
 
 ## 🚀 Current State: HD1 v5.0.0 (In Development)
 
@@ -173,11 +173,11 @@ make test        # Run test suite
 make stop        # Stop daemon
 ```
 
-### Quality Standards
-- **Specification-Driven**: All code auto-generated from `api.yaml`
-- **Zero Regressions**: Surgical precision in all changes
-- **Template Architecture**: 8 externalized templates for maintainability  
-- **Performance Target**: <50ms API response, <10ms WebSocket sync
+### Quality Standards (XVC Principles)
+- **Specification-Driven**: All code auto-generated from `api.yaml` (Single Source of Truth)
+- **Zero Regressions**: Surgical precision in all changes (XVC Surgical Precision)
+- **Template Architecture**: 8 externalized templates for maintainability (Pattern Consistency)
+- **Performance Target**: <50ms API response, <10ms WebSocket sync (Bar-Raising Solutions)
 
 ---
 
@@ -202,11 +202,11 @@ make stop        # Stop daemon
 **HD1 v5.0.0**: API-first 3D engine platform in active development  
 **Next Phase**: Service integration layer and distributed service ecosystem
 
-### Architecture Philosophy
-- **API-First**: Every capability exposed via REST endpoints
-- **Template-Driven**: All code generated from external templates  
-- **Single Source of Truth**: OpenAPI specification drives everything
-- **Quality Focus**: Zero regressions, surgical precision in changes
+### Architecture Philosophy (XVC Methodology)
+- **API-First**: Every capability exposed via REST endpoints (Pattern Consistency)
+- **Template-Driven**: All code generated from external templates (LLM as Pattern Reflection Engine)
+- **Single Source of Truth**: OpenAPI specification drives everything (XVC Core Principle)
+- **Quality Focus**: Zero regressions, surgical precision in changes (XVC Principles in Practice)
 
 ### Support Resources
 - **Complete Documentation**: `/docs/` with professional taxonomy
