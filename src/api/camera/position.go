@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"holodeck1/config"
 	"holodeck1/server"
 	"holodeck1/logging"
 )
@@ -70,7 +71,7 @@ func SetCameraPositionHandler(w http.ResponseWriter, r *http.Request, hub interf
 	
 	// Since we need to find entities by pattern, we'll make an internal HTTP call to list entities
 	// This maintains the 100% API-first principle
-	entitiesURL := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	entitiesURL := fmt.Sprintf("%s/sessions/%s/entities", config.GetInternalAPIBase(), sessionID)
 	resp, err := http.Get(entitiesURL)
 	if err != nil {
 		logging.Warn("failed to list entities for avatar search", map[string]interface{}{
@@ -89,7 +90,7 @@ func SetCameraPositionHandler(w http.ResponseWriter, r *http.Request, hub interf
 	}
 	
 	// Use the entities API with tag filter for clean avatar lookup
-	entitiesURL = fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities?tag=session-avatar", sessionID)
+	entitiesURL = fmt.Sprintf("%s/sessions/%s/entities?tag=session-avatar", config.GetInternalAPIBase(), sessionID)
 	resp, err = http.Get(entitiesURL)
 	if err != nil {
 		logging.Warn("failed to filter entities by session-avatar tag", map[string]interface{}{
@@ -221,7 +222,7 @@ func GetCameraPositionHandler(w http.ResponseWriter, r *http.Request, hub interf
 	}
 	
 	// Make internal HTTP call to list entities (maintains 100% API-first principle)
-	entitiesURL := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	entitiesURL := fmt.Sprintf("%s/sessions/%s/entities", config.GetInternalAPIBase(), sessionID)
 	resp, err := http.Get(entitiesURL)
 	if err != nil {
 		logging.Warn("failed to list entities for avatar search", map[string]interface{}{
@@ -240,7 +241,7 @@ func GetCameraPositionHandler(w http.ResponseWriter, r *http.Request, hub interf
 	}
 	
 	// Use the entities API with tag filter for clean avatar lookup
-	entitiesURL = fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities?tag=session-avatar", sessionID)
+	entitiesURL = fmt.Sprintf("%s/sessions/%s/entities?tag=session-avatar", config.GetInternalAPIBase(), sessionID)
 	resp, err = http.Get(entitiesURL)
 	if err != nil {
 		logging.Warn("failed to filter entities by session-avatar tag", map[string]interface{}{

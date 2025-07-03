@@ -1,3 +1,14 @@
+// Package main provides the HD1 (Holodeck One) daemon entry point.
+// HD1 is an API-first game engine platform that exposes complete 3D game
+// development capabilities through 82 REST endpoints with real-time WebSocket
+// synchronization for collaborative 3D environments.
+//
+// Architecture:
+//   - Configuration system: Flags > Environment Variables > .env File > Defaults
+//   - Unified logging: Structured JSON logging with module-based tracing
+//   - WebSocket hub: Real-time client coordination and session management
+//   - API router: Auto-generated from OpenAPI specification
+//   - PlayCanvas integration: Professional 3D rendering engine
 package main
 
 import (
@@ -14,14 +25,19 @@ import (
 	"holodeck1/server"
 )
 
+// main is the HD1 daemon entry point.
+// Initializes configuration, logging, WebSocket hub, and HTTP server
+// following the startup sequence: Config → Logging → Hub → Router → Server
 func main() {
-	// Initialize configuration system - Single Source of Truth
+	// Configuration initialization: Load settings from all sources
+	// Priority: Flags > Environment Variables > .env File > Defaults
 	if err := config.Initialize(); err != nil {
 		fmt.Fprintf(os.Stderr, "FATAL: Configuration initialization failed: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Additional flags specific to main only (not part of configuration system)
+	// Main-specific flags: Local flags not part of global configuration system
+	// Used for operational commands like help display
 	var (
 		help = flag.Bool("help", false, "Show help message")
 	)
@@ -36,7 +52,8 @@ func main() {
 		return
 	}
 
-	// Initialize unified logging system with configuration from config system
+	// Logging initialization: Setup structured logging with config integration
+	// Supports module-based tracing and configurable log levels
 	logConfig := &logging.Config{
 		Level:        config.Config.Logging.Level,
 		TraceModules: config.Config.Logging.TraceModules,
@@ -119,7 +136,7 @@ func main() {
 
 	// Standard startup banner
 	logging.Info("HD1 (Holodeck One) daemon starting", map[string]interface{}{
-		"version":     "v3.4.0",
+		"version":      config.GetVersion(),
 		"architecture": "spec-driven",
 	})
 	

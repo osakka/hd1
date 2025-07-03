@@ -50,8 +50,8 @@ test: build
 	@$(BIN_DIR)/hd1 > $(LOG_DIR)/test.log 2>&1 & \
 	SERVER_PID=$$!; \
 	sleep 3; \
-	curl -s http://localhost:8080/api/sessions | jq '.' > /dev/null && echo "GET /api/sessions - OK" || echo "GET /api/sessions - FAILED"; \
-	curl -s -X POST http://localhost:8080/api/sessions | jq '.' > /dev/null && echo "POST /api/sessions - OK" || echo "POST /api/sessions - FAILED"; \
+	curl -s $${HD1_API_BASE:-http://localhost:8080/api}/sessions | jq '.' > /dev/null && echo "GET /api/sessions - OK" || echo "GET /api/sessions - FAILED"; \
+	curl -s -X POST $${HD1_API_BASE:-http://localhost:8080/api}/sessions | jq '.' > /dev/null && echo "POST /api/sessions - OK" || echo "POST /api/sessions - FAILED"; \
 	kill $$SERVER_PID 2>/dev/null || true; \
 	echo "API tests complete"
 

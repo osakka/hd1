@@ -25,11 +25,13 @@ type HD1Config struct {
 }
 
 type ServerConfig struct {
-	Host      string `json:"host"`
-	Port      string `json:"port"`
-	APIBase   string `json:"api_base"`
-	StaticDir string `json:"static_dir"`
-	Daemon    bool   `json:"daemon"`
+	Host            string `json:"host"`
+	Port            string `json:"port"`
+	APIBase         string `json:"api_base"`
+	InternalAPIBase string `json:"internal_api_base"`
+	StaticDir       string `json:"static_dir"`
+	Daemon          bool   `json:"daemon"`
+	Version         string `json:"version"`
 }
 
 type PathsConfig struct {
@@ -78,10 +80,11 @@ type SessionConfig struct {
 
 // ChannelsConfig contains channel system configuration
 type ChannelsConfig struct {
-	ConfigFile       string `json:"config_file"`
-	DefaultChannel   string `json:"default_channel"`
-	AutoJoinOnCreate bool   `json:"auto_join_on_create"`
-	SyncOnJoin       bool   `json:"sync_on_join"`
+	ConfigFile       string   `json:"config_file"`
+	DefaultChannel   string   `json:"default_channel"`
+	ProtectedList    []string `json:"protected_list"`
+	AutoJoinOnCreate bool     `json:"auto_join_on_create"`
+	SyncOnJoin       bool     `json:"sync_on_join"`
 }
 
 // AvatarsConfig contains avatar system configuration
@@ -130,6 +133,9 @@ func (c *HD1Config) loadDefaults() {
 	// Server defaults
 	c.Server.Host = "0.0.0.0"
 	c.Server.Port = "8080"
+	c.Server.APIBase = "http://0.0.0.0:8080/api"
+	c.Server.InternalAPIBase = "http://localhost:8080/api"
+	c.Server.Version = "v5.0.1"
 	
 	// Path defaults - configurable root directory
 	rootDir := "/opt/hd1"
@@ -169,6 +175,7 @@ func (c *HD1Config) loadDefaults() {
 	// Channels defaults
 	c.Channels.ConfigFile = "config.yaml"
 	c.Channels.DefaultChannel = "channel_one"
+	c.Channels.ProtectedList = []string{"channel_one", "channel_two"}
 	c.Channels.AutoJoinOnCreate = true
 	c.Channels.SyncOnJoin = true
 	
@@ -236,6 +243,12 @@ func (c *HD1Config) loadEnvironmentVariables() {
 	if apiBase := os.Getenv("HD1_API_BASE"); apiBase != "" {
 		c.Server.APIBase = apiBase
 		c.Client.APIBase = apiBase
+	}
+	if internalAPIBase := os.Getenv("HD1_INTERNAL_API_BASE"); internalAPIBase != "" {
+		c.Server.InternalAPIBase = internalAPIBase
+	}
+	if version := os.Getenv("HD1_VERSION"); version != "" {
+		c.Server.Version = version
 	}
 	if daemon := os.Getenv("HD1_DAEMON"); daemon == "true" || daemon == "1" {
 		c.Server.Daemon = true
@@ -353,6 +366,9 @@ func (c *HD1Config) loadEnvironmentVariables() {
 	} else if syncOnJoin == "false" || syncOnJoin == "0" {
 		c.Channels.SyncOnJoin = false
 	}
+	if protectedList := os.Getenv("HD1_CHANNELS_PROTECTED_LIST"); protectedList != "" {
+		c.Channels.ProtectedList = strings.Split(protectedList, ",")
+	}
 	
 	// Avatars configuration
 	if configFile := os.Getenv("HD1_AVATARS_CONFIG_FILE"); configFile != "" {
@@ -403,6 +419,8 @@ func (c *HD1Config) loadFlags() {
 		host := flag.String("host", c.Server.Host, "Host to bind to")
 		port := flag.String("port", c.Server.Port, "Port to bind to") 
 		apiBase := flag.String("api-base", c.Server.APIBase, "API base URL")
+		internalAPIBase := flag.String("internal-api-base", c.Server.InternalAPIBase, "Internal API base URL for server communications")
+		version := flag.String("version", c.Server.Version, "HD1 version identifier")
 		daemon := flag.Bool("daemon", c.Server.Daemon, "Run in daemon mode")
 		rootDir := flag.String("root-dir", c.Paths.RootDir, "HD1 root directory (absolute path)")
 		buildDir := flag.String("build-dir", c.Paths.BuildDir, "Build directory (absolute path)")
@@ -412,6 +430,7 @@ func (c *HD1Config) loadFlags() {
 		logFile := flag.String("log-file", c.Logging.LogFile, "Log file path (absolute)")
 		logLevel := flag.String("log-level", c.Logging.Level, "Logging level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
 		traceModules := flag.String("trace-modules", strings.Join(c.Logging.TraceModules, ","), "Comma-separated trace modules")
+		protectedChannels := flag.String("protected-channels", strings.Join(c.Channels.ProtectedList, ","), "Comma-separated list of protected channels")
 		
 		flag.Parse()
 		
@@ -423,6 +442,12 @@ func (c *HD1Config) loadFlags() {
 			c.Server.APIBase = *apiBase
 			c.Client.APIBase = *apiBase
 		}
+		if *internalAPIBase != "" {
+			c.Server.InternalAPIBase = *internalAPIBase
+		}
+		if *version != "" {
+			c.Server.Version = *version
+		}
 		c.Paths.RootDir = *rootDir
 		c.Paths.BuildDir = *buildDir
 		c.Paths.LogDir = *logDir
@@ -433,6 +458,9 @@ func (c *HD1Config) loadFlags() {
 		c.Logging.Level = *logLevel
 		if *traceModules != "" {
 			c.Logging.TraceModules = strings.Split(*traceModules, ",")
+		}
+		if *protectedChannels != "" {
+			c.Channels.ProtectedList = strings.Split(*protectedChannels, ",")
 		}
 		
 		// Recompute derived paths if root changed
@@ -710,6 +738,30 @@ func GetChannelsSyncOnJoin() bool {
 		return Config.Channels.SyncOnJoin
 	}
 	return true // fallback
+}
+
+// GetChannelsProtectedList returns the list of protected channels
+func GetChannelsProtectedList() []string {
+	if Config != nil {
+		return Config.Channels.ProtectedList
+	}
+	return []string{"channel_one", "channel_two"} // fallback
+}
+
+// GetInternalAPIBase returns the configured internal API base URL
+func GetInternalAPIBase() string {
+	if Config != nil {
+		return Config.Server.InternalAPIBase
+	}
+	return "http://localhost:8080/api" // fallback
+}
+
+// GetVersion returns the configured HD1 version
+func GetVersion() string {
+	if Config != nil {
+		return Config.Server.Version
+	}
+	return "v5.0.1" // fallback
 }
 
 // Avatars configuration getters

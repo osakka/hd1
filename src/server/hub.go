@@ -1,3 +1,14 @@
+// Package server provides the core WebSocket hub and session management
+// infrastructure for HD1. The hub coordinates real-time communication
+// between clients, manages session state, and provides TCP-level reliability
+// for collaborative 3D environments.
+//
+// Key components:
+//   - Hub: Central WebSocket coordinator with session management
+//   - SessionChannel: Persistent session state with message queuing
+//   - Client management: WebSocket connection lifecycle
+//   - Graph state: Real-time 3D scene synchronization
+//   - Channel integration: YAML-based scene configuration loading
 package server
 
 import (
@@ -15,31 +26,40 @@ import (
 	"holodeck1/logging"
 )
 
+// Hub represents the central WebSocket coordination hub for HD1.
+// Manages real-time communication between clients, session state persistence,
+// and provides TCP-level reliability for collaborative 3D environments.
+// Thread-safe with RWMutex protection for concurrent access.
 type Hub struct {
-	clients       map[*Client]bool
-	broadcast     chan []byte
-	register      chan *Client
-	unregister    chan *Client
-	logger        *LogManager
-	store         *SessionStore
-	mutex         sync.RWMutex
+	clients       map[*Client]bool            // Active WebSocket clients
+	broadcast     chan []byte                 // Global broadcast channel
+	register      chan *Client                // Client registration channel
+	unregister    chan *Client                // Client cleanup channel
+	logger        *LogManager                 // Structured logging manager
+	store         *SessionStore               // Thread-safe session persistence
+	mutex         sync.RWMutex                // Hub-level concurrency protection
 	
 	// Session Graph Architecture - Channel-based persistence
-	sessionChannels     map[string]*SessionChannel  // sessionID -> SessionChannel
-	clientSessions   map[*Client]string       // client -> sessionID mapping
+	sessionChannels     map[string]*SessionChannel  // sessionID -> SessionChannel mapping
+	clientSessions   map[*Client]string           // client -> sessionID reverse mapping
 }
 
-// SessionChannel represents a persistent session graph with TCP-level reliability
+// SessionChannel represents a persistent session with TCP-level reliability.
+// Maintains session graph state, client membership, and message queuing
+// for reliable delivery during client reconnections. Thread-safe with
+// individual mutex protection for session-level concurrency.
 type SessionChannel struct {
-	sessionID     string
-	clients       map[*Client]bool     // clients currently in this channel
-	graphState    map[string]interface{}  // persistent session graph state
-	lastActivity  time.Time
-	mutex         sync.RWMutex
-	messageQueue  [][]byte             // queued messages for reconnecting clients
+	sessionID     string                      // Unique session identifier
+	clients       map[*Client]bool            // Active clients in this session
+	graphState    map[string]interface{}      // Persistent 3D scene state
+	lastActivity  time.Time                   // Last activity timestamp for cleanup
+	mutex         sync.RWMutex                // Session-level concurrency protection
+	messageQueue  [][]byte                    // Queued messages for reconnecting clients
 }
 
-// NewSessionChannel creates a new persistent session channel
+// NewSessionChannel creates a new persistent session channel.
+// Initializes empty client map, graph state, and message queue
+// for reliable session management and state persistence.
 func NewSessionChannel(sessionID string) *SessionChannel {
 	return &SessionChannel{
 		sessionID:    sessionID,
@@ -50,26 +70,37 @@ func NewSessionChannel(sessionID string) *SessionChannel {
 	}
 }
 
-// Channel data structures for loading YAML configurations
+// PlayCanvasEntity represents a 3D entity loaded from YAML channel configuration.
+// Contains entity name and PlayCanvas component structure for scene initialization.
 type PlayCanvasEntity struct {
-	Name       string                 `json:"name" yaml:"name"`
-	Components map[string]interface{} `json:"components" yaml:"components"`
+	Name       string                 `json:"name" yaml:"name"`           // Entity display name
+	Components map[string]interface{} `json:"components" yaml:"components"` // PlayCanvas components (transform, model, etc.)
 }
 
+// PlayCanvasScene represents scene-level configuration from YAML channels.
+// Defines global scene properties like lighting and physics settings.
 type PlayCanvasScene struct {
-	AmbientLight interface{} `json:"ambientLight,omitempty" yaml:"ambientLight,omitempty"` // Can be string or []float64
-	Gravity      []float64   `json:"gravity,omitempty" yaml:"gravity,omitempty"`
+	AmbientLight interface{} `json:"ambientLight,omitempty" yaml:"ambientLight,omitempty"` // Ambient light (string color or RGB array)
+	Gravity      []float64   `json:"gravity,omitempty" yaml:"gravity,omitempty"`          // Physics gravity vector [x,y,z]
 }
 
+// PlayCanvasConfig represents the complete PlayCanvas configuration from YAML.
+// Contains scene settings and pre-defined entities for channel initialization.
 type PlayCanvasConfig struct {
-	Scene    PlayCanvasScene    `json:"scene,omitempty" yaml:"scene,omitempty"`
-	Entities []PlayCanvasEntity `json:"entities,omitempty" yaml:"entities,omitempty"`
+	Scene    PlayCanvasScene    `json:"scene,omitempty" yaml:"scene,omitempty"`     // Global scene configuration
+	Entities []PlayCanvasEntity `json:"entities,omitempty" yaml:"entities,omitempty"` // Pre-defined channel entities
 }
 
+// ChannelConfig represents the top-level YAML channel configuration.
+// Contains PlayCanvas-specific settings and can be extended with additional
+// channel properties as needed.
 type ChannelConfig struct {
-	PlayCanvas *PlayCanvasConfig `yaml:"playcanvas,omitempty"`
+	PlayCanvas *PlayCanvasConfig `yaml:"playcanvas,omitempty"` // PlayCanvas engine configuration
 }
 
+// NewHub creates and initializes a new WebSocket hub.
+// Sets up all channels, maps, and managers required for session coordination.
+// Returns a ready-to-use hub that can be started with Run().
 func NewHub() *Hub {
 	hub := &Hub{
 		clients:    make(map[*Client]bool),
@@ -90,7 +121,21 @@ func NewHub() *Hub {
 
 // Session Channel Management Methods
 
-// JoinSessionChannel joins a client to a session channel with TCP-level reliability
+// JoinSessionChannel joins a client to a session channel with TCP-level reliability.
+// Provides persistent session state, message queuing for reconnections, and
+// graph state synchronization for collaborative 3D environments.
+//
+// Parameters:
+//   - sessionID: Target session identifier
+//   - clientID: Unique client identifier for tracking
+//   - reconnect: Whether this is a reconnection (affects message delivery)
+//
+// Returns:
+//   - SessionChannel: The joined session channel
+//   - int: Number of queued messages delivered
+//   - map[string]interface{}: Current session graph state
+//
+// Thread-safe with hub-level mutex protection.
 func (h *Hub) JoinSessionChannel(sessionID, clientID string, reconnect bool) (*SessionChannel, int, map[string]interface{}) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
@@ -352,11 +397,22 @@ func (h *Hub) Run() {
 	}
 }
 
+// BroadcastMessage sends a message to all connected WebSocket clients.
+// Uses the hub's broadcast channel for efficient message distribution.
+// Non-blocking operation - queues message for hub's main loop processing.
 func (h *Hub) BroadcastMessage(message []byte) {
 	h.broadcast <- message
 }
 
-// BroadcastToSession sends a message only to clients in a specific session
+// BroadcastToSession sends a message only to clients in a specific session.
+// Provides session-isolated communication for entity updates, physics events,
+// and other session-specific real-time synchronization. Automatically handles
+// client cleanup for disconnected clients.
+//
+// Parameters:
+//   - sessionID: Target session for message delivery
+//   - updateType: Message type identifier for client processing
+//   - data: Payload data to be JSON-marshaled and sent
 func (h *Hub) BroadcastToSession(sessionID string, updateType string, data interface{}) {
 	update := map[string]interface{}{
 		"type": updateType,
@@ -389,8 +445,15 @@ func (h *Hub) BroadcastToSession(sessionID string, updateType string, data inter
 	}
 }
 
-// BroadcastAvatarPositionToChannel broadcasts avatar position updates to ALL sessions in the same channel
-// This enables bidirectional visibility - all participants see each other's avatars
+// BroadcastAvatarPositionToChannel broadcasts avatar position updates to ALL sessions in the same channel.
+// Enables bidirectional visibility across different sessions sharing the same channel -
+// all participants see each other's avatars regardless of session boundaries.
+// Provides multiplayer avatar synchronization for collaborative 3D environments.
+//
+// Parameters:
+//   - sessionID: Originating session ID for the avatar update
+//   - updateType: Message type (typically 'avatar_position_update')
+//   - data: Avatar position and orientation data
 func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType string, data interface{}) {
 	// Get the current session to find which channel it's in
 	session, exists := h.GetStore().GetSession(sessionID)
@@ -643,6 +706,9 @@ func (s *SessionStore) UpdateEntity(sessionID, entityID string, updatedEntity *E
 // Use /sessions/{sessionId}/entities and /channels endpoints instead
 
 // GetStore returns the session store for external access
+// GetStore returns the hub's thread-safe session store.
+// Provides access to session persistence, entity management, and
+// concurrent session operations across the HD1 system.
 func (h *Hub) GetStore() *SessionStore {
 	return h.store
 }
@@ -827,13 +893,15 @@ func (h *Hub) ClearSessionEntitiesWithBroadcast(sessionID string) error {
 	clearedCount := 0
 	for _, entity := range entities {
 		// Delete each entity via internal HTTP call to ensure proper broadcasts
-		url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities/%s", sessionID, entity.ID)
+		url := fmt.Sprintf("%s/sessions/%s/entities/%s", config.GetInternalAPIBase(), sessionID, entity.ID)
 		req, err := http.NewRequest("DELETE", url, nil)
 		if err != nil {
-			logging.Error("failed to create delete request", map[string]interface{}{
+			logging.Error("delete request creation failed", map[string]interface{}{
+				"operation":  "clear_session_entities",
 				"session_id": sessionID,
-				"entity_id": entity.ID,
-				"error": err.Error(),
+				"entity_id":  entity.ID,
+				"url":        url,
+				"error":      err.Error(),
 			})
 			continue
 		}
@@ -841,10 +909,12 @@ func (h *Hub) ClearSessionEntitiesWithBroadcast(sessionID string) error {
 		client := &http.Client{}
 		resp, err := client.Do(req)
 		if err != nil {
-			logging.Error("failed to delete entity", map[string]interface{}{
+			logging.Error("entity deletion request failed", map[string]interface{}{
+				"operation":  "clear_session_entities",
 				"session_id": sessionID,
-				"entity_id": entity.ID,
-				"error": err.Error(),
+				"entity_id":  entity.ID,
+				"url":        url,
+				"error":      err.Error(),
 			})
 			continue
 		}
@@ -883,7 +953,7 @@ func (h *Hub) createEntityInSession(sessionID string, entity PlayCanvasEntity) e
 	}
 	
 	// Make internal HTTP request to create entity
-	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	url := fmt.Sprintf("%s/sessions/%s/entities", config.GetInternalAPIBase(), sessionID)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadJSON))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -915,7 +985,7 @@ func (h *Hub) CreateEntityViaAPI(sessionID string, entityPayload map[string]inte
 	}
 	
 	// Make internal HTTP request to HD1's create entity API
-	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	url := fmt.Sprintf("%s/sessions/%s/entities", config.GetInternalAPIBase(), sessionID)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadJSON))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -942,7 +1012,7 @@ func (h *Hub) CreateEntityViaAPI(sessionID string, entityPayload map[string]inte
 // This maintains 100% API-first architecture - all entity operations go through the API
 func (h *Hub) DeleteEntityByNameViaAPI(sessionID, entityName string) error {
 	// First, get all entities to find the one with matching name
-	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	url := fmt.Sprintf("%s/sessions/%s/entities", config.GetInternalAPIBase(), sessionID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create list entities request: %w", err)
@@ -985,7 +1055,7 @@ func (h *Hub) DeleteEntityByNameViaAPI(sessionID, entityName string) error {
 	}
 	
 	// Delete the entity via API
-	deleteURL := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities/%s", sessionID, entityID)
+	deleteURL := fmt.Sprintf("%s/sessions/%s/entities/%s", config.GetInternalAPIBase(), sessionID, entityID)
 	deleteReq, err := http.NewRequest("DELETE", deleteURL, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create delete request: %w", err)
@@ -1009,7 +1079,7 @@ func (h *Hub) DeleteEntityByNameViaAPI(sessionID, entityName string) error {
 // This maintains 100% API-first architecture - all entity operations go through the API
 func (h *Hub) UpdateEntityByNameViaAPI(sessionID, entityName string, updatePayload map[string]interface{}) error {
 	// First, get all entities to find the one with matching name
-	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	url := fmt.Sprintf("%s/sessions/%s/entities", config.GetInternalAPIBase(), sessionID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create list entities request: %w", err)
@@ -1058,7 +1128,7 @@ func (h *Hub) UpdateEntityByNameViaAPI(sessionID, entityName string, updatePaylo
 	}
 	
 	// Update the entity via API
-	updateURL := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities/%s", sessionID, entityID)
+	updateURL := fmt.Sprintf("%s/sessions/%s/entities/%s", config.GetInternalAPIBase(), sessionID, entityID)
 	updateReq, err := http.NewRequest("PUT", updateURL, bytes.NewBuffer(payloadJSON))
 	if err != nil {
 		return fmt.Errorf("failed to create update request: %w", err)
@@ -1084,7 +1154,7 @@ func (h *Hub) UpdateEntityByNameViaAPI(sessionID, entityName string, updatePaylo
 // This maintains 100% API-first architecture - all entity operations go through the API
 func (h *Hub) GetEntityByNameViaAPI(sessionID, entityName string) (map[string]interface{}, error) {
 	// First, get all entities to find the one with matching name
-	url := fmt.Sprintf("http://localhost:8080/api/sessions/%s/entities", sessionID)
+	url := fmt.Sprintf("%s/sessions/%s/entities", config.GetInternalAPIBase(), sessionID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create list entities request: %w", err)

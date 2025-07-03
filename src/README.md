@@ -5,7 +5,7 @@
 ## 🎯 Architecture Overview
 
 **HD1 v5.0.1** transforms game development through **API-First Game Engine** architecture:
-- **59 REST Endpoints**: Complete game engine control via HTTP APIs
+- **82 REST Endpoints**: Complete game engine control via HTTP APIs
 - **Real-Time WebSocket**: Entity lifecycle synchronization  
 - **PlayCanvas Engine**: Professional 3D rendering with ECS
 - **Single Source of Truth**: 100% auto-generated from `api.yaml`
@@ -58,7 +58,7 @@ vim api/sessions/join_channel.go              # Business logic
 src/
 ├── api.yaml                # 🎯 PHASE 1: SINGLE SOURCE OF TRUTH - OpenAPI 3.0.3
 ├── main.go                 # HD1 daemon entry point
-├── auto_router.go          # 🤖 AUTO-GENERATED - 77 endpoint routing
+├── auto_router.go          # 🤖 AUTO-GENERATED - 82 endpoint routing
 ├── go.mod                  # Go dependencies
 ├── Makefile               # Build system with auto-generation
 │
@@ -108,7 +108,7 @@ HD1 uses **100% external templates** for maintainable code generation:
 ```
 codegen/templates/
 ├── go/                    # Go code generation
-│   ├── router.tmpl        # → auto_router.go (77 endpoints)
+│   ├── router.tmpl        # → auto_router.go (82 endpoints)
 │   └── client.tmpl        # → client/main.go (CLI tool)
 ├── javascript/            # JavaScript code generation  
 │   ├── api-client.tmpl    # → ../share/htdocs/static/js/hd1lib.js
@@ -167,7 +167,7 @@ vim codegen/templates/javascript/api-client.tmpl # Add JS method patterns
 make generate
 
 # Produces:
-# ├── auto_router.go              (77 endpoints)
+# ├── auto_router.go              (82 endpoints)
 # ├── ../lib/hd1lib.sh            (Shell API functions)
 # ├── ../share/htdocs/static/js/hd1lib.js (JavaScript API)
 # ├── ../share/htdocs/static/js/hd1-ui-components.js
@@ -252,7 +252,7 @@ playcanvas:
         rigidbody: {type: "static"}
 ```
 
-## 🎯 API Endpoints (77 Total)
+## 🎯 API Endpoints (82 Total)
 
 ### Core Game Engine
 ```
@@ -391,6 +391,6 @@ func (r *APIRouter) {{.FuncName}}(w http.ResponseWriter, req *http.Request) {
 
 ---
 
-**HD1 v5.0.0 - Where OpenAPI specifications become immersive game worlds through API-first engineering.**
+**HD1 v5.0.1 - Where OpenAPI specifications become immersive game worlds through API-first engineering.**
 
 **Development Flow: API specification → Template processing → Code logic implementation**

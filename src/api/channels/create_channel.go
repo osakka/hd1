@@ -1,3 +1,12 @@
+// Package channels provides HTTP handlers for channel management in HD1.
+// Channels represent YAML-based scene configurations that sessions can join
+// for collaborative 3D environments with shared physics and real-time sync.
+//
+// Key concepts:
+//   - Channel: YAML configuration defining 3D scene properties
+//   - Environment: Base scene template (lighting, physics, entities)
+//   - Session-Channel relationship: Sessions join channels for scene state
+//   - File-based storage: Channels stored as YAML files in filesystem
 package channels
 
 import (
@@ -13,23 +22,42 @@ import (
 	"holodeck1/logging"
 )
 
-// CreateChannelHandler handles POST /channels - create new channel
+// CreateChannelRequest represents the request body for channel creation.
+// All fields except Name and Environment are optional with sensible defaults.
+type CreateChannelRequest struct {
+	ID          string `json:"id"`          // Optional: channel identifier (auto-generated from name if empty)
+	Name        string `json:"name"`        // Required: human-readable channel name
+	Description string `json:"description"` // Optional: channel description
+	Environment string `json:"environment"` // Required: base environment template
+	MaxClients  int    `json:"max_clients"` // Optional: concurrent user limit (default: 50)
+	Enabled     *bool  `json:"enabled"`     // Optional: channel active state (default: true)
+	Priority    int    `json:"priority"`    // Optional: channel priority for ordering (default: 100)
+}
+
+// CreateChannelHandler handles POST /channels requests.
+// Creates a new channel with YAML configuration file and directory structure.
+// Channels define scene environments that sessions can join for collaborative
+// 3D experiences with shared physics, entities, and real-time synchronization.
+//
+// The request body should contain channel name and environment template.
+// Returns 201 Created with channel details on success, or appropriate
+// error status codes for validation failures.
+//
+// File system: Creates /opt/hd1/share/channels/{channel_id}/ directory
+// with config.yaml containing channel configuration.
+//
+// URL path: /api/channels
+// Method: POST
+// Content-Type: application/json
 func CreateChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 	logging.Debug("channel creation requested", map[string]interface{}{
 		"method": r.Method,
 		"path":   r.URL.Path,
 	})
 
-	// Parse request body
-	var req struct {
-		ID          string `json:"id"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		Environment string `json:"environment"`
-		MaxClients  int    `json:"max_clients"`
-		Enabled     *bool  `json:"enabled"`
-		Priority    int    `json:"priority"`
-	}
+	// Request parsing: Decode JSON request body to struct
+	// Validates JSON format and structure
+	var req CreateChannelRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		logging.Error("failed to parse channel creation request", map[string]interface{}{
@@ -39,7 +67,8 @@ func CreateChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		return
 	}
 
-	// Validate required fields
+	// Field validation: Check required fields are present
+	// Name and Environment are required for channel creation
 	if req.Name == "" {
 		logging.Warn("channel creation missing required field", map[string]interface{}{
 			"field": "name",
@@ -56,7 +85,8 @@ func CreateChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		return
 	}
 
-	// Auto-generate ID if not provided
+	// ID generation: Auto-generate channel ID from name if not provided
+	// Ensures consistent naming convention: channel_{sanitized_name}
 	if req.ID == "" {
 		// Generate ID from name: convert to lowercase, replace spaces with underscores, remove special chars
 		id := strings.ToLower(req.Name)
@@ -75,7 +105,8 @@ func CreateChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		})
 	}
 
-	// Validate ID format
+	// ID format validation: Ensure channel ID follows naming convention
+	// Required format: channel_{alphanumeric_with_underscores_hyphens}
 	if !regexp.MustCompile(`^channel_[a-z0-9_\-]+$`).MatchString(req.ID) {
 		logging.Warn("invalid channel ID format", map[string]interface{}{
 			"id": req.ID,
@@ -84,7 +115,8 @@ func CreateChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		return
 	}
 
-	// Set defaults
+	// Default values: Apply sensible defaults for optional fields
+	// MaxClients=50, Enabled=true, Priority=100
 	if req.MaxClients <= 0 {
 		req.MaxClients = 50
 	}
@@ -96,7 +128,8 @@ func CreateChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		req.Priority = 100
 	}
 
-	// Check if channel already exists
+	// Conflict detection: Verify channel ID is unique
+	// Prevents overwriting existing channel configurations
 	channelsDir := "/opt/hd1/share/channels"
 	channelPath := filepath.Join(channelsDir, req.ID)
 	
@@ -108,7 +141,8 @@ func CreateChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		return
 	}
 
-	// Create channel directory
+	// Directory creation: Create channel directory structure
+	// Each channel gets isolated directory for configuration and assets
 	if err := os.MkdirAll(channelPath, 0755); err != nil {
 		logging.Error("failed to create channel directory", map[string]interface{}{
 			"error": err.Error(),
@@ -118,7 +152,8 @@ func CreateChannelHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		return
 	}
 
-	// Create channel configuration YAML
+	// Configuration generation: Create YAML config file with channel settings
+	// Includes channel metadata, collaboration settings, and performance tuning
 	configContent := fmt.Sprintf(`# HD1 Channel Configuration - %s
 # Auto-generated channel configuration
 
@@ -156,7 +191,8 @@ created_via: "api"
 			"path":  configPath,
 		})
 		
-		// Clean up directory on failure
+		// Cleanup on failure: Remove partially created directory
+		// Maintains consistency - either complete success or clean failure
 		os.RemoveAll(channelPath)
 		http.Error(w, `{"success": false, "message": "Failed to create channel configuration"}`, http.StatusInternalServerError)
 		return
@@ -171,7 +207,8 @@ created_via: "api"
 		"enabled":      *req.Enabled,
 	})
 
-	// Return success response
+	// Success response: Return created channel details
+	// 201 Created with complete channel configuration for client reference
 	response := map[string]interface{}{
 		"success": true,
 		"message": "Channel created successfully",
