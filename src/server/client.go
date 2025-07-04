@@ -65,6 +65,12 @@ type Client struct {
 	sessionID string  // HD1 session isolation
 }
 
+// readPump handles incoming WebSocket messages from the client.
+// It runs in a separate goroutine and manages the client's read lifecycle:
+// - Sets connection limits and deadlines for message size and pong timeouts
+// - Processes incoming messages through handleClientMessage
+// - Automatically unregisters client and closes connection on errors or disconnection
+// - Handles graceful and unexpected connection closures
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
@@ -94,6 +100,17 @@ func (c *Client) readPump() {
 	}
 }
 
+// handleClientMessage processes WebSocket messages received from clients.
+// It handles three types of messages:
+// 1. avatar_position_update: High-frequency avatar movement with direct position updates
+// 2. session_change: Client requests to switch between HD1 channels
+// 3. Regular 3D visualization messages: Standard scene graph operations
+// 
+// Parameters:
+//   message: Raw JSON message bytes from the WebSocket connection
+//
+// The function ensures avatar persistence during rapid updates and manages
+// bidirectional session isolation for multiplayer synchronization.
 func (c *Client) handleClientMessage(message []byte) {
 	var msg map[string]interface{}
 	if err := json.Unmarshal(message, &msg); err != nil {
@@ -220,6 +237,13 @@ func (c *Client) handleClientMessage(message []byte) {
 	}
 }
 
+// writePump handles outgoing WebSocket messages to the client.
+// It runs in a separate goroutine and manages the client's write lifecycle:
+// - Sends queued messages from the client's send channel
+// - Implements ping/pong keepalive mechanism with configurable intervals
+// - Manages write deadlines to prevent connection hangs
+// - Gracefully handles channel closure and connection errors
+// - Automatically closes connection when send channel is closed
 func (c *Client) writePump() {
 	ticker := time.NewTicker(getPingPeriod())
 	defer func() {

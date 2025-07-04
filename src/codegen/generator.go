@@ -348,11 +348,15 @@ type HandlerStub struct {
 	Comment  string
 }
 
+// fileExists checks if a file exists at the given path.
+// Returns true if the file exists and is accessible, false otherwise.
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }
 
+// contains checks if a string slice contains a specific item.
+// Uses linear search for small slices typical in code generation.
 func contains(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {
@@ -461,9 +465,11 @@ func buildGoClient(sourcePath, binaryPath string) error {
 	return nil
 }
 
-// getCommandName converts route info to command name
+// getCommandName converts route info to CLI command name.
+// Transforms camelCase operationID to kebab-case for CLI consistency.
+// Example: "createSession" becomes "create-session"
 func getCommandName(route RouteInfo) string {
-	// Convert operationId to kebab-case
+	// Convert operationId to kebab-case by inserting hyphens before uppercase letters
 	name := route.OperationID
 	result := ""
 	for i, r := range name {

@@ -12,6 +12,7 @@
 package server
 
 import (
+	// Standard library
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -21,7 +22,10 @@ import (
 	"sync"
 	"time"
 
+	// Third-party
 	"gopkg.in/yaml.v3"
+	
+	// Local
 	"holodeck1/config"
 	"holodeck1/logging"
 )

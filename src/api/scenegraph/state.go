@@ -9,7 +9,16 @@ import (
 	"fmt"
 )
 
-// GetSceneState handles GET /sessions/{sessionId}/scene/state
+// GetSceneStateHandler handles GET /sessions/{sessionId}/scene/state
+// Retrieves the current 3D scene configuration including lighting, camera, and materials.
+//
+// Parameters:
+//   w: HTTP response writer for JSON scene state data
+//   r: HTTP request containing sessionId path parameter
+//   hub: WebSocket hub for session isolation and real-time sync
+//
+// Returns JSON scene state with lighting settings, camera configuration, and material properties.
+// Uses mock PlayCanvas scene data for consistent 3D rendering baseline.
 func GetSceneStateHandler(w http.ResponseWriter, r *http.Request, hub *server.Hub) {
 	sessionId := extractSessionId(r)
 	
@@ -62,7 +71,17 @@ func GetSceneStateHandler(w http.ResponseWriter, r *http.Request, hub *server.Hu
 	json.NewEncoder(w).Encode(response)
 }
 
-// UpdateSceneState handles PUT /sessions/{sessionId}/scene/state
+// UpdateSceneStateHandler handles PUT /sessions/{sessionId}/scene/state
+// Updates 3D scene configuration with new lighting, camera, or material settings.
+//
+// Parameters:
+//   w: HTTP response writer for operation confirmation
+//   r: HTTP request containing sessionId and JSON scene state updates
+//   hub: WebSocket hub for broadcasting changes to connected clients
+//
+// Request body: JSON object with scene state properties to update
+// Response: Confirmation message with applied changes count
+// Broadcasts scene state changes to all clients in the session via WebSocket.
 func UpdateSceneStateHandler(w http.ResponseWriter, r *http.Request, hub *server.Hub) {
 	sessionId := extractSessionId(r)
 	

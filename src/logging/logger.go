@@ -24,10 +24,11 @@ const (
 	FATAL
 )
 
-// Log rotation constants
+// Log rotation constants for production deployment.
+// Sizes chosen to balance disk usage with operational visibility.
 const (
-	DefaultMaxLogSize = 10 * 1024 * 1024 // 10MB
-	DefaultMaxRotations = 3              // Keep 3 rotated logs
+	DefaultMaxLogSize = 10 * 1024 * 1024 // 10MB - Prevents excessive disk usage while maintaining sufficient log history
+	DefaultMaxRotations = 3              // Keep 3 rotated logs - Provides 30MB total log retention for troubleshooting
 )
 
 var levelNames = map[LogLevel]string{

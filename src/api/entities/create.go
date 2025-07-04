@@ -175,7 +175,7 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	// ID generation: Create unique identifiers for entity tracking
 	// PlayCanvas GUID enables integration with PlayCanvas engine
 	entityID := fmt.Sprintf("entity-%s-%d", sessionID[8:], time.Now().UnixNano()%1000000)
-	playcanvasGUID := fmt.Sprintf("pc-guid-%d", time.Now().UnixNano())
+	playCanvasGUID := fmt.Sprintf("pc-guid-%d", time.Now().UnixNano())
 	
 	// Component processing: Build PlayCanvas component structure
 	// Supports both modern components and legacy position fields
@@ -200,7 +200,7 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	entity := &server.Entity{
 		ID:             entityID,
 		Name:           req.Name,
-		PlayCanvasGUID: playcanvasGUID,
+		PlayCanvasGUID: playCanvasGUID,
 		Components:     components,
 		Tags:           req.Tags,
 		CreatedAt:      time.Now(),
@@ -230,7 +230,7 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		"name":             req.Name,
 		"enabled":          enabled,
 		"tags":             req.Tags,
-		"playcanvas_guid":  playcanvasGUID,
+		"playcanvas_guid":  playCanvasGUID,
 	})
 	
 	// WebSocket notification: Broadcast entity creation to all session clients
@@ -241,7 +241,7 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		"name":             req.Name,
 		"enabled":          enabled,
 		"tags":             req.Tags,
-		"playcanvas_guid":  playcanvasGUID,
+		"playcanvas_guid":  playCanvasGUID,
 		"components":       req.Components, // CRITICAL: Include components for client rendering
 	})
 	
@@ -253,7 +253,7 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		"success":          true,
 		"entity_id":        entityID,
 		"name":             req.Name,
-		"playcanvas_guid":  playcanvasGUID,
+		"playcanvas_guid":  playCanvasGUID,
 		"created_at":       time.Now().Format(time.RFC3339),
 	})
 }
