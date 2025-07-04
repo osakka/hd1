@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"holodeck1/logging"
+	"holodeck1/memory"
 	"holodeck1/server"
 )
 
@@ -90,8 +91,9 @@ func ListEntitiesHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 	
-	// Convert to response format
-	entities := make([]map[string]interface{}, 0, len(storedEntities))
+	// RADICAL OPTIMIZATION: Use pooled slice for entity list response
+	entities := memory.GetEntitySlice()
+	defer memory.PutEntitySlice(entities)
 	for _, entity := range storedEntities {
 		// Apply filters
 		if tagFilter != "" {
@@ -116,6 +118,7 @@ func ListEntitiesHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 			}
 		}
 		
+		// Create entity data map (cannot use pooled map here as it gets stored in slice)
 		entityData := map[string]interface{}{
 			"entity_id":        entity.ID,
 			"name":             entity.Name,
@@ -142,11 +145,15 @@ func ListEntitiesHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		"count":         len(entities),
 	})
 	
+	// OPTIMIZATION: Use pooled map for API response
+	responseData := memory.GetWebSocketUpdate()
+	defer memory.PutWebSocketUpdate(responseData)
+	
+	responseData["success"] = true
+	responseData["entities"] = entities
+	responseData["total"] = len(entities)
+	responseData["timestamp"] = time.Now().Format(time.RFC3339)
+	
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":   true,
-		"entities":  entities,
-		"total":     len(entities),
-		"timestamp": time.Now().Format(time.RFC3339),
-	})
+	json.NewEncoder(w).Encode(responseData)
 }

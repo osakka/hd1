@@ -123,16 +123,21 @@ func ProcessEntityUpdate(sessionID string, entityID string, data UpdateData) err
 - **Present tense**: "Returns user data" not "Will return user data"
 - **No redundancy**: Don't repeat what the code obviously does
 - **Focus on why and what**: Explain purpose and business logic, not syntax
+- **Atomic Naming**: Use lowercase_snake_case for consistency and semantic clarity
 
 ### **Good Examples**
 ```go
 // ✅ Good: Explains purpose and behavior
-// ValidateSessionID checks if the session exists and is active.
+// validate_session_id checks if the session exists and is active.
 // Returns ErrSessionNotFound if session doesn't exist or expired.
 
 // ✅ Good: Explains business context
-// BroadcastEntityUpdate sends real-time entity changes to all clients
+// broadcast_entity_update sends real-time entity changes to all clients
 // in the session, excluding the client that initiated the change.
+
+// ✅ Good: Atomic naming with clear semantics
+// convert_to_daemon_process detaches the HD1 process from terminal
+// and creates PID file for system service management.
 ```
 
 ### **Bad Examples**
@@ -145,6 +150,11 @@ func ProcessEntityUpdate(sessionID string, entityID string, data UpdateData) err
 
 // ❌ Bad: Too vague
 // HandleRequest handles the request
+
+// ❌ Bad: Non-indicative naming patterns
+// func fixSession()      // What kind of fix?
+// func tmpHandler()      // Temporary implies incomplete
+// func ensureDirectories() // Vague about what directories
 ```
 
 ## 🔧 Implementation Checklist

@@ -1,6 +1,6 @@
 # HD1 API Reference
 
-**HD1 v5.0.1 - Complete API-First Game Engine Platform**
+**HD1 v5.0.2 - Complete API-First Game Engine Platform**
 
 HD1 provides a comprehensive REST API for 3D game engine control with **82 endpoints** covering all aspects of entity management, physics simulation, audio systems, and real-time multiplayer capabilities.
 
@@ -121,11 +121,10 @@ Multi-user collaboration and scene management.
 - `PUT /channels/{channelId}` - Update channel
 - `DELETE /channels/{channelId}` - Delete channel
 
-### Administration (5 endpoints)
+### Administration (4 endpoints)
 System logging and configuration management.
 
 - `GET /admin/logging/config` - Get logging configuration
-- `POST /admin/logging/config` - Set logging configuration
 - `POST /admin/logging/level` - Set log level
 - `POST /admin/logging/trace` - Set trace modules
 - `GET /admin/logging/logs` - Get log entries
@@ -198,6 +197,6 @@ The complete OpenAPI 3.0.3 specification is available in `src/api.yaml` and serv
 
 ---
 
-**HD1 v5.0.1** - Complete API-First Game Engine Platform  
+**HD1 v5.0.2** - Complete API-First Game Engine Platform  
 **Generated from**: `src/api.yaml` (Single Source of Truth)  
-**Last Updated**: 2025-07-03
+**Last Updated**: 2025-07-04

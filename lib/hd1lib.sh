@@ -62,10 +62,14 @@ EOF
     echo "CAMERA: Positioned at ($x,$y,$z)"
 }
 
-# Auto-generated from GET /sessions/{sessionId}
-hd1::get_session() {
-    local session_id="${1:-$HD1_SESSION_ID}"
-    hd1::api_call "GET" "/sessions/$session_id"
+# Auto-generated from POST /sessions
+hd1::create_session() {
+    hd1::api_call "POST" "/sessions"
+}
+
+# Auto-generated from GET /sessions
+hd1::list_sessions() {
+    hd1::api_call "GET" "/sessions"
 }
 
 # Auto-generated from POST /browser/canvas
@@ -96,14 +100,10 @@ hd1::clear() {
     hd1::canvas_control "clear"
 }
 
-# Auto-generated from GET /sessions
-hd1::list_sessions() {
-    hd1::api_call "GET" "/sessions"
-}
-
-# Auto-generated from POST /sessions
-hd1::create_session() {
-    hd1::api_call "POST" "/sessions"
+# Auto-generated from GET /sessions/{sessionId}
+hd1::get_session() {
+    local session_id="${1:-$HD1_SESSION_ID}"
+    hd1::api_call "GET" "/sessions/$session_id"
 }
 
 

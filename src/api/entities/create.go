@@ -17,13 +17,14 @@ import (
 	"time"
 
 	"holodeck1/logging"
+	"holodeck1/memory"
 	"holodeck1/server"
 )
 
 // mustMarshal converts any value to JSON bytes, ignoring errors.
 // Used for internal WebSocket message marshaling where errors are not expected.
 // Panics should not occur as we control the input data structures.
-func mustMarshal(v interface{}) []byte {
+func marshal_with_fallback(v interface{}) []byte {
 	b, _ := json.Marshal(v)
 	return b
 }
@@ -178,7 +179,7 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	playCanvasGUID := fmt.Sprintf("pc-guid-%d", time.Now().UnixNano())
 	
 	// Component processing: Build PlayCanvas component structure
-	// Supports both modern components and legacy position fields
+	// Create component map for entity storage (cannot use pooled map here as entity retains it)
 	components := make(map[string]interface{})
 	
 	// Component assignment: Use provided components or empty map
@@ -234,26 +235,32 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	})
 	
 	// WebSocket notification: Broadcast entity creation to all session clients
-	// Includes full entity data for immediate PlayCanvas rendering
-	h.BroadcastUpdate("entity_created", map[string]interface{}{
-		"session_id":       sessionID,
-		"entity_id":        entityID,
-		"name":             req.Name,
-		"enabled":          enabled,
-		"tags":             req.Tags,
-		"playcanvas_guid":  playCanvasGUID,
-		"components":       req.Components, // CRITICAL: Include components for client rendering
-	})
+	// RADICAL OPTIMIZATION: Use pooled map for WebSocket broadcast data
+	broadcastData := memory.GetWebSocketUpdate()
+	defer memory.PutWebSocketUpdate(broadcastData)
 	
-	// Success response: Return created entity details
-	// 201 Created with entity metadata for client reference
+	broadcastData["session_id"] = sessionID
+	broadcastData["entity_id"] = entityID
+	broadcastData["name"] = req.Name
+	broadcastData["enabled"] = enabled
+	broadcastData["tags"] = req.Tags
+	broadcastData["playcanvas_guid"] = playCanvasGUID
+	broadcastData["components"] = req.Components // CRITICAL: Include components for client rendering
+	
+	h.BroadcastUpdate("entity_created", broadcastData)
+	
+	// Success response: Return created entity details  
+	// OPTIMIZATION: Use pooled map for API response
+	responseData := memory.GetWebSocketUpdate()
+	defer memory.PutWebSocketUpdate(responseData)
+	
+	responseData["success"] = true
+	responseData["entity_id"] = entityID
+	responseData["name"] = req.Name
+	responseData["playcanvas_guid"] = playCanvasGUID
+	responseData["created_at"] = time.Now().Format(time.RFC3339)
+	
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":          true,
-		"entity_id":        entityID,
-		"name":             req.Name,
-		"playcanvas_guid":  playCanvasGUID,
-		"created_at":       time.Now().Format(time.RFC3339),
-	})
+	json.NewEncoder(w).Encode(responseData)
 }

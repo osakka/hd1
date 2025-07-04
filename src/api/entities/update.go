@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"holodeck1/logging"
+	"holodeck1/memory"
 	"holodeck1/server"
 )
 
@@ -108,8 +109,9 @@ func UpdateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		return
 	}
 
-	// Also parse as generic map for component updates
-	var genericReq map[string]interface{}
+	// RADICAL OPTIMIZATION: Use pooled map for generic request parsing
+	genericReq := memory.GetEntityRequestPool()
+	defer memory.PutEntityRequestPool(genericReq)
 	json.Unmarshal(bodyBytes, &genericReq)
 	
 	// Validate position array if provided
@@ -275,18 +277,25 @@ func UpdateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		"changes":    changes,
 	})
 	
-	// Broadcast entity update via WebSocket
-	h.BroadcastUpdate("entity_updated", map[string]interface{}{
-		"session_id": sessionID,
-		"entity_id":  entityID,
-		"changes":    changes,
-	})
+	// RADICAL OPTIMIZATION: Use pooled maps for WebSocket broadcast and API response
+	broadcastData := memory.GetWebSocketUpdate()
+	defer memory.PutWebSocketUpdate(broadcastData)
+	
+	broadcastData["session_id"] = sessionID
+	broadcastData["entity_id"] = entityID
+	broadcastData["changes"] = changes
+	
+	h.BroadcastUpdate("entity_updated", broadcastData)
+	
+	// Use pooled map for API response
+	responseData := memory.GetWebSocketUpdate()
+	defer memory.PutWebSocketUpdate(responseData)
+	
+	responseData["success"] = true
+	responseData["entity_id"] = entityID
+	responseData["changes"] = changes
+	responseData["updated_at"] = time.Now().Format(time.RFC3339)
 	
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success":    true,
-		"entity_id":  entityID,
-		"changes":    changes,
-		"updated_at": time.Now().Format(time.RFC3339),
-	})
+	json.NewEncoder(w).Encode(responseData)
 }

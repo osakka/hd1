@@ -77,7 +77,7 @@ func main() {
 
 	// Handle daemon mode
 	if config.GetDaemon() {
-		if err := becomedaemon(config.GetPIDFile()); err != nil {
+		if err := convert_to_daemon_process(config.GetPIDFile()); err != nil {
 			logging.Fatal("failed to daemonize process", map[string]interface{}{
 				"pid_file": config.GetPIDFile(),
 				"error":    err.Error(),
@@ -208,7 +208,7 @@ func showHelp() {
 	fmt.Printf("  PID: %s\n", config.GetPIDFile())
 }
 
-func ensureDirectories() error {
+func create_required_build_directories() error {
 	dirs := []string{
 		config.Config.Paths.BuildDir, 
 		config.Config.Paths.BinDir, 
@@ -253,7 +253,7 @@ func removePidFile(pidFile string) {
 	os.Remove(pidFile)
 }
 
-func becomedaemon(pidFile string) error {
+func convert_to_daemon_process(pidFile string) error {
 	// Fork and exit parent
 	if os.Getppid() != 1 {
 		// We are in the parent process, need to fork
