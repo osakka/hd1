@@ -667,6 +667,45 @@ paths:
       x-handler: "api/avatars/get.go"
       x-function: "GetAvatarSpecification"
 
+  /avatars/{avatarType}/asset:
+    get:
+      operationId: getAvatarAsset
+      tags: [Avatars]
+      summary: Get avatar GLB asset
+      description: |
+        Returns the binary GLB asset for the specified avatar type.
+        This endpoint serves the 3D model file that PlayCanvas loads for avatar rendering.
+      parameters:
+        - name: avatarType
+          in: path
+          required: true
+          description: Avatar type identifier (e.g., 'claude_avatar', 'human_avatar')
+          schema:
+            type: string
+          example: "claude_avatar"
+      responses:
+        '200':
+          description: Avatar GLB asset retrieved successfully
+          content:
+            model/gltf-binary:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Avatar type not found or asset not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-handler: "api/avatars/asset.go"
+      x-function: "GetAvatarAsset"
+
   /sessions/{sessionId}/avatar:
     get:
       operationId: getSessionAvatar

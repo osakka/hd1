@@ -9,20 +9,22 @@
 - **"API = Control, WebSocket = Graph Extension"**
 
 ## Current State (2025-07-04)
-HD1 v5.0.2 is a **production-ready API-first game engine** platform with **complete configuration management standardization** and **exotic memory optimization algorithms**.
+HD1 v5.0.2 is a **production-ready API-first game engine** platform with **complete 3D avatar system** and **native GLB model loading**.
 
 ### ✅ Completed Features
 - **82 REST Endpoints**: Complete game engine control via HTTP + Avatar management
 - **Real-Time WebSocket**: Entity lifecycle synchronization + avatar position updates
-- **PlayCanvas Integration**: Professional 3D rendering with ECS + advanced camera system
-- **Avatar Synchronization**: High-frequency multiplayer avatar tracking with persistence
+- **PlayCanvas Integration**: Professional 3D rendering with ECS + native GLB asset loading
+- **3D Avatar System**: Production-ready multiplayer avatars with real GLB models
+- **Avatar GLB Loading**: Native PlayCanvas `loadFromUrlAndFilename()` with proper resource handling
+- **Avatar Asset Delivery**: HTTP-based GLB asset serving with proper content-type headers
+- **Avatar Types**: CesiumMan robot (Claude) and Fox model (humans) from Khronos glTF samples
 - **Advanced Camera System**: Smooth movement, momentum, orbital mode with TAB toggle
 - **Channel System**: YAML-based scene configuration with 3 channels
 - **Console UI**: Professional monitoring with smooth animations
 - **Vendor Cleanup**: Removed 1.1GB redundant directories, optimized structure
 - **Template Architecture**: 8 externalized templates for maintainable code generation
 - **Configuration Management**: Complete configuration system with priority order: Flags > Environment Variables > .env File > Defaults
-- **Memory Optimization**: Exotic algorithms with comprehensive object pooling system for 60-80% allocation reduction
 
 ### Architecture
 ```
@@ -35,10 +37,12 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → Client Ren
 - `src/codegen/templates/` - External template files
 - `share/channels/*.yaml` - Scene configurations
 - `share/htdocs/static/js/hd1-console/` - Modular console system
-- `share/htdocs/static/js/hd1-playcanvas.js` - Advanced camera system with orbital mode
-- `src/api/sessions/avatar/` - Avatar management endpoints
+- `share/htdocs/static/js/hd1-playcanvas.js` - 3D avatar system with native GLB loading
+- `src/api/avatars/asset.go` - GLB asset HTTP delivery with proper headers
+- `src/api/avatars/get.go` & `list.go` - Avatar specification and listing APIs
+- `share/avatars/*/model.glb` - GLB avatar models (CesiumMan, Fox)
+- `share/avatars/*/avatar.yaml` - Avatar configuration specifications
 - `src/api/camera/position.go` - Camera position API with avatar sync
-- `src/memory/pools.go` - Comprehensive object pooling system with exotic algorithms
 
 ## Development Commands
 ```bash
@@ -101,19 +105,26 @@ HD1_DAEMON=false
 - **Advanced Camera**: TAB toggle between free/orbital modes, smooth movement with momentum
 - **Avatar Sync**: Real-time multiplayer avatar position updates via WebSocket
 
-## Avatar Synchronization System
-**High-Frequency Multiplayer Support**: Handles 100+ movements/updates per second
-- **Avatar Persistence**: Prevents avatar disappearing during rapid position updates
-- **Dual Message Types**: `avatar_position_update` for movement, `entity_updated` for creation
-- **Entity Lifecycle Protection**: Direct position updates avoid delete/recreate cycles
-- **Channel Broadcasting**: Bidirectional avatar visibility across sessions
-- **Performance Optimized**: Real-time WebSocket for multiplayer synchronization
+## 3D Avatar System
+**Production-Ready Multiplayer Avatars**: Real GLB models with full synchronization
+- **Native GLB Loading**: PlayCanvas `loadFromUrlAndFilename()` with proper resource handling
+- **HTTP Asset Delivery**: Binary GLB files served via `/api/avatars/{type}/asset` with correct headers
+- **Avatar Types**: CesiumMan robot (Claude) and Fox model (humans) from Khronos glTF samples
+- **YAML Configuration**: Complete avatar specifications with physics, animations, and camera settings
+- **Real-Time Sync**: High-frequency multiplayer avatar tracking with persistence
+- **Error-Free Loading**: Resolved PlayCanvas container asset `resource.clone` compatibility issues
+
+**Avatar Asset Architecture**:
+- **GLB Models**: `/share/avatars/{type}/model.glb` - Binary glTF 2.0 3D models
+- **YAML Specs**: `/share/avatars/{type}/avatar.yaml` - Complete avatar configuration
+- **HTTP Endpoints**: Auto-generated from api.yaml for asset delivery and specifications
+- **PlayCanvas v1.73.3**: Stable, tested version with proven GLB container support
 
 **Camera System Architecture**:
 - **Free Camera Mode**: WASD movement with smooth momentum and acceleration/deceleration
 - **Orbital Camera Mode**: TAB to toggle, automatic avatar centering, mouse wheel zoom
 - **PlayCanvas Integration**: Professional Vec3.lerp() interpolation and Quat.slerp() rotation
-- **Error-Free Operation**: Fixed critical PlayCanvas constructor issues
+- **Avatar-Ready**: Configured for future camera-avatar binding system
 
 ## Configuration Management
 **Priority**: Flags > Environment Variables > .env File > Defaults

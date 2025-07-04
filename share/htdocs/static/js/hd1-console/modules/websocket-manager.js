@@ -212,6 +212,12 @@ class HD1WebSocketManager {
             case 'avatar_position_update':
                 this.handleAvatarPositionUpdate(message);
                 break;
+            case 'avatar_asset_response':
+                this.handleAvatarAssetResponse(message);
+                break;
+            case 'avatar_asset_error':
+                this.handleAvatarAssetError(message);
+                break;
             default:
                 this.dom.addDebugEntry('WS_MESSAGE', message);
         }
@@ -1417,6 +1423,41 @@ class HD1WebSocketManager {
             
             this.preservedAvatars = [];
         }, 200); // Allow scene clearing to complete
+    }
+
+    /**
+     * Handle avatar asset response - receives GLB data via WebSocket
+     */
+    handleAvatarAssetResponse(message) {
+        console.log('[HD1-WebSocket] Avatar asset response received:', message.avatar_type, `${message.size} bytes`);
+        
+        try {
+            // Forward to PlayCanvas integration for GLB processing
+            if (window.handleAvatarAssetResponse) {
+                window.handleAvatarAssetResponse(message.avatar_type, message.data);
+            } else {
+                console.warn('[HD1-WebSocket] handleAvatarAssetResponse not available in PlayCanvas integration');
+            }
+        } catch (error) {
+            console.error('[HD1-WebSocket] Failed to handle avatar asset response:', error);
+        }
+        
+        this.dom.addDebugEntry('AVATAR_ASSET_RESPONSE', {
+            avatar_type: message.avatar_type,
+            size: message.size
+        });
+    }
+
+    /**
+     * Handle avatar asset error - GLB asset loading failed
+     */
+    handleAvatarAssetError(message) {
+        console.error('[HD1-WebSocket] Avatar asset error:', message.avatar_type, message.error);
+        
+        this.dom.addDebugEntry('AVATAR_ASSET_ERROR', {
+            avatar_type: message.avatar_type,
+            error: message.error
+        });
     }
 
     /**

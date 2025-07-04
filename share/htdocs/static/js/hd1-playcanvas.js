@@ -912,9 +912,49 @@ function createObjectFromData(objectData) {
 
     // Add model component (only if not a light)
     if (!objectData.components?.light) {
-        entity.addComponent('model', {
-            type: modelType
-        });
+        // Check if this entity has avatar tags to determine if it should load GLB assets
+        let avatarTag = objectData.tags?.find(tag => tag.startsWith('avatar-'));
+        let avatarType = avatarTag ? avatarTag.replace('avatar-', '') : null;
+        
+        // Special handling for session client avatars - check session avatar configuration
+        if (!avatarType && objectData.tags?.includes('session-avatar') && objectData.name?.includes('session_client_')) {
+            // This is a session client avatar, try to get the session's configured avatar type
+            const sessionId = objectData.session_id || getCurrentSession();
+            if (sessionId) {
+                console.log('[HD1] Session client avatar detected, checking session avatar configuration for:', sessionId);
+                // For now, default to claude_avatar for demo - in production this would query the session avatar API
+                avatarType = 'claude_avatar';
+                console.log('[HD1] Using default avatar type for session client:', avatarType);
+            }
+        }
+        
+        // Handle GLB asset loading for avatars via HTTP
+        if (avatarType) {
+            console.log('[HD1] Avatar entity detected, loading GLB asset via HTTP:', avatarType);
+            
+            // Store entity reference
+            entity.hd1AvatarType = avatarType;
+            entity.hd1WaitingForAsset = true;
+            
+            // Add entity to scene first
+            hd1GameEngine.root.addChild(entity);
+            
+            // Load GLB asset directly via HTTP endpoint
+            loadAvatarAssetHTTP(avatarType, entity);
+            
+            // Don't add model component yet - wait for GLB asset
+            console.log('[HD1] Entity added to scene, waiting for GLB asset:', entity.name);
+            return; // Skip the normal model component addition
+        } else if (modelType === 'asset' && objectData.components?.model?.asset_path) {
+            // Legacy asset loading (for non-avatar assets)
+            console.warn('[HD1] Non-avatar asset entity, using primitive model fallback');
+            entity.addComponent('model', { type: 'box' });
+        } else {
+            // Standard primitive model
+            entity.addComponent('model', {
+                type: modelType
+            });
+        }
     }
     
     // Add light component if entity has light
@@ -1068,6 +1108,245 @@ function deleteObjectByName(objectName) {
     }
 }
 
+// Global storage for pending avatar asset requests
+const pendingAvatarAssets = new Map(); // avatarType -> entity
+
+/**
+ * Load GLB avatar asset via HTTP endpoint
+ * Uses HD1's API-first architecture with proper HTTP asset delivery
+ */
+function loadAvatarAssetHTTP(avatarType, entity) {
+    console.log('[HD1] Loading avatar asset via HTTP with PlayCanvas v1.73.3:', avatarType);
+    
+    try {
+        // Construct HTTP URL for avatar GLB asset
+        const assetUrl = `/api/avatars/${avatarType}/asset`;
+        
+        // Use PlayCanvas loadFromUrlAndFilename for proper GLB loading
+        hd1GameEngine.assets.loadFromUrlAndFilename(
+            assetUrl,
+            `${avatarType}.glb`,
+            'container',
+            function(err, asset) {
+                if (err) {
+                    console.error('[HD1] Avatar GLB asset loading failed:', err);
+                    console.log('[HD1] Falling back to colored sphere for entity:', entity.name);
+                    loadAvatarFallback(avatarType, entity);
+                    return;
+                }
+                
+                console.log('[HD1] Avatar GLB asset loaded successfully with v1.73.3:', avatarType);
+                console.log('[HD1] Asset resource:', asset.resource);
+                
+                try {
+                    // Remove existing model component if any
+                    if (entity.model) {
+                        entity.removeComponent('model');
+                    }
+                    
+                    // Apply the loaded asset using the resource.model property
+                    entity.addComponent('model', {
+                        asset: asset.resource.model
+                    });
+                    
+                    console.log('[HD1] Avatar GLB model applied to entity:', entity.name);
+                    entity.hd1WaitingForAsset = false;
+                    
+                } catch (componentError) {
+                    console.error('[HD1] Error applying avatar GLB model component:', componentError);
+                    // Fallback to colored sphere
+                    loadAvatarFallback(avatarType, entity);
+                }
+            }
+        );
+        
+        console.log('[HD1] Started loading avatar asset with loadFromUrlAndFilename:', assetUrl);
+        
+    } catch (error) {
+        console.error('[HD1] Error in loadAvatarAssetHTTP:', error);
+        loadAvatarFallback(avatarType, entity);
+    }
+}
+
+// Fallback function for avatar loading
+function loadAvatarFallback(avatarType, entity) {
+    try {
+        // Remove existing model component if any
+        if (entity.model) {
+            entity.removeComponent('model');
+        }
+        
+        // Create a basic material first
+        const material = new pc.StandardMaterial();
+        
+        // Set avatar-specific colors
+        if (avatarType === 'claude_avatar') {
+            material.diffuse = new pc.Color(0.2, 0.4, 0.8); // Blue for Claude
+        } else if (avatarType === 'human_avatar') {
+            material.diffuse = new pc.Color(0.8, 0.4, 0.2); // Orange for human
+        } else {
+            material.diffuse = new pc.Color(0.5, 0.5, 0.5); // Gray for unknown
+        }
+        
+        material.update();
+        
+        // Use a sphere as avatar representation with proper material
+        entity.addComponent('model', { 
+            type: 'sphere'
+        });
+        
+        // Apply the material after component is added
+        if (entity.model && entity.model.model) {
+            entity.model.model.meshInstances[0].material = material;
+        }
+        
+        console.log('[HD1] Applied fallback avatar model:', avatarType);
+        entity.hd1WaitingForAsset = false;
+        
+    } catch (error) {
+        console.error('[HD1] Error in fallback avatar loading:', error);
+        
+        // Ultimate fallback to box
+        if (entity.model) {
+            entity.removeComponent('model');
+        }
+        
+        entity.addComponent('model', { type: 'box' });
+        entity.hd1WaitingForAsset = false;
+    }
+}
+
+/**
+ * Handle incoming avatar asset data from WebSocket
+ * Converts base64 data to ArrayBuffer and creates PlayCanvas GLB asset
+ */
+function handleAvatarAssetResponse(avatarType, base64Data) {
+    console.log('[HD1] Processing avatar asset response:', avatarType, 'pending entities:', pendingAvatarAssets.size);
+    
+    const entity = pendingAvatarAssets.get(avatarType);
+    if (!entity) {
+        console.warn('[HD1] Received avatar asset but no pending entity found:', avatarType);
+        console.log('[HD1] Available pending assets:', Array.from(pendingAvatarAssets.keys()));
+        return;
+    }
+    
+    try {
+        // Convert base64 to ArrayBuffer
+        const binaryString = atob(base64Data);
+        const arrayBuffer = new ArrayBuffer(binaryString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < binaryString.length; i++) {
+            uint8Array[i] = binaryString.charCodeAt(i);
+        }
+        
+        console.log('[HD1] Converted GLB data to ArrayBuffer:', arrayBuffer.byteLength, 'bytes');
+        
+        // Create PlayCanvas container asset and set binary data directly
+        const asset = new pc.Asset(entity.name + '_model', 'container');
+        
+        // Add asset to registry
+        hd1GameEngine.assets.add(asset);
+        
+        // Set the GLB binary data directly on the asset
+        asset.data = arrayBuffer;
+        
+        // Use PlayCanvas's built-in GLB loader through the asset system with proper binary handling
+        try {
+            // Create a temporary object URL for the GLB data
+            const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
+            const tempUrl = URL.createObjectURL(blob);
+            
+            // Create a new asset with the temporary URL
+            const tempAsset = new pc.Asset(entity.name + '_temp_model', 'container', {
+                url: tempUrl
+            });
+            
+            // Add to asset registry
+            hd1GameEngine.assets.add(tempAsset);
+            
+            // Set up asset ready handler
+            tempAsset.ready((loadedAsset) => {
+                console.log('[HD1] GLB asset loaded successfully, applying to entity:', entity.name);
+                
+                try {
+                    // Remove existing model component if any
+                    if (entity.model) {
+                        entity.removeComponent('model');
+                    }
+                    
+                    // Apply the loaded asset to the entity
+                    entity.addComponent('model', {
+                        type: 'asset',
+                        asset: loadedAsset
+                    });
+                    
+                    console.log('[HD1] GLB asset applied to entity:', entity.name);
+                    
+                    // Clean up
+                    URL.revokeObjectURL(tempUrl);
+                    entity.hd1WaitingForAsset = false;
+                    pendingAvatarAssets.delete(avatarType);
+                    
+                } catch (componentError) {
+                    console.error('[HD1] Error applying GLB model component:', componentError);
+                    // Fallback to primitive
+                    entity.addComponent('model', { type: 'box' });
+                    URL.revokeObjectURL(tempUrl);
+                    entity.hd1WaitingForAsset = false;
+                    pendingAvatarAssets.delete(avatarType);
+                }
+            });
+            
+            // Set up error handler
+            tempAsset.on('error', (err, asset) => {
+                console.error('[HD1] GLB asset loading failed:', err);
+                console.log('[HD1] Falling back to primitive model for entity:', entity.name);
+                
+                // Fallback to primitive
+                if (entity.model) {
+                    entity.removeComponent('model');
+                } else {
+                    entity.addComponent('model', { type: 'box' });
+                }
+                
+                // Clean up
+                URL.revokeObjectURL(tempUrl);
+                entity.hd1WaitingForAsset = false;
+                pendingAvatarAssets.delete(avatarType);
+            });
+            
+            // Load the asset
+            hd1GameEngine.assets.load(tempAsset);
+            
+        } catch (parseError) {
+            console.error('[HD1] GLB asset processing error:', parseError);
+            console.log('[HD1] Falling back to primitive model for entity:', entity.name);
+            
+            // Fallback to primitive
+            if (entity.model) {
+                entity.removeComponent('model');
+            }
+            entity.addComponent('model', { type: 'box' });
+            
+            // Clean up after error
+            entity.hd1WaitingForAsset = false;
+            pendingAvatarAssets.delete(avatarType);
+        }
+        console.log('[HD1] GLB asset loading started via WebSocket:', avatarType);
+        
+    } catch (error) {
+        console.error('[HD1] Failed to process GLB asset:', error);
+        
+        // Fallback to primitive
+        if (entity.model) {
+            entity.removeComponent('model');
+        }
+        entity.addComponent('model', { type: 'box' });
+        entity.hd1WaitingForAsset = false;
+        pendingAvatarAssets.delete(avatarType);
+    }
+}
+
 // Add the createObject and deleteObject methods to the engine
 if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', function() {
@@ -1076,6 +1355,10 @@ if (typeof window !== 'undefined') {
                 window.hd1GameEngine.createObject = createObjectFromData;
                 window.hd1GameEngine.deleteObject = deleteObjectByName;
                 console.log('[HD1] Added createObject and deleteObject methods to PlayCanvas engine');
+                
+                // Add avatar asset handler to global scope for WebSocket manager
+                window.handleAvatarAssetResponse = handleAvatarAssetResponse;
+                console.log('[HD1] Added avatar asset handler to global scope');
                 
                 // Process any pending objects
                 if (window.pendingObjects && window.pendingObjects.length > 0) {

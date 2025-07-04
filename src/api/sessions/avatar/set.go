@@ -65,16 +65,24 @@ func SetSessionAvatarHandler(w http.ResponseWriter, r *http.Request, hub interfa
 		return
 	}
 
-	// Validate avatar type
-	validTypes := map[string]bool{
-		"default":  true,
-		"business": true,
-		"casual":   true,
+	// Dynamically validate avatar type from configuration
+	validTypes, err := getValidAvatarTypes()
+	if err != nil {
+		logger.Error("Failed to load avatar configuration", map[string]interface{}{
+			"error": err,
+		})
+		http.Error(w, "Avatar configuration error", http.StatusInternalServerError)
+		return
 	}
 
 	if !validTypes[req.AvatarType] {
+		validTypesList := make([]string, 0, len(validTypes))
+		for t := range validTypes {
+			validTypesList = append(validTypesList, t)
+		}
 		logger.Warn("Invalid avatar type requested", map[string]interface{}{
 			"avatar_type": req.AvatarType,
+			"valid_types": validTypesList,
 		})
 		http.Error(w, "Invalid avatar type", http.StatusBadRequest)
 		return
@@ -234,4 +242,32 @@ func SetSessionAvatarHandler(w http.ResponseWriter, r *http.Request, hub interfa
 		"avatar_type": req.AvatarType,
 		"entity_id":   entityID,
 	})
+}
+
+// getValidAvatarTypes dynamically loads valid avatar types from configuration
+func getValidAvatarTypes() (map[string]bool, error) {
+	configPath := filepath.Join(config.GetAvatarsDir(), "config.yaml")
+	configData, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	var avatarConfig struct {
+		AvatarTypes map[string]struct {
+			Path        string   `yaml:"path"`
+			Description string   `yaml:"description"`
+			Contexts    []string `yaml:"contexts"`
+		} `yaml:"avatar_types"`
+	}
+	
+	if err := yaml.Unmarshal(configData, &avatarConfig); err != nil {
+		return nil, err
+	}
+
+	validTypes := make(map[string]bool)
+	for avatarType := range avatarConfig.AvatarTypes {
+		validTypes[avatarType] = true
+	}
+
+	return validTypes, nil
 }

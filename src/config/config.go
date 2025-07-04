@@ -161,9 +161,9 @@ func (c *HD1Config) loadDefaults() {
 	c.WebSocket.WriteTimeout = 10 * time.Second
 	c.WebSocket.PongTimeout = 60 * time.Second
 	c.WebSocket.PingPeriod = 54 * time.Second // (60 * 9) / 10
-	c.WebSocket.MaxMessageSize = 512
-	c.WebSocket.ReadBufferSize = 1024
-	c.WebSocket.WriteBufferSize = 1024
+	c.WebSocket.MaxMessageSize = 1048576  // 1MB for GLB assets
+	c.WebSocket.ReadBufferSize = 1048576  // 1MB read buffer
+	c.WebSocket.WriteBufferSize = 1048576 // 1MB write buffer
 	c.WebSocket.ClientChannelBuffer = 256
 	
 	// Session defaults (based on current hardcoded values)

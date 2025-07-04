@@ -74,17 +74,24 @@ func GetAvatarSpecificationHandler(w http.ResponseWriter, r *http.Request, hub i
 		"avatar_type": avatarType,
 	})
 
-	// Validate avatar type
-	validTypes := map[string]bool{
-		"default":  true,
-		"business": true,
-		"casual":   true,
+	// Dynamically validate avatar type from configuration
+	validTypes, err := getValidAvatarTypes()
+	if err != nil {
+		logging.Error("failed to load avatar configuration", map[string]interface{}{
+			"error": err.Error(),
+		})
+		http.Error(w, "Avatar configuration error", http.StatusInternalServerError)
+		return
 	}
 
 	if !validTypes[avatarType] {
+		validTypesList := make([]string, 0, len(validTypes))
+		for t := range validTypes {
+			validTypesList = append(validTypesList, t)
+		}
 		logging.Warn("invalid avatar type", map[string]interface{}{
 			"avatar_type": avatarType,
-			"valid_types": []string{"default", "business", "casual"},
+			"valid_types": validTypesList,
 		})
 		http.Error(w, "Invalid avatar type", http.StatusBadRequest)
 		return
@@ -149,4 +156,34 @@ func extractAvatarType(path string) string {
 	}
 	
 	return ""
+}
+
+
+// getValidAvatarTypes dynamically loads valid avatar types from configuration
+func getValidAvatarTypes() (map[string]bool, error) {
+	configPath := filepath.Join(config.GetAvatarsDir(), "config.yaml")
+	configData, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Use AvatarConfig struct from list.go to avoid duplication
+	var avatarConfig struct {
+		AvatarTypes map[string]struct {
+			Path        string   `yaml:"path"`
+			Description string   `yaml:"description"`
+			Contexts    []string `yaml:"contexts"`
+		} `yaml:"avatar_types"`
+	}
+	
+	if err := yaml.Unmarshal(configData, &avatarConfig); err != nil {
+		return nil, err
+	}
+
+	validTypes := make(map[string]bool)
+	for avatarType := range avatarConfig.AvatarTypes {
+		validTypes[avatarType] = true
+	}
+
+	return validTypes, nil
 }

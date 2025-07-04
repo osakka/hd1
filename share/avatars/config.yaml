@@ -28,6 +28,16 @@ avatar_types:
     path: "casual/avatar.yaml"
     description: "Relaxed avatar for informal sessions"
     contexts: ["creative", "social", "brainstorm"]
+    
+  claude_avatar:
+    path: "claude_avatar/avatar.yaml"
+    description: "Expressive robot avatar for Claude's AI clients"
+    contexts: ["ai", "robot", "futuristic", "demonstration"]
+    
+  human_avatar:
+    path: "human_avatar/avatar.yaml"
+    description: "Professional human avatar for collaborative sessions"
+    contexts: ["human", "professional", "collaboration", "natural"]
 
 # Channel-specific avatar defaults
 channel_defaults:
