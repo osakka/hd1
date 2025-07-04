@@ -116,3 +116,12 @@ network:
     enabled: true
     method: "linear"
     time: 0.15                         # Slightly slower for professional feel
+
+# Camera Configuration  
+camera:
+  # Camera position relative to avatar
+  position: {x: 0, y: 1.7, z: 0}       # Standard head level
+  # Camera rotation (looking forward)  
+  rotation: {x: 0, y: 0, z: 0}         # Straight ahead
+  # Field of view
+  field_of_view: 75                     # degrees

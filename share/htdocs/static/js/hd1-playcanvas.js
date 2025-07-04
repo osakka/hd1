@@ -214,8 +214,16 @@ function createEmptyScene(app) {
     // Store camera reference globally
     app.camera = camera;
     
+    // Create camera controller
+    app.cameraController = new HD1CameraController(app, camera);
+    
+    // Camera controller will be updated in setupCameraControls
+    
     // Setup manual camera controls
     setupCameraControls(app, camera);
+    
+    // Setup automatic avatar-driven camera system
+    setupAvatarDrivenCamera(app.cameraController);
     
     console.log('[HD1] Empty PlayCanvas scene created - ready for channel content');
 }
@@ -228,132 +236,144 @@ class HD1CameraController {
     constructor(app, camera) {
         this.app = app;
         this.camera = camera;
-        this.mode = 'free'; // 'free', 'orbit'
+        this.mode = 'avatar-driven'; // Only avatar-driven mode
         
-        // Orbital camera properties
-        this.orbitTarget = new pc.Vec3(0, 0, 0);
-        this.orbitDistance = 15;
-        this.orbitHeight = 5;
-        this.orbitAngle = 0;
-        this.orbitSpeed = 1.0;
-        this.orbitAutoRotate = false;
+        // Avatar-driven camera properties
+        this.boundAvatar = null;
+        this.avatarCameraOffset = new pc.Vec3(0, 1.7, 0); // Default head level
+        this.availableAvatars = [];
         
-        // Smooth transitions
-        this.targetPosition = camera.getPosition().clone();
-        this.targetRotation = camera.getRotation().clone();
-        this.smoothFactor = 0.1;
-        
-        console.log('[HD1] 🎮 Camera Controller initialized');
+        console.log('[HD1] 🎮 Camera Controller initialized - Avatar-driven mode only');
     }
     
-    // Switch to orbital camera mode
-    setOrbitMode(center = new pc.Vec3(0, 0, 0), distance = 15, height = 5) {
-        this.mode = 'orbit';
-        this.orbitTarget.copy(center);
-        this.orbitDistance = distance;
-        this.orbitHeight = height;
-        this.orbitAngle = 0;
+    
+    // Switch to avatar-driven camera mode based on avatar type
+    setAvatarDrivenMode(avatar = null) {
+        this.mode = 'avatar-driven';
+        this.updateAvailableAvatars();
         
-        console.log('[HD1] 🎮 Switched to Orbital Camera Mode');
-        this.updateOrbitPosition();
-    }
-    
-    // Switch to free camera mode
-    setFreeMode() {
-        this.mode = 'free';
-        console.log('[HD1] 🎮 Switched to Free Camera Mode');
-    }
-    
-    // Toggle between camera modes
-    toggleMode() {
-        if (this.mode === 'free') {
-            // Calculate center point of all avatars for orbiting
-            const avatarCenter = this.calculateAvatarCenter();
-            this.setOrbitMode(avatarCenter, 20, 8);
+        if (avatar) {
+            this.boundAvatar = avatar;
+        } else if (this.availableAvatars.length > 0) {
+            // Find the current session's avatar
+            const sessionId = getCurrentSession();
+            this.boundAvatar = this.availableAvatars.find(av => 
+                av.name && av.name.includes(sessionId)
+            ) || this.availableAvatars[0];
         } else {
-            this.setFreeMode();
+            console.warn('[HD1] 🎮 No avatars available for avatar-driven camera');
+            return;
         }
+        
+        // Determine avatar type and set appropriate vision system
+        if (!this.configureAvatarVision(this.boundAvatar)) {
+            console.error('[HD1] 🎮 Failed to configure camera for avatar, unbinding');
+            this.boundAvatar = null;
+            return;
+        }
+        
+        console.log('[HD1] 🎮 Avatar-driven camera activated:', this.boundAvatar.name);
+        // NOTE: No updateAvatarPosition() - camera moves independently, avatar follows via API sync
     }
     
-    // Calculate center point of all visible avatars
-    calculateAvatarCenter() {
-        const avatars = this.app.root.children.filter(entity => 
+    // Configure camera based on avatar type - use simple defaults for now
+    configureAvatarVision(avatar) {
+        if (!avatar) {
+            console.error('[HD1] 🎮 Avatar configuration failed: No avatar provided');
+            return false;
+        }
+        
+        // Use default camera configuration for all avatars
+        // TODO: Load from YAML when avatar loading system supports it
+        this.avatarCameraOffset.set(0, 1.7, 0); // Head level for most avatars
+        
+        if (this.camera.camera) {
+            this.camera.camera.fov = 75; // Standard FOV
+        }
+        
+        console.log(`[HD1] 🎮 Camera configured for avatar:`, {
+            avatar: avatar.name,
+            offset: this.avatarCameraOffset,
+            fov: 75
+        });
+        
+        return true;
+    }
+    
+    
+    
+    
+    // Update available avatars list
+    updateAvailableAvatars() {
+        this.availableAvatars = this.app.root.children.filter(entity => 
             entity.hd1Tags && entity.hd1Tags.includes('session-avatar')
         );
-        
-        if (avatars.length === 0) {
-            return new pc.Vec3(0, 0, 0);
-        }
-        
-        const center = new pc.Vec3(0, 0, 0);
-        avatars.forEach(avatar => {
-            center.add(avatar.getPosition());
-        });
-        center.scale(1 / avatars.length);
-        
-        console.log(`[HD1] 🎮 Calculated avatar center for ${avatars.length} avatars:`, center);
-        return center;
     }
     
-    // Update orbital camera position
-    updateOrbitPosition() {
-        if (this.mode !== 'orbit') return;
+    // Update avatar-driven camera position based on avatar type
+    updateAvatarPosition() {
+        if (!this.boundAvatar || this.mode !== 'avatar-driven') return;
         
-        const x = this.orbitTarget.x + Math.cos(this.orbitAngle) * this.orbitDistance;
-        const z = this.orbitTarget.z + Math.sin(this.orbitAngle) * this.orbitDistance;
-        const y = this.orbitTarget.y + this.orbitHeight;
+        const avatarPos = this.boundAvatar.getPosition();
+        const avatarRot = this.boundAvatar.getRotation();
         
-        this.targetPosition.set(x, y, z);
+        // Calculate camera position based on avatar vision type
+        const offset = this.avatarCameraOffset.clone();
+        const rotatedOffset = new pc.Vec3();
+        avatarRot.transformVector(offset, rotatedOffset);
         
-        // Calculate look-at rotation
+        this.targetPosition.copy(avatarPos).add(rotatedOffset);
+        
+        // Configure look target based on perspective type
+        let lookTarget;
+        
+        switch(this.avatarPerspective) {
+            case 'first-person':
+                // First-person: look in the direction the avatar is facing
+                lookTarget = avatarPos.clone();
+                const forwardDir = new pc.Vec3();
+                avatarRot.transformVector(pc.Vec3.FORWARD, forwardDir);
+                lookTarget.add(forwardDir.scale(10)); // Look ahead
+                break;
+                
+            case 'third-person-elevated':
+                // Elevated third-person: look down at avatar from above
+                lookTarget = avatarPos.clone();
+                lookTarget.y += 0.5; // Look at avatar center
+                break;
+                
+            default: // third-person
+                // Standard third-person: look at avatar
+                lookTarget = avatarPos.clone();
+                lookTarget.y += 1; // Look at avatar's upper body
+                break;
+        }
+        
         const lookDirection = new pc.Vec3();
-        lookDirection.sub2(this.orbitTarget, this.targetPosition).normalize();
+        lookDirection.sub2(lookTarget, this.targetPosition).normalize();
         const lookAtMatrix = new pc.Mat4();
-        lookAtMatrix.setLookAt(this.targetPosition, this.orbitTarget, pc.Vec3.UP);
+        lookAtMatrix.setLookAt(this.targetPosition, lookTarget, pc.Vec3.UP);
         this.targetRotation.setFromMat4(lookAtMatrix);
     }
     
+    
     // Update camera (called every frame)
     update(dt) {
-        if (this.mode === 'orbit') {
-            // Auto-rotate if enabled
-            if (this.orbitAutoRotate) {
-                this.orbitAngle += this.orbitSpeed * dt;
-            }
+        // Update avatar position to match camera (camera-first movement)
+        if (this.boundAvatar) {
+            const cameraPos = this.camera.getPosition();
+            const cameraRot = this.camera.getRotation();
             
-            this.updateOrbitPosition();
+            // Calculate avatar position from camera position (subtract offset)
+            const avatarPos = new pc.Vec3();
+            avatarPos.copy(cameraPos).sub(this.avatarCameraOffset);
             
-            // Smooth interpolation to target position/rotation
-            const currentPos = this.camera.getPosition();
-            const currentRot = this.camera.getRotation();
-            
-            const newPos = new pc.Vec3();
-            const newRot = new pc.Quat();
-            
-            newPos.lerp(currentPos, this.targetPosition, this.smoothFactor);
-            newRot.slerp(currentRot, this.targetRotation, this.smoothFactor);
-            
-            this.camera.setPosition(newPos);
-            this.camera.setRotation(newRot);
+            // Update avatar to match camera
+            this.boundAvatar.setPosition(avatarPos);
+            this.boundAvatar.setRotation(cameraRot);
         }
     }
     
-    // Handle mouse input for orbital camera
-    handleOrbitInput(deltaX, deltaY) {
-        if (this.mode === 'orbit') {
-            this.orbitAngle -= deltaX * 0.01;
-            this.orbitHeight = pc.math.clamp(this.orbitHeight + deltaY * 0.1, 2, 50);
-            this.updateOrbitPosition();
-        }
-    }
-    
-    // Handle scroll wheel for zoom
-    handleZoom(delta) {
-        if (this.mode === 'orbit') {
-            this.orbitDistance = pc.math.clamp(this.orbitDistance + delta * 2, 5, 100);
-            this.updateOrbitPosition();
-        }
-    }
 }
 
 /**
@@ -374,8 +394,8 @@ function setupCameraControls(app, camera) {
     const momentumDecay = 0.85; // How quickly momentum fades
     const accelerationRate = 0.2; // How quickly we reach target speed
     
-    // 🎮 ORBITAL CAMERA: Initialize camera controller
-    const cameraController = new HD1CameraController(app, camera);
+    // 🎮 ORBITAL CAMERA: Use existing camera controller
+    const cameraController = app.cameraController;
     window.hd1CameraController = cameraController; // Make it globally accessible
     
     // Mouse look controls
@@ -407,26 +427,15 @@ function setupCameraControls(app, camera) {
     
     app.mouse.on(pc.EVENT_MOUSEMOVE, function(event) {
         if (isMouseDown && document.pointerLockElement) {
-            // 🎮 ORBITAL CAMERA: Handle different camera modes
-            if (cameraController.mode === 'orbit') {
-                cameraController.handleOrbitInput(event.dx, event.dy);
-            } else {
-                // Free camera mode
-                yaw -= event.dx * lookSpeed;
-                pitch -= event.dy * lookSpeed;
-                pitch = pc.math.clamp(pitch, -90, 90);
-                
-                camera.setEulerAngles(pitch, yaw, 0);
-            }
+            // Avatar-driven camera mode
+            yaw -= event.dx * lookSpeed;
+            pitch -= event.dy * lookSpeed;
+            pitch = pc.math.clamp(pitch, -90, 90);
+            
+            camera.setEulerAngles(pitch, yaw, 0);
         }
     });
     
-    // 🎮 ORBITAL CAMERA: Add mouse wheel zoom support
-    app.mouse.on(pc.EVENT_MOUSEWHEEL, function(event) {
-        if (cameraController.mode === 'orbit') {
-            cameraController.handleZoom(event.wheel);
-        }
-    });
     
     // WASD movement controls with HD1 API synchronization
     let lastCameraUpdate = 0;
@@ -441,32 +450,15 @@ function setupCameraControls(app, camera) {
         if (now - lastKeyTime < 200) return;
         lastKeyTime = now;
         
-        switch(event.key) {
-            case pc.KEY_TAB: // Toggle camera mode
-                event.event.preventDefault();
-                cameraController.toggleMode();
-                break;
-            case pc.KEY_R: // Auto-rotate in orbit mode
-                if (cameraController.mode === 'orbit') {
-                    cameraController.orbitAutoRotate = !cameraController.orbitAutoRotate;
-                    console.log('[HD1] 🎮 Auto-rotate:', cameraController.orbitAutoRotate ? 'ON' : 'OFF');
-                }
-                break;
-            case pc.KEY_C: // Center on avatars
-                if (cameraController.mode === 'orbit') {
-                    const center = cameraController.calculateAvatarCenter();
-                    cameraController.setOrbitMode(center, cameraController.orbitDistance, cameraController.orbitHeight);
-                }
-                break;
-        }
+        // No special key handling needed for avatar-driven mode
     });
     
     app.on('update', function(dt) {
-        // 🎮 ORBITAL CAMERA: Update camera controller first
+        // Update camera controller
         cameraController.update(dt);
         
-        // Only process WASD movement in free camera mode
-        if (cameraController.mode === 'free') {
+        // Process WASD movement in avatar-driven mode
+        if (cameraController.mode === 'avatar-driven') {
             const forward = camera.forward;
             const right = camera.right;
             const up = pc.Vec3.UP;
@@ -509,22 +501,23 @@ function setupCameraControls(app, camera) {
                 currentVelocity.scale(momentumDecay);
             }
             
-            // 🎮 SMOOTH MOVEMENT: Calculate target position
+            // 🎮 CAMERA MOVEMENT: Move camera directly, avatar will follow
             if (currentVelocity.length() > 0.01) { // Only move if velocity is significant
+                // Move the camera directly
                 targetPosition.add(currentVelocity.clone().scale(dt));
                 
-                // Smoothly interpolate to target position
                 const currentPos = camera.getPosition();
                 const newPos = new pc.Vec3();
                 newPos.lerp(currentPos, targetPosition, smoothingFactor);
                 
                 camera.setPosition(newPos);
                 
-                // Throttled camera position sync to HD1 API for avatar updates
+                // Sync avatar position to API for multiplayer (avatar position calculated in update())
                 const now = Date.now();
-                if (now - lastCameraUpdate > cameraUpdateThrottle) {
+                if (now - lastCameraUpdate > cameraUpdateThrottle && cameraController.boundAvatar) {
                     lastCameraUpdate = now;
-                    syncCameraPositionToAPI(newPos);
+                    const avatarPos = cameraController.boundAvatar.getPosition();
+                    syncCameraPositionToAPI(avatarPos);
                 }
             }
             
@@ -567,6 +560,84 @@ function setupCameraControls(app, camera) {
     });
     
     console.log('[HD1] Camera controls enabled: Mouse to look, WASD to move, QE for up/down, Right-click to select objects');
+}
+
+/**
+ * Setup camera control buttons and keyboard shortcuts
+ */
+function setupAvatarDrivenCamera(cameraController) {
+    // Update vision indicator
+    function updateVisionIndicator() {
+        const indicator = document.getElementById('vision-type');
+        if (!indicator) return;
+        
+        let displayText = '👁️ Avatar';
+        
+        if (cameraController.boundAvatar) {
+            displayText = '👁️ Avatar';
+        } else {
+            displayText = '👁️ No Avatar';
+        }
+        
+        indicator.textContent = displayText;
+    }
+    
+    // Automatically detect and switch to avatar-driven camera when avatars are available
+    function checkForAvatars() {
+        cameraController.updateAvailableAvatars();
+        
+        if (cameraController.availableAvatars.length > 0 && !cameraController.boundAvatar) {
+            // Automatically bind to avatar when avatars become available
+            cameraController.setAvatarDrivenMode();
+            updateVisionIndicator();
+            console.log('[HD1] 🎮 Auto-bound to avatar - avatars detected');
+        } else if (cameraController.availableAvatars.length === 0 && cameraController.boundAvatar) {
+            // Unbind if no avatars available
+            cameraController.boundAvatar = null;
+            updateVisionIndicator();
+            console.log('[HD1] 🎮 Unbound from avatar - no avatars detected');
+        }
+    }
+    
+    // Check for avatars periodically
+    setInterval(checkForAvatars, 2000); // Check every 2 seconds
+    
+    // Manual override keys (for debugging/admin purposes)
+    document.addEventListener('keydown', (e) => {
+        // Only handle if not typing in input fields
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        
+        // Hold Shift for manual camera overrides
+        if (e.shiftKey) {
+            switch(e.key.toLowerCase()) {
+                case 'f':
+                    e.preventDefault();
+                    cameraController.setFreeMode();
+                    updateVisionIndicator();
+                    console.log('[HD1] 🎮 Manual override: Free camera mode');
+                    break;
+                case 'o':
+                    e.preventDefault();
+                    const avatarCenter = cameraController.calculateAvatarCenter();
+                    cameraController.setOrbitMode(avatarCenter, 20, 8);
+                    updateVisionIndicator();
+                    console.log('[HD1] 🎮 Manual override: Orbit camera mode');
+                    break;
+                case 'a':
+                    e.preventDefault();
+                    cameraController.setAvatarDrivenMode();
+                    updateVisionIndicator();
+                    console.log('[HD1] 🎮 Manual override: Avatar-driven camera mode');
+                    break;
+            }
+        }
+    });
+    
+    // Initial check and indicator update
+    updateVisionIndicator();
+    setTimeout(checkForAvatars, 1000); // Initial check after 1 second
+    
+    console.log('[HD1] 🎮 Avatar-driven camera system enabled - automatic avatar detection active');
 }
 
 /**

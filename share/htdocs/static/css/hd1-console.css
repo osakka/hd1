@@ -1,4 +1,28 @@
 body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: monospace; }
+
+/* Camera Control Buttons */
+.camera-control-btn {
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.camera-control-btn:hover {
+    background: rgba(0, 255, 255, 0.3) !important;
+    border-color: rgba(0, 255, 255, 0.5) !important;
+    color: rgba(0, 255, 255, 1) !important;
+    transform: scale(1.05);
+}
+
+.camera-control-btn:active {
+    transform: scale(0.95);
+}
+
+.camera-control-btn.active {
+    background: rgba(0, 255, 255, 0.4) !important;
+    border-color: rgba(0, 255, 255, 0.6) !important;
+    color: rgba(0, 255, 255, 1) !important;
+    box-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
+}
 a-scene { display: block; }
 
 

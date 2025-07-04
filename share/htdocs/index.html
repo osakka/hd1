@@ -33,10 +33,15 @@
         <!-- Always visible channel and stats -->
         <div id="debug-persistent-content">
             <div id="debug-channel-bar" style="background: rgba(0, 255, 255, 0.12); padding: 6px 8px; border-bottom: 1px solid rgba(0, 255, 255, 0.15); margin-bottom: 4px;">
-                <div style="width: 100%; display: flex; gap: 4px;">
+                <div style="width: 100%; display: flex; gap: 4px; align-items: center;">
                     <select id="channel-selector" style="flex: 1;" title="Switch collaboration channels">
                         <option value="">Loading channels...</option>
                     </select>
+                    
+                    <!-- Avatar Vision Indicator -->
+                    <div id="avatar-vision-indicator" style="display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.2); border-radius: 4px; font-size: 10px; color: rgba(0, 255, 255, 0.8);">
+                        <span id="vision-type">👁️ Free</span>
+                    </div>
                 </div>
             </div>
             <!-- Graph panels (hidden when collapsed) -->
