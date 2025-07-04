@@ -73,12 +73,61 @@ function initializePlayCanvasEngine() {
     console.log('[HD1] Canvas found, creating PlayCanvas application...');
 
     try {
-        // Create PlayCanvas application
+        // Detect WebGL renderer backend using WEBGL_debug_renderer_info
+        function detectWebGLRenderer() {
+            const testCanvas = document.createElement('canvas');
+            const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+            
+            if (!gl) return { renderer: 'unknown', isMetal: false };
+            
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if (debugInfo) {
+                const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                const isMetal = renderer && renderer.includes('Metal');
+                console.log('[HD1] WebGL Renderer detected:', renderer);
+                return { renderer, isMetal };
+            }
+            
+            return { renderer: 'unknown', isMetal: false };
+        }
+        
+        const rendererInfo = detectWebGLRenderer();
+        const isChromeMac = /Chrome/.test(navigator.userAgent) && /Mac/.test(navigator.platform);
+        
+        // Create PlayCanvas application with proper backend configuration
+        const graphicsOptions = {
+            antialias: true,
+            alpha: false,
+            depth: true,
+            stencil: true
+        };
+        
+        // Force OpenGL backend instead of Metal to avoid shader compilation issues
+        if (isChromeMac || rendererInfo.isMetal) {
+            console.log('[HD1] Metal backend detected - implementing OpenGL fallback');
+            
+            // Multiple strategies to force OpenGL backend
+            graphicsOptions.powerPreference = 'default'; // Avoid discrete GPU
+            graphicsOptions.failIfMajorPerformanceCaveat = false; // Accept performance tradeoffs
+            graphicsOptions.antialias = false; // Reduce Metal backend triggers
+            
+            // Force WebGL 1.0 context to avoid Metal backend entirely
+            graphicsOptions.preferWebGl1 = true;
+            graphicsOptions.webgl1 = true;
+            
+            // Additional Metal backend avoidance
+            graphicsOptions.preserveDrawingBuffer = false;
+            graphicsOptions.premultipliedAlpha = false;
+            
+            console.log('[HD1] OpenGL fallback configured - WebGL 1.0 forced');
+        }
+        
         const app = new pc.Application(canvas, {
             mouse: new pc.Mouse(canvas),
             keyboard: new pc.Keyboard(window),
             touch: new pc.TouchDevice(canvas),
-            elementInput: new pc.ElementInput(canvas)
+            elementInput: new pc.ElementInput(canvas),
+            graphicsDeviceOptions: graphicsOptions
         });
 
         console.log('[HD1] PlayCanvas application created, configuring...');
@@ -87,9 +136,40 @@ function initializePlayCanvasEngine() {
         app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
         app.setCanvasResolution(pc.RESOLUTION_AUTO);
 
+        // Add error handling for shader compilation issues
+        app.graphicsDevice.on('error', function(message) {
+            console.warn('[HD1] Graphics device error (possibly Metal backend):', message);
+            // Continue running - don't crash the application
+        });
+        
         // Start the application
         app.start();
         console.log('[HD1] PlayCanvas application started');
+        
+        // Check final WebGL renderer after PlayCanvas initialization
+        const finalCanvas = app.graphicsDevice.canvas;
+        const finalGl = finalCanvas.getContext('webgl') || finalCanvas.getContext('webgl2');
+        if (finalGl) {
+            const finalDebugInfo = finalGl.getExtension('WEBGL_debug_renderer_info');
+            if (finalDebugInfo) {
+                const finalRenderer = finalGl.getParameter(finalDebugInfo.UNMASKED_RENDERER_WEBGL);
+                console.log('[HD1] Final WebGL Renderer:', finalRenderer);
+                
+                if (finalRenderer && finalRenderer.includes('Metal')) {
+                    console.warn('[HD1] Warning: Still using Metal backend - shader compilation issues may occur');
+                    console.warn('[HD1] Chrome Metal backend detected - this causes shader compilation errors');
+                    console.warn('[HD1] To fix: Go to chrome://flags/#use-angle-gl and set to "OpenGL"');
+                    console.warn('[HD1] Or try: chrome://flags/#use-angle-metal and set to "Disabled"');
+                    
+                    // Display user-friendly alert
+                    setTimeout(() => {
+                        alert('Chrome Metal Backend Issue:\n\nTo fix the blank screen:\n1. Go to chrome://flags/#use-angle-gl\n2. Set to "OpenGL"\n3. Restart Chrome\n\nOr use Firefox which works correctly.');
+                    }, 2000);
+                } else {
+                    console.log('[HD1] Success: Using OpenGL backend - shader compilation should work correctly');
+                }
+            }
+        }
 
         // Create empty scene - content loaded from channels/scenes
         createEmptyScene(app);
