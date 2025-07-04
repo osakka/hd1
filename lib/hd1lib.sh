@@ -40,32 +40,14 @@ hd1::api_call() {
 }
 
 
-# Auto-generated from POST /browser/canvas
-hd1::canvas_control() {
-    local command="$1"
-    shift
-    local objects="$@"
-    
-    if [[ -z "$command" ]]; then
-        echo "Usage: hd1::canvas_control <command> [objects...]"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "command": "$command",
-    "objects": [$objects]
-}
-EOF
-)
-    
-    hd1::api_call "POST" "/browser/canvas" "$payload"
+# Auto-generated from GET /sessions
+hd1::list_sessions() {
+    hd1::api_call "GET" "/sessions"
 }
 
-# Clear holodeck (uses canvas control)
-hd1::clear() {
-    echo "CLEAR: Clearing holodeck..."
-    hd1::canvas_control "clear"
+# Auto-generated from POST /sessions
+hd1::create_session() {
+    hd1::api_call "POST" "/sessions"
 }
 
 # Auto-generated from GET /sessions/{sessionId}
@@ -96,14 +78,32 @@ EOF
     echo "CAMERA: Positioned at ($x,$y,$z)"
 }
 
-# Auto-generated from GET /sessions
-hd1::list_sessions() {
-    hd1::api_call "GET" "/sessions"
+# Auto-generated from POST /browser/canvas
+hd1::canvas_control() {
+    local command="$1"
+    shift
+    local objects="$@"
+    
+    if [[ -z "$command" ]]; then
+        echo "Usage: hd1::canvas_control <command> [objects...]"
+        return 1
+    fi
+    
+    local payload=$(cat <<EOF
+{
+    "command": "$command",
+    "objects": [$objects]
+}
+EOF
+)
+    
+    hd1::api_call "POST" "/browser/canvas" "$payload"
 }
 
-# Auto-generated from POST /sessions
-hd1::create_session() {
-    hd1::api_call "POST" "/sessions"
+# Clear holodeck (uses canvas control)
+hd1::clear() {
+    echo "CLEAR: Clearing holodeck..."
+    hd1::canvas_control "clear"
 }
 
 
