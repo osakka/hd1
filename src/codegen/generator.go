@@ -112,18 +112,16 @@ func loadTemplate(templatePath string) (*template.Template, error) {
 
 // Handler validation and generation
 func main() {
-	fmt.Println("HD1 Code Generator - Upstream/Downstream Integration")
-	fmt.Println("======================================================")
-
 	// Initialize configuration system for code generation
 	if err := config.Initialize(); err != nil {
+		// Cannot use structured logging before logging is initialized
 		fmt.Fprintf(os.Stderr, "FATAL: Configuration initialization failed: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Initialize logging for code generation
 	logging.InitLogger(config.GetLogDir(), logging.INFO, []string{})
-	logging.Info("advanced code generator starting", map[string]interface{}{
+	logging.Info("code generator starting", map[string]interface{}{
 		"task": "upstream-downstream-integration",
 		"single_source_of_truth": true,
 	})
@@ -149,8 +147,12 @@ func main() {
 		"version": spec.Info.Version,
 		"total_paths": len(spec.Paths),
 	})
-	fmt.Printf("Loaded API Spec: %s v%s\n", spec.Info.Title, spec.Info.Version)
-	fmt.Printf("Found %d paths to process\n", len(spec.Paths))
+	// DEBUG: Developer-focused code generation details
+	logging.Debug("API spec analysis", map[string]interface{}{
+		"title": spec.Info.Title,
+		"version": spec.Info.Version,
+		"paths_to_process": len(spec.Paths),
+	})
 
 	// Analyze and validate all endpoints
 	var routes []RouteInfo
@@ -171,7 +173,12 @@ func main() {
 				continue
 			}
 
-			fmt.Printf("Processing: %s %s -> %s\n", method, path, op.OperationID)
+			// TRACE: Detailed processing information for code generation
+			logging.Trace("codegen", "processing endpoint", map[string]interface{}{
+				"method": method,
+				"path": path,
+				"operation_id": op.OperationID,
+			})
 
 			// Validate handler file exists
 			if op.XHandler != "" {
@@ -210,12 +217,10 @@ func main() {
 
 	// FAIL BUILD if handlers missing and strict mode enabled
 	if spec.XCodeGeneration.FailOnMissingHandlers && len(missingHandlers) > 0 {
-		fmt.Println("\nBuild Failure - Missing Required Handlers:")
-		for _, missing := range missingHandlers {
-			fmt.Printf("   Missing: %s\n", missing)
-		}
-		fmt.Println("\nCreate the missing handler files or disable strict validation")
-		os.Exit(1)
+		logging.Fatal("build failed - missing required handlers", map[string]interface{}{
+			"missing_handlers": missingHandlers,
+			"message": "Create the missing handler files or disable strict validation",
+		})
 	}
 
 	// Add server import
@@ -224,7 +229,9 @@ func main() {
 	}
 
 	// Generate router code
-	fmt.Printf("\nGenerating auto-router with %d routes...\n", len(routes))
+	logging.Info("generating auto-router", map[string]interface{}{
+		"routes_count": len(routes),
+	})
 
 	tmpl, err := loadTemplate("templates/go/router.tmpl")
 	if err != nil {
@@ -257,56 +264,75 @@ func main() {
 		})
 	}
 
-	fmt.Println("auto_router.go generated successfully")
-	fmt.Printf("Generated %d routes\n", len(routes))
-	fmt.Printf("Generated %d handler stubs\n", len(handlerStubs))
+	logging.Info("auto-router generated", map[string]interface{}{
+		"routes_generated": len(routes),
+		"handler_stubs_generated": len(handlerStubs),
+		"missing_handlers": len(missingHandlers),
+	})
 	
 	if len(missingHandlers) > 0 {
-		fmt.Printf("Warning: %d handlers missing (build will continue)\n", len(missingHandlers))
+		logging.Warn("handlers missing but build continuing", map[string]interface{}{
+			"missing_count": len(missingHandlers),
+			"missing_handlers": missingHandlers,
+		})
 	}
 
 	// Generate HD1 Client from same spec
-	fmt.Println("\nGenerating HD1 client...")
+	logging.Info("generating HD1 client", map[string]interface{}{
+		"source": "api.yaml",
+	})
 	generateHD1Client(spec, routes)
 
 	// Generate Web UI Client
-	fmt.Println("\nGenerating Web UI client...")
+	logging.Info("generating Web UI client")
 	generateWebUIClient(spec, routes)
 
 	// Generate core shell functions from API specification
-	fmt.Println("\nGenerating core shell functions from API spec...")
+	logging.Info("generating core shell functions from API spec")
 	if err := generateCoreShellFunctions(&spec, routes); err != nil {
 		logging.Error("core shell function generation failed", map[string]interface{}{
 			"error": err.Error(),
 		})
-		fmt.Printf("Warning: Core shell function generation failed: %v\n", err)
+		logging.Warn("core shell function generation failed", map[string]interface{}{
+			"error": err.Error(),
+		})
 	} else {
-		fmt.Printf("Core shell functions generated from API specification\n")
-		fmt.Printf("Generated: /opt/hd1/lib/hd1lib.sh (upstream core library)\n")
+		logging.Info("core shell functions generated", map[string]interface{}{
+			"output_path": "/opt/hd1/lib/hd1lib.sh",
+			"single_source_of_truth": true,
+			"source": "api.yaml",
+		})
 	}
 
 	// Advanced enhanced generation with A-Frame integration
-	fmt.Println("\nGenerating A-Frame integration...")
+	logging.Info("generating A-Frame integration")
 	if err := generateEnhancedIntegration(spec, routes); err != nil {
 		logging.Error("enhanced integration generation failed", map[string]interface{}{
 			"error": err.Error(),
 		})
-		fmt.Printf("Warning: Enhanced generation failed: %v\n", err)
+		logging.Warn("enhanced generation failed", map[string]interface{}{
+			"error": err.Error(),
+		})
 	} else {
-		fmt.Printf("A-Frame integration generated successfully\n")
-		fmt.Printf("Shell: PlayCanvas shell integration: /opt/hd1/lib/downstream/playcanvaslib.sh\n")
-		fmt.Printf("JavaScript: PlayCanvas JavaScript bridge: /opt/hd1/lib/downstream/playcanvaslib.js\n")
+		logging.Info("A-Frame integration generated", map[string]interface{}{
+			"shell_output": "/opt/hd1/lib/downstream/playcanvaslib.sh",
+			"javascript_output": "/opt/hd1/lib/downstream/playcanvaslib.js",
+		})
 	}
 
-	fmt.Println("\nCode generation complete")
-	fmt.Println("   • Standard generation: API specification drives all routing")
-	fmt.Println("   • Core shell functions: Auto-generated from API spec (SINGLE SOURCE)")
-	fmt.Println("   • Enhanced generation: PlayCanvas schemas drive function bridge")
-	fmt.Println("   • Upstream APIs: Shell + JavaScript + CLI identical signatures")
-	fmt.Println("   • Downstream APIs: PlayCanvas + WebGL seamless integration")
-	fmt.Println("   • Zero manual route configuration needed")
-	fmt.Println("   • Web UI client auto-generated from spec")
-	fmt.Println("   • Change spec = change API + UI + shell functions automatically")
+	logging.Info("code generation complete", map[string]interface{}{
+		"features": []string{
+			"API specification drives all routing",
+			"Auto-generated from API spec (SINGLE SOURCE)",
+			"PlayCanvas schemas drive function bridge",
+			"Shell + JavaScript + CLI identical signatures",
+			"PlayCanvas + WebGL seamless integration",
+			"Zero manual route configuration needed",
+			"Web UI client auto-generated from spec",
+			"Change spec = change API + UI + shell functions automatically",
+		},
+		"single_source_of_truth": true,
+	})
 }
 
 type RouteInfo struct {
@@ -372,7 +398,9 @@ func generateHD1Client(spec OpenAPISpec, routes []RouteInfo) {
 		return
 	}
 	
-	fmt.Printf("hd1-client Go binary generated with %d commands\n", len(routes))
+	logging.Info("hd1-client generated", map[string]interface{}{
+		"commands_count": len(routes),
+	})
 }
 
 // generateGoClient creates the Go source code for HD1 client
@@ -552,7 +580,7 @@ func buildPathTemplate(path string, params []string) string {
 
 // generateWebUIClient creates the advanced auto-generated web UI client
 func generateWebUIClient(spec OpenAPISpec, routes []RouteInfo) {
-	fmt.Println("🏗️  Creating Web UI Generator Infrastructure...")
+	logging.Debug("creating Web UI generator infrastructure")
 	
 	// Create web UI client directory structure
 	uiClientDir := "../share/htdocs/static/js"
@@ -587,12 +615,16 @@ func generateWebUIClient(spec OpenAPISpec, routes []RouteInfo) {
 		return
 	}
 	
-	fmt.Printf("Web UI Client generated with %d API endpoints\n", len(routes))
-	fmt.Println("Single source of truth achieved")
-	fmt.Println("   • JavaScript API client auto-generated")
-	fmt.Println("   • UI components auto-generated")
-	fmt.Println("   • Dynamic forms auto-generated")
-	fmt.Println("   • Zero manual UI synchronization needed")
+	logging.Info("Web UI client generated", map[string]interface{}{
+		"endpoints_count": len(routes),
+		"features": []string{
+			"JavaScript API client auto-generated",
+			"UI components auto-generated",
+			"Dynamic forms auto-generated",
+			"Zero manual UI synchronization needed",
+		},
+		"single_source_of_truth": true,
+	})
 }
 
 // generateJavaScriptAPIClient creates the complete JavaScript API wrapper

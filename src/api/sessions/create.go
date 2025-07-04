@@ -29,6 +29,9 @@ import (
 // Method: POST
 // Content-Type: application/json (no body required)
 func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
+	// TRACE: Module-specific debugging for session operations
+	logging.Trace("sessions", "session creation request initiated")
+	
 	// Hub interface validation: Ensure we have a valid server hub
 	// This cast should never fail in normal operation
 	h, ok := hub.(*server.Hub)
@@ -43,7 +46,8 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 	// Session creation: Use thread-safe session store to create new session
 	// Generates unique ID and initializes default state
 	session := h.GetStore().CreateSession()
-	logging.Info("session created successfully", map[string]interface{}{
+	// INFO: Production-appropriate completion logging
+	logging.Info("session created", map[string]interface{}{
 		"session_id": session.ID,
 		"created_at": session.CreatedAt,
 	})

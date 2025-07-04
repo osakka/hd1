@@ -36,15 +36,15 @@ type AvatarConfig struct {
 
 // ListAvatarsHandler handles GET /avatars
 func ListAvatarsHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
-	logger := logging.GetLogger()
-	logger.Info("Listing available avatar types")
+	// TRACE: Module-specific debugging for avatar operations
+	logging.Trace("avatars", "avatar list request initiated")
 
 	// Read avatar config from configured path
 	configPath := config.GetAvatarsConfigFile()
 	configData, err := os.ReadFile(configPath)
 	if err != nil {
-		logger.Error("Failed to read avatar config", map[string]interface{}{
-			"error": err,
+		logging.Error("avatar config read failed", map[string]interface{}{
+			"error": err.Error(),
 			"path":  configPath,
 		})
 		http.Error(w, "Failed to read avatar configuration", http.StatusInternalServerError)
@@ -53,8 +53,8 @@ func ListAvatarsHandler(w http.ResponseWriter, r *http.Request, hub interface{})
 
 	var avatarConfig AvatarConfig
 	if err := yaml.Unmarshal(configData, &avatarConfig); err != nil {
-		logger.Error("Failed to parse avatar config", map[string]interface{}{
-			"error": err,
+		logging.Error("avatar config parse failed", map[string]interface{}{
+			"error": err.Error(),
 		})
 		http.Error(w, "Failed to parse avatar configuration", http.StatusInternalServerError)
 		return
@@ -67,10 +67,10 @@ func ListAvatarsHandler(w http.ResponseWriter, r *http.Request, hub interface{})
 		avatarSpecPath := filepath.Join(config.GetAvatarsDir(), avatarInfo.Path)
 		specData, err := os.ReadFile(avatarSpecPath)
 		if err != nil {
-			logger.Warn("Could not read avatar spec", map[string]interface{}{
+			logging.Warn("avatar spec read failed", map[string]interface{}{
 				"type":  avatarType,
 				"path":  avatarSpecPath,
-				"error": err,
+				"error": err.Error(),
 			})
 			continue
 		}
@@ -82,9 +82,9 @@ func ListAvatarsHandler(w http.ResponseWriter, r *http.Request, hub interface{})
 			} `yaml:"metadata"`
 		}
 		if err := yaml.Unmarshal(specData, &spec); err != nil {
-			logger.Warn("Could not parse avatar spec", map[string]interface{}{
+			logging.Warn("avatar spec parse failed", map[string]interface{}{
 				"type":  avatarType,
-				"error": err,
+				"error": err.Error(),
 			})
 			continue
 		}
@@ -107,14 +107,15 @@ func ListAvatarsHandler(w http.ResponseWriter, r *http.Request, hub interface{})
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		logger.Error("Failed to encode avatar list response", map[string]interface{}{
-			"error": err,
+		logging.Error("response encoding failed", map[string]interface{}{
+			"error": err.Error(),
 		})
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}
 
-	logger.Info("Avatar types listed successfully", map[string]interface{}{
+	// INFO: Production-appropriate completion logging
+	logging.Info("avatar types retrieved", map[string]interface{}{
 		"count": len(avatars),
 	})
 }

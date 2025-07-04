@@ -32,6 +32,7 @@ func main() {
 	// Configuration initialization: Load settings from all sources
 	// Priority: Flags > Environment Variables > .env File > Defaults
 	if err := config.Initialize(); err != nil {
+		// Cannot use structured logging before logging is initialized
 		fmt.Fprintf(os.Stderr, "FATAL: Configuration initialization failed: %v\n", err)
 		os.Exit(1)
 	}
@@ -60,6 +61,7 @@ func main() {
 		LogDir:       config.Config.Logging.LogDir,
 	}
 	if err := logging.ApplyConfig(logConfig); err != nil {
+		// Cannot use structured logging before logging is initialized
 		fmt.Fprintf(os.Stderr, "FATAL: Failed to initialize logging: %v\n", err)
 		os.Exit(1)
 	}

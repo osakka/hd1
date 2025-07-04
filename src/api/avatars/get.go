@@ -67,11 +67,10 @@ type AvatarSpecification struct {
 
 // GetAvatarSpecificationHandler handles GET /avatars/{avatarType}
 func GetAvatarSpecificationHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
-	logger := logging.GetLogger()
 	avatarType := extractAvatarType(r.URL.Path)
 
-	logger.Info("Getting avatar specification", map[string]interface{}{
-		"raw_path":    r.URL.Path,
+	// TRACE: Module-specific debugging for avatar operations
+	logging.Trace("avatars", "avatar specification request", map[string]interface{}{
 		"avatar_type": avatarType,
 	})
 
@@ -83,8 +82,9 @@ func GetAvatarSpecificationHandler(w http.ResponseWriter, r *http.Request, hub i
 	}
 
 	if !validTypes[avatarType] {
-		logger.Warn("Invalid avatar type requested", map[string]interface{}{
+		logging.Warn("invalid avatar type", map[string]interface{}{
 			"avatar_type": avatarType,
+			"valid_types": []string{"default", "business", "casual"},
 		})
 		http.Error(w, "Invalid avatar type", http.StatusBadRequest)
 		return
@@ -94,10 +94,10 @@ func GetAvatarSpecificationHandler(w http.ResponseWriter, r *http.Request, hub i
 	specPath := filepath.Join(config.GetAvatarsDir(), avatarType, "avatar.yaml")
 	specData, err := os.ReadFile(specPath)
 	if err != nil {
-		logger.Error("Failed to read avatar specification", map[string]interface{}{
+		logging.Error("avatar specification read failed", map[string]interface{}{
 			"avatar_type": avatarType,
 			"path":        specPath,
-			"error":       err,
+			"error":       err.Error(),
 		})
 		http.Error(w, "Avatar specification not found", http.StatusNotFound)
 		return
@@ -106,9 +106,9 @@ func GetAvatarSpecificationHandler(w http.ResponseWriter, r *http.Request, hub i
 	// Parse YAML specification
 	var spec AvatarSpecification
 	if err := yaml.Unmarshal(specData, &spec); err != nil {
-		logger.Error("Failed to parse avatar specification", map[string]interface{}{
+		logging.Error("avatar specification parse failed", map[string]interface{}{
 			"avatar_type": avatarType,
-			"error":       err,
+			"error":       err.Error(),
 		})
 		http.Error(w, "Failed to parse avatar specification", http.StatusInternalServerError)
 		return
@@ -123,14 +123,15 @@ func GetAvatarSpecificationHandler(w http.ResponseWriter, r *http.Request, hub i
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		logger.Error("Failed to encode avatar specification response", map[string]interface{}{
-			"error": err,
+		logging.Error("response encoding failed", map[string]interface{}{
+			"error": err.Error(),
 		})
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}
 
-	logger.Info("Avatar specification retrieved successfully", map[string]interface{}{
+	// INFO: Production-appropriate completion logging
+	logging.Info("avatar specification retrieved", map[string]interface{}{
 		"avatar_type": avatarType,
 	})
 }

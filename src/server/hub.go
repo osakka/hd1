@@ -137,6 +137,13 @@ func NewHub() *Hub {
 //
 // Thread-safe with hub-level mutex protection.
 func (h *Hub) JoinSessionChannel(sessionID, clientID string, reconnect bool) (*SessionChannel, int, map[string]interface{}) {
+	// TRACE: Detailed WebSocket session management debugging
+	logging.Trace("websocket", "session channel join request", map[string]interface{}{
+		"session_id": sessionID,
+		"client_id": clientID,
+		"reconnect": reconnect,
+	})
+	
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 	
