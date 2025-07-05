@@ -84,14 +84,14 @@ curl -X PUT "http://localhost:8080/api/sessions/$SESSION_ID/camera/position" \
   }'
 ```
 
-## 🌍 Step 6: Join Channel and View Scene
+## 🌍 Step 6: Join World and View Scene
 
-### **Join a Channel**
+### **Join a World**
 ```bash
-# Join channel for real-time collaboration
-curl -X POST "http://localhost:8080/api/sessions/$SESSION_ID/channel/join" \
+# Join world for real-time collaboration
+curl -X POST "http://localhost:8080/api/sessions/$SESSION_ID/world/join" \
   -H "Content-Type: application/json" \
-  -d '{"channel_id": "channel_one"}'
+  -d '{"world_id": "world_one"}'
 ```
 
 ### **Access Web Interface**
@@ -129,7 +129,7 @@ You've successfully:
 - ✅ Created a 3D session
 - ✅ Added 3D objects with materials
 - ✅ Positioned the camera
-- ✅ Joined a collaborative channel
+- ✅ Joined a collaborative world
 - ✅ Viewed your scene in the browser
 
 ## 📚 What's Next?

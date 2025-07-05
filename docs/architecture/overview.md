@@ -29,15 +29,15 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 - **Components**: Transform, Model, Material, Physics, Audio, Animation
 - **Dynamic**: Runtime component attachment/detachment
 
-### **Channel Manager**
-- **Configuration**: YAML-based scene definitions
+### **World Manager**
+- **Configuration**: YAML-based world definitions
 - **Collaboration**: Multi-user environments with real-time sync
 
 ## 📊 **Performance Characteristics**
 - **API Response Time**: Optimized for entity operations
 - **WebSocket Latency**: Real-time state synchronization
 - **Memory Usage**: <100MB for typical sessions (10-50 entities)
-- **Concurrent Capacity**: 100+ clients per channel
+- **Concurrent Capacity**: 100+ clients per world
 
 ---
 

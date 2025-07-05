@@ -1,10 +1,10 @@
 # HD1 (Holodeck One) - System Architecture v2.0
 
-> **API-first 3D visualization platform with three-layer game engine architecture**
+> **API-first 3D visualization platform with world-based game engine architecture**
 
 ## 🏗️ **CURRENT SYSTEM OVERVIEW (2025-07-01)**
 
-HD1 implements a **specification-driven architecture** with **three-layer game engine design** where the OpenAPI 3.0.3 specification (`api.yaml`) serves as the single source of truth for all HTTP APIs, while WebSockets provide real-time broadcasting only.
+HD1 implements a **specification-driven architecture** with **world-based game engine design** where the OpenAPI 3.0.3 specification (`api.yaml`) serves as the single source of truth for all HTTP APIs, while WebSockets provide real-time broadcasting only.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -40,7 +40,7 @@ HD1 implements a **specification-driven architecture** with **three-layer game e
 
 ---
 
-## 🎮 **THREE-LAYER GAME ENGINE ARCHITECTURE**
+## 🎮 **WORLD-BASED GAME ENGINE ARCHITECTURE**
 
 ### **Current Implementation (Revolutionary Achievement)**
 
@@ -48,7 +48,7 @@ HD1 now implements a **complete game engine architecture** matching Unity/Unreal
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    THREE-LAYER SYSTEM                          │
+│                    WORLD-BASED SYSTEM                          │
 ├─────────────────────────────────────────────────────────────────┤
 │  ENVIRONMENT LAYER                                              │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐│
@@ -170,19 +170,17 @@ type World struct {
 | | `GET` | `/api/sessions` | List all sessions |
 | | `GET` | `/api/sessions/{id}` | Get session details |
 | | `DELETE` | `/api/sessions/{id}` | Delete session |
-| **Objects** | `POST` | `/api/sessions/{id}/objects` | Create object in session |
-| | `GET` | `/api/sessions/{id}/objects` | List session objects |
-| | `GET` | `/api/sessions/{id}/objects/{name}` | Get specific object |
-| | `PUT` | `/api/sessions/{id}/objects/{name}` | Update object |
-| | `DELETE` | `/api/sessions/{id}/objects/{name}` | Delete object |
-| **Environments** | `GET` | `/api/environments` | List available physics contexts |
-| | `POST` | `/api/environments/{id}` | Apply environment to session |
-| **Props** | `GET` | `/api/props` | List available prop categories |
-| | `POST` | `/api/sessions/{id}/props/{propId}` | Instantiate prop in session |
-| **Scenes** | `GET` | `/api/scenes` | List available scene compositions |
-| | `POST` | `/api/scenes/{id}` | Load scene into session |
-| | `POST` | `/api/scenes/{id}/fork` | Create scene variation |
-| | `POST` | `/api/sessions/{id}/scenes/save` | Save session as scene |
+| **Entities** | `POST` | `/api/sessions/{id}/entities` | Create entity in session |
+| | `GET` | `/api/sessions/{id}/entities` | List session entities |
+| | `GET` | `/api/sessions/{id}/entities/{name}` | Get specific entity |
+| | `PUT` | `/api/sessions/{id}/entities/{name}` | Update entity |
+| | `DELETE` | `/api/sessions/{id}/entities/{name}` | Delete entity |
+| **Worlds** | `GET` | `/api/worlds` | List available worlds |
+| | `POST` | `/api/worlds` | Create new world |
+| | `GET` | `/api/worlds/{id}` | Get world details |
+| | `PUT` | `/api/worlds/{id}` | Update world |
+| | `DELETE` | `/api/worlds/{id}` | Delete world |
+| | `POST` | `/api/sessions/{id}/world/join` | Join session to world |
 | **Camera** | `PUT` | `/api/sessions/{id}/camera/position` | Set camera position |
 | | `POST` | `/api/sessions/{id}/camera/orbit` | Start camera animation |
 | **Recording** | `POST` | `/api/sessions/{id}/recording/start` | Begin session recording |
@@ -344,11 +342,11 @@ type World struct {
 
 ### **Evolution from v1.0**
 
-- **From world-centric to session-centric architecture**
-- **From basic object management to three-layer game engine**  
-- **From incomplete lighting to full A-Frame light integration**
+- **From basic object management to world-based game engine**  
+- **From incomplete lighting to full PlayCanvas light integration**
 - **From manual routing to 100% auto-generated APIs**
 - **From global session locks to per-client restoration**
+- **From three-layer architecture to unified world-based system**
 
 ---
 
