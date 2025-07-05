@@ -22,6 +22,7 @@ type HD1Config struct {
 	Session   SessionConfig   `json:"session"`
 	Channels  ChannelsConfig  `json:"channels"`
 	Avatars   AvatarsConfig   `json:"avatars"`
+	Sync      SyncConfig      `json:"sync"`
 }
 
 type ServerConfig struct {
@@ -97,6 +98,21 @@ type AvatarsConfig struct {
 	ReconnectDelay          time.Duration `json:"reconnect_delay"`
 	MaxReconnectDelay       time.Duration `json:"max_reconnect_delay"`
 	HeartbeatFrequency      time.Duration `json:"heartbeat_frequency"`
+}
+
+// SyncConfig contains HD1-VSC synchronization protocol configuration
+type SyncConfig struct {
+	Protocol                string        `json:"protocol"`                 // HD1-VSC protocol version
+	SyncInterval            time.Duration `json:"sync_interval"`            // Sync broadcast interval
+	MaxDeltaLog            int           `json:"max_delta_log"`            // Maximum delta operations to keep
+	ChecksumAlgorithm      string        `json:"checksum_algorithm"`       // Checksum algorithm (sha256, md5)
+	CausalityTimeout       time.Duration `json:"causality_timeout"`        // Timeout for out-of-order operations
+	DeltaQueueSize         int           `json:"delta_queue_size"`         // Size of delta operation queue
+	AvatarRegistrySize     int           `json:"avatar_registry_size"`     // Initial avatar registry capacity
+	BroadcastChannelBuffer int           `json:"broadcast_channel_buffer"` // Broadcast channel buffer size
+	WorldStateCompressionEnabled bool    `json:"world_state_compression_enabled"` // Enable world state compression
+	PerformanceMetricsEnabled bool      `json:"performance_metrics_enabled"`     // Enable sync performance metrics
+	VectorClockPrecision   int           `json:"vector_clock_precision"`   // Vector clock precision bits
 }
 
 // Global configuration instance - Single Source of Truth
@@ -188,6 +204,19 @@ func (c *HD1Config) loadDefaults() {
 	c.Avatars.ReconnectDelay = 1 * time.Second
 	c.Avatars.MaxReconnectDelay = 30 * time.Second
 	c.Avatars.HeartbeatFrequency = 5 * time.Second
+	
+	// Sync protocol defaults (eliminating hardcoded values)
+	c.Sync.Protocol = "HD1-VSC-v1.0"
+	c.Sync.SyncInterval = 16 * time.Millisecond  // ~60fps sync rate
+	c.Sync.MaxDeltaLog = 10000                   // Store 10k delta operations
+	c.Sync.ChecksumAlgorithm = "sha256"          // Cryptographic integrity
+	c.Sync.CausalityTimeout = 5 * time.Second    // Timeout for out-of-order ops
+	c.Sync.DeltaQueueSize = 1000                 // Queue size for causality resolution
+	c.Sync.AvatarRegistrySize = 100              // Initial avatar registry capacity
+	c.Sync.BroadcastChannelBuffer = 1024         // Configurable broadcast buffer
+	c.Sync.WorldStateCompressionEnabled = true   // Enable compression for performance
+	c.Sync.PerformanceMetricsEnabled = false     // Disable metrics by default
+	c.Sync.VectorClockPrecision = 64             // 64-bit vector clock precision
 }
 
 // loadEnvFile reads configuration from .env file if it exists
@@ -407,6 +436,59 @@ func (c *HD1Config) loadEnvironmentVariables() {
 	if heartbeat := os.Getenv("HD1_AVATARS_HEARTBEAT_FREQUENCY"); heartbeat != "" {
 		if frequency, err := time.ParseDuration(heartbeat); err == nil {
 			c.Avatars.HeartbeatFrequency = frequency
+		}
+	}
+	
+	// Sync protocol configuration
+	if protocol := os.Getenv("HD1_SYNC_PROTOCOL"); protocol != "" {
+		c.Sync.Protocol = protocol
+	}
+	if syncInterval := os.Getenv("HD1_SYNC_INTERVAL"); syncInterval != "" {
+		if interval, err := time.ParseDuration(syncInterval); err == nil {
+			c.Sync.SyncInterval = interval
+		}
+	}
+	if maxDeltaLog := os.Getenv("HD1_SYNC_MAX_DELTA_LOG"); maxDeltaLog != "" {
+		if max, err := strconv.Atoi(maxDeltaLog); err == nil {
+			c.Sync.MaxDeltaLog = max
+		}
+	}
+	if checksumAlgorithm := os.Getenv("HD1_SYNC_CHECKSUM_ALGORITHM"); checksumAlgorithm != "" {
+		c.Sync.ChecksumAlgorithm = checksumAlgorithm
+	}
+	if causalityTimeout := os.Getenv("HD1_SYNC_CAUSALITY_TIMEOUT"); causalityTimeout != "" {
+		if timeout, err := time.ParseDuration(causalityTimeout); err == nil {
+			c.Sync.CausalityTimeout = timeout
+		}
+	}
+	if deltaQueueSize := os.Getenv("HD1_SYNC_DELTA_QUEUE_SIZE"); deltaQueueSize != "" {
+		if size, err := strconv.Atoi(deltaQueueSize); err == nil {
+			c.Sync.DeltaQueueSize = size
+		}
+	}
+	if avatarRegistrySize := os.Getenv("HD1_SYNC_AVATAR_REGISTRY_SIZE"); avatarRegistrySize != "" {
+		if size, err := strconv.Atoi(avatarRegistrySize); err == nil {
+			c.Sync.AvatarRegistrySize = size
+		}
+	}
+	if broadcastBuffer := os.Getenv("HD1_SYNC_BROADCAST_CHANNEL_BUFFER"); broadcastBuffer != "" {
+		if buffer, err := strconv.Atoi(broadcastBuffer); err == nil {
+			c.Sync.BroadcastChannelBuffer = buffer
+		}
+	}
+	if compression := os.Getenv("HD1_SYNC_WORLD_STATE_COMPRESSION_ENABLED"); compression == "true" || compression == "1" {
+		c.Sync.WorldStateCompressionEnabled = true
+	} else if compression == "false" || compression == "0" {
+		c.Sync.WorldStateCompressionEnabled = false
+	}
+	if metrics := os.Getenv("HD1_SYNC_PERFORMANCE_METRICS_ENABLED"); metrics == "true" || metrics == "1" {
+		c.Sync.PerformanceMetricsEnabled = true
+	} else if metrics == "false" || metrics == "0" {
+		c.Sync.PerformanceMetricsEnabled = false
+	}
+	if precision := os.Getenv("HD1_SYNC_VECTOR_CLOCK_PRECISION"); precision != "" {
+		if prec, err := strconv.Atoi(precision); err == nil {
+			c.Sync.VectorClockPrecision = prec
 		}
 	}
 }
@@ -812,4 +894,82 @@ func GetAvatarsHeartbeatFrequency() time.Duration {
 		return Config.Avatars.HeartbeatFrequency
 	}
 	return 5 * time.Second // fallback
+}
+
+// Sync protocol configuration getters
+func GetSyncProtocol() string {
+	if Config != nil {
+		return Config.Sync.Protocol
+	}
+	return "HD1-VSC-v1.0" // fallback
+}
+
+func GetSyncInterval() time.Duration {
+	if Config != nil {
+		return Config.Sync.SyncInterval
+	}
+	return 16 * time.Millisecond // fallback
+}
+
+func GetSyncMaxDeltaLog() int {
+	if Config != nil {
+		return Config.Sync.MaxDeltaLog
+	}
+	return 10000 // fallback
+}
+
+func GetSyncChecksumAlgorithm() string {
+	if Config != nil {
+		return Config.Sync.ChecksumAlgorithm
+	}
+	return "sha256" // fallback
+}
+
+func GetSyncCausalityTimeout() time.Duration {
+	if Config != nil {
+		return Config.Sync.CausalityTimeout
+	}
+	return 5 * time.Second // fallback
+}
+
+func GetSyncDeltaQueueSize() int {
+	if Config != nil {
+		return Config.Sync.DeltaQueueSize
+	}
+	return 1000 // fallback
+}
+
+func GetSyncAvatarRegistrySize() int {
+	if Config != nil {
+		return Config.Sync.AvatarRegistrySize
+	}
+	return 100 // fallback
+}
+
+func GetSyncBroadcastChannelBuffer() int {
+	if Config != nil {
+		return Config.Sync.BroadcastChannelBuffer
+	}
+	return 1024 // fallback
+}
+
+func GetSyncWorldStateCompressionEnabled() bool {
+	if Config != nil {
+		return Config.Sync.WorldStateCompressionEnabled
+	}
+	return true // fallback
+}
+
+func GetSyncPerformanceMetricsEnabled() bool {
+	if Config != nil {
+		return Config.Sync.PerformanceMetricsEnabled
+	}
+	return false // fallback
+}
+
+func GetSyncVectorClockPrecision() int {
+	if Config != nil {
+		return Config.Sync.VectorClockPrecision
+	}
+	return 64 // fallback
 }

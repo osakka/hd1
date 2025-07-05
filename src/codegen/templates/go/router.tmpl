@@ -117,6 +117,6 @@ func (r *APIRouter) generateRoutes() {
 {{range .HandlerStubs}}
 // {{.Comment}}
 func (r *APIRouter) {{.FuncName}}(w http.ResponseWriter, req *http.Request) {
-	{{if eq .Package "logging"}}apiLogging{{else}}{{.Package}}{{end}}.{{.FuncName}}Handler(w, req, r.hub)
+	{{if eq .Package "logging"}}apiLogging{{else}}{{.Package}}{{end}}.{{if hasSuffix .FuncName "Handler"}}{{.FuncName}}{{else}}{{.FuncName}}Handler{{end}}(w, req, r.hub)
 }
 {{end}}

@@ -322,8 +322,8 @@ class HD1WebSocketManager {
      * Handle avatar position updates - HIGH-FREQUENCY PROTECTED real-time movement
      */
     handleAvatarPositionUpdate(message) {
-        // Extract position data
-        const { session_id, avatar_name, position, camera_position, channel_id } = message.data || message;
+        // Extract position data including avatar type for GLB loading
+        const { session_id, avatar_name, avatar_type, position, camera_position, channel_id } = message.data || message;
         
         if (!session_id || !avatar_name || !position) {
             console.warn('[HD1-WebSocket] Invalid avatar position update - missing required fields');
@@ -342,6 +342,7 @@ class HD1WebSocketManager {
         // 🔥 HIGH-FREQUENCY PROTECTION: Queue position updates and throttle processing
         this.queuePositionUpdate(session_id, {
             avatar_name,
+            avatar_type,
             position,
             camera_position,
             channel_id,
@@ -1100,7 +1101,7 @@ class HD1WebSocketManager {
     }
     
     /**
-     * 🛡️ PROTECTED: Create visual representation of another session's avatar
+     * 🛡️ PROTECTED: Create visual representation of another session's avatar with GLB support
      */
     createOtherSessionAvatarProtected(session_id, avatar_name, position) {
         if (!window.hd1GameEngine) {
@@ -1111,6 +1112,22 @@ class HD1WebSocketManager {
         setTimeout(() => {
             try {
                 const app = window.hd1GameEngine;
+                
+                // Use real avatar type from WebSocket message - no fallbacks or mock data
+                const avatarType = updateData.avatar_type;
+                let avatarTags = ['session-avatar', 'other-session'];
+                
+                // Only proceed with GLB loading if we have real avatar type data
+                if (avatarType === 'claude_avatar') {
+                    avatarTags.push('avatar', 'claude', 'robot', 'ai', 'avatar-claude_avatar');
+                } else if (avatarType === 'human_avatar') {
+                    avatarTags.push('avatar', 'human', 'avatar-human_avatar');
+                } else {
+                    // No avatar type means basic visual representation only
+                    avatarTags.push('visual-only');
+                }
+                
+                console.log(`[HD1-WebSocket] 🔍 Detected avatar type: ${avatarType} for ${avatar_name}`);
                 
                 // Create entity with protection against naming conflicts
                 const safeEntityName = `${avatar_name}_${session_id.substring(0, 8)}_${Date.now()}`;
@@ -1123,31 +1140,71 @@ class HD1WebSocketManager {
                     scale: [1, 1, 1]
                 });
                 
-                // Add render component with distinct appearance
-                entity.addComponent('render', {
-                    type: 'capsule',
-                    material: {
-                        ambient: [0.0, 1.0, 0.5], // Green-teal for other sessions
-                        diffuse: [0.0, 1.0, 0.5],
-                        emissive: [0.0, 0.2, 0.1]
-                    }
-                });
-                
-                // Protected metadata assignment
-                entity.hd1Id = avatar_name;
-                entity.hd1SessionId = session_id;
-                entity.hd1Tags = ['session-avatar', 'other-session', 'visual-only'];
-                entity.hd1IsOtherSession = true;
-                entity.hd1Protected = true; // Mark as protected entity
-                
-                // Add to scene
-                app.root.addChild(entity);
-                
-                // Register in protected registry
-                this.updateAvatarRegistry(session_id, entity, Date.now());
-                
-                console.log(`[HD1-WebSocket] ✅ Protected other avatar created: ${avatar_name} for ${session_id}`);
-                this.unlockAvatarCreation(session_id);
+                // 🔥 CRITICAL FIX: Use GLB loading if avatar type detected, otherwise fallback
+                if (avatarType && window.createObjectFromData) {
+                    // Create avatar entity data with proper tags for GLB loading
+                    const avatarEntityData = {
+                        name: safeEntityName,
+                        entity_id: `other-${avatar_name}-${Date.now()}`,
+                        tags: avatarTags,
+                        components: {
+                            model: {
+                                type: 'asset',
+                                asset_path: 'model.glb'
+                            },
+                            transform: {
+                                position: [position.x, position.y, position.z],
+                                rotation: [0, 0, 0],
+                                scale: [1, 1, 1]
+                            }
+                        }
+                    };
+                    
+                    // Use the existing PlayCanvas object creation system for proper GLB loading
+                    window.createObjectFromData(avatarEntityData);
+                    
+                    // Find the created entity and register it
+                    setTimeout(() => {
+                        const createdEntity = app.root.findByName(safeEntityName);
+                        if (createdEntity) {
+                            createdEntity.hd1Id = avatar_name;
+                            createdEntity.hd1SessionId = session_id;
+                            createdEntity.hd1Tags = avatarTags;
+                            createdEntity.hd1IsOtherSession = true;
+                            createdEntity.hd1Protected = true;
+                            this.updateAvatarRegistry(session_id, createdEntity, Date.now());
+                            console.log(`[HD1-WebSocket] ✅ Protected GLB avatar created: ${avatarType} for ${session_id}`);
+                        }
+                        this.unlockAvatarCreation(session_id);
+                    }, 200); // Wait for GLB loading
+                    
+                } else {
+                    // Fallback to basic visual representation
+                    entity.addComponent('render', {
+                        type: 'capsule',
+                        material: {
+                            ambient: [0.0, 1.0, 0.5], // Green-teal for other sessions
+                            diffuse: [0.0, 1.0, 0.5],
+                            emissive: [0.0, 0.2, 0.1]
+                        }
+                    });
+                    
+                    // Protected metadata assignment
+                    entity.hd1Id = avatar_name;
+                    entity.hd1SessionId = session_id;
+                    entity.hd1Tags = avatarTags;
+                    entity.hd1IsOtherSession = true;
+                    entity.hd1Protected = true; // Mark as protected entity
+                    
+                    // Add to scene
+                    app.root.addChild(entity);
+                    
+                    // Register in protected registry
+                    this.updateAvatarRegistry(session_id, entity, Date.now());
+                    
+                    console.log(`[HD1-WebSocket] ✅ Protected fallback avatar created: ${avatar_name} for ${session_id}`);
+                    this.unlockAvatarCreation(session_id);
+                }
                 
             } catch (error) {
                 console.error(`[HD1-WebSocket] Protected other avatar creation failed:`, error);

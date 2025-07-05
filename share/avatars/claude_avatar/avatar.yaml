@@ -125,3 +125,79 @@ camera:
   rotation: {x: 0, y: 0, z: 0}         # Straight ahead  
   # Field of view
   field_of_view: 75                     # degrees
+
+# Physics Configuration - ENHANCED AI CAPABILITIES
+physics:
+  # Core Physics Properties
+  mass: 50.0                            # kg (lightweight robot)
+  gravity_scale: 0.8                    # Reduced gravity effect (enhanced servos)
+  linear_damping: 0.05                  # Low air resistance (aerodynamic)
+  angular_damping: 0.1                  # Precise rotational control
+  
+  # Collision Properties
+  collision:
+    type: "capsule"                     # Robot body shape
+    radius: 0.35                        # meters (slimmer than human)
+    height: 1.6                         # meters
+    material:
+      friction: 0.5                     # Mechanical feet, less grip
+      restitution: 0.2                  # Slight bounce (metal construction)
+      static_friction: 0.6              # Servo-controlled standing
+  
+  # Movement Capabilities
+  locomotion:
+    # Ground Movement - Enhanced
+    can_walk: true
+    walk_speed: 2.5                     # m/s (faster than human)
+    run_speed: 8.0                      # m/s (much faster)
+    acceleration: 15.0                  # m/s² (instant response)
+    deceleration: 20.0                  # m/s² (servo braking)
+    turn_speed: 360.0                   # degrees/s (instant turns)
+    
+    # Vertical Movement - Enhanced
+    can_jump: true
+    can_fly: false
+    can_hover: false
+    jump_force: 800.0                   # Newtons (powerful hydraulics)
+    jump_cooldown: 0.3                  # seconds (rapid recovery)
+    max_jumps: 2                        # Double jump capability
+    
+    # Advanced Capabilities
+    can_climb: true                     # Enhanced grip systems
+    can_swim: false                     # Waterproofing optional
+    climb_speed: 2.0                    # m/s (mechanical advantage)
+    swim_speed: 0.0                     # Not water-capable
+  
+  # Environmental Interactions
+  environment:
+    affected_by_gravity: true
+    affected_by_wind: false             # Heavy/stable construction
+    affected_by_water: false            # Sealed systems
+    ground_detection: true              # Sensor-based
+    wall_sliding: false                 # Precise movement control
+    step_height: 0.5                    # meters (can step higher)
+  
+  # Energy System - Battery Based
+  energy:
+    max_energy: 1000.0                  # Battery units
+    energy_drain_rate: 5.0              # per second when active
+    energy_recovery_rate: 0.0           # No natural recovery (needs charging)
+    low_energy_threshold: 100.0         # When performance degrades
+    
+    # Special Abilities Energy Costs
+    jump_energy_cost: 50.0
+    run_energy_cost: 10.0               # per second
+    climb_energy_cost: 20.0             # per second
+  
+  # Movement Modifiers
+  modifiers:
+    # Terrain effects - Mechanical systems less affected
+    grass_speed_multiplier: 1.0
+    mud_speed_multiplier: 0.9           # Better than human
+    ice_speed_multiplier: 1.0           # Traction control
+    sand_speed_multiplier: 0.9          # Mechanical feet handle sand
+    
+    # State effects
+    low_energy_speed_multiplier: 0.5    # Battery conservation mode
+    damaged_speed_multiplier: 0.7       # Backup systems
+    overheated_speed_multiplier: 0.6    # Thermal protection

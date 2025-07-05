@@ -62,13 +62,34 @@ func JoinSessionChannelHandler(w http.ResponseWriter, r *http.Request, hub inter
 			"channel_id": request.ChannelID,
 		})
 		
-		// PHASE 1 FIX: Clear existing entities first (API-first with proper broadcasts)
+		// CRITICAL FIX: Remove client from old channel before joining new one
+		if oldSession, exists := h.GetStore().GetSession(sessionID); exists && oldSession.ChannelID != "" && oldSession.ChannelID != request.ChannelID {
+			if removed, _ := h.LeaveSessionChannel(sessionID, request.ClientID); removed {
+				logging.Info("client removed from old channel", map[string]interface{}{
+					"session_id": sessionID,
+					"old_channel": oldSession.ChannelID,
+					"new_channel": request.ChannelID,
+					"client_id": request.ClientID,
+				})
+			}
+		}
+		
+		// PHASE 1 FIX: Clear existing entities AND avatars (API-first with proper broadcasts)
 		if err := h.ClearSessionEntitiesWithBroadcast(sessionID); err != nil {
 			logging.Error("failed to clear session entities", map[string]interface{}{
 				"session_id": sessionID,
 				"error": err.Error(),
 			})
 			// Continue anyway - don't fail channel join for clearing issues
+		}
+		
+		// CRITICAL FIX: Clear avatar from sync protocol when changing channels
+		if err := h.ClearAvatarFromSyncProtocol(sessionID); err != nil {
+			logging.Warn("failed to clear avatar from sync protocol", map[string]interface{}{
+				"session_id": sessionID,
+				"error": err.Error(),
+			})
+			// Continue anyway - avatar clearing failure shouldn't block channel join
 		}
 		
 		// Load channel configuration and create entities

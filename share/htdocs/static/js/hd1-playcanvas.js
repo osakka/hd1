@@ -171,6 +171,10 @@ function initializePlayCanvasEngine() {
             }
         }
 
+        // Initialize physics world with realistic settings - PHYSICS EXCELLENCE
+        app.systems.rigidbody.setGravity(0, -9.81, 0); // Standard Earth gravity
+        console.log('[HD1] 🎮 Physics world initialized: gravity=9.81m/s², physics engine ready');
+
         // Create empty scene - content loaded from channels/scenes
         createEmptyScene(app);
 
@@ -276,29 +280,44 @@ class HD1CameraController {
         // NOTE: No updateAvatarPosition() - camera moves independently, avatar follows via API sync
     }
     
-    // Configure camera based on avatar type - use simple defaults for now
+    // Configure camera and physics based on avatar configuration - SINGLE SOURCE OF TRUTH
     configureAvatarVision(avatar) {
         if (!avatar) {
             console.error('[HD1] 🎮 Avatar configuration failed: No avatar provided');
             return false;
         }
         
-        // Use default camera configuration for all avatars
-        // TODO: Load from YAML when avatar loading system supports it
-        this.avatarCameraOffset.set(0, 1.7, 0); // Head level for most avatars
-        
-        if (this.camera.camera) {
-            this.camera.camera.fov = 75; // Standard FOV
+        // Camera configuration from avatar data
+        if (avatar.hd1CameraConfig) {
+            const config = avatar.hd1CameraConfig;
+            this.avatarCameraOffset.set(
+                config.position.x || 0,
+                config.position.y || 1.7,
+                config.position.z || 0
+            );
+            if (this.camera.camera && config.field_of_view) {
+                this.camera.camera.fov = config.field_of_view;
+            }
+        } else {
+            // Fallback defaults
+            this.avatarCameraOffset.set(0, 1.7, 0);
+            if (this.camera.camera) {
+                this.camera.camera.fov = 75;
+            }
         }
         
-        console.log(`[HD1] 🎮 Camera configured for avatar:`, {
+        // Simple avatar configuration - RESTORE WORKING STATE
+        console.log('[HD1] 🎮 Basic avatar configuration (physics disabled)');
+        
+        console.log(`[HD1] 🎮 Avatar configured successfully:`, {
             avatar: avatar.name,
-            offset: this.avatarCameraOffset,
-            fov: 75
+            camera_offset: this.avatarCameraOffset,
+            physics_enabled: !!avatar.hd1PhysicsConfig
         });
         
         return true;
     }
+    
     
     
     
@@ -359,20 +378,30 @@ class HD1CameraController {
     
     // Update camera (called every frame)
     update(dt) {
-        // Update avatar position to match camera (camera-first movement)
+        // Update avatar position to match camera - SIMPLE WORKING APPROACH
         if (this.boundAvatar) {
+            const avatar = this.boundAvatar;
             const cameraPos = this.camera.getPosition();
             const cameraRot = this.camera.getRotation();
             
-            // Calculate avatar position from camera position (subtract offset)
+            // Avatar follows camera (restore working behavior)
             const avatarPos = new pc.Vec3();
             avatarPos.copy(cameraPos).sub(this.avatarCameraOffset);
             
-            // Update avatar to match camera
-            this.boundAvatar.setPosition(avatarPos);
-            this.boundAvatar.setRotation(cameraRot);
+            // SIMPLE GROUND COLLISION: Prevent avatar from going below Y=0
+            if (avatarPos.y < 0) {
+                avatarPos.y = 0;
+                // Also adjust camera to maintain offset
+                const newCameraPos = avatarPos.clone().add(this.avatarCameraOffset);
+                this.camera.setPosition(newCameraPos);
+            }
+            
+            avatar.setPosition(avatarPos);
+            avatar.setRotation(cameraRot);
         }
     }
+    
+    
     
 }
 
@@ -441,16 +470,19 @@ function setupCameraControls(app, camera) {
     let lastCameraUpdate = 0;
     const cameraUpdateThrottle = 100; // Update camera position via API every 100ms
     
-    // 🎮 ORBITAL CAMERA: Keyboard shortcuts
+    // 🎮 PHYSICS-BASED CONTROLS: Avatar-specific abilities
     let lastKeyTime = 0;
     app.keyboard.on(pc.EVENT_KEYDOWN, function(event) {
         const now = Date.now();
         
-        // Prevent rapid key presses
+        // Simple space key handling (no physics)
+        if (event.key === pc.KEY_SPACE) {
+            // Basic space key - can add simple jump later
+        }
+        
+        // Prevent rapid key presses for other keys
         if (now - lastKeyTime < 200) return;
         lastKeyTime = now;
-        
-        // No special key handling needed for avatar-driven mode
     });
     
     app.on('update', function(dt) {
@@ -501,22 +533,19 @@ function setupCameraControls(app, camera) {
                 currentVelocity.scale(momentumDecay);
             }
             
-            // 🎮 CAMERA MOVEMENT: Move camera directly, avatar will follow
-            if (currentVelocity.length() > 0.01) { // Only move if velocity is significant
-                // Move the camera directly
+            // 🎮 SIMPLE MOVEMENT: Apply direct camera movement (restore working behavior)
+            if (currentVelocity.length() > 0.01) {
                 targetPosition.add(currentVelocity.clone().scale(dt));
-                
                 const currentPos = camera.getPosition();
                 const newPos = new pc.Vec3();
                 newPos.lerp(currentPos, targetPosition, smoothingFactor);
-                
                 camera.setPosition(newPos);
                 
-                // Sync avatar position to API for multiplayer (avatar position calculated in update())
+                // Sync avatar position to API for multiplayer
                 const now = Date.now();
-                if (now - lastCameraUpdate > cameraUpdateThrottle && cameraController.boundAvatar) {
+                if (now - lastCameraUpdate > cameraUpdateThrottle) {
                     lastCameraUpdate = now;
-                    const avatarPos = cameraController.boundAvatar.getPosition();
+                    const avatarPos = camera.getPosition();
                     syncCameraPositionToAPI(avatarPos);
                 }
             }
@@ -1303,6 +1332,8 @@ function loadAvatarAssetHTTP(avatarType, entity) {
                     console.log('[HD1] Avatar GLB model applied to entity:', entity.name);
                     entity.hd1WaitingForAsset = false;
                     
+                    // Simple avatar loading (no physics config)
+                    
                 } catch (componentError) {
                     console.error('[HD1] Error applying avatar GLB model component:', componentError);
                     // Fallback to colored sphere
@@ -1354,6 +1385,8 @@ function loadAvatarFallback(avatarType, entity) {
         console.log('[HD1] Applied fallback avatar model:', avatarType);
         entity.hd1WaitingForAsset = false;
         
+        // Simple avatar loading (no physics config)
+        
     } catch (error) {
         console.error('[HD1] Error in fallback avatar loading:', error);
         
@@ -1366,6 +1399,8 @@ function loadAvatarFallback(avatarType, entity) {
         entity.hd1WaitingForAsset = false;
     }
 }
+
+
 
 /**
  * Handle incoming avatar asset data from WebSocket

@@ -98,7 +98,12 @@ func loadTemplate(templatePath string) (*template.Template, error) {
 		return nil, fmt.Errorf("failed to read template %s: %w", templatePath, err)
 	}
 	
-	tmpl, err := template.New(filepath.Base(templatePath)).Parse(string(content))
+	// Add custom template functions
+	funcMap := template.FuncMap{
+		"hasSuffix": strings.HasSuffix,
+	}
+	
+	tmpl, err := template.New(filepath.Base(templatePath)).Funcs(funcMap).Parse(string(content))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse template %s: %w", templatePath, err)
 	}

@@ -125,3 +125,74 @@ camera:
   rotation: {x: 0, y: 0, z: 0}         # Straight ahead
   # Field of view
   field_of_view: 75                     # degrees
+
+# Physics Configuration - SINGLE SOURCE OF TRUTH
+physics:
+  # Core Physics Properties
+  mass: 75.0                            # kg (average human)
+  gravity_scale: 1.0                    # Standard gravity effect
+  linear_damping: 0.1                   # Air resistance for movement
+  angular_damping: 0.3                  # Rotational resistance
+  
+  # Collision Properties
+  collision:
+    type: "capsule"                     # Human-shaped collision
+    radius: 0.4                         # meters
+    height: 1.75                        # meters
+    material:
+      friction: 0.7                     # Ground grip
+      restitution: 0.1                  # Bounce factor (low for humans)
+      static_friction: 0.8              # Standing grip
+  
+  # Movement Capabilities
+  locomotion:
+    # Ground Movement
+    can_walk: true
+    walk_speed: 2.0                     # m/s
+    run_speed: 5.0                      # m/s
+    acceleration: 8.0                   # m/s²
+    deceleration: 12.0                  # m/s²
+    turn_speed: 180.0                   # degrees/s
+    
+    # Vertical Movement
+    can_jump: true
+    can_fly: false
+    can_hover: false
+    jump_force: 400.0                   # Newtons (realistic human jump)
+    jump_cooldown: 1.0                  # seconds
+    max_jumps: 1                        # Single jump only
+    
+    # Advanced Capabilities
+    can_climb: true                     # Can climb ladders/walls
+    can_swim: true                      # Can move in water
+    climb_speed: 1.0                    # m/s
+    swim_speed: 1.5                     # m/s
+  
+  # Environmental Interactions
+  environment:
+    affected_by_gravity: true
+    affected_by_wind: true
+    affected_by_water: true
+    ground_detection: true              # Automatically detect ground
+    wall_sliding: true                  # Slide along walls when walking into them
+    step_height: 0.3                    # meters (can step over small obstacles)
+  
+  # Stamina/Energy System
+  energy:
+    max_stamina: 100.0
+    stamina_drain_rate: 10.0            # per second when running
+    stamina_recovery_rate: 20.0         # per second when walking/idle
+    low_stamina_threshold: 20.0         # When movement slows down
+  
+  # Movement Modifiers
+  modifiers:
+    # Terrain effects
+    grass_speed_multiplier: 1.0
+    mud_speed_multiplier: 0.6
+    ice_speed_multiplier: 0.8
+    sand_speed_multiplier: 0.7
+    
+    # State effects
+    crouching_speed_multiplier: 0.5
+    injured_speed_multiplier: 0.3
+    carrying_speed_multiplier: 0.8

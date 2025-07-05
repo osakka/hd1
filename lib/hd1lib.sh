@@ -100,9 +100,9 @@ EOF
     hd1::api_call "POST" "/browser/canvas" "$payload"
 }
 
-# Clear holodeck (uses canvas control)
+# Clear HD1 scene (uses canvas control)
 hd1::clear() {
-    echo "CLEAR: Clearing holodeck..."
+    echo "CLEAR: Clearing HD1 scene..."
     hd1::canvas_control "clear"
 }
 

@@ -31,7 +31,7 @@ func NewLogManager() *LogManager {
 
 	// Create log file with timestamp
 	timestamp := time.Now().Format("2006-01-02_15-04-05")
-	logPath := filepath.Join(logsDir, fmt.Sprintf("holodeck_%s.log", timestamp))
+	logPath := filepath.Join(logsDir, fmt.Sprintf("hd1_%s.log", timestamp))
 
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
