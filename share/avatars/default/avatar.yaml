@@ -1,0 +1,57 @@
+# HD1 Avatar Specification - Default Avatar
+# Single Source of Truth for Default Session Avatar
+# Placeholder until proper humanoid model is available
+
+metadata:
+  name: "Default Avatar"
+  description: "Standard HD1 session avatar - simple placeholder"
+  version: "1.0.0"
+  type: "session-avatar"
+  created: "2025-07-05"
+  attribution: "HD1 Default"
+
+# Asset References (uses primitive model instead of GLB for now)
+assets:
+  model: "primitive:capsule"     # Use primitive capsule until humanoid GLB available
+  textures: []                   
+  animations: []                 
+
+# Avatar Physical Properties
+physical:
+  height: 1.8                    # Standard human height in meters
+  mass: 70                       # Standard mass in kg
+  collision_shape: "capsule"     # Simple capsule collision
+  
+  bounding_box:
+    width: 0.6                   # Shoulder width
+    height: 1.8                  # Full height
+    depth: 0.3                   # Front-to-back depth
+
+# Visual appearance for primitive
+appearance:
+  material:
+    color: "#4A90E2"             # Nice blue color
+    metalness: 0.1               # Slightly metallic
+    roughness: 0.8               # Matte finish
+
+# Camera Configuration
+camera:
+  position: {x: 0, y: 1.7, z: 0}  # Eye level
+  field_of_view: 75                # Standard FOV
+  perspective: "first-person"       # Default camera mode
+
+# Movement & Animation
+movement:
+  walk_speed: 5.0                # m/s walking speed
+  run_speed: 8.0                 # m/s running speed
+  jump_force: 300                # Jump impulse force
+
+# Network sync settings
+network:
+  priority: "high"               # High priority for user avatars
+  update_frequency: 30           # 30 Hz position updates
+  
+  interpolation:
+    enabled: true                # Smooth movement interpolation
+    method: "linear"             # Linear interpolation
+    time: 0.1                    # 100ms interpolation window

@@ -122,7 +122,7 @@ func SetCameraPositionHandler(w http.ResponseWriter, r *http.Request, hub interf
 		logging.Warn("session avatar not found for update", map[string]interface{}{
 			"session_id": sessionID,
 		})
-		http.Error(w, "Avatar not found or session not in channel", http.StatusNotFound)
+		http.Error(w, "Avatar not found or session not in world", http.StatusNotFound)
 		return
 	}
 	
@@ -146,7 +146,7 @@ func SetCameraPositionHandler(w http.ResponseWriter, r *http.Request, hub interf
 	// 	// Don't fail the camera position request if avatar update fails
 	// }
 	
-	// Broadcast avatar position update to all sessions in the channel via WebSocket
+	// Broadcast avatar position update to all sessions in the world via WebSocket
 	// This ensures all participants see the avatar movement in real-time
 	avatarPositionUpdate := map[string]interface{}{
 		"session_id": sessionID,
@@ -291,7 +291,7 @@ func GetCameraPositionHandler(w http.ResponseWriter, r *http.Request, hub interf
 		logging.Warn("session avatar not found", map[string]interface{}{
 			"session_id": sessionID,
 		})
-		http.Error(w, "Avatar not found or session not in channel", http.StatusNotFound)
+		http.Error(w, "Avatar not found or session not in world", http.StatusNotFound)
 		return
 	}
 	

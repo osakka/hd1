@@ -58,8 +58,8 @@ func StartRecordingHandler(w http.ResponseWriter, r *http.Request, hub interface
 
 	// Clear existing objects if requested
 	if req.ClearOnStart {
-		// Recording now works with channel entities, not session objects
-		// Clear handled via PlayCanvas/channels
+		// Recording now works with world entities, not session objects
+		// Clear handled via PlayCanvas/worlds
 		
 		// Broadcast clear message
 		clearMessage := map[string]interface{}{

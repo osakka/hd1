@@ -106,7 +106,7 @@ func (c *Client) readPump() {
 // handleClientMessage processes WebSocket messages received from clients.
 // It handles three types of messages:
 // 1. avatar_position_update: High-frequency avatar movement with direct position updates
-// 2. session_change: Client requests to switch between HD1 channels
+// 2. session_change: Client requests to switch between HD1 worlds
 // 3. Regular 3D visualization messages: Standard scene graph operations
 // 
 // Parameters:
@@ -151,7 +151,7 @@ func (c *Client) handleClientMessage(message []byte) {
 				select {
 				case c.send <- jsonData:
 				default:
-					// Client channel blocked, don't wait
+					// Client Go channel blocked, don't wait
 				}
 			}
 		}
@@ -197,7 +197,7 @@ func (c *Client) handleClientMessage(message []byte) {
 			select {
 			case c.send <- jsonData:
 			default:
-				// Client channel blocked, don't wait
+				// Client Go channel blocked, don't wait
 			}
 		}
 		
@@ -215,11 +215,11 @@ func (c *Client) handleClientMessage(message []byte) {
 			
 			if c.hub.store != nil {
 				// Join the session room (this handles duplicate prevention)
-				_, _, _ = c.hub.JoinSessionChannel(sessionID, fmt.Sprintf("%p", c), false)
+				_, _, _ = c.hub.JoinSessionWorld(sessionID, fmt.Sprintf("%p", c), false)
 				
-				// Legacy object loading removed - entities now managed via channels/PlayCanvas
-				// Session restoration handled by channel manager when switching channels
-				logging.Info("session connected, entities managed via channels", map[string]interface{}{
+				// Legacy object loading removed - entities now managed via worlds/PlayCanvas
+				// Session restoration handled by world manager when switching worlds
+				logging.Info("session connected, entities managed via worlds", map[string]interface{}{
 					"session_id": sessionID,
 				})
 			}
@@ -274,7 +274,7 @@ func (c *Client) handleAvatarAssetRequest(avatarType string) {
 			select {
 			case c.send <- jsonData:
 			default:
-				// Client channel blocked, don't wait
+				// Client Go channel blocked, don't wait
 			}
 		}
 		return
@@ -299,7 +299,7 @@ func (c *Client) handleAvatarAssetRequest(avatarType string) {
 				"size_bytes": len(glbData),
 			})
 		default:
-			logging.Warn("failed to send GLB asset - client channel blocked", map[string]interface{}{
+			logging.Warn("failed to send GLB asset - client Go channel blocked", map[string]interface{}{
 				"avatar_type": avatarType,
 			})
 		}
@@ -313,11 +313,11 @@ func (c *Client) handleAvatarAssetRequest(avatarType string) {
 
 // writePump handles outgoing WebSocket messages to the client.
 // It runs in a separate goroutine and manages the client's write lifecycle:
-// - Sends queued messages from the client's send channel
+// - Sends queued messages from the client's send Go channel
 // - Implements ping/pong keepalive mechanism with configurable intervals
 // - Manages write deadlines to prevent connection hangs
-// - Gracefully handles channel closure and connection errors
-// - Automatically closes connection when send channel is closed
+// - Gracefully handles Go channel closure and connection errors
+// - Automatically closes connection when send Go channel is closed
 func (c *Client) writePump() {
 	ticker := time.NewTicker(getPingPeriod())
 	defer func() {
@@ -357,7 +357,7 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, config.GetWebSocketClientChannelBuffer())}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, config.GetWebSocketClientWorldBuffer())}
 	client.hub.register <- client
 	
 	go client.writePump()

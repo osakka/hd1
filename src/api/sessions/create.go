@@ -20,7 +20,7 @@ import (
 // CreateSessionHandler handles POST /sessions requests.
 // Creates a new isolated game session with unique ID and default state.
 // Sessions provide the foundation for 3D world management and can later
-// join channels for scene configuration and collaborative features.
+// join worlds for scene configuration and collaborative features.
 //
 // Returns 201 Created with session details on success.
 // Broadcasts 'session_created' event via WebSocket for real-time monitoring.
@@ -67,7 +67,7 @@ func CreateSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{
 		"session_id": session.ID,
 		"created_at": session.CreatedAt,
 		"status":     session.Status,
-		"message":    "Session created - ready to join channels",
+		"message":    "Session created - ready to join worlds",
 	})
 }
 

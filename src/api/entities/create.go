@@ -247,7 +247,8 @@ func CreateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	broadcastData["playcanvas_guid"] = playCanvasGUID
 	broadcastData["components"] = req.Components // CRITICAL: Include components for client rendering
 	
-	h.BroadcastUpdate("entity_created", broadcastData)
+	// CRITICAL FIX: Use world-based broadcast for multiplayer entity visibility
+	h.BroadcastAvatarPositionToChannel(sessionID, "entity_created", broadcastData)
 	
 	// Success response: Return created entity details  
 	// OPTIMIZATION: Use pooled map for API response

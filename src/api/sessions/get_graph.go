@@ -39,8 +39,8 @@ func GetSessionGraphHandler(w http.ResponseWriter, r *http.Request, hub interfac
 	// Get session graph state
 	graphState, clientCount, lastUpdated := h.GetSessionGraphState(sessionID)
 	
-	// Get all entities in the session from channel
-	entities := []interface{}{} // Entities managed via PlayCanvas/channels
+	// Get all entities in the session from world
+	entities := []interface{}{} // Entities managed via PlayCanvas/worlds
 	
 	logging.Debug("session graph state retrieved", map[string]interface{}{
 		"session_id":   sessionID,

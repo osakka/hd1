@@ -112,14 +112,14 @@ Core game engine functionality including entity management, physics, audio, and 
 - `GET /sessions/{sessionId}` - Get session details
 - `DELETE /sessions/{sessionId}` - Delete session
 
-### Channels (5 endpoints)
+### Worlds (5 endpoints)
 Multi-user collaboration and scene management.
 
-- `GET /channels` - List all channels
-- `POST /channels` - Create new channel
-- `GET /channels/{channelId}` - Get channel details
-- `PUT /channels/{channelId}` - Update channel
-- `DELETE /channels/{channelId}` - Delete channel
+- `GET /worlds` - List all worlds
+- `POST /worlds` - Create new world
+- `GET /worlds/{worldId}` - Get world details
+- `PUT /worlds/{worldId}` - Update world
+- `DELETE /worlds/{worldId}` - Delete world
 
 ### Administration (4 endpoints)
 System logging and configuration management.

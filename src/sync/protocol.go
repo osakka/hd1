@@ -22,6 +22,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 	
@@ -56,7 +57,7 @@ type WorldState struct {
 // AvatarState represents a single avatar's synchronized state
 type AvatarState struct {
 	SessionID    string             `json:"session_id"`
-	ChannelID    string             `json:"channel_id"`    // NEW: Channel-based isolation
+	WorldID      string             `json:"world_id"`      // NEW: World-based isolation
 	Position     Vector3            `json:"position"`
 	Rotation     Vector3            `json:"rotation"`
 	Animation    string             `json:"animation"`
@@ -79,7 +80,7 @@ type EntityState struct {
 
 // SceneState represents synchronized scene configuration
 type SceneState struct {
-	Channel      string             `json:"channel"`
+	WorldID      string             `json:"world_id"`
 	Lighting     map[string]interface{} `json:"lighting"`
 	Physics      map[string]interface{} `json:"physics"`
 	LastUpdate   time.Time          `json:"last_update"`
@@ -112,10 +113,11 @@ type SyncProtocol struct {
 	
 	// Enhanced causality handling
 	deltaQueue   chan *Delta              // Queue for out-of-order deltas
-	queueWorker  chan bool                // Worker control channel
+	queueWorker  chan bool                // Worker control Go channel
 	
 	// Avatar registry (single source of truth)
-	avatarRegistry map[string]*AvatarState // Channel-based avatar registry
+	// KEY FORMAT: "sessionID:worldID:avatarType:instanceID" for multi-avatar support
+	avatarRegistry map[string]*AvatarState // Multi-avatar world-based registry
 }
 
 // ClientState represents per-client prediction and rollback state
@@ -232,7 +234,7 @@ func (sp *SyncProtocol) GetWorldStateSnapshot() *WorldState {
 	return snapshot
 }
 
-// RegisterClient registers a new client for synchronization
+// RegisterClient registers a new client for synchronization with complete world state sync
 func (sp *SyncProtocol) RegisterClient(clientID, sessionID string) error {
 	sp.mutex.Lock()
 	defer sp.mutex.Unlock()
@@ -245,15 +247,19 @@ func (sp *SyncProtocol) RegisterClient(clientID, sessionID string) error {
 		IsOnline:    true,
 	}
 	
-	// Initialize client's vector clock
-	client.VectorClock[clientID] = 0
+	// CRITICAL FIX: Initialize client's vector clock with current world state
+	// This ensures session independence - new clients see existing state
+	for clientKey, clockValue := range sp.worldState.VectorClock {
+		client.VectorClock[clientKey] = clockValue
+	}
+	client.VectorClock[clientID] = 0 // Start own clock at 0
 	
 	sp.clients[clientID] = client
 	sp.clientStates[clientID] = &ClientState{
 		ClientID:     clientID,
 		PredictedOps: make([]*Delta, 0),
 		ConfirmedOps: make([]*Delta, 0),
-		VectorClock:  make(VectorClock),
+		VectorClock:  sp.copyVectorClock(client.VectorClock),
 		LastSync:     time.Now(),
 	}
 	
@@ -613,11 +619,19 @@ func (sp *SyncProtocol) copyVectorClock(vc VectorClock) VectorClock {
 }
 
 func (sp *SyncProtocol) copyAvatarState(avatar *AvatarState) *AvatarState {
+	// Deep copy metadata map
+	metadata := make(map[string]interface{})
+	for k, v := range avatar.Metadata {
+		metadata[k] = v
+	}
+	
 	return &AvatarState{
 		SessionID:   avatar.SessionID,
+		WorldID:     avatar.WorldID,      // CRITICAL FIX: Include WorldID
 		Position:    avatar.Position,
 		Rotation:    avatar.Rotation,
 		Animation:   avatar.Animation,
+		Metadata:    metadata,            // CRITICAL FIX: Include Metadata
 		LastUpdate:  avatar.LastUpdate,
 		VectorClock: sp.copyVectorClock(avatar.VectorClock),
 	}
@@ -653,7 +667,7 @@ func (sp *SyncProtocol) copySceneState(scene *SceneState) *SceneState {
 	}
 	
 	return &SceneState{
-		Channel:     scene.Channel,
+		WorldID:     scene.WorldID,
 		Lighting:    lighting,
 		Physics:     physics,
 		LastUpdate:  scene.LastUpdate,
@@ -741,15 +755,18 @@ func (sp *SyncProtocol) processDeltaQueue() {
 	}
 }
 
-// RegisterAvatar adds avatar to the single source of truth registry
+// RegisterAvatar adds avatar to the single source of truth registry with multi-avatar support
 func (sp *SyncProtocol) RegisterAvatar(sessionID string, avatarState *AvatarState) {
 	sp.mutex.Lock()
 	defer sp.mutex.Unlock()
 	
-	// Store in avatar registry (single source of truth)
-	sp.avatarRegistry[sessionID] = avatarState
+	// Generate composite key for multi-avatar support: sessionID:worldID:avatarType:instanceID
+	avatarKey := sp.generateAvatarKey(sessionID, avatarState.WorldID, avatarState.Metadata)
 	
-	// Also update world state for backward compatibility
+	// Store in avatar registry (single source of truth)
+	sp.avatarRegistry[avatarKey] = avatarState
+	
+	// Also update world state using session-based key for backward compatibility
 	sp.worldState.Avatars[sessionID] = avatarState
 	sp.updateWorldStateChecksum()
 }
@@ -759,8 +776,20 @@ func (sp *SyncProtocol) GetAvatar(sessionID string) (*AvatarState, bool) {
 	sp.mutex.RLock()
 	defer sp.mutex.RUnlock()
 	
+	// Try session-based lookup first for backward compatibility
 	avatar, exists := sp.avatarRegistry[sessionID]
-	return avatar, exists
+	if exists {
+		return avatar, true
+	}
+	
+	// Search for any avatar matching sessionID in composite keys
+	for key, avatar := range sp.avatarRegistry {
+		if strings.HasPrefix(key, sessionID+":") {
+			return avatar, true
+		}
+	}
+	
+	return nil, false
 }
 
 // GetAllAvatars returns all avatars from the registry
@@ -781,16 +810,31 @@ func (sp *SyncProtocol) UpdateAvatarPosition(sessionID string, position Vector3)
 	sp.mutex.Lock()
 	defer sp.mutex.Unlock()
 	
-	avatar, exists := sp.avatarRegistry[sessionID]
-	if !exists {
+	// Find avatar using flexible key lookup
+	var avatar *AvatarState
+	
+	// Try session-based lookup first
+	if registryAvatar, exists := sp.avatarRegistry[sessionID]; exists {
+		avatar = registryAvatar
+	} else {
+		// Search for any avatar matching sessionID in composite keys
+		for key, registryAvatar := range sp.avatarRegistry {
+			if strings.HasPrefix(key, sessionID+":") {
+				avatar = registryAvatar
+				break
+			}
+		}
+	}
+	
+	if avatar == nil {
 		return fmt.Errorf("avatar not found for session %s", sessionID)
 	}
 	
-	// Update position in registry (single source of truth)
+	// ATOMIC UPDATE: Update both registry and world state atomically
 	avatar.Position = position
 	avatar.LastUpdate = time.Now()
 	
-	// Update world state for backward compatibility
+	// Update world state for backward compatibility (atomic)
 	if worldAvatar, exists := sp.worldState.Avatars[sessionID]; exists {
 		worldAvatar.Position = position
 		worldAvatar.LastUpdate = avatar.LastUpdate
@@ -800,25 +844,40 @@ func (sp *SyncProtocol) UpdateAvatarPosition(sessionID string, position Vector3)
 	return nil
 }
 
-// UpdateAvatarPositionInChannel updates avatar position with channel isolation
-func (sp *SyncProtocol) UpdateAvatarPositionInChannel(sessionID, channelID string, position Vector3) error {
+// UpdateAvatarPositionInWorld updates avatar position with world isolation
+func (sp *SyncProtocol) UpdateAvatarPositionInWorld(sessionID, worldID string, position Vector3) error {
 	sp.mutex.Lock()
 	defer sp.mutex.Unlock()
 	
-	avatar, exists := sp.avatarRegistry[sessionID]
-	if !exists {
+	// Find avatar using flexible key lookup
+	var avatar *AvatarState
+	
+	// Try session-based lookup first
+	if registryAvatar, exists := sp.avatarRegistry[sessionID]; exists {
+		avatar = registryAvatar
+	} else {
+		// Search for any avatar matching sessionID in composite keys
+		for key, registryAvatar := range sp.avatarRegistry {
+			if strings.HasPrefix(key, sessionID+":") {
+				avatar = registryAvatar
+				break
+			}
+		}
+	}
+	
+	if avatar == nil {
 		return fmt.Errorf("avatar not found for session %s", sessionID)
 	}
 	
-	// Update position and channel in registry (single source of truth)
+	// ATOMIC UPDATE: Update position and world atomically
 	avatar.Position = position
-	avatar.ChannelID = channelID
+	avatar.WorldID = worldID
 	avatar.LastUpdate = time.Now()
 	
-	// Update world state for backward compatibility
+	// Update world state for backward compatibility (atomic)
 	if worldAvatar, exists := sp.worldState.Avatars[sessionID]; exists {
 		worldAvatar.Position = position
-		worldAvatar.ChannelID = channelID
+		worldAvatar.WorldID = worldID
 		worldAvatar.LastUpdate = avatar.LastUpdate
 	}
 	
@@ -826,23 +885,38 @@ func (sp *SyncProtocol) UpdateAvatarPositionInChannel(sessionID, channelID strin
 	return nil
 }
 
-// ClearAvatarChannel removes avatar from channel (for channel switching)
-func (sp *SyncProtocol) ClearAvatarChannel(sessionID string) error {
+// ClearAvatarWorld removes avatar from world (for world switching)
+func (sp *SyncProtocol) ClearAvatarWorld(sessionID string) error {
 	sp.mutex.Lock()
 	defer sp.mutex.Unlock()
 	
-	avatar, exists := sp.avatarRegistry[sessionID]
-	if !exists {
+	// Find avatar using flexible key lookup
+	var avatar *AvatarState
+	
+	// Try session-based lookup first
+	if registryAvatar, exists := sp.avatarRegistry[sessionID]; exists {
+		avatar = registryAvatar
+	} else {
+		// Search for any avatar matching sessionID in composite keys
+		for key, registryAvatar := range sp.avatarRegistry {
+			if strings.HasPrefix(key, sessionID+":") {
+				avatar = registryAvatar
+				break
+			}
+		}
+	}
+	
+	if avatar == nil {
 		return fmt.Errorf("avatar not found for session %s", sessionID)
 	}
 	
-	// Clear channel association
-	avatar.ChannelID = ""
+	// ATOMIC UPDATE: Clear world association atomically
+	avatar.WorldID = ""
 	avatar.LastUpdate = time.Now()
 	
-	// Update world state
+	// Update world state atomically
 	if worldAvatar, exists := sp.worldState.Avatars[sessionID]; exists {
-		worldAvatar.ChannelID = ""
+		worldAvatar.WorldID = ""
 		worldAvatar.LastUpdate = avatar.LastUpdate
 	}
 	
@@ -850,8 +924,8 @@ func (sp *SyncProtocol) ClearAvatarChannel(sessionID string) error {
 	return nil
 }
 
-// GetWorldStateSnapshotForChannel returns world state filtered by channel
-func (sp *SyncProtocol) GetWorldStateSnapshotForChannel(channelID string) *WorldState {
+// GetWorldStateSnapshotForWorld returns world state filtered by world
+func (sp *SyncProtocol) GetWorldStateSnapshotForWorld(worldID string) *WorldState {
 	sp.mutex.RLock()
 	defer sp.mutex.RUnlock()
 	
@@ -865,19 +939,65 @@ func (sp *SyncProtocol) GetWorldStateSnapshotForChannel(channelID string) *World
 		Checksum:    sp.worldState.Checksum,
 	}
 	
-	// Copy only avatars in the specified channel
+	// Copy only avatars in the specified world
 	for id, avatar := range sp.worldState.Avatars {
-		if avatar.ChannelID == channelID {
+		if avatar.WorldID == worldID {
 			snapshot.Avatars[id] = sp.copyAvatarState(avatar)
 		}
 	}
 	
-	// Copy only entities in the specified channel (assuming entities have channel field)
+	// Copy only entities in the specified world (entities filtered by world)
 	for id, entity := range sp.worldState.Entities {
-		snapshot.Entities[id] = sp.copyEntityState(entity)
+		// Check if entity has world information in metadata or components
+		entityWorldID := ""
+		
+		// Extract world from entity metadata/components
+		if entity.Components != nil {
+			if worldMeta, exists := entity.Components["world_id"]; exists {
+				if worldStr, ok := worldMeta.(string); ok {
+					entityWorldID = worldStr
+				}
+			}
+		}
+		
+		// Include entity only if it belongs to the same world
+		if entityWorldID == worldID || entityWorldID == "" {
+			snapshot.Entities[id] = sp.copyEntityState(entity)
+		}
 	}
 	
 	return snapshot
+}
+
+// generateAvatarKey creates composite key for multi-avatar support
+// Format: "sessionID:worldID:avatarType:instanceID"
+func (sp *SyncProtocol) generateAvatarKey(sessionID, worldID string, metadata map[string]interface{}) string {
+	// Extract avatar type from metadata
+	avatarType := "default"
+	if metadata != nil {
+		if avType, exists := metadata["avatar_type"]; exists {
+			if typeStr, ok := avType.(string); ok {
+				avatarType = typeStr
+			}
+		}
+	}
+	
+	// Extract instance ID from metadata (default to "0")
+	instanceID := "0"
+	if metadata != nil {
+		if instID, exists := metadata["instance_id"]; exists {
+			if idStr, ok := instID.(string); ok {
+				instanceID = idStr
+			}
+		}
+	}
+	
+	// Use empty string for world if not provided
+	if worldID == "" {
+		worldID = "_default"
+	}
+	
+	return fmt.Sprintf("%s:%s:%s:%s", sessionID, worldID, avatarType, instanceID)
 }
 
 // Cleanup stops the delta queue worker and cleans up resources

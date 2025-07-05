@@ -44,7 +44,7 @@ vim codegen/templates/shell/core-functions.tmpl  # Shell functions
 ```bash
 # 3. Implement handler logic (only after API + templates are complete)
 vim api/entities/create.go                    # Handler implementation
-vim api/sessions/join_channel.go              # Business logic
+vim api/sessions/join_world.go                # Business logic
 
 # Handler code implements the API contracts defined in Phase 1
 # Code generation from Phase 2 provides routing and client libraries
@@ -79,14 +79,14 @@ src/
 │
 ├── api/                   # 🎮 PHASE 3: GAME ENGINE API HANDLERS
 │   ├── entities/         # Entity lifecycle (create, update, delete)
-│   ├── sessions/         # Session & channel management
+│   ├── sessions/         # Session & world management
 │   ├── components/       # ECS component system
 │   ├── hierarchy/        # Transform hierarchy & parenting
 │   ├── physics/          # Physics world & rigidbodies
 │   ├── audio/            # 3D audio sources & playback
 │   ├── animation/        # Animation system
 │   ├── lifecycle/        # Entity activation/deactivation
-│   ├── channels/         # Channel management
+│   ├── worlds/           # World management
 │   ├── camera/           # Camera controls
 │   ├── browser/          # Browser integration
 │   ├── scenegraph/       # Scene graph management
@@ -232,11 +232,11 @@ curl -X POST /api/sessions/{sessionId}/entities \
 {"type": "entity_created", "data": {"entity_id": "...", "components": {...}}}
 ```
 
-### Channel-Based Scene Management
+### World-Based Scene Management
 ```yaml
-# /opt/hd1/share/channels/channel_one.yaml
-channel:
-  id: "channel_one"
+# /opt/hd1/share/worlds/world_one.yaml
+world:
+  id: "world_one"
   name: "Scene 1 - Red Box"
 
 playcanvas:
@@ -276,12 +276,12 @@ PUT    /sessions/{id}/entities/{entityId}/hierarchy/transforms  # Set transform
 GET    /sessions/{id}/entities/{entityId}/hierarchy/parent      # Get parent
 ```
 
-### Session & Channel Management
+### Session & World Management
 ```
 POST /sessions                              # Create session
-POST /sessions/{id}/channel/join           # Join channel
-POST /sessions/{id}/channel/leave          # Leave channel
-GET  /sessions/{id}/channel/status         # Channel status
+POST /sessions/{id}/world/join             # Join world
+POST /sessions/{id}/world/leave            # Leave world
+GET  /sessions/{id}/world/status           # World status
 ```
 
 ## 🏆 Performance Characteristics
@@ -289,7 +289,7 @@ GET  /sessions/{id}/channel/status         # Channel status
 - **API Response**: <50ms for entity operations
 - **WebSocket Latency**: <10ms for real-time sync
 - **Entity Capacity**: 1000+ entities per session at 60fps
-- **Concurrent Clients**: 100+ per channel
+- **Concurrent Clients**: 100+ per world
 - **Throughput**: 1000+ API requests/second
 
 ## 🔨 Quality Standards
@@ -357,7 +357,7 @@ GET  /sessions/{id}/channel/status         # Channel status
 - ✅ **Production Ready**: Enterprise logging, monitoring, scalability
 - ✅ **PlayCanvas Integration**: Professional 3D rendering engine
 - ✅ **Auto-Generation**: 8 different outputs from single API spec
-- ✅ **Channel System**: YAML-based scene configuration
+- ✅ **World System**: YAML-based scene configuration
 
 ## 🚀 **Template Development Examples**
 

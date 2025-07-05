@@ -40,6 +40,34 @@ hd1::api_call() {
 }
 
 
+# Auto-generated from POST /browser/canvas
+hd1::canvas_control() {
+    local command="$1"
+    shift
+    local objects="$@"
+    
+    if [[ -z "$command" ]]; then
+        echo "Usage: hd1::canvas_control <command> [objects...]"
+        return 1
+    fi
+    
+    local payload=$(cat <<EOF
+{
+    "command": "$command",
+    "objects": [$objects]
+}
+EOF
+)
+    
+    hd1::api_call "POST" "/browser/canvas" "$payload"
+}
+
+# Clear HD1 scene (uses canvas control)
+hd1::clear() {
+    echo "CLEAR: Clearing HD1 scene..."
+    hd1::canvas_control "clear"
+}
+
 # Auto-generated from GET /sessions
 hd1::list_sessions() {
     hd1::api_call "GET" "/sessions"
@@ -78,38 +106,10 @@ EOF
     echo "CAMERA: Positioned at ($x,$y,$z)"
 }
 
-# Auto-generated from POST /browser/canvas
-hd1::canvas_control() {
-    local command="$1"
-    shift
-    local objects="$@"
-    
-    if [[ -z "$command" ]]; then
-        echo "Usage: hd1::canvas_control <command> [objects...]"
-        return 1
-    fi
-    
-    local payload=$(cat <<EOF
-{
-    "command": "$command",
-    "objects": [$objects]
-}
-EOF
-)
-    
-    hd1::api_call "POST" "/browser/canvas" "$payload"
-}
-
-# Clear HD1 scene (uses canvas control)
-hd1::clear() {
-    echo "CLEAR: Clearing HD1 scene..."
-    hd1::canvas_control "clear"
-}
-
 
 echo "HD1: Core Functions Loaded - AUTO-GENERATED FROM API SPEC"
 echo "SPEC: Generated from api.yaml specification"
 echo "SYNC: Single source of truth - Zero manual synchronization"
 echo "FUNCS: canvas_control, clear, camera, session management"
-echo "SESSION: create_session, get_session, join_channel"
+echo "SESSION: create_session, get_session, join_world"
 echo "STATUS: Bar-raising achieved"

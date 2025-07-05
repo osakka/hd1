@@ -1,0 +1,64 @@
+# HD1 World One - Minimalist Red Box Scene
+# Scene 1: Red Box + Overhead Light + Earth Environment
+
+world:
+  id: "world_one"
+  name: "Scene 1 - Red Box"
+  description: "Minimalist scene with red box and overhead lighting"
+  max_clients: 100
+
+# Native PlayCanvas Scene Configuration
+playcanvas:
+  # Global scene settings - Earth-like environment
+  scene:
+    ambientLight: [0.3, 0.3, 0.3]  # RGB values 0-1 (soft ambient)
+    gravity: [0, -9.81, 0]          # Earth gravity
+    
+  # Minimal entities: red box + overhead light + floor
+  entities:
+    - name: "floor"
+      components:
+        model:
+          type: "plane"
+        transform:
+          position: [0, -0.1, 0]  # Slightly below origin
+          rotation: [0, 0, 0]     # No rotation - flat horizontal
+          scale: [10, 1, 10]      # 10x1x10 floor (10 wide, 1 tall, 10 deep)
+        material:
+          diffuse: "#cccccc"      # Light gray floor
+          metalness: 0.1
+          roughness: 0.8
+        rigidbody:
+          type: "static"
+        collision:
+          type: "box"
+          
+    - name: "red_box"
+      components:
+        model:
+          type: "box"
+        transform:
+          position: [0, 1, 0]     # 1 unit above floor
+          scale: [1, 1, 1]        # 1x1x1 meter box
+        material:
+          diffuse: "#ff0000"     # Pure red
+          metalness: 0.0         # Non-metallic for better color
+          roughness: 0.7
+          shininess: 50
+        rigidbody:
+          type: "dynamic"
+          mass: 1.0
+        collision:
+          type: "box"
+          
+    - name: "overhead_light"
+      components:
+        light:
+          type: "directional"
+          color: [1.0, 1.0, 1.0]  # RGB values 0-1 (white)
+          intensity: 3.0          # Intensity 0-10 range
+          castShadows: true
+          enabled: true           # Explicitly enable
+        transform:
+          position: [0, 10, 5]    # Position for reference
+          rotation: [60, 30, 0]   # More direct downward angle

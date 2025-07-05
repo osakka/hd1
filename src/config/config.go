@@ -20,7 +20,7 @@ type HD1Config struct {
 	Client    ClientConfig    `json:"client"`
 	WebSocket WebSocketConfig `json:"websocket"`
 	Session   SessionConfig   `json:"session"`
-	Channels  ChannelsConfig  `json:"channels"`
+	Worlds    WorldsConfig    `json:"worlds"`
 	Avatars   AvatarsConfig   `json:"avatars"`
 	Sync      SyncConfig      `json:"sync"`
 }
@@ -44,7 +44,7 @@ type PathsConfig struct {
 	ShareDir     string `json:"share_dir"`
 	HtDocsDir    string `json:"htdocs_dir"`
 	PIDFile      string `json:"pid_file"`
-	ChannelsDir  string `json:"channels_dir"`
+	WorldsDir    string `json:"worlds_dir"`
 	AvatarsDir   string `json:"avatars_dir"`
 	RecordingsDir string `json:"recordings_dir"`
 }
@@ -68,7 +68,7 @@ type WebSocketConfig struct {
 	MaxMessageSize      int64         `json:"max_message_size"`
 	ReadBufferSize      int           `json:"read_buffer_size"`
 	WriteBufferSize     int           `json:"write_buffer_size"`
-	ClientChannelBuffer int           `json:"client_channel_buffer"`
+	ClientWorldBuffer int           `json:"client_world_buffer"`
 }
 
 // SessionConfig contains session management configuration
@@ -79,10 +79,10 @@ type SessionConfig struct {
 	DefaultSessionID    string        `json:"default_session_id"`
 }
 
-// ChannelsConfig contains channel system configuration
-type ChannelsConfig struct {
+// WorldsConfig contains world system configuration
+type WorldsConfig struct {
 	ConfigFile       string   `json:"config_file"`
-	DefaultChannel   string   `json:"default_channel"`
+	DefaultWorld     string   `json:"default_world"`
 	ProtectedList    []string `json:"protected_list"`
 	AutoJoinOnCreate bool     `json:"auto_join_on_create"`
 	SyncOnJoin       bool     `json:"sync_on_join"`
@@ -109,7 +109,7 @@ type SyncConfig struct {
 	CausalityTimeout       time.Duration `json:"causality_timeout"`        // Timeout for out-of-order operations
 	DeltaQueueSize         int           `json:"delta_queue_size"`         // Size of delta operation queue
 	AvatarRegistrySize     int           `json:"avatar_registry_size"`     // Initial avatar registry capacity
-	BroadcastChannelBuffer int           `json:"broadcast_channel_buffer"` // Broadcast channel buffer size
+	BroadcastWorldBuffer int           `json:"broadcast_world_buffer"` // Broadcast world buffer size
 	WorldStateCompressionEnabled bool    `json:"world_state_compression_enabled"` // Enable world state compression
 	PerformanceMetricsEnabled bool      `json:"performance_metrics_enabled"`     // Enable sync performance metrics
 	VectorClockPrecision   int           `json:"vector_clock_precision"`   // Vector clock precision bits
@@ -163,7 +163,7 @@ func (c *HD1Config) loadDefaults() {
 	c.Paths.ShareDir = filepath.Join(rootDir, "share")
 	c.Paths.HtDocsDir = filepath.Join(rootDir, "share", "htdocs")
 	c.Paths.PIDFile = filepath.Join(rootDir, "build", "runtime", "hd1.pid")
-	c.Paths.ChannelsDir = filepath.Join(rootDir, "share", "channels")
+	c.Paths.WorldsDir = filepath.Join(rootDir, "share", "worlds")
 	c.Paths.AvatarsDir = filepath.Join(rootDir, "share", "avatars")
 	c.Paths.RecordingsDir = filepath.Join(rootDir, "recordings")
 	c.Server.StaticDir = filepath.Join(rootDir, "share", "htdocs", "static")
@@ -180,7 +180,7 @@ func (c *HD1Config) loadDefaults() {
 	c.WebSocket.MaxMessageSize = 1048576  // 1MB for GLB assets
 	c.WebSocket.ReadBufferSize = 1048576  // 1MB read buffer
 	c.WebSocket.WriteBufferSize = 1048576 // 1MB write buffer
-	c.WebSocket.ClientChannelBuffer = 256
+	c.WebSocket.ClientWorldBuffer = 256
 	
 	// Session defaults (based on current hardcoded values)
 	c.Session.CleanupInterval = 2 * time.Minute
@@ -188,12 +188,12 @@ func (c *HD1Config) loadDefaults() {
 	c.Session.HTTPClientTimeout = 5 * time.Second
 	c.Session.DefaultSessionID = "session-19cdcfgj"
 	
-	// Channels defaults
-	c.Channels.ConfigFile = "config.yaml"
-	c.Channels.DefaultChannel = "channel_one"
-	c.Channels.ProtectedList = []string{"channel_one", "channel_two"}
-	c.Channels.AutoJoinOnCreate = true
-	c.Channels.SyncOnJoin = true
+	// Worlds defaults
+	c.Worlds.ConfigFile = "config.yaml"
+	c.Worlds.DefaultWorld = "world_one"
+	c.Worlds.ProtectedList = []string{"world_one", "world_two"}
+	c.Worlds.AutoJoinOnCreate = true
+	c.Worlds.SyncOnJoin = true
 	
 	// Avatars defaults (based on current hardcoded values)
 	c.Avatars.ConfigFile = "config.yaml"
@@ -213,7 +213,7 @@ func (c *HD1Config) loadDefaults() {
 	c.Sync.CausalityTimeout = 5 * time.Second    // Timeout for out-of-order ops
 	c.Sync.DeltaQueueSize = 1000                 // Queue size for causality resolution
 	c.Sync.AvatarRegistrySize = 100              // Initial avatar registry capacity
-	c.Sync.BroadcastChannelBuffer = 1024         // Configurable broadcast buffer
+	c.Sync.BroadcastWorldBuffer = 1024         // Configurable broadcast buffer
 	c.Sync.WorldStateCompressionEnabled = true   // Enable compression for performance
 	c.Sync.PerformanceMetricsEnabled = false     // Disable metrics by default
 	c.Sync.VectorClockPrecision = 64             // 64-bit vector clock precision
@@ -300,8 +300,8 @@ func (c *HD1Config) loadEnvironmentVariables() {
 		c.Server.StaticDir = staticDir
 	}
 	
-	if channelsDir := os.Getenv("HD1_CHANNELS_DIR"); channelsDir != "" {
-		c.Paths.ChannelsDir = channelsDir
+	if worldsDir := os.Getenv("HD1_WORLDS_DIR"); worldsDir != "" {
+		c.Paths.WorldsDir = worldsDir
 	}
 	if avatarsDir := os.Getenv("HD1_AVATARS_DIR"); avatarsDir != "" {
 		c.Paths.AvatarsDir = avatarsDir
@@ -352,9 +352,9 @@ func (c *HD1Config) loadEnvironmentVariables() {
 			c.WebSocket.WriteBufferSize = size
 		}
 	}
-	if channelBuffer := os.Getenv("HD1_WEBSOCKET_CLIENT_CHANNEL_BUFFER"); channelBuffer != "" {
-		if size, err := strconv.Atoi(channelBuffer); err == nil {
-			c.WebSocket.ClientChannelBuffer = size
+	if worldBuffer := os.Getenv("HD1_WEBSOCKET_CLIENT_WORLD_BUFFER"); worldBuffer != "" {
+		if size, err := strconv.Atoi(worldBuffer); err == nil {
+			c.WebSocket.ClientWorldBuffer = size
 		}
 	}
 	
@@ -378,25 +378,25 @@ func (c *HD1Config) loadEnvironmentVariables() {
 		c.Session.DefaultSessionID = defaultSessionID
 	}
 	
-	// Channels configuration
-	if configFile := os.Getenv("HD1_CHANNELS_CONFIG_FILE"); configFile != "" {
-		c.Channels.ConfigFile = configFile
+	// Worlds configuration
+	if configFile := os.Getenv("HD1_WORLDS_CONFIG_FILE"); configFile != "" {
+		c.Worlds.ConfigFile = configFile
 	}
-	if defaultChannel := os.Getenv("HD1_CHANNELS_DEFAULT_CHANNEL"); defaultChannel != "" {
-		c.Channels.DefaultChannel = defaultChannel
+	if defaultWorld := os.Getenv("HD1_WORLDS_DEFAULT_WORLD"); defaultWorld != "" {
+		c.Worlds.DefaultWorld = defaultWorld
 	}
-	if autoJoin := os.Getenv("HD1_CHANNELS_AUTO_JOIN_ON_CREATE"); autoJoin == "true" || autoJoin == "1" {
-		c.Channels.AutoJoinOnCreate = true
+	if autoJoin := os.Getenv("HD1_WORLDS_AUTO_JOIN_ON_CREATE"); autoJoin == "true" || autoJoin == "1" {
+		c.Worlds.AutoJoinOnCreate = true
 	} else if autoJoin == "false" || autoJoin == "0" {
-		c.Channels.AutoJoinOnCreate = false
+		c.Worlds.AutoJoinOnCreate = false
 	}
-	if syncOnJoin := os.Getenv("HD1_CHANNELS_SYNC_ON_JOIN"); syncOnJoin == "true" || syncOnJoin == "1" {
-		c.Channels.SyncOnJoin = true
+	if syncOnJoin := os.Getenv("HD1_WORLDS_SYNC_ON_JOIN"); syncOnJoin == "true" || syncOnJoin == "1" {
+		c.Worlds.SyncOnJoin = true
 	} else if syncOnJoin == "false" || syncOnJoin == "0" {
-		c.Channels.SyncOnJoin = false
+		c.Worlds.SyncOnJoin = false
 	}
-	if protectedList := os.Getenv("HD1_CHANNELS_PROTECTED_LIST"); protectedList != "" {
-		c.Channels.ProtectedList = strings.Split(protectedList, ",")
+	if protectedList := os.Getenv("HD1_WORLDS_PROTECTED_LIST"); protectedList != "" {
+		c.Worlds.ProtectedList = strings.Split(protectedList, ",")
 	}
 	
 	// Avatars configuration
@@ -471,9 +471,9 @@ func (c *HD1Config) loadEnvironmentVariables() {
 			c.Sync.AvatarRegistrySize = size
 		}
 	}
-	if broadcastBuffer := os.Getenv("HD1_SYNC_BROADCAST_CHANNEL_BUFFER"); broadcastBuffer != "" {
+	if broadcastBuffer := os.Getenv("HD1_SYNC_BROADCAST_WORLD_BUFFER"); broadcastBuffer != "" {
 		if buffer, err := strconv.Atoi(broadcastBuffer); err == nil {
-			c.Sync.BroadcastChannelBuffer = buffer
+			c.Sync.BroadcastWorldBuffer = buffer
 		}
 	}
 	if compression := os.Getenv("HD1_SYNC_WORLD_STATE_COMPRESSION_ENABLED"); compression == "true" || compression == "1" {
@@ -512,7 +512,7 @@ func (c *HD1Config) loadFlags() {
 		logFile := flag.String("log-file", c.Logging.LogFile, "Log file path (absolute)")
 		logLevel := flag.String("log-level", c.Logging.Level, "Logging level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
 		traceModules := flag.String("trace-modules", strings.Join(c.Logging.TraceModules, ","), "Comma-separated trace modules")
-		protectedChannels := flag.String("protected-channels", strings.Join(c.Channels.ProtectedList, ","), "Comma-separated list of protected channels")
+		protectedWorlds := flag.String("protected-worlds", strings.Join(c.Worlds.ProtectedList, ","), "Comma-separated list of protected worlds")
 		
 		flag.Parse()
 		
@@ -541,8 +541,8 @@ func (c *HD1Config) loadFlags() {
 		if *traceModules != "" {
 			c.Logging.TraceModules = strings.Split(*traceModules, ",")
 		}
-		if *protectedChannels != "" {
-			c.Channels.ProtectedList = strings.Split(*protectedChannels, ",")
+		if *protectedWorlds != "" {
+			c.Worlds.ProtectedList = strings.Split(*protectedWorlds, ",")
 		}
 		
 		// Recompute derived paths if root changed
@@ -577,8 +577,8 @@ func (c *HD1Config) computeDerivedPaths() {
 	if c.Server.StaticDir == "" || strings.HasPrefix(c.Server.StaticDir, "/opt/hd1") {
 		c.Server.StaticDir = filepath.Join(c.Paths.HtDocsDir, "static")
 	}
-	if c.Paths.ChannelsDir == "" || strings.HasPrefix(c.Paths.ChannelsDir, "/opt/hd1") {
-		c.Paths.ChannelsDir = filepath.Join(c.Paths.ShareDir, "channels")
+	if c.Paths.WorldsDir == "" || strings.HasPrefix(c.Paths.WorldsDir, "/opt/hd1") {
+		c.Paths.WorldsDir = filepath.Join(c.Paths.ShareDir, "worlds")
 	}
 	if c.Paths.AvatarsDir == "" || strings.HasPrefix(c.Paths.AvatarsDir, "/opt/hd1") {
 		c.Paths.AvatarsDir = filepath.Join(c.Paths.ShareDir, "avatars")
@@ -681,12 +681,12 @@ func GetDaemon() bool {
 	return false // fallback
 }
 
-// GetChannelsDir returns the configured channels directory
-func GetChannelsDir() string {
+// GetWorldsDir returns the configured worlds directory
+func GetWorldsDir() string {
 	if Config != nil {
-		return Config.Paths.ChannelsDir
+		return Config.Paths.WorldsDir
 	}
-	return "/opt/hd1/share/channels" // fallback
+	return "/opt/hd1/share/worlds" // fallback
 }
 
 // GetAvatarsDir returns the configured avatars directory
@@ -705,12 +705,12 @@ func GetRecordingsDir() string {
 	return "/opt/hd1/recordings" // fallback
 }
 
-// GetChannelsConfigFile returns the configured channels config file path
-func GetChannelsConfigFile() string {
+// GetWorldsConfigFile returns the configured worlds config file path
+func GetWorldsConfigFile() string {
 	if Config != nil {
-		return filepath.Join(Config.Paths.ChannelsDir, Config.Channels.ConfigFile)
+		return filepath.Join(Config.Paths.WorldsDir, Config.Worlds.ConfigFile)
 	}
-	return "/opt/hd1/share/channels/config.yaml" // fallback
+	return "/opt/hd1/share/worlds/config.yaml" // fallback
 }
 
 // GetAvatarsConfigFile returns the configured avatars config file path
@@ -764,9 +764,9 @@ func GetWebSocketWriteBufferSize() int {
 	return 1024 // fallback
 }
 
-func GetWebSocketClientChannelBuffer() int {
+func GetWebSocketClientWorldBuffer() int {
 	if Config != nil {
-		return Config.WebSocket.ClientChannelBuffer
+		return Config.WebSocket.ClientWorldBuffer
 	}
 	return 256 // fallback
 }
@@ -800,34 +800,34 @@ func GetSessionDefaultID() string {
 	return "session-19cdcfgj" // fallback
 }
 
-// Channels configuration getters
-func GetChannelsDefaultChannel() string {
+// Worlds configuration getters
+func GetWorldsDefaultWorld() string {
 	if Config != nil {
-		return Config.Channels.DefaultChannel
+		return Config.Worlds.DefaultWorld
 	}
-	return "channel_one" // fallback
+	return "world_one" // fallback
 }
 
-func GetChannelsAutoJoinOnCreate() bool {
+func GetWorldsAutoJoinOnCreate() bool {
 	if Config != nil {
-		return Config.Channels.AutoJoinOnCreate
+		return Config.Worlds.AutoJoinOnCreate
 	}
 	return true // fallback
 }
 
-func GetChannelsSyncOnJoin() bool {
+func GetWorldsSyncOnJoin() bool {
 	if Config != nil {
-		return Config.Channels.SyncOnJoin
+		return Config.Worlds.SyncOnJoin
 	}
 	return true // fallback
 }
 
-// GetChannelsProtectedList returns the list of protected channels
-func GetChannelsProtectedList() []string {
+// GetWorldsProtectedList returns the list of protected worlds
+func GetWorldsProtectedList() []string {
 	if Config != nil {
-		return Config.Channels.ProtectedList
+		return Config.Worlds.ProtectedList
 	}
-	return []string{"channel_one", "channel_two"} // fallback
+	return []string{"world_one", "world_two"} // fallback
 }
 
 // GetInternalAPIBase returns the configured internal API base URL
@@ -946,9 +946,9 @@ func GetSyncAvatarRegistrySize() int {
 	return 100 // fallback
 }
 
-func GetSyncBroadcastChannelBuffer() int {
+func GetSyncBroadcastWorldBuffer() int {
 	if Config != nil {
-		return Config.Sync.BroadcastChannelBuffer
+		return Config.Sync.BroadcastWorldBuffer
 	}
 	return 1024 // fallback
 }

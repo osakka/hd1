@@ -96,8 +96,8 @@ func DeleteEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 		"cascade":    cascade,
 	})
 	
-	// Broadcast entity deletion via WebSocket
-	h.BroadcastUpdate("entity_deleted", map[string]interface{}{
+	// CRITICAL FIX: Use world-based broadcast for multiplayer entity visibility
+	h.BroadcastAvatarPositionToChannel(sessionID, "entity_deleted", map[string]interface{}{
 		"session_id": sessionID,
 		"entity_id":  entityID,
 		"cascade":    cascade,

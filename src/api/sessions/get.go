@@ -35,7 +35,7 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request, hub interface{}) 
 		"id":         session.ID,
 		"created_at": session.CreatedAt,
 		"status":     session.Status,
-		"channel_id": session.ChannelID, // Current channel joined
+		"world_id": session.WorldID, // Current world joined
 	}
 	
 	w.Header().Set("Content-Type", "application/json")

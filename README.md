@@ -47,12 +47,12 @@ HD1 has a **complete API surface** for 3D engine control with **82 REST endpoint
 - **Scene Hierarchy**: Parent-child relationships and transform inheritance
 
 ### 🌐 Multi-User Collaborative Environment
-- **Channel Architecture**: YAML-based scene configuration
+- **World Architecture**: YAML-based scene configuration
 - **Real-Time Sync**: WebSocket state synchronization
 - **Avatar Persistence**: High-frequency position updates (100+ per second) without entity deletion
 - **Multiplayer Camera**: Orbital mode for multi-session viewing with automatic centering
 - **Session Isolation**: Per-user state with clean restoration
-- **Concurrent Users**: Multiple operators per channel with conflict resolution
+- **Concurrent Users**: Multiple operators per world with conflict resolution
 
 ### 🔗 Service Integration Platform
 > **The Holodeck Vision**: Any service can **present**, **animate**, **demonstrate**, **write**, **talk**, and **play** through HD1's visual interface.

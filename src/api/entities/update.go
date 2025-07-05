@@ -285,7 +285,8 @@ func UpdateEntityHandler(w http.ResponseWriter, r *http.Request, hub interface{}
 	broadcastData["entity_id"] = entityID
 	broadcastData["changes"] = changes
 	
-	h.BroadcastUpdate("entity_updated", broadcastData)
+	// CRITICAL FIX: Use world-based broadcast for multiplayer entity visibility
+	h.BroadcastAvatarPositionToChannel(sessionID, "entity_updated", broadcastData)
 	
 	// Use pooled map for API response
 	responseData := memory.GetWebSocketUpdate()

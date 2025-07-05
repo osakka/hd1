@@ -18,7 +18,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 2. **Single Source of Truth** - All functionality auto-generated from `api.yaml`
 3. **Specification-Driven Development** - OpenAPI 3.0.3 as system foundation
 4. **Entity-Component-System** - Modern game engine architecture
-5. **Channel-Based Collaboration** - YAML-configured multi-user environments
+5. **World-Based Collaboration** - YAML-configured multi-user environments
 
 ## 📚 **Architecture Documentation**
 
@@ -33,7 +33,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → PlayCanvas
 
 ### **Component Architecture**
 - **[Entity-Component-System](../user-guide/entities-components.md)** - Game object architecture
-- **[Channel System](../user-guide/channels.md)** - Scene configuration and collaboration
+- **[World System](../user-guide/worlds.md)** - Scene configuration and collaboration
 - **[Template System](../developer-guide/api-development.md#template-architecture)** - Code generation architecture
 
 ## 🏗️ **Key Architectural Decisions**
@@ -54,11 +54,11 @@ All system functionality is auto-generated from OpenAPI specification:
 - **Client Libraries** - JavaScript, Go CLI, and shell functions auto-generated
 - **Template Architecture** - External templates for maintainable code generation
 
-### **Channel-Based Collaboration**
-Multi-user collaboration through YAML-configured channels:
+### **World-Based Collaboration**
+Multi-user collaboration through YAML-configured worlds:
 
 - **YAML Configuration** - Declarative scene definition
-- **Isolated Environments** - Per-channel collaborative spaces
+- **Isolated Environments** - Per-world collaborative spaces
 - **Real-Time Synchronization** - Live state sync across all clients
 - **Session Management** - Per-user session isolation
 
@@ -75,7 +75,7 @@ Multi-user collaboration through YAML-configured channels:
 - **API Response Time** - <50ms for entity operations
 - **WebSocket Latency** - <10ms for state synchronization
 - **Entity Creation** - <100ms end-to-end with rendering
-- **Concurrent Clients** - 100+ per channel, 500+ total connections
+- **Concurrent Clients** - 100+ per world, 500+ total connections
 
 ### **Quality Standards**
 - **Thread-Safe** - Comprehensive concurrency safety

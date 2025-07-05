@@ -5,10 +5,10 @@
 //
 // Key components:
 //   - Hub: Central WebSocket coordinator with session management
-//   - SessionChannel: Persistent session state with message queuing
+//   - SessionWorld: Persistent session state with message queuing
 //   - Client management: WebSocket connection lifecycle
 //   - Graph state: Real-time 3D scene synchronization
-//   - Channel integration: YAML-based scene configuration loading
+//   - World integration: YAML-based scene configuration loading
 package server
 
 import (
@@ -48,8 +48,8 @@ type Hub struct {
 	store         *SessionStore               // Thread-safe session persistence
 	mutex         sync.RWMutex                // Hub-level concurrency protection
 	
-	// Session Graph Architecture - Channel-based persistence
-	sessionChannels     map[string]*SessionChannel  // sessionID -> SessionChannel mapping
+	// Session Graph Architecture - World-based persistence
+	sessionWorlds       map[string]*SessionWorld    // sessionID -> SessionWorld mapping
 	clientSessions   map[*Client]string           // client -> sessionID reverse mapping
 	
 	// 🔥 REVOLUTIONARY HD1-VSC SYNCHRONIZATION PROTOCOL
@@ -57,11 +57,11 @@ type Hub struct {
 	syncMutex        sync.RWMutex               // Sync protocol protection
 }
 
-// SessionChannel represents a persistent session with TCP-level reliability.
+// SessionWorld represents a persistent session with TCP-level reliability.
 // Maintains session graph state, client membership, and message queuing
 // for reliable delivery during client reconnections. Thread-safe with
 // individual mutex protection for session-level concurrency.
-type SessionChannel struct {
+type SessionWorld struct {
 	sessionID     string                      // Unique session identifier
 	clients       map[*Client]bool            // Active clients in this session
 	clientIDs     map[string]time.Time        // Client ID tracking with join time (CRITICAL FIX)
@@ -71,11 +71,11 @@ type SessionChannel struct {
 	messageQueue  [][]byte                    // Queued messages for reconnecting clients
 }
 
-// NewSessionChannel creates a new persistent session channel.
+// NewSessionWorld creates a new persistent session world.
 // Initializes empty client map, graph state, and message queue
 // for reliable session management and state persistence.
-func NewSessionChannel(sessionID string) *SessionChannel {
-	return &SessionChannel{
+func NewSessionWorld(sessionID string) *SessionWorld {
+	return &SessionWorld{
 		sessionID:    sessionID,
 		clients:      make(map[*Client]bool),
 		clientIDs:    make(map[string]time.Time), // CRITICAL FIX: Initialize client ID map
@@ -85,14 +85,14 @@ func NewSessionChannel(sessionID string) *SessionChannel {
 	}
 }
 
-// PlayCanvasEntity represents a 3D entity loaded from YAML channel configuration.
+// PlayCanvasEntity represents a 3D entity loaded from YAML world configuration.
 // Contains entity name and PlayCanvas component structure for scene initialization.
 type PlayCanvasEntity struct {
 	Name       string                 `json:"name" yaml:"name"`           // Entity display name
 	Components map[string]interface{} `json:"components" yaml:"components"` // PlayCanvas components (transform, model, etc.)
 }
 
-// PlayCanvasScene represents scene-level configuration from YAML channels.
+// PlayCanvasScene represents scene-level configuration from YAML worlds.
 // Defines global scene properties like lighting and physics settings.
 type PlayCanvasScene struct {
 	AmbientLight interface{} `json:"ambientLight,omitempty" yaml:"ambientLight,omitempty"` // Ambient light (string color or RGB array)
@@ -100,33 +100,33 @@ type PlayCanvasScene struct {
 }
 
 // PlayCanvasConfig represents the complete PlayCanvas configuration from YAML.
-// Contains scene settings and pre-defined entities for channel initialization.
+// Contains scene settings and pre-defined entities for world initialization.
 type PlayCanvasConfig struct {
 	Scene    PlayCanvasScene    `json:"scene,omitempty" yaml:"scene,omitempty"`     // Global scene configuration
-	Entities []PlayCanvasEntity `json:"entities,omitempty" yaml:"entities,omitempty"` // Pre-defined channel entities
+	Entities []PlayCanvasEntity `json:"entities,omitempty" yaml:"entities,omitempty"` // Pre-defined world entities
 }
 
-// ChannelConfig represents the top-level YAML channel configuration.
+// WorldConfig represents the top-level YAML world configuration.
 // Contains PlayCanvas-specific settings and can be extended with additional
-// channel properties as needed.
-type ChannelConfig struct {
+// world properties as needed.
+type WorldConfig struct {
 	PlayCanvas *PlayCanvasConfig `yaml:"playcanvas,omitempty"` // PlayCanvas engine configuration
 }
 
 // NewHub creates and initializes a new WebSocket hub.
-// Sets up all channels, maps, and managers required for session coordination.
+// Sets up all Go channels, maps, and managers required for session coordination.
 // Returns a ready-to-use hub that can be started with Run().
 func NewHub() *Hub {
 	hub := &Hub{
 		clients:    make(map[*Client]bool),
-		broadcast:  make(chan []byte, config.GetSyncBroadcastChannelBuffer()),
+		broadcast:  make(chan []byte, config.GetSyncBroadcastWorldBuffer()),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		logger:     NewLogManager(),
 		store:      NewSessionStore(),
 		
 		// Session Graph Architecture
-		sessionChannels:   make(map[string]*SessionChannel),
+		sessionWorlds:     make(map[string]*SessionWorld),
 		clientSessions: make(map[*Client]string),
 		
 		// 🔥 REVOLUTIONARY HD1-VSC SYNCHRONIZATION PROTOCOL
@@ -147,9 +147,9 @@ func NewHub() *Hub {
 	return hub
 }
 
-// Session Channel Management Methods
+// Session World Management Methods
 
-// JoinSessionChannel joins a client to a session channel with TCP-level reliability.
+// JoinSessionWorld joins a client to a session world with TCP-level reliability.
 // Provides persistent session state, message queuing for reconnections, and
 // graph state synchronization for collaborative 3D environments.
 //
@@ -159,14 +159,14 @@ func NewHub() *Hub {
 //   - reconnect: Whether this is a reconnection (affects message delivery)
 //
 // Returns:
-//   - SessionChannel: The joined session channel
+//   - SessionWorld: The joined session world
 //   - int: Number of queued messages delivered
 //   - map[string]interface{}: Current session graph state
 //
 // Thread-safe with hub-level mutex protection.
-func (h *Hub) JoinSessionChannel(sessionID, clientID string, reconnect bool) (*SessionChannel, int, map[string]interface{}) {
+func (h *Hub) JoinSessionWorld(sessionID, clientID string, reconnect bool) (*SessionWorld, int, map[string]interface{}) {
 	// TRACE: Detailed WebSocket session management debugging
-	logging.Trace("websocket", "session channel join request", map[string]interface{}{
+	logging.Trace("websocket", "session world join request", map[string]interface{}{
 		"session_id": sessionID,
 		"client_id": clientID,
 		"reconnect": reconnect,
@@ -175,76 +175,69 @@ func (h *Hub) JoinSessionChannel(sessionID, clientID string, reconnect bool) (*S
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 	
-	// CRITICAL FIX: Use channel_id for named channels to enable multi-user channels
-	session, _ := h.store.GetSession(sessionID)
-	channelKey := sessionID // Default to session-based channels
-	if session.ChannelID != "" {
-		channelKey = session.ChannelID // Use named channel for shared access
-	}
+	// CRITICAL FIX: Use centralized world key resolution
+	worldKey := h.GetWorldKey(sessionID)
+	session, _ := h.store.GetSession(sessionID) // Get session for logging
 	
-	// Get or create session channel using proper key
-	channel, exists := h.sessionChannels[channelKey]
+	// Get or create session world using proper key
+	world, exists := h.sessionWorlds[worldKey]
 	if !exists {
-		channel = NewSessionChannel(channelKey)
-		h.sessionChannels[channelKey] = channel
-		logging.Info("session channel created", map[string]interface{}{
-			"channel_key": channelKey,
+		world = NewSessionWorld(worldKey)
+		h.sessionWorlds[worldKey] = world
+		logging.Info("session world created", map[string]interface{}{
+			"world_key": worldKey,
 			"session_id": sessionID,
-			"named_channel": session.ChannelID != "",
+			"named_world": session.WorldID != "",
 		})
 	}
 	
-	// Add client to channel using clientID tracking (CRITICAL FIX)
-	channel.mutex.Lock()
-	channel.clientIDs[clientID] = time.Now() // Track client ID properly
-	channel.lastActivity = time.Now()
-	clientCount := len(channel.clientIDs) // Use clientIDs for accurate count
+	// Add client to world using clientID tracking (CRITICAL FIX)
+	world.mutex.Lock()
+	world.clientIDs[clientID] = time.Now() // Track client ID properly
+	world.lastActivity = time.Now()
+	clientCount := len(world.clientIDs) // Use clientIDs for accurate count
 	
-	// Initialize graph state from session entities if channel is new
-	if len(channel.graphState) == 0 {
-		// Entities are managed via channels/PlayCanvas, not stored in sessions
-		channel.graphState["entities"] = []interface{}{}
-		channel.graphState["last_updated"] = time.Now()
+	// Initialize graph state from session entities if world is new
+	if len(world.graphState) == 0 {
+		// Entities are managed via worlds/PlayCanvas, not stored in sessions
+		world.graphState["entities"] = []interface{}{}
+		world.graphState["last_updated"] = time.Now()
 	}
 	
 	graphState := make(map[string]interface{})
-	for k, v := range channel.graphState {
+	for k, v := range world.graphState {
 		graphState[k] = v
 	}
-	channel.mutex.Unlock()
+	world.mutex.Unlock()
 	
-	return channel, clientCount, graphState
+	return world, clientCount, graphState
 }
 
-// LeaveSessionChannel removes a client from a session channel
-func (h *Hub) LeaveSessionChannel(sessionID, clientID string) (bool, int) {
+// LeaveSessionWorld removes a client from a session world
+func (h *Hub) LeaveSessionWorld(sessionID, clientID string) (bool, int) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 	
-	// CRITICAL FIX: Use same channel key logic as JoinSessionChannel
-	session, _ := h.store.GetSession(sessionID)
-	channelKey := sessionID
-	if session.ChannelID != "" {
-		channelKey = session.ChannelID
-	}
+	// CRITICAL FIX: Use centralized world key resolution
+	worldKey := h.GetWorldKey(sessionID)
 	
-	channel, exists := h.sessionChannels[channelKey]
+	world, exists := h.sessionWorlds[worldKey]
 	if !exists {
 		return false, 0
 	}
 	
-	channel.mutex.Lock()
-	defer channel.mutex.Unlock()
+	world.mutex.Lock()
+	defer world.mutex.Unlock()
 	
-	// Remove client from channel using clientIDs (CRITICAL FIX)
-	if _, exists := channel.clientIDs[clientID]; exists {
-		delete(channel.clientIDs, clientID)
-		channel.lastActivity = time.Now()
-		clientCount := len(channel.clientIDs)
+	// Remove client from world using clientIDs (CRITICAL FIX)
+	if _, exists := world.clientIDs[clientID]; exists {
+		delete(world.clientIDs, clientID)
+		world.lastActivity = time.Now()
+		clientCount := len(world.clientIDs)
 		return true, clientCount
 	}
 	
-	return false, len(channel.clientIDs)
+	return false, len(world.clientIDs)
 }
 
 // GetSessionGraphState retrieves the current graph state for a session
@@ -252,48 +245,48 @@ func (h *Hub) GetSessionGraphState(sessionID string) (map[string]interface{}, in
 	h.mutex.RLock()
 	defer h.mutex.RUnlock()
 	
-	channel, exists := h.sessionChannels[sessionID]
+	world, exists := h.sessionWorlds[sessionID]
 	if !exists {
-		// Return empty state if channel doesn't exist yet
+		// Return empty state if world doesn't exist yet
 		return make(map[string]interface{}), 0, time.Now()
 	}
 	
-	channel.mutex.RLock()
-	defer channel.mutex.RUnlock()
+	world.mutex.RLock()
+	defer world.mutex.RUnlock()
 	
 	graphState := make(map[string]interface{})
-	for k, v := range channel.graphState {
+	for k, v := range world.graphState {
 		graphState[k] = v
 	}
 	
 	lastUpdated := time.Now()
-	if t, ok := channel.graphState["last_updated"].(time.Time); ok {
+	if t, ok := world.graphState["last_updated"].(time.Time); ok {
 		lastUpdated = t
 	}
 	
-	return graphState, len(channel.clients), lastUpdated
+	return graphState, len(world.clients), lastUpdated
 }
 
-// UpdateSessionGraphState updates the graph state and broadcasts to channel members
+// UpdateSessionGraphState updates the graph state and broadcasts to world members
 func (h *Hub) UpdateSessionGraphState(sessionID, clientID string, updates map[string]interface{}, atomic bool) (int, error) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 	
-	channel, exists := h.sessionChannels[sessionID]
+	world, exists := h.sessionWorlds[sessionID]
 	if !exists {
-		channel = NewSessionChannel(sessionID)
-		h.sessionChannels[sessionID] = channel
+		world = NewSessionWorld(sessionID)
+		h.sessionWorlds[sessionID] = world
 	}
 	
-	channel.mutex.Lock()
-	defer channel.mutex.Unlock()
+	world.mutex.Lock()
+	defer world.mutex.Unlock()
 	
 	// Apply updates to graph state
 	for k, v := range updates {
-		channel.graphState[k] = v
+		world.graphState[k] = v
 	}
-	channel.graphState["last_updated"] = time.Now()
-	channel.lastActivity = time.Now()
+	world.graphState["last_updated"] = time.Now()
+	world.lastActivity = time.Now()
 	
 	// Broadcast updates to all session clients
 	broadcastData := map[string]interface{}{
@@ -304,7 +297,7 @@ func (h *Hub) UpdateSessionGraphState(sessionID, clientID string, updates map[st
 	
 	h.BroadcastToSession(sessionID, "graph_updated", broadcastData)
 	
-	return len(channel.clients), nil
+	return len(world.clients), nil
 }
 
 // SyncSessionState forces synchronization of session state across all clients
@@ -312,76 +305,72 @@ func (h *Hub) SyncSessionState(sessionID string, forceFullSync bool) (int, error
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 	
-	channel, exists := h.sessionChannels[sessionID]
+	world, exists := h.sessionWorlds[sessionID]
 	if !exists {
-		return 0, nil // No channel to sync
+		return 0, nil // No world to sync
 	}
 	
-	channel.mutex.Lock()
-	defer channel.mutex.Unlock()
+	world.mutex.Lock()
+	defer world.mutex.Unlock()
 	
-	// Get current session entities for full sync (from channel)
-	entities := []interface{}{} // Entities managed via PlayCanvas/channels
+	// Get current session entities for full sync (from world)
+	entities := []interface{}{} // Entities managed via PlayCanvas/worlds
 	
 	syncData := map[string]interface{}{
 		"sync_type":     "full",
 		"entities":      entities,
-		"graph_state":   channel.graphState,
+		"graph_state":   world.graphState,
 		"force_full":    forceFullSync,
 		"sync_timestamp": time.Now(),
 	}
 	
 	h.BroadcastToSession(sessionID, "state_sync", syncData)
 	
-	return len(channel.clients), nil
+	return len(world.clients), nil
 }
 
-// BroadcastToSessionChannel broadcasts to all clients in a session channel, optionally excluding one
-func (h *Hub) BroadcastToSessionChannel(sessionID, messageType string, data interface{}, excludeClientID string) {
+// BroadcastToSessionWorld broadcasts to all clients in a session world, optionally excluding one
+func (h *Hub) BroadcastToSessionWorld(sessionID, messageType string, data interface{}, excludeClientID string) {
 	// For now, use the existing BroadcastToSession method
 	// In a full implementation, this would filter by excludeClientID
 	h.BroadcastToSession(sessionID, messageType, data)
 }
 
-// SessionChannelStatus represents the status of a session channel
-type SessionChannelStatus struct {
-	ChannelActive       bool                   `json:"channel_active"`
+// SessionWorldStatus represents the status of a session world
+type SessionWorldStatus struct {
+	WorldActive         bool                   `json:"world_active"`
 	ConnectedClients []map[string]interface{} `json:"connected_clients"`
 	GraphSummary     map[string]interface{} `json:"graph_summary"`
 	HealthMetrics    map[string]interface{} `json:"health_metrics"`
 }
 
-// GetSessionChannelStatus retrieves detailed status information for a session channel
-func (h *Hub) GetSessionChannelStatus(sessionID string) *SessionChannelStatus {
+// GetSessionWorldStatus retrieves detailed status information for a session world
+func (h *Hub) GetSessionWorldStatus(sessionID string) *SessionWorldStatus {
 	h.mutex.RLock()
 	defer h.mutex.RUnlock()
 	
-	// CRITICAL FIX: Use same channel key logic as JoinSessionChannel
-	session, _ := h.store.GetSession(sessionID)
-	channelKey := sessionID
-	if session.ChannelID != "" {
-		channelKey = session.ChannelID
-	}
+	// CRITICAL FIX: Use centralized world key resolution
+	worldKey := h.GetWorldKey(sessionID)
 	
-	channel, exists := h.sessionChannels[channelKey]
+	world, exists := h.sessionWorlds[worldKey]
 	if !exists {
-		return &SessionChannelStatus{
-			ChannelActive:       false,
+		return &SessionWorldStatus{
+			WorldActive:         false,
 			ConnectedClients: []map[string]interface{}{},
 			GraphSummary:     map[string]interface{}{"object_count": 0},
 			HealthMetrics:    map[string]interface{}{"uptime": "0s", "message_count": 0},
 		}
 	}
 	
-	channel.mutex.RLock()
-	defer channel.mutex.RUnlock()
+	world.mutex.RLock()
+	defer world.mutex.RUnlock()
 	
-	// Get entity count (managed via channels/PlayCanvas)
-	entityCount := 0 // Entities managed via PlayCanvas/channels
+	// Get entity count (managed via worlds/PlayCanvas)
+	entityCount := 0 // Entities managed via PlayCanvas/worlds
 	
 	// Build client list using proper client IDs (CRITICAL FIX)
 	clients := make([]map[string]interface{}, 0)
-	for clientID, joinTime := range channel.clientIDs {
+	for clientID, joinTime := range world.clientIDs {
 		clients = append(clients, map[string]interface{}{
 			"client_id":     clientID,
 			"connected_at":  joinTime,
@@ -389,25 +378,25 @@ func (h *Hub) GetSessionChannelStatus(sessionID string) *SessionChannelStatus {
 		})
 	}
 	
-	uptime := time.Since(channel.lastActivity)
+	uptime := time.Since(world.lastActivity)
 	
-	return &SessionChannelStatus{
-		ChannelActive:       len(channel.clientIDs) > 0, // Use clientIDs for active status
+	return &SessionWorldStatus{
+		WorldActive:         len(world.clientIDs) > 0, // Use clientIDs for active status
 		ConnectedClients: clients,
 		GraphSummary: map[string]interface{}{
 			"entity_count":  entityCount,
-			"last_updated":  channel.graphState["last_updated"],
+			"last_updated":  world.graphState["last_updated"],
 		},
 		HealthMetrics: map[string]interface{}{
 			"uptime":       uptime.String(),
-			"message_count": len(channel.messageQueue),
-			"last_sync":    channel.lastActivity,
+			"message_count": len(world.messageQueue),
+			"last_sync":    world.lastActivity,
 		},
 	}
 }
 
-// GetID returns the session channel ID
-func (sr *SessionChannel) GetID() string {
+// GetID returns the session world ID
+func (sr *SessionWorld) GetID() string {
 	return sr.sessionID
 }
 
@@ -459,7 +448,7 @@ func (h *Hub) Run() {
 }
 
 // BroadcastMessage sends a message to all connected WebSocket clients.
-// Uses the hub's broadcast channel for efficient message distribution.
+// Uses the hub's broadcast Go channel for efficient message distribution.
 // Non-blocking operation - queues message for hub's main loop processing.
 func (h *Hub) BroadcastMessage(message []byte) {
 	h.broadcast <- message
@@ -517,8 +506,8 @@ func (h *Hub) BroadcastToSession(sessionID string, updateType string, data inter
 	}
 }
 
-// BroadcastAvatarPositionToChannel broadcasts avatar position updates to ALL sessions in the same channel.
-// Enables bidirectional visibility across different sessions sharing the same channel -
+// BroadcastAvatarPositionToWorld broadcasts avatar position updates to ALL sessions in the same world.
+// Enables bidirectional visibility across different sessions sharing the same world -
 // all participants see each other's avatars regardless of session boundaries.
 // Provides multiplayer avatar synchronization for collaborative 3D environments.
 //
@@ -526,8 +515,8 @@ func (h *Hub) BroadcastToSession(sessionID string, updateType string, data inter
 //   - sessionID: Originating session ID for the avatar update
 //   - updateType: Message type (typically 'avatar_position_update')
 //   - data: Avatar position and orientation data
-func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType string, data interface{}) {
-	// Get the current session to find which channel it's in
+func (h *Hub) BroadcastAvatarPositionToWorld(sessionID string, updateType string, data interface{}) {
+	// Get the current session to find which world it's in
 	session, exists := h.GetStore().GetSession(sessionID)
 	if !exists {
 		logging.Warn("cannot broadcast avatar position - session not found", map[string]interface{}{
@@ -536,23 +525,23 @@ func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType stri
 		return
 	}
 	
-	// If session is not in a named channel, fall back to session-only broadcast
-	if session.ChannelID == "" {
+	// If session is not in a named world, fall back to session-only broadcast
+	if session.WorldID == "" {
 		h.BroadcastToSession(sessionID, updateType, data)
 		return
 	}
 	
-	channelID := session.ChannelID
+	worldID := session.WorldID
 	
-	// Find ALL sessions currently in the same channel
+	// Find ALL sessions currently in the same world
 	allSessions := h.GetStore().ListSessions()
-	// OPTIMIZATION: Use pooled slice for channel sessions
-	channelSessions := memory.GetStringSlice()
-	defer memory.PutStringSlice(channelSessions)
+	// OPTIMIZATION: Use pooled slice for world sessions
+	worldSessions := memory.GetStringSlice()
+	defer memory.PutStringSlice(worldSessions)
 	
 	for _, s := range allSessions {
-		if s.ChannelID == channelID {
-			channelSessions = append(channelSessions, s.ID)
+		if s.WorldID == worldID {
+			worldSessions = append(worldSessions, s.ID)
 		}
 	}
 	
@@ -564,7 +553,7 @@ func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType stri
 	update["data"] = data
 	update["timestamp"] = time.Now().Unix()
 	update["session_id"] = sessionID  // Still identify the originating session
-	update["channel_id"] = channelID  // Add channel context
+	update["world_id"] = worldID      // Add world context
 	
 	// Use pooled JSON buffer for marshaling
 	buf := memory.GetJSONBuffer()
@@ -573,12 +562,12 @@ func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType stri
 	encoder := json.NewEncoder(buf)
 	if err := encoder.Encode(update); err == nil {
 		jsonData := buf.Bytes()
-		// Broadcast to ALL sessions in the channel for bidirectional visibility
+		// Broadcast to ALL sessions in the world for bidirectional visibility
 		totalClients := 0
 		for client := range h.clients {
-			// Send to clients in ANY session that's in this channel
-			for _, chanSessionID := range channelSessions {
-				if client.sessionID == chanSessionID {
+			// Send to clients in ANY session that's in this world
+			for _, worldSessionID := range worldSessions {
+				if client.sessionID == worldSessionID {
 					select {
 					case client.send <- jsonData:
 						totalClients++
@@ -591,11 +580,11 @@ func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType stri
 			}
 		}
 		
-		// Enhanced logging for channel broadcasts
-		logging.Info("avatar position broadcast to channel", map[string]interface{}{
+		// Enhanced logging for world broadcasts
+		logging.Info("avatar position broadcast to world", map[string]interface{}{
 			"originating_session": sessionID,
-			"channel_id": channelID,
-			"channel_sessions": channelSessions,
+			"world_id": worldID,
+			"world_sessions": worldSessions,
 			"total_clients": totalClients,
 			"update_type": updateType,
 		})
@@ -606,7 +595,7 @@ func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType stri
 type SessionStore struct {
 	mutex    sync.RWMutex
 	sessions map[string]*Session
-	// Legacy objects and worlds removed - entities managed via channels/PlayCanvas
+	// Legacy objects removed - entities managed via worlds/PlayCanvas
 }
 
 // Session represents a 3D visualization session
@@ -625,11 +614,11 @@ type Session struct {
 	ID        string             `json:"id"`
 	CreatedAt time.Time          `json:"created_at"`
 	Status    string             `json:"status"`
-	ChannelID string             `json:"channel_id,omitempty"` // Current channel joined
+	WorldID   string             `json:"world_id,omitempty"`   // Current world joined
 	Entities  map[string]*Entity `json:"entities,omitempty"`   // Entity storage
 }
 
-// Legacy Object and World types removed - replaced by PlayCanvas entities and channels
+// Legacy Object types removed - replaced by PlayCanvas entities and worlds
 
 // NewSessionStore creates a new session store
 func NewSessionStore() *SessionStore {
@@ -691,8 +680,8 @@ func (s *SessionStore) DeleteSession(sessionID string) bool {
 	return true
 }
 
-// UpdateSessionChannel updates the channel ID for a session
-func (s *SessionStore) UpdateSessionChannel(sessionID, channelID string) error {
+// UpdateSessionWorld updates the world ID for a session
+func (s *SessionStore) UpdateSessionWorld(sessionID, worldID string) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -701,7 +690,7 @@ func (s *SessionStore) UpdateSessionChannel(sessionID, channelID string) error {
 		return &SessionError{Message: "Session not found"}
 	}
 
-	session.ChannelID = channelID
+	session.WorldID = worldID
 	return nil
 }
 
@@ -785,7 +774,7 @@ func (s *SessionStore) UpdateEntity(sessionID, entityID string, updatedEntity *E
 
 // Legacy Object and World management methods removed
 // Objects/Worlds replaced by PlayCanvas Entities via Channels
-// Use /sessions/{sessionId}/entities and /channels endpoints instead
+// Use /sessions/{sessionId}/entities and /worlds endpoints instead
 
 // GetStore returns the session store for external access
 // GetStore returns the hub's thread-safe session store.
@@ -793,6 +782,28 @@ func (s *SessionStore) UpdateEntity(sessionID, entityID string, updatedEntity *E
 // concurrent session operations across the HD1 system.
 func (h *Hub) GetStore() *SessionStore {
 	return h.store
+}
+
+// GetSyncProtocol returns the HD1-VSC synchronization protocol instance.
+// Provides access to multi-avatar, multi-world sync operations.
+func (h *Hub) GetSyncProtocol() *hd1sync.SyncProtocol {
+	return h.syncProtocol
+}
+
+// GetWorldKey resolves the proper world key for session operations.
+// Centralizes world key resolution logic to prevent inconsistencies.
+// Returns named world ID if session is in a named world, otherwise sessionID.
+func (h *Hub) GetWorldKey(sessionID string) string {
+	session, exists := h.store.GetSession(sessionID)
+	if !exists {
+		return sessionID // Fallback to session ID
+	}
+	
+	if session.WorldID != "" {
+		return session.WorldID // Use named world for shared access
+	}
+	
+	return sessionID // Default to session-based worlds
 }
 
 
@@ -843,73 +854,30 @@ func (h *Hub) GetWorldStateSnapshot(sessionID string) (*hd1sync.WorldState, erro
 	h.syncMutex.RLock()
 	defer h.syncMutex.RUnlock()
 	
-	// Get session's channel for proper filtering
+	// Get session's world for proper filtering
 	currentSession, exists := h.GetStore().GetSession(sessionID)
-	channelID := ""
+	worldID := ""
 	if exists {
-		channelID = currentSession.ChannelID
+		worldID = currentSession.WorldID
 	}
 	
-	// Get channel-filtered world state from sync protocol (CRITICAL FIX)
+	// Get world-filtered world state from sync protocol (CRITICAL FIX)
 	var worldState *hd1sync.WorldState
-	if channelID != "" {
-		worldState = h.syncProtocol.GetWorldStateSnapshotForChannel(channelID)
+	if worldID != "" {
+		worldState = h.syncProtocol.GetWorldStateSnapshotForWorld(worldID)
 	} else {
 		worldState = h.syncProtocol.GetWorldStateSnapshot()
 	}
 	
-	// LEGACY COMPATIBILITY: Ensure ALL session avatars are included for 100% consistency
-	if exists && currentSession.ChannelID != "" {
-		// Find ALL sessions in the same channel
-		allSessions := h.GetStore().ListSessions()
-		for _, session := range allSessions {
-			if session.ChannelID == currentSession.ChannelID && session.ID != sessionID {
-				// Look for avatar entities in other sessions (tagged with "session-avatar")
-				for _, entity := range session.Entities {
-					// Check if this is an avatar entity
-					isAvatar := false
-					for _, tag := range entity.Tags {
-						if tag == "session-avatar" {
-							isAvatar = true
-							break
-						}
-					}
-					
-					if isAvatar {
-						// Extract position and rotation from components
-						position := hd1sync.Vector3{X: 0, Y: 0, Z: 0}
-						rotation := hd1sync.Vector3{X: 0, Y: 0, Z: 0}
-						
-						if transformComp, exists := entity.Components["transform"]; exists {
-							if transformMap, ok := transformComp.(map[string]interface{}); ok {
-								if pos, exists := transformMap["position"].(map[string]interface{}); exists {
-									if x, ok := pos["x"].(float64); ok { position.X = x }
-									if y, ok := pos["y"].(float64); ok { position.Y = y }
-									if z, ok := pos["z"].(float64); ok { position.Z = z }
-								}
-								if rot, exists := transformMap["rotation"].(map[string]interface{}); exists {
-									if x, ok := rot["x"].(float64); ok { rotation.X = x }
-									if y, ok := rot["y"].(float64); ok { rotation.Y = y }
-									if z, ok := rot["z"].(float64); ok { rotation.Z = z }
-								}
-							}
-						}
-						
-						// Create avatar state from entity data
-						avatarState := &hd1sync.AvatarState{
-							SessionID:   session.ID,
-							Position:    position,
-							Rotation:    rotation,
-							Animation:   "idle",
-							Metadata:    map[string]interface{}{"entity_id": entity.ID, "name": entity.Name},
-							LastUpdate:  entity.CreatedAt,
-							VectorClock: worldState.VectorClock, // Share vector clock for consistency
-						}
-						
-						// Add to world state avatars
-						worldState.Avatars[session.ID] = avatarState
-					}
-				}
+	// CRITICAL FIX: Use sync protocol registry as single source of truth for avatars
+	// Get all avatars directly from sync protocol registry (much more efficient)
+	allAvatars := h.syncProtocol.GetAllAvatars()
+	for avatarSessionID, avatar := range allAvatars {
+		// Include avatars from same world or if world filtering is disabled
+		if worldID == "" || avatar.WorldID == worldID {
+			// Ensure avatar is included in world state
+			if _, exists := worldState.Avatars[avatarSessionID]; !exists {
+				worldState.Avatars[avatarSessionID] = avatar
 			}
 		}
 	}
@@ -963,31 +931,31 @@ func (h *Hub) ApplyAvatarMovement(sessionID string, position, rotation map[strin
 		return err
 	}
 	
-	// Update avatar position in sync protocol with channel isolation (single source of truth)
+	// Update avatar position in sync protocol with world isolation (single source of truth)
 	avatarPosition := hd1sync.Vector3{
 		X: position["x"],
 		Y: position["y"],
 		Z: position["z"],
 	}
 	
-	// Get session's channel ID for proper isolation
-	channelID := ""
+	// Get session's world ID for proper isolation
+	worldID := ""
 	if session, exists := h.GetStore().GetSession(sessionID); exists {
-		channelID = session.ChannelID
+		worldID = session.WorldID
 	}
 	
-	if err := h.syncProtocol.UpdateAvatarPositionInChannel(sessionID, channelID, avatarPosition); err != nil {
+	if err := h.syncProtocol.UpdateAvatarPositionInWorld(sessionID, worldID, avatarPosition); err != nil {
 		logging.Warn("failed to update avatar position in sync protocol", map[string]interface{}{
 			"session_id": sessionID,
-			"channel_id": channelID,
+			"world_id": worldID,
 			"error": err.Error(),
 		})
 	}
 	
-	// Get session's actual channel ID for proper routing
-	actualChannelID := sessionID // default fallback
-	if session, exists := h.GetStore().GetSession(sessionID); exists && session.ChannelID != "" {
-		actualChannelID = session.ChannelID
+	// Get session's actual world ID for proper routing
+	actualWorldID := sessionID // default fallback
+	if session, exists := h.GetStore().GetSession(sessionID); exists && session.WorldID != "" {
+		actualWorldID = session.WorldID
 	}
 	
 	// Get actual avatar information from session's avatar entity
@@ -1035,7 +1003,7 @@ func (h *Hub) ApplyAvatarMovement(sessionID string, position, rotation map[strin
 			"y": position["y"] - 1.5, // Camera position (avatar - offset)
 			"z": position["z"] - 0.0,
 		},
-		"channel_id": actualChannelID,
+		"world_id": actualWorldID,
 	}
 	
 	// Only include avatar_type if we have real data
@@ -1102,20 +1070,36 @@ func (h *Hub) ApplyAvatarMovement(sessionID string, position, rotation map[strin
 	return nil
 }
 
-// ClearAvatarFromSyncProtocol removes avatar from sync protocol (for channel switching)
+// ClearAvatarFromSyncProtocol removes avatar from sync protocol (for world switching)
 func (h *Hub) ClearAvatarFromSyncProtocol(sessionID string) error {
 	if h.syncProtocol == nil {
 		return fmt.Errorf("sync protocol not initialized")
 	}
 	
-	return h.syncProtocol.ClearAvatarChannel(sessionID)
+	return h.syncProtocol.ClearAvatarWorld(sessionID)
 }
 
-// getVectorClockForDelta creates vector clock for delta operations
+// getVectorClockForDelta creates vector clock for delta operations with logical causality
+// NOTE: This method assumes the caller already holds appropriate mutex locks
 func (h *Hub) getVectorClockForDelta(clientID string) hd1sync.VectorClock {
-	// Create client vector clock with current timestamp
+	// CRITICAL FIX: No additional locking to prevent deadlock
+	// Caller must ensure proper synchronization
+	
 	vectorClock := make(hd1sync.VectorClock)
-	vectorClock[clientID] = uint64(time.Now().UnixNano())
+	
+	// Get current world vector clock for causality (without additional locking)
+	worldState := h.syncProtocol.GetWorldStateSnapshot()
+	for clientKey, clockValue := range worldState.VectorClock {
+		vectorClock[clientKey] = clockValue
+	}
+	
+	// Increment the originating client's logical clock
+	if currentValue, exists := vectorClock[clientID]; exists {
+		vectorClock[clientID] = currentValue + 1
+	} else {
+		vectorClock[clientID] = 1 // Start at 1 for new clients
+	}
+	
 	return vectorClock
 }
 
@@ -1235,7 +1219,7 @@ func (h *Hub) broadcastSyncUpdate(updateType string, data interface{}) {
 	if config.GetSyncPerformanceMetricsEnabled() {
 		update["metrics"] = map[string]interface{}{
 			"sync_interval": config.GetSyncInterval().String(),
-			"broadcast_buffer": config.GetSyncBroadcastChannelBuffer(),
+			"broadcast_buffer": config.GetSyncBroadcastWorldBuffer(),
 		}
 	}
 	
@@ -1266,7 +1250,7 @@ func (h *Hub) sendToClient(clientID string, message interface{}) error {
 			case client.send <- buf.Bytes():
 				return nil
 			default:
-				return fmt.Errorf("client send channel blocked")
+				return fmt.Errorf("client send Go channel blocked")
 			}
 		}
 	}
@@ -1324,15 +1308,15 @@ func (h *Hub) cleanupInactiveSessions() {
 				}
 			}
 			
-			// Clean up session channels that are inactive
-			if channel, exists := h.sessionChannels[session.ID]; exists {
-				channel.mutex.RLock()
-				channelInactive := len(channel.clients) == 0 && channel.lastActivity.Before(cutoff)
-				channel.mutex.RUnlock()
+			// Clean up session worlds that are inactive
+			if world, exists := h.sessionWorlds[session.ID]; exists {
+				world.mutex.RLock()
+				worldInactive := len(world.clients) == 0 && world.lastActivity.Before(cutoff)
+				world.mutex.RUnlock()
 				
-				if channelInactive {
-					delete(h.sessionChannels, session.ID)
-					logging.Debug("cleaned up inactive session channel", map[string]interface{}{
+				if worldInactive {
+					delete(h.sessionWorlds, session.ID)
+					logging.Debug("cleaned up inactive session world", map[string]interface{}{
 						"session_id": session.ID,
 						"age": now.Sub(session.CreatedAt),
 					})
@@ -1360,29 +1344,29 @@ func (h *Hub) cleanupInactiveSessions() {
 	}
 }
 
-// LoadNamedChannelIntoSession loads a named channel's PlayCanvas configuration into a session
-func (h *Hub) LoadNamedChannelIntoSession(sessionID, channelID string) error {
-	logging.Info("loading named channel into session", map[string]interface{}{
+// LoadNamedWorldIntoSession loads a named world's PlayCanvas configuration into a session
+func (h *Hub) LoadNamedWorldIntoSession(sessionID, worldID string) error {
+	logging.Info("loading named world into session", map[string]interface{}{
 		"session_id": sessionID,
-		"channel_id": channelID,
+		"world_id": worldID,
 	})
 	
-	// Read channel YAML configuration
-	channelPath := filepath.Join(config.GetChannelsDir(), channelID+".yaml")
-	configData, err := ioutil.ReadFile(channelPath)
+	// Read world YAML configuration
+	worldPath := filepath.Join(config.GetWorldsDir(), worldID+".yaml")
+	configData, err := ioutil.ReadFile(worldPath)
 	if err != nil {
-		return fmt.Errorf("failed to read channel config %s: %w", channelPath, err)
+		return fmt.Errorf("failed to read world config %s: %w", worldPath, err)
 	}
 	
 	// Parse YAML configuration
-	var config ChannelConfig
+	var config WorldConfig
 	if err := yaml.Unmarshal(configData, &config); err != nil {
-		return fmt.Errorf("failed to parse channel config %s: %w", channelPath, err)
+		return fmt.Errorf("failed to parse world config %s: %w", worldPath, err)
 	}
 	
 	if config.PlayCanvas == nil {
-		logging.Info("no PlayCanvas configuration in channel", map[string]interface{}{
-			"channel_id": channelID,
+		logging.Info("no PlayCanvas configuration in world", map[string]interface{}{
+			"world_id": worldID,
 		})
 		return nil
 	}
@@ -1392,7 +1376,7 @@ func (h *Hub) LoadNamedChannelIntoSession(sessionID, channelID string) error {
 		if err := h.createEntityInSession(sessionID, entity); err != nil {
 			logging.Error("failed to create entity in session", map[string]interface{}{
 				"session_id": sessionID,
-				"channel_id": channelID,
+				"world_id": worldID,
 				"entity_name": entity.Name,
 				"error": err.Error(),
 			})
@@ -1405,9 +1389,9 @@ func (h *Hub) LoadNamedChannelIntoSession(sessionID, channelID string) error {
 		}
 	}
 	
-	logging.Info("channel entities loaded into session", map[string]interface{}{
+	logging.Info("world entities loaded into session", map[string]interface{}{
 		"session_id": sessionID,
-		"channel_id": channelID,
+		"world_id": worldID,
 		"entities_created": len(config.PlayCanvas.Entities),
 	})
 	
@@ -1733,4 +1717,31 @@ func (h *Hub) GetEntityByNameViaAPI(sessionID, entityName string) (map[string]in
 	}
 	
 	return nil, fmt.Errorf("entity with name '%s' not found", entityName)
+}
+
+// ===================================================================
+// COMPATIBILITY ALIASES: Channel → World Method Compatibility
+// ===================================================================
+// These methods provide backward compatibility for code that still
+// references the old "Channel" terminology while delegating to the
+// new "World" implementations.
+
+// BroadcastAvatarPositionToChannel is a compatibility alias for BroadcastAvatarPositionToWorld
+func (h *Hub) BroadcastAvatarPositionToChannel(sessionID string, updateType string, data interface{}) {
+	h.BroadcastAvatarPositionToWorld(sessionID, updateType, data)
+}
+
+// LeaveSessionChannel is a compatibility alias for LeaveSessionWorld  
+func (h *Hub) LeaveSessionChannel(sessionID, clientID string) (bool, int) {
+	return h.LeaveSessionWorld(sessionID, clientID)
+}
+
+// JoinSessionChannel is a compatibility alias for JoinSessionWorld
+func (h *Hub) JoinSessionChannel(sessionID, clientID string, reconnect bool) (*SessionWorld, int, map[string]interface{}) {
+	return h.JoinSessionWorld(sessionID, clientID, reconnect)
+}
+
+// BroadcastToSessionChannel is a compatibility alias for BroadcastToSessionWorld
+func (h *Hub) BroadcastToSessionChannel(sessionID, messageType string, data interface{}, excludeClientID string) {
+	h.BroadcastToSessionWorld(sessionID, messageType, data, excludeClientID)
 }

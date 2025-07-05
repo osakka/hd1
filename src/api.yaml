@@ -27,18 +27,18 @@ servers:
 
 paths:
   # ========================================
-  # CHANNELS MANAGEMENT
+  # WORLDS MANAGEMENT
   # ========================================
-  /channels:
+  /worlds:
     get:
-      operationId: listChannels
-      summary: List available collaboration channels
+      operationId: listWorlds
+      summary: List available collaboration worlds
       description: |
-        Returns a list of all available collaboration channels with their
+        Returns a list of all available collaboration worlds with their
         configurations, environments, and capacity information.
       responses:
         '200':
-          description: Available channels retrieved successfully
+          description: Available worlds retrieved successfully
           content:
             application/json:
               schema:
@@ -49,36 +49,36 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Available channels retrieved successfully"
-                  channels:
+                    example: "Available worlds retrieved successfully"
+                  worlds:
                     type: array
                     items:
                       type: object
                       properties:
                         id:
                           type: string
-                          example: "channel_one"
+                          example: "world_one"
                         name:
                           type: string
-                          example: "Channel One - Main Collaboration"
+                          example: "World One - Main Collaboration"
                         description:
                           type: string
                           example: "Primary collaborative environment for general holodeck activities"
                         environment:
                           type: string
-                          example: "channel_one"
+                          example: "world_one"
                         max_clients:
                           type: integer
                           example: 100
-      x-handler: "api/channels/list_channels.go"
-      x-function: "ListChannels"
+      x-handler: "api/worlds/list_worlds.go"
+      x-function: "ListWorlds"
 
     post:
-      operationId: createChannel
-      summary: Create a new collaboration channel
+      operationId: createWorld
+      summary: Create a new collaboration world
       description: |
-        Creates a new collaboration channel with specified configuration.
-        Channel ID will be auto-generated if not provided.
+        Creates a new collaboration world with specified configuration.
+        World ID will be auto-generated if not provided.
       requestBody:
         required: true
         content:
@@ -88,36 +88,36 @@ paths:
               properties:
                 id:
                   type: string
-                  description: Channel ID (auto-generated if not provided)
-                  example: "channel_custom"
+                  description: World ID (auto-generated if not provided)
+                  example: "world_custom"
                 name:
                   type: string
-                  description: Human-readable channel name
-                  example: "Custom Collaboration Channel"
+                  description: Human-readable world name
+                  example: "Custom Collaboration World"
                 description:
                   type: string
-                  description: Channel description and purpose
+                  description: World description and purpose
                   example: "Custom environment for specialized workflows"
                 environment:
                   type: string
-                  description: Environment ID to apply to channel
-                  example: "channel_one"
+                  description: Environment ID to apply to world
+                  example: "world_one"
                 max_clients:
                   type: integer
                   description: Maximum concurrent clients allowed
                   example: 50
                 enabled:
                   type: boolean
-                  description: Whether channel is active
+                  description: Whether world is active
                   default: true
                 priority:
                   type: integer
-                  description: Channel priority for display ordering
+                  description: World priority for display ordering
                   default: 100
               required: [name, environment]
       responses:
         '201':
-          description: Channel created successfully
+          description: World created successfully
           content:
             application/json:
               schema:
@@ -128,22 +128,22 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Channel created successfully"
-                  channel:
+                    example: "World created successfully"
+                  world:
                     type: object
                     properties:
                       id:
                         type: string
-                        example: "channel_custom"
+                        example: "world_custom"
                       name:
                         type: string
-                        example: "Custom Collaboration Channel"
+                        example: "Custom Collaboration World"
                       description:
                         type: string
                         example: "Custom environment for specialized workflows"
                       environment:
                         type: string
-                        example: "channel_one"
+                        example: "world_one"
                       max_clients:
                         type: integer
                         example: 50
@@ -154,7 +154,7 @@ paths:
                         type: string
                         format: date-time
         '400':
-          description: Invalid channel configuration
+          description: Invalid world configuration
           content:
             application/json:
               schema:
@@ -165,13 +165,13 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Invalid channel configuration"
+                    example: "Invalid world configuration"
                   errors:
                     type: array
                     items:
                       type: string
         '409':
-          description: Channel ID already exists
+          description: World ID already exists
           content:
             application/json:
               schema:
@@ -182,27 +182,27 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Channel ID already exists"
-      x-handler: "api/channels/create_channel.go"
-      x-function: "CreateChannel"
+                    example: "World ID already exists"
+      x-handler: "api/worlds/create_world.go"
+      x-function: "CreateWorld"
 
-  /channels/{channelId}:
+  /worlds/{worldId}:
     get:
-      operationId: getChannel
-      summary: Get channel configuration
+      operationId: getWorld
+      summary: Get world configuration
       description: |
-        Returns detailed configuration for a specific channel including
-        current client count and channel statistics.
+        Returns detailed configuration for a specific world including
+        current client count and world statistics.
       parameters:
-        - name: channelId
+        - name: worldId
           in: path
           required: true
           schema:
             type: string
-          example: "channel_one"
+          example: "world_one"
       responses:
         '200':
-          description: Channel configuration retrieved successfully
+          description: World configuration retrieved successfully
           content:
             application/json:
               schema:
@@ -211,21 +211,21 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  channel:
+                  world:
                     type: object
                     properties:
                       id:
                         type: string
-                        example: "channel_one"
+                        example: "world_one"
                       name:
                         type: string
-                        example: "Channel One - Main Collaboration"
+                        example: "World One - Main Collaboration"
                       description:
                         type: string
                         example: "Primary collaborative environment for general holodeck activities"
                       environment:
                         type: string
-                        example: "channel_one"
+                        example: "world_one"
                       max_clients:
                         type: integer
                         example: 100
@@ -242,7 +242,7 @@ paths:
                         type: string
                         format: date-time
         '404':
-          description: Channel not found
+          description: World not found
           content:
             application/json:
               schema:
@@ -253,23 +253,23 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Channel not found"
-      x-handler: "api/channels/get_channel.go"
-      x-function: "GetChannel"
+                    example: "World not found"
+      x-handler: "api/worlds/get_world.go"
+      x-function: "GetWorld"
 
     put:
-      operationId: updateChannel
-      summary: Update channel configuration
+      operationId: updateWorld
+      summary: Update world configuration
       description: |
-        Updates configuration for an existing channel. Only provided fields
-        will be updated. Cannot change channel ID.
+        Updates configuration for an existing world. Only provided fields
+        will be updated. Cannot change world ID.
       parameters:
-        - name: channelId
+        - name: worldId
           in: path
           required: true
           schema:
             type: string
-          example: "channel_one"
+          example: "world_one"
       requestBody:
         required: true
         content:
@@ -279,15 +279,15 @@ paths:
               properties:
                 name:
                   type: string
-                  description: Human-readable channel name
-                  example: "Updated Channel Name"
+                  description: Human-readable world name
+                  example: "Updated World Name"
                 description:
                   type: string
-                  description: Channel description and purpose
-                  example: "Updated channel description"
+                  description: World description and purpose
+                  example: "Updated world description"
                 environment:
                   type: string
-                  description: Environment ID to apply to channel
+                  description: Environment ID to apply to world
                   example: "molecular-scale"
                 max_clients:
                   type: integer
@@ -295,15 +295,15 @@ paths:
                   example: 75
                 enabled:
                   type: boolean
-                  description: Whether channel is active
+                  description: Whether world is active
                   example: true
                 priority:
                   type: integer
-                  description: Channel priority for display ordering
+                  description: World priority for display ordering
                   example: 50
       responses:
         '200':
-          description: Channel updated successfully
+          description: World updated successfully
           content:
             application/json:
               schema:
@@ -314,19 +314,19 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Channel updated successfully"
-                  channel:
+                    example: "World updated successfully"
+                  world:
                     type: object
                     properties:
                       id:
                         type: string
-                        example: "channel_one"
+                        example: "world_one"
                       name:
                         type: string
-                        example: "Updated Channel Name"
+                        example: "Updated World Name"
                       description:
                         type: string
-                        example: "Updated channel description"
+                        example: "Updated world description"
                       environment:
                         type: string
                         example: "molecular-scale"
@@ -340,7 +340,7 @@ paths:
                         type: string
                         format: date-time
         '400':
-          description: Invalid channel configuration
+          description: Invalid world configuration
           content:
             application/json:
               schema:
@@ -351,13 +351,13 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Invalid channel configuration"
+                    example: "Invalid world configuration"
                   errors:
                     type: array
                     items:
                       type: string
         '404':
-          description: Channel not found
+          description: World not found
           content:
             application/json:
               schema:
@@ -368,23 +368,23 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Channel not found"
-      x-handler: "api/channels/update_channel.go"
-      x-function: "UpdateChannel"
+                    example: "World not found"
+      x-handler: "api/worlds/update_world.go"
+      x-function: "UpdateWorld"
 
     delete:
-      operationId: deleteChannel
-      summary: Delete a collaboration channel
+      operationId: deleteWorld
+      summary: Delete a collaboration world
       description: |
-        Deletes an existing channel. Will disconnect all current clients
-        and remove channel configuration. Cannot delete default channel.
+        Deletes an existing world. Will disconnect all current clients
+        and remove world configuration. Cannot delete default world.
       parameters:
-        - name: channelId
+        - name: worldId
           in: path
           required: true
           schema:
             type: string
-          example: "channel_custom"
+          example: "world_custom"
         - name: force
           in: query
           required: false
@@ -394,7 +394,7 @@ paths:
           description: Force deletion even if clients are connected
       responses:
         '200':
-          description: Channel deleted successfully
+          description: World deleted successfully
           content:
             application/json:
               schema:
@@ -405,12 +405,12 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Channel deleted successfully"
+                    example: "World deleted successfully"
                   disconnected_clients:
                     type: integer
                     example: 3
         '400':
-          description: Cannot delete channel
+          description: Cannot delete world
           content:
             application/json:
               schema:
@@ -421,12 +421,12 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Cannot delete default channel or channel has active clients"
+                    example: "Cannot delete default world or world has active clients"
                   current_clients:
                     type: integer
                     example: 5
         '404':
-          description: Channel not found
+          description: World not found
           content:
             application/json:
               schema:
@@ -437,9 +437,9 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Channel not found"
-      x-handler: "api/channels/delete_channel.go"
-      x-function: "DeleteChannel"
+                    example: "World not found"
+      x-handler: "api/worlds/delete_world.go"
+      x-function: "DeleteWorld"
 
   # ========================================
   # API INFORMATION
@@ -919,9 +919,9 @@ paths:
               properties:
                 avatar_type:
                   type: string
-                  enum: [default, business, casual]
+                  enum: [humanoid_avatar, fox_avatar, claude_avatar, default]
                   description: Avatar type to assign to session
-                  example: business
+                  example: humanoid_avatar
                 spawn_position:
                   type: object
                   properties:
@@ -987,19 +987,101 @@ paths:
       x-handler: "api/sessions/avatar/set.go"
       x-function: "SetSessionAvatar"
 
-  # ========================================
-  # SESSION GRAPH SESSION GRAPH & ROOM MANAGEMENT CHANNEL MANAGEMENT
-  # TCP-level reliability with channel-based architecture
-  # ========================================
-  /sessions/{sessionId}/channel/join:
-    post:
-      operationId: joinSessionChannel
-      tags: [Session Graph]
-      summary: Join persistent session channel
+    put:
+      operationId: changeSessionAvatar
+      tags: [Session Avatars]
+      summary: Change avatar in real-time
       description: |
-        Join a session channel for real-time graph collaboration.
-        Session channels provide TCP-level reliability with automatic state sync.
-        Multiple clients can join the same channel to share session state.
+        Change the avatar for a session in real-time. This will:
+        - Remove the old avatar entity
+        - Create a new avatar entity with the specified type
+        - Broadcast the change to all session participants
+        - Update avatar in sync protocol for multiplayer consistency
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                avatar_type:
+                  type: string
+                  enum: [humanoid_avatar, fox_avatar, claude_avatar, default]
+                  description: New avatar type to switch to
+                  example: fox_avatar
+                preserve_position:
+                  type: boolean
+                  default: true
+                  description: Keep current avatar position after change
+                broadcast:
+                  type: boolean
+                  default: true
+                  description: Broadcast change to other session participants
+              required:
+                - avatar_type
+      responses:
+        '200':
+          description: Avatar changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  old_avatar_type:
+                    type: string
+                    example: "humanoid_avatar"
+                  new_avatar_type:
+                    type: string
+                    example: "fox_avatar"
+                  entity_id:
+                    type: string
+                    description: New avatar entity ID
+                    example: "avatar-session-123-fox"
+                  position:
+                    type: object
+                    description: Avatar position after change
+                  message:
+                    type: string
+                    example: "Avatar changed successfully"
+        '400':
+          description: Bad request - invalid avatar type or session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-handler: "api/sessions/avatar/change.go"
+      x-function: "ChangeSessionAvatar"
+
+  # ========================================
+  # SESSION GRAPH & WORLD MANAGEMENT
+  # TCP-level reliability with world-based architecture
+  # ========================================
+  /sessions/{sessionId}/world/join:
+    post:
+      operationId: joinSessionWorld
+      tags: [Session Graph]
+      summary: Join persistent session world
+      description: |
+        Join a session world for real-time graph collaboration.
+        Session worlds provide TCP-level reliability with automatic state sync.
+        Multiple clients can join the same world to share session state.
       parameters:
         - $ref: '#/components/parameters/SessionId'
       requestBody:
@@ -1011,18 +1093,18 @@ paths:
               properties:
                 client_id:
                   type: string
-                  description: Unique client identifier for channel membership
-                channel_id:
+                  description: Unique client identifier for world membership
+                world_id:
                   type: string
-                  description: Named channel to join (e.g., channel_one, channel_two)
-                  example: "channel_one"
+                  description: Named world to join (e.g., world_one, world_two)
+                  example: "world_one"
                 reconnect:
                   type: boolean
                   default: false
                   description: Whether this is a reconnection (preserves state)
       responses:
         '200':
-          description: Successfully joined session channel
+          description: Successfully joined session world
           content:
             application/json:
               schema:
@@ -1030,7 +1112,7 @@ paths:
                 properties:
                   success:
                     type: boolean
-                  channel_id:
+                  world_id:
                     type: string
                   session_id:
                     type: string
@@ -1041,16 +1123,16 @@ paths:
                     description: Current session graph state
         '404':
           $ref: '#/components/responses/NotFound'
-      x-handler: "api/sessions/join_channel.go"
-      x-function: "JoinSessionChannel"
+      x-handler: "api/sessions/join_world.go"
+      x-function: "JoinSessionWorld"
 
-  /sessions/{sessionId}/channel/leave:
+  /sessions/{sessionId}/world/leave:
     post:
-      operationId: leaveSessionChannel
+      operationId: leaveSessionWorld
       tags: [Session Graph]
-      summary: Leave session channel
+      summary: Leave session world
       description: |
-        Leave a session channel while preserving the channel for other clients.
+        Leave a session world while preserving the world for other clients.
         Room persists even when all clients leave (TCP-level persistence).
       parameters:
         - $ref: '#/components/parameters/SessionId'
@@ -1066,17 +1148,17 @@ paths:
                   description: Client ID to remove from room
       responses:
         '200':
-          description: Successfully left session channel
+          description: Successfully left session world
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Success'
         '404':
           $ref: '#/components/responses/NotFound'
-      x-handler: "api/sessions/leave_channel.go"
-      x-function: "LeaveSessionChannel"
+      x-handler: "api/sessions/leave_world.go"
+      x-function: "LeaveSessionWorld"
 
-  /sessions/{sessionId}/channel/graph:
+  /sessions/{sessionId}/world/graph:
     get:
       operationId: getSessionGraph
       tags: [Session Graph]
@@ -1122,7 +1204,7 @@ paths:
       tags: [Session Graph]
       summary: Update session graph state
       description: |
-        Update the session graph state and broadcast changes to all channel members.
+        Update the session graph state and broadcast changes to all world members.
         Provides atomic updates with rollback protection.
       parameters:
         - $ref: '#/components/parameters/SessionId'
@@ -1166,13 +1248,13 @@ paths:
       x-handler: "api/sessions/update_graph.go"
       x-function: "UpdateSessionGraph"
 
-  /sessions/{sessionId}/channel/sync:
+  /sessions/{sessionId}/world/sync:
     post:
       operationId: syncSessionState
       tags: [Session Graph]
       summary: Force session state synchronization
       description: |
-        Force synchronization of session state across all channel members.
+        Force synchronization of session state across all world members.
         Used for recovery after network issues or connection problems.
       parameters:
         - $ref: '#/components/parameters/SessionId'
@@ -1207,13 +1289,13 @@ paths:
       x-handler: "api/sessions/sync_state.go"
       x-function: "SyncSessionState"
 
-  /sessions/{sessionId}/channel/status:
+  /sessions/{sessionId}/world/status:
     get:
-      operationId: getSessionChannelStatus
+      operationId: getSessionWorldStatus
       tags: [Session Graph]
-      summary: Get session channel status
+      summary: Get session world status
       description: |
-        Get detailed status of session channel including connected clients,
+        Get detailed status of session world including connected clients,
         graph state summary, and connection health metrics.
       parameters:
         - $ref: '#/components/parameters/SessionId'
@@ -1229,7 +1311,7 @@ paths:
                     type: boolean
                   session_id:
                     type: string
-                  channel_active:
+                  world_active:
                     type: boolean
                   connected_clients:
                     type: array
@@ -1264,8 +1346,8 @@ paths:
                         format: date-time
         '404':
           $ref: '#/components/responses/NotFound'
-      x-handler: "api/sessions/channel_status.go"
-      x-function: "GetSessionChannelStatus"
+      x-handler: "api/sessions/world_status.go"
+      x-function: "GetSessionWorldStatus"
 
   # ========================================
   # ========================================
@@ -5027,7 +5109,7 @@ components:
         id:
           type: string
           pattern: '^[a-z][a-z0-9\-]*[a-z0-9]$'
-          example: "channel_one"
+          example: "world_one"
           description: "Environment identifier"
         name:
           type: string

@@ -104,7 +104,7 @@ class HD1ConsoleManager {
             { name: 'input', path: '/static/js/hd1-console/modules/input-manager.js', class: 'HD1InputManager' },
             { name: 'session', path: '/static/js/hd1-console/modules/session-manager.js', class: 'HD1SessionManager' },
             { name: 'websocket', path: '/static/js/hd1-console/modules/websocket-manager.js', class: 'HD1WebSocketManager' },
-            { name: 'channel', path: '/static/js/hd1-console/modules/channel-manager.js', class: 'HD1ChannelManager' },
+            { name: 'world', path: '/static/js/hd1-console/modules/world-manager.js', class: 'HD1WorldManager' },
             { name: 'stats', path: '/static/js/hd1-console/modules/stats-manager.js', class: 'HD1StatsManager' }
         ];
 

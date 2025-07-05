@@ -35,7 +35,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → Client Ren
 - `src/api.yaml` - Single source of truth (82 total route endpoints, 59 unique paths)
 - `src/auto_router.go` - Auto-generated routing
 - `src/codegen/templates/` - External template files
-- `share/channels/*.yaml` - Scene configurations
+- `share/worlds/*.yaml` - Scene configurations
 - `share/htdocs/static/js/hd1-console/` - Modular console system
 - `share/htdocs/static/js/hd1-playcanvas.js` - 3D avatar system with native GLB loading
 - `src/api/avatars/asset.go` - GLB asset HTTP delivery with proper headers

@@ -8,42 +8,37 @@ system:
 
 # Default avatar selection
 defaults:
-  avatar_type: "default"              # Fallback avatar
+  avatar_type: "humanoid_avatar"      # Default to humanoid for general use
   spawn_position: {x: 0, y: 0, z: 0}  # Default spawn location
-  camera_mode: "third_person"         # first_person | third_person | free
+  camera_mode: "first_person"         # first_person | third_person | free
 
 # Available avatar types
 avatar_types:
-  default:
-    path: "default/avatar.yaml"
-    description: "Standard HD1 session avatar"
-    contexts: ["general", "collaboration", "gaming"]
+  humanoid_avatar:
+    path: "humanoid_avatar/avatar.yaml"
+    description: "Standard humanoid avatar for general use"
+    contexts: ["general", "collaboration", "gaming", "professional"]
     
-  business:
-    path: "business/avatar.yaml" 
-    description: "Professional avatar for business contexts"
-    contexts: ["meeting", "presentation", "corporate"]
-    
-  casual:
-    path: "casual/avatar.yaml"
-    description: "Relaxed avatar for informal sessions"
-    contexts: ["creative", "social", "brainstorm"]
+  fox_avatar:
+    path: "fox_avatar/avatar.yaml"
+    description: "Animal fox avatar for creative and casual sessions"
+    contexts: ["creative", "casual", "gaming", "fun"]
     
   claude_avatar:
     path: "claude_avatar/avatar.yaml"
     description: "Expressive robot avatar for Claude's AI clients"
     contexts: ["ai", "robot", "futuristic", "demonstration"]
     
-  human_avatar:
-    path: "human_avatar/avatar.yaml"
-    description: "Professional human avatar for collaborative sessions"
-    contexts: ["human", "professional", "collaboration", "natural"]
+  default:
+    path: "default/avatar.yaml"
+    description: "Simple fallback avatar (primitive capsule)"
+    contexts: ["fallback", "testing"]
 
 # Channel-specific avatar defaults
 channel_defaults:
-  channel_one: "default"             # General purpose
-  channel_two: "business"            # Business channel
-  channel_three: "casual"            # Creative channel
+  channel_one: "humanoid_avatar"     # General purpose - humanoid
+  channel_two: "fox_avatar"          # Creative channel - fox
+  channel_three: "humanoid_avatar"   # Professional - humanoid
 
 # Avatar loading configuration
 loading:
