@@ -49,7 +49,7 @@ func main() {
 	}
 
 	if *help {
-		showHelp()
+		display_help_information()
 		return
 	}
 
@@ -68,7 +68,7 @@ func main() {
 
 	// Setup legacy logging compatibility if specified
 	if config.Config.Logging.LogFile != "" {
-		if err := setupLogging(config.Config.Logging.LogFile); err != nil {
+		if err := configure_file_logging(config.Config.Logging.LogFile); err != nil {
 			logging.Warn("legacy logging setup failed", map[string]interface{}{
 				"error": err.Error(),
 			})
@@ -83,7 +83,7 @@ func main() {
 				"error":    err.Error(),
 			})
 		}
-		defer removePidFile(config.GetPIDFile())
+		defer remove_process_identifier_file(config.GetPIDFile())
 	}
 
 	// Validate static directory from configuration
@@ -180,7 +180,7 @@ func main() {
 	}
 }
 
-func showHelp() {
+func display_help_information() {
 	fmt.Println("HD1 (Holodeck One) - Professional 3D Holodeck Platform")
 	fmt.Println("============================================================")
 	fmt.Println()
@@ -223,7 +223,7 @@ func create_required_build_directories() error {
 	return nil
 }
 
-func setupLogging(logFile string) error {
+func configure_file_logging(logFile string) error {
 	if logFile == "" {
 		// Default timestamped log file
 		logFile = filepath.Join(config.Config.Paths.LogDir, fmt.Sprintf("hd1_%s.log", 
@@ -233,7 +233,7 @@ func setupLogging(logFile string) error {
 	return server.SetupFileLogging(logFile)
 }
 
-func writePidFile(pidFile string, pid ...int) error {
+func write_process_identifier_file(pidFile string, pid ...int) error {
 	file, err := os.Create(pidFile)
 	if err != nil {
 		return err
@@ -249,7 +249,7 @@ func writePidFile(pidFile string, pid ...int) error {
 	return err
 }
 
-func removePidFile(pidFile string) {
+func remove_process_identifier_file(pidFile string) {
 	os.Remove(pidFile)
 }
 
@@ -282,7 +282,7 @@ func convert_to_daemon_process(pidFile string) error {
 		}
 		
 		// Write PID file from parent before exiting
-		if err := writePidFile(pidFile, cmd.Process.Pid); err != nil {
+		if err := write_process_identifier_file(pidFile, cmd.Process.Pid); err != nil {
 			cmd.Process.Kill()
 			return fmt.Errorf("failed to write PID file: %v", err)
 		}

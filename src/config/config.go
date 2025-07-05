@@ -2,6 +2,7 @@ package config
 
 import (
 	"bufio"
+	"crypto/rand"
 	"flag"
 	"fmt"
 	"os"
@@ -118,6 +119,20 @@ type SyncConfig struct {
 // Global configuration instance - Single Source of Truth
 var Config *HD1Config
 
+// create_unique_session_identifier creates a unique session identifier
+func create_unique_session_identifier() string {
+	// Generate 8 random bytes for session ID
+	bytes := make([]byte, 8)
+	if _, err := rand.Read(bytes); err != nil {
+		// Fallback to timestamp-based ID if crypto/rand fails
+		return fmt.Sprintf("session-%d", time.Now().Unix())
+	}
+	
+	// Convert to lowercase hex string
+	id := fmt.Sprintf("session-%x", bytes)
+	return id
+}
+
 // Initialize loads configuration from all sources with proper priority
 func Initialize() error {
 	config := &HD1Config{}
@@ -151,7 +166,7 @@ func (c *HD1Config) loadDefaults() {
 	c.Server.Port = "8080"
 	c.Server.APIBase = "http://0.0.0.0:8080/api"
 	c.Server.InternalAPIBase = "http://localhost:8080/api"
-	c.Server.Version = "v5.0.1"
+	c.Server.Version = "v5.0.5"
 	
 	// Path defaults - configurable root directory
 	rootDir := "/opt/hd1"
@@ -186,7 +201,7 @@ func (c *HD1Config) loadDefaults() {
 	c.Session.CleanupInterval = 2 * time.Minute
 	c.Session.InactivityTimeout = 10 * time.Minute
 	c.Session.HTTPClientTimeout = 5 * time.Second
-	c.Session.DefaultSessionID = "session-19cdcfgj"
+	c.Session.DefaultSessionID = create_unique_session_identifier()
 	
 	// Worlds defaults
 	c.Worlds.ConfigFile = "config.yaml"
@@ -287,7 +302,7 @@ func (c *HD1Config) loadEnvironmentVariables() {
 	if rootDir := os.Getenv("HD1_ROOT_DIR"); rootDir != "" {
 		c.Paths.RootDir = rootDir
 		// Recompute derived paths
-		c.computeDerivedPaths()
+		c.calculate_dependent_directory_paths()
 	}
 	if buildDir := os.Getenv("HD1_BUILD_DIR"); buildDir != "" {
 		c.Paths.BuildDir = buildDir
@@ -498,12 +513,17 @@ func (c *HD1Config) loadFlags() {
 	// Only parse flags if not already parsed
 	if !flag.Parsed() {
 		// Define flags with current config values as defaults
+		// Long and short flag combinations for essential operations
 		host := flag.String("host", c.Server.Host, "Host to bind to")
+		hostShort := flag.String("h", c.Server.Host, "Host to bind to (short)")
 		port := flag.String("port", c.Server.Port, "Port to bind to") 
+		portShort := flag.String("p", c.Server.Port, "Port to bind to (short)")
 		apiBase := flag.String("api-base", c.Server.APIBase, "API base URL")
 		internalAPIBase := flag.String("internal-api-base", c.Server.InternalAPIBase, "Internal API base URL for server communications")
 		version := flag.String("version", c.Server.Version, "HD1 version identifier")
+		versionShort := flag.String("v", c.Server.Version, "HD1 version identifier (short)")
 		daemon := flag.Bool("daemon", c.Server.Daemon, "Run in daemon mode")
+		daemonShort := flag.Bool("d", c.Server.Daemon, "Run in daemon mode (short)")
 		rootDir := flag.String("root-dir", c.Paths.RootDir, "HD1 root directory (absolute path)")
 		buildDir := flag.String("build-dir", c.Paths.BuildDir, "Build directory (absolute path)")
 		logDir := flag.String("log-dir", c.Paths.LogDir, "Log directory (absolute path)")
@@ -514,12 +534,67 @@ func (c *HD1Config) loadFlags() {
 		traceModules := flag.String("trace-modules", strings.Join(c.Logging.TraceModules, ","), "Comma-separated trace modules")
 		protectedWorlds := flag.String("protected-worlds", strings.Join(c.Worlds.ProtectedList, ","), "Comma-separated list of protected worlds")
 		
+		// Extended flags for complete configuration coverage
+		worldsDir := flag.String("worlds-dir", c.Paths.WorldsDir, "Worlds configuration directory")
+		avatarsDir := flag.String("avatars-dir", c.Paths.AvatarsDir, "Avatars configuration directory")
+		recordingsDir := flag.String("recordings-dir", c.Paths.RecordingsDir, "Recordings directory")
+		defaultWorld := flag.String("default-world", c.Worlds.DefaultWorld, "Default world identifier")
+		autoJoinOnCreate := flag.Bool("auto-join-on-create", c.Worlds.AutoJoinOnCreate, "Auto-join world on session create")
+		syncOnJoin := flag.Bool("sync-on-join", c.Worlds.SyncOnJoin, "Sync world state on join")
+		
+		// WebSocket configuration flags
+		writeTimeout := flag.Duration("websocket-write-timeout", c.WebSocket.WriteTimeout, "WebSocket write timeout")
+		pongTimeout := flag.Duration("websocket-pong-timeout", c.WebSocket.PongTimeout, "WebSocket pong timeout") 
+		pingPeriod := flag.Duration("websocket-ping-period", c.WebSocket.PingPeriod, "WebSocket ping period")
+		maxMessageSize := flag.Int64("websocket-max-message-size", c.WebSocket.MaxMessageSize, "WebSocket max message size")
+		readBufferSize := flag.Int("websocket-read-buffer-size", c.WebSocket.ReadBufferSize, "WebSocket read buffer size")
+		writeBufferSize := flag.Int("websocket-write-buffer-size", c.WebSocket.WriteBufferSize, "WebSocket write buffer size")
+		
+		// Session configuration flags
+		cleanupInterval := flag.Duration("session-cleanup-interval", c.Session.CleanupInterval, "Session cleanup interval")
+		inactivityTimeout := flag.Duration("session-inactivity-timeout", c.Session.InactivityTimeout, "Session inactivity timeout")
+		httpClientTimeout := flag.Duration("session-http-client-timeout", c.Session.HTTPClientTimeout, "HTTP client timeout")
+		
+		// Avatar configuration flags
+		maxConcurrentCreations := flag.Int("avatars-max-concurrent-creations", c.Avatars.MaxConcurrentCreations, "Max concurrent avatar creations")
+		healthCheckInterval := flag.Duration("avatars-health-check-interval", c.Avatars.HealthCheckInterval, "Avatar health check interval")
+		positionUpdateThrottle := flag.Duration("avatars-position-update-throttle", c.Avatars.PositionUpdateThrottle, "Avatar position update throttle")
+		maxReconnectAttempts := flag.Int("avatars-max-reconnect-attempts", c.Avatars.MaxReconnectAttempts, "Max avatar reconnect attempts")
+		reconnectDelay := flag.Duration("avatars-reconnect-delay", c.Avatars.ReconnectDelay, "Avatar reconnect delay")
+		maxReconnectDelay := flag.Duration("avatars-max-reconnect-delay", c.Avatars.MaxReconnectDelay, "Max avatar reconnect delay")
+		heartbeatFrequency := flag.Duration("avatars-heartbeat-frequency", c.Avatars.HeartbeatFrequency, "Avatar heartbeat frequency")
+		
+		// Sync protocol configuration flags
+		syncProtocol := flag.String("sync-protocol", c.Sync.Protocol, "HD1-VSC sync protocol version")
+		syncInterval := flag.Duration("sync-interval", c.Sync.SyncInterval, "Sync broadcast interval")
+		maxDeltaLog := flag.Int("sync-max-delta-log", c.Sync.MaxDeltaLog, "Max delta operations to keep")
+		checksumAlgorithm := flag.String("sync-checksum-algorithm", c.Sync.ChecksumAlgorithm, "Checksum algorithm")
+		causalityTimeout := flag.Duration("sync-causality-timeout", c.Sync.CausalityTimeout, "Causality timeout")
+		deltaQueueSize := flag.Int("sync-delta-queue-size", c.Sync.DeltaQueueSize, "Delta operation queue size")
+		avatarRegistrySize := flag.Int("sync-avatar-registry-size", c.Sync.AvatarRegistrySize, "Avatar registry size")
+		broadcastWorldBuffer := flag.Int("sync-broadcast-world-buffer", c.Sync.BroadcastWorldBuffer, "Broadcast world buffer size")
+		worldStateCompression := flag.Bool("sync-world-state-compression", c.Sync.WorldStateCompressionEnabled, "Enable world state compression")
+		performanceMetrics := flag.Bool("sync-performance-metrics", c.Sync.PerformanceMetricsEnabled, "Enable sync performance metrics")
+		vectorClockPrecision := flag.Int("sync-vector-clock-precision", c.Sync.VectorClockPrecision, "Vector clock precision bits")
+		
 		flag.Parse()
 		
-		// Apply flag values
-		c.Server.Host = *host
-		c.Server.Port = *port
-		c.Server.Daemon = *daemon
+		// Apply flag values (short flags take precedence over long flags)
+		if *hostShort != c.Server.Host {
+			c.Server.Host = *hostShort
+		} else {
+			c.Server.Host = *host
+		}
+		if *portShort != c.Server.Port {
+			c.Server.Port = *portShort
+		} else {
+			c.Server.Port = *port
+		}
+		if *daemonShort != c.Server.Daemon {
+			c.Server.Daemon = *daemonShort
+		} else {
+			c.Server.Daemon = *daemon
+		}
 		if *apiBase != "" {
 			c.Server.APIBase = *apiBase
 			c.Client.APIBase = *apiBase
@@ -527,7 +602,9 @@ func (c *HD1Config) loadFlags() {
 		if *internalAPIBase != "" {
 			c.Server.InternalAPIBase = *internalAPIBase
 		}
-		if *version != "" {
+		if *versionShort != c.Server.Version {
+			c.Server.Version = *versionShort
+		} else if *version != "" {
 			c.Server.Version = *version
 		}
 		c.Paths.RootDir = *rootDir
@@ -545,13 +622,56 @@ func (c *HD1Config) loadFlags() {
 			c.Worlds.ProtectedList = strings.Split(*protectedWorlds, ",")
 		}
 		
+		// Apply extended configuration flags
+		c.Paths.WorldsDir = *worldsDir
+		c.Paths.AvatarsDir = *avatarsDir
+		c.Paths.RecordingsDir = *recordingsDir
+		c.Worlds.DefaultWorld = *defaultWorld
+		c.Worlds.AutoJoinOnCreate = *autoJoinOnCreate
+		c.Worlds.SyncOnJoin = *syncOnJoin
+		
+		// Apply WebSocket configuration
+		c.WebSocket.WriteTimeout = *writeTimeout
+		c.WebSocket.PongTimeout = *pongTimeout
+		c.WebSocket.PingPeriod = *pingPeriod
+		c.WebSocket.MaxMessageSize = *maxMessageSize
+		c.WebSocket.ReadBufferSize = *readBufferSize
+		c.WebSocket.WriteBufferSize = *writeBufferSize
+		
+		// Apply Session configuration
+		c.Session.CleanupInterval = *cleanupInterval
+		c.Session.InactivityTimeout = *inactivityTimeout
+		c.Session.HTTPClientTimeout = *httpClientTimeout
+		
+		// Apply Avatar configuration
+		c.Avatars.MaxConcurrentCreations = *maxConcurrentCreations
+		c.Avatars.HealthCheckInterval = *healthCheckInterval
+		c.Avatars.PositionUpdateThrottle = *positionUpdateThrottle
+		c.Avatars.MaxReconnectAttempts = *maxReconnectAttempts
+		c.Avatars.ReconnectDelay = *reconnectDelay
+		c.Avatars.MaxReconnectDelay = *maxReconnectDelay
+		c.Avatars.HeartbeatFrequency = *heartbeatFrequency
+		
+		// Apply Sync protocol configuration
+		c.Sync.Protocol = *syncProtocol
+		c.Sync.SyncInterval = *syncInterval
+		c.Sync.MaxDeltaLog = *maxDeltaLog
+		c.Sync.ChecksumAlgorithm = *checksumAlgorithm
+		c.Sync.CausalityTimeout = *causalityTimeout
+		c.Sync.DeltaQueueSize = *deltaQueueSize
+		c.Sync.AvatarRegistrySize = *avatarRegistrySize
+		c.Sync.BroadcastWorldBuffer = *broadcastWorldBuffer
+		c.Sync.WorldStateCompressionEnabled = *worldStateCompression
+		c.Sync.PerformanceMetricsEnabled = *performanceMetrics
+		c.Sync.VectorClockPrecision = *vectorClockPrecision
+		
 		// Recompute derived paths if root changed
-		c.computeDerivedPaths()
+		c.calculate_dependent_directory_paths()
 	}
 }
 
-// computeDerivedPaths calculates dependent paths from root directory
-func (c *HD1Config) computeDerivedPaths() {
+// calculate_dependent_directory_paths calculates dependent paths from root directory
+func (c *HD1Config) calculate_dependent_directory_paths() {
 	if c.Paths.BuildDir == "" || strings.HasPrefix(c.Paths.BuildDir, "/opt/hd1") {
 		c.Paths.BuildDir = filepath.Join(c.Paths.RootDir, "build")
 	}
@@ -797,7 +917,7 @@ func GetSessionDefaultID() string {
 	if Config != nil {
 		return Config.Session.DefaultSessionID
 	}
-	return "session-19cdcfgj" // fallback
+	return create_unique_session_identifier() // fallback - generate unique ID
 }
 
 // Worlds configuration getters
@@ -843,7 +963,7 @@ func GetVersion() string {
 	if Config != nil {
 		return Config.Server.Version
 	}
-	return "v5.0.1" // fallback
+	return "v5.0.5" // fallback
 }
 
 // Avatars configuration getters

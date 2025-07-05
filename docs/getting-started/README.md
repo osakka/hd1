@@ -1,6 +1,6 @@
 # Getting Started with HD1
 
-**HD1 v5.0.1 - API-First Game Engine Platform**
+**HD1 v5.0.5 - API-First Game Engine Platform**
 
 Welcome to HD1, the world's first API-first game engine platform! Get up and running with professional 3D game development through REST endpoints.
 

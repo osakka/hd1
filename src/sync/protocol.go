@@ -27,6 +27,7 @@ import (
 	"time"
 	
 	"holodeck1/config"
+	"holodeck1/logging"
 )
 
 // VectorClock represents a vector clock for causality tracking
@@ -736,7 +737,10 @@ func (sp *SyncProtocol) processDeltaQueue() {
 						
 						// Apply the operation now that causality is satisfied
 						if err := sp.ApplyDelta(delta); err != nil {
-							fmt.Printf("ERROR: Failed to apply queued delta %s: %v\n", delta.ID, err)
+							logging.Error("queued delta application failed", map[string]interface{}{
+								"delta_id": delta.ID,
+								"error": err.Error(),
+							})
 						}
 						ready = true
 					} else {

@@ -1,13 +1,13 @@
 # HD1 (Holodeck One) Documentation
 
-**HD1 v5.0.2 - API-First Game Engine Platform**
+**HD1 v5.0.5 - API-First Game Engine Platform**
 
-Welcome to the comprehensive documentation for HD1, the world's first API-first game engine platform with **82 REST endpoints** providing complete 3D game development capabilities.
+Welcome to the comprehensive documentation for HD1, the world's first API-first game engine platform with **86 REST endpoints** providing complete 3D game development capabilities.
 
 ## 🚀 **Quick Start**
 
 - **[Getting Started Guide](getting-started/README.md)** - Installation, setup, and first steps with HD1
-- **[API Reference](reference/API-Specification.md)** - Complete API documentation (82 endpoints)
+- **[API Reference](reference/API-Specification.md)** - Complete API documentation (86 endpoints)
 - **[Installation Guide](getting-started/Installation.md)** - System requirements and setup procedures
 - **[Quick Start Tutorial](getting-started/Quick-Start.md)** - 5-minute HD1 tutorial
 
@@ -15,7 +15,7 @@ Welcome to the comprehensive documentation for HD1, the world's first API-first 
 
 ### **🎯 Getting Started**
 - **[Getting Started Hub](getting-started/README.md)** - New user onboarding and tutorials
-  - Complete installation procedures for HD1 v5.0.2
+  - Complete installation procedures for HD1 v5.0.5
   - Quick start tutorial with practical examples
   - System requirements and prerequisites
 
@@ -34,19 +34,19 @@ Welcome to the comprehensive documentation for HD1, the world's first API-first 
 
 ### **📖 Technical Reference**
 - **[Complete Reference](reference/README.md)** - Technical reference documentation
-  - [API Specification](reference/API-Specification.md) - Complete 82-endpoint API reference
+  - [API Specification](reference/API-Specification.md) - Complete 86-endpoint API reference
   - [Documentation Taxonomy](reference/Documentation-Taxonomy.md) - Documentation standards and organization
 
 ### **🏛️ Architectural Decisions**
-- **[ADR Collection](decisions/README.md)** - All 25 Architectural Decision Records
+- **[ADR Collection](decisions/README.md)** - All 28 Architectural Decision Records
   - Complete chronological timeline of HD1's technical evolution
-  - Detailed rationale for architectural choices from v1.0 through v5.0.2
+  - Detailed rationale for architectural choices from v1.0 through v5.0.5
   - Implementation evidence and cross-references
 
 ## 🎯 **Key Technical Facts**
 
 ### **API Specification**
-- **82 REST Endpoints**: Complete game engine control via HTTP APIs
+- **86 REST Endpoints**: Complete game engine control via HTTP APIs
 - **Auto-Generated**: 100% generated from OpenAPI 3.0.3 specification (`src/api.yaml`)
 - **Real-Time Sync**: WebSocket coordination with <10ms latency
 - **Single Source of Truth**: All routing auto-generated from specification
@@ -58,8 +58,8 @@ Welcome to the comprehensive documentation for HD1, the world's first API-first 
 - **Template Externalization**: 100% external template system for code generation
 
 ### **Current Development State**
-- **Version**: HD1 v5.0.2 (Production-ready API-first game engine)
-- **ADRs**: 25 architectural decisions spanning v1.0 through v5.0.2
+- **Version**: HD1 v5.0.5 (Production-ready API-first game engine)
+- **ADRs**: 28 architectural decisions spanning v1.0 through v5.0.5
 - **Code Quality**: Zero warnings, comprehensive documentation standards
 - **Build System**: Professional validation pipeline with auto-generation
 
@@ -93,6 +93,6 @@ This documentation follows strict technical writing standards:
 
 ---
 
-**HD1 v5.0.2** - API-First Game Engine Platform  
-**Documentation Version**: v5.0.2 (Updated: 2025-07-04)  
+**HD1 v5.0.5** - API-First Game Engine Platform  
+**Documentation Version**: v5.0.5 (Updated: 2025-07-05)  
 **Total Files**: 40 documentation files covering complete system

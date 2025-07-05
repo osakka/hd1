@@ -3,12 +3,14 @@
 
 .PHONY: all clean generate build test run validate client logs status start stop restart daemon-start daemon-stop daemon-status
 
-# Professional build directory structure
+# Professional build directory structure - Configuration-driven
 BUILD_DIR = $(shell test -n "$$HD1_BUILD_DIR" && echo "$$HD1_BUILD_DIR" || echo "../build")
 BIN_DIR = $(BUILD_DIR)/bin
 LOG_DIR = $(shell test -n "$$HD1_LOG_DIR" && echo "$$HD1_LOG_DIR" || echo "$(BUILD_DIR)/logs")
-RUNTIME_DIR = $(BUILD_DIR)/runtime
-SHARE_DIR = $(shell test -n "$$HD1_SHARE_DIR" && echo "$$HD1_SHARE_DIR" || echo "../share")
+RUNTIME_DIR = $(shell test -n "$$HD1_RUNTIME_DIR" && echo "$$HD1_RUNTIME_DIR" || echo "$(BUILD_DIR)/runtime")
+SHARE_DIR = $(shell test -n "$$HD1_STATIC_DIR" && dirname "$$HD1_STATIC_DIR" || echo "../share")
+CHANNELS_DIR = $(shell test -n "$$HD1_CHANNELS_DIR" && echo "$$HD1_CHANNELS_DIR" || echo "../share/channels")
+AVATARS_DIR = $(shell test -n "$$HD1_AVATARS_DIR" && echo "$$HD1_AVATARS_DIR" || echo "../share/avatars")
 
 # Default target
 all: validate generate build
@@ -50,8 +52,9 @@ test: build
 	@$(BIN_DIR)/hd1 > $(LOG_DIR)/test.log 2>&1 & \
 	SERVER_PID=$$!; \
 	sleep 3; \
-	curl -s $${HD1_API_BASE:-http://localhost:8080/api}/sessions | jq '.' > /dev/null && echo "GET /api/sessions - OK" || echo "GET /api/sessions - FAILED"; \
-	curl -s -X POST $${HD1_API_BASE:-http://localhost:8080/api}/sessions | jq '.' > /dev/null && echo "POST /api/sessions - OK" || echo "POST /api/sessions - FAILED"; \
+	API_BASE=$${HD1_API_BASE:-http://$${HD1_HOST:-0.0.0.0}:$${HD1_PORT:-8080}/api}; \
+	curl -s "$$API_BASE/sessions" | jq '.' > /dev/null && echo "GET /api/sessions - OK" || echo "GET /api/sessions - FAILED"; \
+	curl -s -X POST "$$API_BASE/sessions" | jq '.' > /dev/null && echo "POST /api/sessions - OK" || echo "POST /api/sessions - FAILED"; \
 	kill $$SERVER_PID 2>/dev/null || true; \
 	echo "API tests complete"
 
@@ -67,7 +70,7 @@ client:
 	@mkdir -p $(BIN_DIR)
 	@echo '#!/bin/bash' > $(BIN_DIR)/hd1-client
 	@echo '# HD1 (Holodeck One) API Client' >> $(BIN_DIR)/hd1-client
-	@echo 'API_BASE="$${HD1_API_BASE:-http://localhost:8080/api}"' >> $(BIN_DIR)/hd1-client
+	@echo 'API_BASE="$${HD1_API_BASE:-http://$${HD1_HOST:-0.0.0.0}:$${HD1_PORT:-8080}/api}"' >> $(BIN_DIR)/hd1-client
 	@echo 'case "$${1:-help}" in' >> $(BIN_DIR)/hd1-client
 	@echo '  "sessions") curl -s "$$API_BASE/sessions" | jq "." ;;' >> $(BIN_DIR)/hd1-client
 	@echo '  "create-session") curl -s -X POST "$$API_BASE/sessions" | jq ".session_id" ;;' >> $(BIN_DIR)/hd1-client
@@ -129,7 +132,7 @@ start: build
 			rm -f $(RUNTIME_DIR)/hd1.pid; \
 		fi \
 	fi
-	@HD1_PORT=$${HD1_PORT:-8080}; \
+	@HD1_HOST=$${HD1_HOST:-0.0.0.0}; HD1_PORT=$${HD1_PORT:-8080}; \
 	echo "Checking port $$HD1_PORT..."; \
 	if netstat -tuln 2>/dev/null | grep -q ":$$HD1_PORT "; then \
 		echo "ERROR: Port $$HD1_PORT already in use"; \
@@ -139,7 +142,7 @@ start: build
 		exit 1; \
 	fi; \
 	echo "Port $$HD1_PORT available"
-	@$(BIN_DIR)/hd1 --daemon
+	@HD1_HOST=$${HD1_HOST:-0.0.0.0} HD1_PORT=$${HD1_PORT:-8080} $(BIN_DIR)/hd1 --daemon
 	@sleep 2
 	@if [ -f $(RUNTIME_DIR)/hd1.pid ]; then \
 		PID=$$(cat $(RUNTIME_DIR)/hd1.pid); \
@@ -178,7 +181,7 @@ stop:
 force-stop:
 	@echo "Force stopping all HD1 processes..."
 	@pkill -f hd1 || echo "No HD1 processes found"
-	@HD1_PORT=$${HD1_PORT:-8080}; \
+	@HD1_HOST=$${HD1_HOST:-0.0.0.0}; HD1_PORT=$${HD1_PORT:-8080}; \
 	lsof -ti:$$HD1_PORT | xargs -r kill -9 || echo "No processes on port $$HD1_PORT"
 	@rm -f $(RUNTIME_DIR)/hd1.pid
 	@echo "Force stop complete"
@@ -195,7 +198,7 @@ status:
 		PID=$$(cat $(RUNTIME_DIR)/hd1.pid); \
 		if kill -0 $$PID 2>/dev/null; then \
 			echo "STATUS: HD1 daemon is running (PID: $$PID)"; \
-			HD1_PORT=$${HD1_PORT:-8080}; \
+			HD1_HOST=$${HD1_HOST:-0.0.0.0}; HD1_PORT=$${HD1_PORT:-8080}; \
 			echo "PORT: Checking port $$HD1_PORT..."; \
 			if netstat -tuln 2>/dev/null | grep -q ":$$HD1_PORT "; then \
 				echo "PORT: Listening on port $$HD1_PORT"; \

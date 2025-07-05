@@ -1,13 +1,13 @@
-# ADR-005: Simple Scene Update System
+# ADR-005: API-Based Scene Update System
 
 **Date**: 2025-06-29  
-**Status**: ✅ **ACCEPTED** - Simplified solution implemented  
+**Status**: ✅ **ACCEPTED** - API-based solution implemented  
 **Decision Makers**: Architecture Review Board  
-**Impact**: 🎯 **OPTIMIZATION** - Simple API-based scene updates  
+**Impact**: 🎯 **OPTIMIZATION** - API-based scene updates  
 
 ## 📋 Summary
 
-Implement simple scene dropdown updates using API calls on page load instead of complex file system monitoring, after discovering filesystem mount options interfere with fsnotify.
+Implement API-based scene dropdown updates using API calls on page load instead of filesystem monitoring, after discovering filesystem mount options interfere with fsnotify.
 
 ## 🎯 Context & Problem Statement
 

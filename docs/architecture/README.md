@@ -1,6 +1,6 @@
 # HD1 Architecture Documentation
 
-**HD1 v5.0.1 - System Architecture and Design**
+**HD1 v5.0.5 - System Architecture and Design**
 
 This section provides comprehensive architectural documentation for HD1, covering system design, principles, and technical implementation details.
 

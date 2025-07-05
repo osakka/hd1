@@ -26,76 +26,118 @@ func main() {
 	command := os.Args[1]
 	
 	switch command {
-	case "list-entities":
-		listEntities()
-	case "create-entity":
-		createEntity()
-	case "get-entity-children":
-		getEntityChildren()
-	case "update-scene-state":
-		updateSceneState()
-	case "get-scene-state":
-		getSceneState()
-	case "list-session-scenes":
-		listSessionScenes()
+	case "get-world-state-sync":
+		getWorldStateSync()
+	case "post-client-join-sync":
+		postClientJoinSync()
 	case "create-session-scene":
 		createSessionScene()
-	case "set-log-level":
-		setLogLevel()
+	case "list-session-scenes":
+		listSessionScenes()
+	case "stop-recording":
+		stopRecording()
+	case "get-version":
+		getVersion()
+	case "create-session":
+		createSession()
+	case "list-sessions":
+		listSessions()
+	case "list-avatars":
+		listAvatars()
+	case "get-avatar-specification":
+		getAvatarSpecification()
+	case "join-session-world":
+		joinSessionWorld()
+	case "get-entity-lifecycle-status":
+		getEntityLifecycleStatus()
+	case "list-rigid-bodies":
+		listRigidBodies()
+	case "play-audio":
+		playAudio()
+	case "add-component":
+		addComponent()
+	case "list-entity-components":
+		listEntityComponents()
+	case "destroy-entity":
+		destroyEntity()
+	case "list-audio-sources":
+		listAudioSources()
+	case "create-audio-source":
+		createAudioSource()
+	case "get-entity":
+		getEntity()
 	case "update-entity":
 		updateEntity()
 	case "delete-entity":
 		deleteEntity()
-	case "get-entity":
-		getEntity()
-	case "get-entity-lifecycle-status":
-		getEntityLifecycleStatus()
-	case "play-animation":
-		playAnimation()
-	case "apply-force":
-		applyForce()
-	case "update-session-graph":
-		updateSessionGraph()
-	case "get-session-graph":
-		getSessionGraph()
-	case "get-avatar-specification":
-		getAvatarSpecification()
-	case "set-trace-modules":
-		setTraceModules()
+	case "get-hierarchy-tree":
+		getHierarchyTree()
+	case "activate-session-scene":
+		activateSessionScene()
+	case "get-avatar-asset":
+		getAvatarAsset()
+	case "import-scene-definition":
+		importSceneDefinition()
+	case "get-world":
+		getWorld()
 	case "update-world":
 		updateWorld()
 	case "delete-world":
 		deleteWorld()
-	case "get-world":
-		getWorld()
-	case "set-entity-transforms":
-		setEntityTransforms()
-	case "get-entity-transforms":
-		getEntityTransforms()
-	case "activate-entity":
-		activateEntity()
-	case "activate-session-scene":
-		activateSessionScene()
-	case "stop-audio":
-		stopAudio()
-	case "load-scene-state":
-		loadSceneState()
-	case "export-scene-definition":
-		exportSceneDefinition()
+	case "get-session":
+		getSession()
+	case "delete-session":
+		deleteSession()
+	case "get-session-avatar":
+		getSessionAvatar()
+	case "set-session-avatar":
+		setSessionAvatar()
+	case "change-session-avatar":
+		changeSessionAvatar()
+	case "get-session-graph":
+		getSessionGraph()
+	case "update-session-graph":
+		updateSessionGraph()
+	case "sync-session-state":
+		syncSessionState()
+	case "deactivate-entity":
+		deactivateEntity()
+	case "get-logging-config":
+		getLoggingConfig()
+	case "set-logging-config":
+		setLoggingConfig()
 	case "get-camera-position":
 		getCameraPosition()
 	case "set-camera-position":
 		setCameraPosition()
-	case "enable-entity":
-		enableEntity()
-	case "list-sessions":
-		listSessions()
-	case "create-session":
-		createSession()
-	case "list-avatars":
-		listAvatars()
-	case "destroy-entity":
-		destroyEntity()
+	case "get-session-world-status":
+		getSessionWorldStatus()
+	case "load-scene-state":
+		loadSceneState()
+	case "get-scene-state":
+		getSceneState()
+	case "update-scene-state":
+		updateSceneState()
+	case "list-entities":
+		listEntities()
+	case "create-entity":
+		createEntity()
+	case "save-scene-state":
+		saveSceneState()
+	case "get-recording-status":
+		getRecordingStatus()
+	case "get-logs":
+		getLogs()
+	case "force-refresh":
+		forceRefresh()
+	case "start-camera-orbit":
+		startCameraOrbit()
+	case "get-component":
+		getComponent()
+	case "update-component":
+		updateComponent()
+	case "remove-component":
+		removeComponent()
 	case "list-animations":
 		listAnimations()
 	case "create-animation":
@@ -104,100 +146,58 @@ func main() {
 		stopAnimation()
 	case "start-recording":
 		startRecording()
-	case "play-recording":
-		playRecording()
-	case "create-audio-source":
-		createAudioSource()
-	case "list-audio-sources":
-		listAudioSources()
-	case "set-canvas":
-		setCanvas()
-	case "get-session-world-status":
-		getSessionWorldStatus()
-	case "import-scene-definition":
-		importSceneDefinition()
-	case "get-recording-status":
-		getRecordingStatus()
-	case "get-version":
-		getVersion()
-	case "get-component":
-		getComponent()
-	case "update-component":
-		updateComponent()
-	case "remove-component":
-		removeComponent()
+	case "stop-audio":
+		stopAudio()
+	case "disable-entity":
+		disableEntity()
+	case "get-entity-transforms":
+		getEntityTransforms()
+	case "set-entity-transforms":
+		setEntityTransforms()
+	case "play-animation":
+		playAnimation()
+	case "create-world":
+		createWorld()
+	case "list-worlds":
+		listWorlds()
+	case "enable-entity":
+		enableEntity()
+	case "update-scene-hierarchy":
+		updateSceneHierarchy()
+	case "get-scene-hierarchy":
+		getSceneHierarchy()
+	case "reset-scene-state":
+		resetSceneState()
+	case "export-scene-definition":
+		exportSceneDefinition()
+	case "activate-entity":
+		activateEntity()
+	case "apply-force":
+		applyForce()
+	case "get-entity-children":
+		getEntityChildren()
+	case "bulk-entity-lifecycle-operation":
+		bulkEntityLifecycleOperation()
 	case "get-physics-world":
 		getPhysicsWorld()
 	case "update-physics-world":
 		updatePhysicsWorld()
-	case "start-camera-orbit":
-		startCameraOrbit()
-	case "disable-entity":
-		disableEntity()
-	case "delete-session":
-		deleteSession()
-	case "get-session":
-		getSession()
-	case "get-session-avatar":
-		getSessionAvatar()
-	case "set-session-avatar":
-		setSessionAvatar()
-	case "change-session-avatar":
-		changeSessionAvatar()
-	case "deactivate-entity":
-		deactivateEntity()
-	case "save-scene-state":
-		saveSceneState()
-	case "get-logging-config":
-		getLoggingConfig()
-	case "set-logging-config":
-		setLoggingConfig()
-	case "post-client-join-sync":
-		postClientJoinSync()
-	case "stop-recording":
-		stopRecording()
-	case "force-refresh":
-		forceRefresh()
-	case "bulk-component-operation":
-		bulkComponentOperation()
+	case "play-recording":
+		playRecording()
 	case "get-entity-parent":
 		getEntityParent()
 	case "set-entity-parent":
 		setEntityParent()
-	case "bulk-entity-lifecycle-operation":
-		bulkEntityLifecycleOperation()
-	case "get-scene-hierarchy":
-		getSceneHierarchy()
-	case "update-scene-hierarchy":
-		updateSceneHierarchy()
-	case "reset-scene-state":
-		resetSceneState()
-	case "join-session-world":
-		joinSessionWorld()
-	case "get-logs":
-		getLogs()
-	case "list-worlds":
-		listWorlds()
-	case "create-world":
-		createWorld()
-	case "get-world-state-sync":
-		getWorldStateSync()
-	case "get-avatar-asset":
-		getAvatarAsset()
-	case "sync-session-state":
-		syncSessionState()
-	case "list-entity-components":
-		listEntityComponents()
-	case "add-component":
-		addComponent()
-	case "get-hierarchy-tree":
-		getHierarchyTree()
-	case "play-audio":
-		playAudio()
+	case "set-log-level":
+		setLogLevel()
 	case "leave-session-world":
 		leaveSessionWorld()
-	case "list-rigid-bodies":
-		listRigidBodies()
+	case "bulk-component-operation":
+		bulkComponentOperation()
+	case "set-trace-modules":
+		setTraceModules()
+	case "set-canvas":
+		setCanvas()
 	case "help":
 		showHelp()
 	default:
@@ -210,92 +210,92 @@ func main() {
 func showHelp() {
 	fmt.Println("HD1 Client - Auto-generated from API specification")
 	fmt.Println("Available commands:")
-	fmt.Println("  list-entities - GET /sessions/{sessionId}/entities")
-	fmt.Println("  create-entity - POST /sessions/{sessionId}/entities")
-	fmt.Println("  get-entity-children - GET /sessions/{sessionId}/entities/{entityId}/hierarchy/children")
-	fmt.Println("  update-scene-state - PUT /sessions/{sessionId}/scene/state")
-	fmt.Println("  get-scene-state - GET /sessions/{sessionId}/scene/state")
-	fmt.Println("  list-session-scenes - GET /sessions/{sessionId}/scenes")
+	fmt.Println("  get-world-state-sync - GET /sessions/{sessionId}/sync/world-state")
+	fmt.Println("  post-client-join-sync - POST /sessions/{sessionId}/sync/client-join")
 	fmt.Println("  create-session-scene - POST /sessions/{sessionId}/scenes")
-	fmt.Println("  set-log-level - POST /admin/logging/level")
+	fmt.Println("  list-session-scenes - GET /sessions/{sessionId}/scenes")
+	fmt.Println("  stop-recording - POST /sessions/{sessionId}/recording/stop")
+	fmt.Println("  get-version - GET /version")
+	fmt.Println("  create-session - POST /sessions")
+	fmt.Println("  list-sessions - GET /sessions")
+	fmt.Println("  list-avatars - GET /avatars")
+	fmt.Println("  get-avatar-specification - GET /avatars/{avatarType}")
+	fmt.Println("  join-session-world - POST /sessions/{sessionId}/world/join")
+	fmt.Println("  get-entity-lifecycle-status - GET /sessions/{sessionId}/entities/{entityId}/lifecycle/status")
+	fmt.Println("  list-rigid-bodies - GET /sessions/{sessionId}/physics/rigidbodies")
+	fmt.Println("  play-audio - POST /sessions/{sessionId}/audio/sources/{audioId}/play")
+	fmt.Println("  add-component - POST /sessions/{sessionId}/entities/{entityId}/components")
+	fmt.Println("  list-entity-components - GET /sessions/{sessionId}/entities/{entityId}/components")
+	fmt.Println("  destroy-entity - DELETE /sessions/{sessionId}/entities/{entityId}/lifecycle/destroy")
+	fmt.Println("  list-audio-sources - GET /sessions/{sessionId}/audio/sources")
+	fmt.Println("  create-audio-source - POST /sessions/{sessionId}/audio/sources")
+	fmt.Println("  get-entity - GET /sessions/{sessionId}/entities/{entityId}")
 	fmt.Println("  update-entity - PUT /sessions/{sessionId}/entities/{entityId}")
 	fmt.Println("  delete-entity - DELETE /sessions/{sessionId}/entities/{entityId}")
-	fmt.Println("  get-entity - GET /sessions/{sessionId}/entities/{entityId}")
-	fmt.Println("  get-entity-lifecycle-status - GET /sessions/{sessionId}/entities/{entityId}/lifecycle/status")
-	fmt.Println("  play-animation - POST /sessions/{sessionId}/animations/{animationId}/play")
-	fmt.Println("  apply-force - POST /sessions/{sessionId}/physics/rigidbodies/{entityId}/force")
-	fmt.Println("  update-session-graph - PUT /sessions/{sessionId}/world/graph")
-	fmt.Println("  get-session-graph - GET /sessions/{sessionId}/world/graph")
-	fmt.Println("  get-avatar-specification - GET /avatars/{avatarType}")
-	fmt.Println("  set-trace-modules - POST /admin/logging/trace")
+	fmt.Println("  get-hierarchy-tree - GET /sessions/{sessionId}/entities/hierarchy/tree")
+	fmt.Println("  activate-session-scene - POST /sessions/{sessionId}/scenes/{sceneId}/activate")
+	fmt.Println("  get-avatar-asset - GET /avatars/{avatarType}/asset")
+	fmt.Println("  import-scene-definition - POST /sessions/{sessionId}/scene/import")
+	fmt.Println("  get-world - GET /worlds/{worldId}")
 	fmt.Println("  update-world - PUT /worlds/{worldId}")
 	fmt.Println("  delete-world - DELETE /worlds/{worldId}")
-	fmt.Println("  get-world - GET /worlds/{worldId}")
-	fmt.Println("  set-entity-transforms - PUT /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms")
-	fmt.Println("  get-entity-transforms - GET /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms")
-	fmt.Println("  activate-entity - POST /sessions/{sessionId}/entities/{entityId}/lifecycle/activate")
-	fmt.Println("  activate-session-scene - POST /sessions/{sessionId}/scenes/{sceneId}/activate")
-	fmt.Println("  stop-audio - POST /sessions/{sessionId}/audio/sources/{audioId}/stop")
-	fmt.Println("  load-scene-state - POST /sessions/{sessionId}/scene/state/load")
-	fmt.Println("  export-scene-definition - GET /sessions/{sessionId}/scene/export")
+	fmt.Println("  get-session - GET /sessions/{sessionId}")
+	fmt.Println("  delete-session - DELETE /sessions/{sessionId}")
+	fmt.Println("  get-session-avatar - GET /sessions/{sessionId}/avatar")
+	fmt.Println("  set-session-avatar - POST /sessions/{sessionId}/avatar")
+	fmt.Println("  change-session-avatar - PUT /sessions/{sessionId}/avatar")
+	fmt.Println("  get-session-graph - GET /sessions/{sessionId}/world/graph")
+	fmt.Println("  update-session-graph - PUT /sessions/{sessionId}/world/graph")
+	fmt.Println("  sync-session-state - POST /sessions/{sessionId}/world/sync")
+	fmt.Println("  deactivate-entity - POST /sessions/{sessionId}/entities/{entityId}/lifecycle/deactivate")
+	fmt.Println("  get-logging-config - GET /admin/logging/config")
+	fmt.Println("  set-logging-config - POST /admin/logging/config")
 	fmt.Println("  get-camera-position - GET /sessions/{sessionId}/camera/position")
 	fmt.Println("  set-camera-position - PUT /sessions/{sessionId}/camera/position")
-	fmt.Println("  enable-entity - PUT /sessions/{sessionId}/entities/{entityId}/lifecycle/enable")
-	fmt.Println("  list-sessions - GET /sessions")
-	fmt.Println("  create-session - POST /sessions")
-	fmt.Println("  list-avatars - GET /avatars")
-	fmt.Println("  destroy-entity - DELETE /sessions/{sessionId}/entities/{entityId}/lifecycle/destroy")
+	fmt.Println("  get-session-world-status - GET /sessions/{sessionId}/world/status")
+	fmt.Println("  load-scene-state - POST /sessions/{sessionId}/scene/state/load")
+	fmt.Println("  get-scene-state - GET /sessions/{sessionId}/scene/state")
+	fmt.Println("  update-scene-state - PUT /sessions/{sessionId}/scene/state")
+	fmt.Println("  list-entities - GET /sessions/{sessionId}/entities")
+	fmt.Println("  create-entity - POST /sessions/{sessionId}/entities")
+	fmt.Println("  save-scene-state - POST /sessions/{sessionId}/scene/state/save")
+	fmt.Println("  get-recording-status - GET /sessions/{sessionId}/recording/status")
+	fmt.Println("  get-logs - GET /admin/logging/logs")
+	fmt.Println("  force-refresh - POST /browser/refresh")
+	fmt.Println("  start-camera-orbit - POST /sessions/{sessionId}/camera/orbit")
+	fmt.Println("  get-component - GET /sessions/{sessionId}/entities/{entityId}/components/{componentType}")
+	fmt.Println("  update-component - PUT /sessions/{sessionId}/entities/{entityId}/components/{componentType}")
+	fmt.Println("  remove-component - DELETE /sessions/{sessionId}/entities/{entityId}/components/{componentType}")
 	fmt.Println("  list-animations - GET /sessions/{sessionId}/animations")
 	fmt.Println("  create-animation - POST /sessions/{sessionId}/animations")
 	fmt.Println("  stop-animation - POST /sessions/{sessionId}/animations/{animationId}/stop")
 	fmt.Println("  start-recording - POST /sessions/{sessionId}/recording/start")
-	fmt.Println("  play-recording - POST /sessions/{sessionId}/recording/play")
-	fmt.Println("  create-audio-source - POST /sessions/{sessionId}/audio/sources")
-	fmt.Println("  list-audio-sources - GET /sessions/{sessionId}/audio/sources")
-	fmt.Println("  set-canvas - POST /browser/canvas")
-	fmt.Println("  get-session-world-status - GET /sessions/{sessionId}/world/status")
-	fmt.Println("  import-scene-definition - POST /sessions/{sessionId}/scene/import")
-	fmt.Println("  get-recording-status - GET /sessions/{sessionId}/recording/status")
-	fmt.Println("  get-version - GET /version")
-	fmt.Println("  get-component - GET /sessions/{sessionId}/entities/{entityId}/components/{componentType}")
-	fmt.Println("  update-component - PUT /sessions/{sessionId}/entities/{entityId}/components/{componentType}")
-	fmt.Println("  remove-component - DELETE /sessions/{sessionId}/entities/{entityId}/components/{componentType}")
+	fmt.Println("  stop-audio - POST /sessions/{sessionId}/audio/sources/{audioId}/stop")
+	fmt.Println("  disable-entity - PUT /sessions/{sessionId}/entities/{entityId}/lifecycle/disable")
+	fmt.Println("  get-entity-transforms - GET /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms")
+	fmt.Println("  set-entity-transforms - PUT /sessions/{sessionId}/entities/{entityId}/hierarchy/transforms")
+	fmt.Println("  play-animation - POST /sessions/{sessionId}/animations/{animationId}/play")
+	fmt.Println("  create-world - POST /worlds")
+	fmt.Println("  list-worlds - GET /worlds")
+	fmt.Println("  enable-entity - PUT /sessions/{sessionId}/entities/{entityId}/lifecycle/enable")
+	fmt.Println("  update-scene-hierarchy - PUT /sessions/{sessionId}/scene/hierarchy")
+	fmt.Println("  get-scene-hierarchy - GET /sessions/{sessionId}/scene/hierarchy")
+	fmt.Println("  reset-scene-state - POST /sessions/{sessionId}/scene/state/reset")
+	fmt.Println("  export-scene-definition - GET /sessions/{sessionId}/scene/export")
+	fmt.Println("  activate-entity - POST /sessions/{sessionId}/entities/{entityId}/lifecycle/activate")
+	fmt.Println("  apply-force - POST /sessions/{sessionId}/physics/rigidbodies/{entityId}/force")
+	fmt.Println("  get-entity-children - GET /sessions/{sessionId}/entities/{entityId}/hierarchy/children")
+	fmt.Println("  bulk-entity-lifecycle-operation - POST /sessions/{sessionId}/entities/lifecycle/bulk")
 	fmt.Println("  get-physics-world - GET /sessions/{sessionId}/physics/world")
 	fmt.Println("  update-physics-world - PUT /sessions/{sessionId}/physics/world")
-	fmt.Println("  start-camera-orbit - POST /sessions/{sessionId}/camera/orbit")
-	fmt.Println("  disable-entity - PUT /sessions/{sessionId}/entities/{entityId}/lifecycle/disable")
-	fmt.Println("  delete-session - DELETE /sessions/{sessionId}")
-	fmt.Println("  get-session - GET /sessions/{sessionId}")
-	fmt.Println("  get-session-avatar - GET /sessions/{sessionId}/avatar")
-	fmt.Println("  set-session-avatar - POST /sessions/{sessionId}/avatar")
-	fmt.Println("  change-session-avatar - PUT /sessions/{sessionId}/avatar")
-	fmt.Println("  deactivate-entity - POST /sessions/{sessionId}/entities/{entityId}/lifecycle/deactivate")
-	fmt.Println("  save-scene-state - POST /sessions/{sessionId}/scene/state/save")
-	fmt.Println("  get-logging-config - GET /admin/logging/config")
-	fmt.Println("  set-logging-config - POST /admin/logging/config")
-	fmt.Println("  post-client-join-sync - POST /sessions/{sessionId}/sync/client-join")
-	fmt.Println("  stop-recording - POST /sessions/{sessionId}/recording/stop")
-	fmt.Println("  force-refresh - POST /browser/refresh")
-	fmt.Println("  bulk-component-operation - POST /sessions/{sessionId}/entities/{entityId}/components/bulk")
+	fmt.Println("  play-recording - POST /sessions/{sessionId}/recording/play")
 	fmt.Println("  get-entity-parent - GET /sessions/{sessionId}/entities/{entityId}/hierarchy/parent")
 	fmt.Println("  set-entity-parent - PUT /sessions/{sessionId}/entities/{entityId}/hierarchy/parent")
-	fmt.Println("  bulk-entity-lifecycle-operation - POST /sessions/{sessionId}/entities/lifecycle/bulk")
-	fmt.Println("  get-scene-hierarchy - GET /sessions/{sessionId}/scene/hierarchy")
-	fmt.Println("  update-scene-hierarchy - PUT /sessions/{sessionId}/scene/hierarchy")
-	fmt.Println("  reset-scene-state - POST /sessions/{sessionId}/scene/state/reset")
-	fmt.Println("  join-session-world - POST /sessions/{sessionId}/world/join")
-	fmt.Println("  get-logs - GET /admin/logging/logs")
-	fmt.Println("  list-worlds - GET /worlds")
-	fmt.Println("  create-world - POST /worlds")
-	fmt.Println("  get-world-state-sync - GET /sessions/{sessionId}/sync/world-state")
-	fmt.Println("  get-avatar-asset - GET /avatars/{avatarType}/asset")
-	fmt.Println("  sync-session-state - POST /sessions/{sessionId}/world/sync")
-	fmt.Println("  list-entity-components - GET /sessions/{sessionId}/entities/{entityId}/components")
-	fmt.Println("  add-component - POST /sessions/{sessionId}/entities/{entityId}/components")
-	fmt.Println("  get-hierarchy-tree - GET /sessions/{sessionId}/entities/hierarchy/tree")
-	fmt.Println("  play-audio - POST /sessions/{sessionId}/audio/sources/{audioId}/play")
+	fmt.Println("  set-log-level - POST /admin/logging/level")
 	fmt.Println("  leave-session-world - POST /sessions/{sessionId}/world/leave")
-	fmt.Println("  list-rigid-bodies - GET /sessions/{sessionId}/physics/rigidbodies")
+	fmt.Println("  bulk-component-operation - POST /sessions/{sessionId}/entities/{entityId}/components/bulk")
+	fmt.Println("  set-trace-modules - POST /admin/logging/trace")
+	fmt.Println("  set-canvas - POST /browser/canvas")
 
 }
 
@@ -347,38 +347,15 @@ func makeRequest(method, path string, body interface{}) {
 }
 
 
-func listEntities() {
+func getWorldStateSync() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities", nil)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/sync/world-state", nil)
 }
 
-func createEntity() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities", body)
-}
-
-func getEntityChildren() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/hierarchy/children", nil)
-}
-
-func updateSceneState() {
+func postClientJoinSync() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
@@ -390,23 +367,7 @@ func updateSceneState() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/scene/state", body)
-}
-
-func getSceneState() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/scene/state", nil)
-}
-
-func listSessionScenes() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/scenes", nil)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/sync/client-join", body)
 }
 
 func createSessionScene() {
@@ -424,7 +385,34 @@ func createSessionScene() {
 	makeRequest("POST", "/sessions/" + os.Args[2] + "/scenes", body)
 }
 
-func setLogLevel() {
+func listSessionScenes() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/scenes", nil)
+}
+
+func stopRecording() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/stop", body)
+}
+
+func getVersion() {
+	makeRequest("GET", "/version", nil)
+}
+
+func createSession() {
 	var body interface{}
 	if len(os.Args) > 2 {
 		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
@@ -432,7 +420,131 @@ func setLogLevel() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/admin/logging/level", body)
+	makeRequest("POST", "/sessions", body)
+}
+
+func listSessions() {
+	makeRequest("GET", "/sessions", nil)
+}
+
+func listAvatars() {
+	makeRequest("GET", "/avatars", nil)
+}
+
+func getAvatarSpecification() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/avatars/" + os.Args[2] + "", nil)
+}
+
+func joinSessionWorld() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/world/join", body)
+}
+
+func getEntityLifecycleStatus() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/status", nil)
+}
+
+func listRigidBodies() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/physics/rigidbodies", nil)
+}
+
+func playAudio() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/audio/sources/" + os.Args[3] + "/play", body)
+}
+
+func addComponent() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components", body)
+}
+
+func listEntityComponents() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components", nil)
+}
+
+func destroyEntity() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	makeRequest("DELETE", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/destroy", nil)
+}
+
+func listAudioSources() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/audio/sources", nil)
+}
+
+func createAudioSource() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/audio/sources", body)
+}
+
+func getEntity() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "", nil)
 }
 
 func updateEntity() {
@@ -458,23 +570,15 @@ func deleteEntity() {
 	makeRequest("DELETE", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "", nil)
 }
 
-func getEntity() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
+func getHierarchyTree() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "", nil)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/hierarchy/tree", nil)
 }
 
-func getEntityLifecycleStatus() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/status", nil)
-}
-
-func playAnimation() {
+func activateSessionScene() {
 	if len(os.Args) < 4 {
 		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
@@ -486,25 +590,18 @@ func playAnimation() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/animations/" + os.Args[3] + "/play", body)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/scenes/" + os.Args[3] + "/activate", body)
 }
 
-func applyForce() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
+func getAvatarAsset() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/physics/rigidbodies/" + os.Args[3] + "/force", body)
+	makeRequest("GET", "/avatars/" + os.Args[2] + "/asset", nil)
 }
 
-func updateSessionGraph() {
+func importSceneDefinition() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
@@ -516,34 +613,15 @@ func updateSessionGraph() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/world/graph", body)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/scene/import", body)
 }
 
-func getSessionGraph() {
+func getWorld() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/world/graph", nil)
-}
-
-func getAvatarSpecification() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/avatars/" + os.Args[2] + "", nil)
-}
-
-func setTraceModules() {
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/admin/logging/trace", body)
+	makeRequest("GET", "/worlds/" + os.Args[2] + "", nil)
 }
 
 func updateWorld() {
@@ -569,83 +647,31 @@ func deleteWorld() {
 	makeRequest("DELETE", "/worlds/" + os.Args[2] + "", nil)
 }
 
-func getWorld() {
+func getSession() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/worlds/" + os.Args[2] + "", nil)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "", nil)
 }
 
-func setEntityTransforms() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
+func deleteSession() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/hierarchy/transforms", body)
+	makeRequest("DELETE", "/sessions/" + os.Args[2] + "", nil)
 }
 
-func getEntityTransforms() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
+func getSessionAvatar() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/hierarchy/transforms", nil)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/avatar", nil)
 }
 
-func activateEntity() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/activate", body)
-}
-
-func activateSessionScene() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/scenes/" + os.Args[3] + "/activate", body)
-}
-
-func stopAudio() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/audio/sources/" + os.Args[3] + "/stop", body)
-}
-
-func loadSceneState() {
+func setSessionAvatar() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
@@ -657,15 +683,90 @@ func loadSceneState() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/scene/state/load", body)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/avatar", body)
 }
 
-func exportSceneDefinition() {
+func changeSessionAvatar() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/scene/export", nil)
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/avatar", body)
+}
+
+func getSessionGraph() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/world/graph", nil)
+}
+
+func updateSessionGraph() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/world/graph", body)
+}
+
+func syncSessionState() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/world/sync", body)
+}
+
+func deactivateEntity() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/deactivate", body)
+}
+
+func getLoggingConfig() {
+	makeRequest("GET", "/admin/logging/config", nil)
+}
+
+func setLoggingConfig() {
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/admin/logging/config", body)
 }
 
 func getCameraPosition() {
@@ -691,26 +792,103 @@ func setCameraPosition() {
 	makeRequest("PUT", "/sessions/" + os.Args[2] + "/camera/position", body)
 }
 
-func enableEntity() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
+func getSessionWorldStatus() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/world/status", nil)
+}
+
+func loadSceneState() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
 	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
 			fmt.Printf("Error parsing JSON: %v\n", err)
 			os.Exit(1)
 		}
 	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/enable", body)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/scene/state/load", body)
 }
 
-func listSessions() {
-	makeRequest("GET", "/sessions", nil)
+func getSceneState() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/scene/state", nil)
 }
 
-func createSession() {
+func updateSceneState() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/scene/state", body)
+}
+
+func listEntities() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities", nil)
+}
+
+func createEntity() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities", body)
+}
+
+func saveSceneState() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/scene/state/save", body)
+}
+
+func getRecordingStatus() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/recording/status", nil)
+}
+
+func getLogs() {
+	makeRequest("GET", "/admin/logging/logs", nil)
+}
+
+func forceRefresh() {
 	var body interface{}
 	if len(os.Args) > 2 {
 		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
@@ -718,19 +896,53 @@ func createSession() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/sessions", body)
+	makeRequest("POST", "/browser/refresh", body)
 }
 
-func listAvatars() {
-	makeRequest("GET", "/avatars", nil)
+func startCameraOrbit() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/camera/orbit", body)
 }
 
-func destroyEntity() {
-	if len(os.Args) < 4 {
+func getComponent() {
+	if len(os.Args) < 5 {
 		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
 	}
-	makeRequest("DELETE", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/destroy", nil)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components/" + os.Args[4] + "", nil)
+}
+
+func updateComponent() {
+	if len(os.Args) < 5 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 4 {
+		if err := json.Unmarshal([]byte(os.Args[5]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components/" + os.Args[4] + "", body)
+}
+
+func removeComponent() {
+	if len(os.Args) < 5 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	makeRequest("DELETE", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components/" + os.Args[4] + "", nil)
 }
 
 func listAnimations() {
@@ -786,45 +998,75 @@ func startRecording() {
 	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/start", body)
 }
 
-func playRecording() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
+func stopAudio() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
 	}
 	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
 			fmt.Printf("Error parsing JSON: %v\n", err)
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/play", body)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/audio/sources/" + os.Args[3] + "/stop", body)
 }
 
-func createAudioSource() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
+func disableEntity() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
 	}
 	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
 			fmt.Printf("Error parsing JSON: %v\n", err)
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/audio/sources", body)
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/disable", body)
 }
 
-func listAudioSources() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
+func getEntityTransforms() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/audio/sources", nil)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/hierarchy/transforms", nil)
 }
 
-func setCanvas() {
+func setEntityTransforms() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/hierarchy/transforms", body)
+}
+
+func playAnimation() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/animations/" + os.Args[3] + "/play", body)
+}
+
+func createWorld() {
 	var body interface{}
 	if len(os.Args) > 2 {
 		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
@@ -832,18 +1074,29 @@ func setCanvas() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/browser/canvas", body)
+	makeRequest("POST", "/worlds", body)
 }
 
-func getSessionWorldStatus() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
+func listWorlds() {
+	makeRequest("GET", "/worlds", nil)
+}
+
+func enableEntity() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/world/status", nil)
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/enable", body)
 }
 
-func importSceneDefinition() {
+func updateSceneHierarchy() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
@@ -855,50 +1108,91 @@ func importSceneDefinition() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/scene/import", body)
+	makeRequest("PUT", "/sessions/" + os.Args[2] + "/scene/hierarchy", body)
 }
 
-func getRecordingStatus() {
+func getSceneHierarchy() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/recording/status", nil)
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/scene/hierarchy", nil)
 }
 
-func getVersion() {
-	makeRequest("GET", "/version", nil)
-}
-
-func getComponent() {
-	if len(os.Args) < 5 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components/" + os.Args[4] + "", nil)
-}
-
-func updateComponent() {
-	if len(os.Args) < 5 {
-		fmt.Println("Error: Missing required parameters")
+func resetSceneState() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
 	}
 	var body interface{}
-	if len(os.Args) > 4 {
-		if err := json.Unmarshal([]byte(os.Args[5]), &body); err != nil {
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
 			fmt.Printf("Error parsing JSON: %v\n", err)
 			os.Exit(1)
 		}
 	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components/" + os.Args[4] + "", body)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/scene/state/reset", body)
 }
 
-func removeComponent() {
-	if len(os.Args) < 5 {
+func exportSceneDefinition() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/scene/export", nil)
+}
+
+func activateEntity() {
+	if len(os.Args) < 4 {
 		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
 	}
-	makeRequest("DELETE", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components/" + os.Args[4] + "", nil)
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/activate", body)
+}
+
+func applyForce() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/physics/rigidbodies/" + os.Args[3] + "/force", body)
+}
+
+func getEntityChildren() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/hierarchy/children", nil)
+}
+
+func bulkEntityLifecycleOperation() {
+	if len(os.Args) < 3 {
+		fmt.Println("Error: Missing required parameter")
+		os.Exit(1)
+	}
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/lifecycle/bulk", body)
 }
 
 func getPhysicsWorld() {
@@ -924,7 +1218,7 @@ func updatePhysicsWorld() {
 	makeRequest("PUT", "/sessions/" + os.Args[2] + "/physics/world", body)
 }
 
-func startCameraOrbit() {
+func playRecording() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
 		os.Exit(1)
@@ -936,177 +1230,7 @@ func startCameraOrbit() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/camera/orbit", body)
-}
-
-func disableEntity() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/disable", body)
-}
-
-func deleteSession() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("DELETE", "/sessions/" + os.Args[2] + "", nil)
-}
-
-func getSession() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "", nil)
-}
-
-func getSessionAvatar() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/avatar", nil)
-}
-
-func setSessionAvatar() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/avatar", body)
-}
-
-func changeSessionAvatar() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/avatar", body)
-}
-
-func deactivateEntity() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/lifecycle/deactivate", body)
-}
-
-func saveSceneState() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/scene/state/save", body)
-}
-
-func getLoggingConfig() {
-	makeRequest("GET", "/admin/logging/config", nil)
-}
-
-func setLoggingConfig() {
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/admin/logging/config", body)
-}
-
-func postClientJoinSync() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/sync/client-join", body)
-}
-
-func stopRecording() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/stop", body)
-}
-
-func forceRefresh() {
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/browser/refresh", body)
-}
-
-func bulkComponentOperation() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components/bulk", body)
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/recording/play", body)
 }
 
 func getEntityParent() {
@@ -1132,83 +1256,7 @@ func setEntityParent() {
 	makeRequest("PUT", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/hierarchy/parent", body)
 }
 
-func bulkEntityLifecycleOperation() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/lifecycle/bulk", body)
-}
-
-func getSceneHierarchy() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/scene/hierarchy", nil)
-}
-
-func updateSceneHierarchy() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("PUT", "/sessions/" + os.Args[2] + "/scene/hierarchy", body)
-}
-
-func resetSceneState() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/scene/state/reset", body)
-}
-
-func joinSessionWorld() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/world/join", body)
-}
-
-func getLogs() {
-	makeRequest("GET", "/admin/logging/logs", nil)
-}
-
-func listWorlds() {
-	makeRequest("GET", "/worlds", nil)
-}
-
-func createWorld() {
+func setLogLevel() {
 	var body interface{}
 	if len(os.Args) > 2 {
 		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
@@ -1216,84 +1264,7 @@ func createWorld() {
 			os.Exit(1)
 		}
 	}
-	makeRequest("POST", "/worlds", body)
-}
-
-func getWorldStateSync() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/sync/world-state", nil)
-}
-
-func getAvatarAsset() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/avatars/" + os.Args[2] + "/asset", nil)
-}
-
-func syncSessionState() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[3]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/world/sync", body)
-}
-
-func listEntityComponents() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components", nil)
-}
-
-func addComponent() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components", body)
-}
-
-func getHierarchyTree() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/entities/hierarchy/tree", nil)
-}
-
-func playAudio() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	var body interface{}
-	if len(os.Args) > 3 {
-		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sessions/" + os.Args[2] + "/audio/sources/" + os.Args[3] + "/play", body)
+	makeRequest("POST", "/admin/logging/level", body)
 }
 
 func leaveSessionWorld() {
@@ -1311,10 +1282,39 @@ func leaveSessionWorld() {
 	makeRequest("POST", "/sessions/" + os.Args[2] + "/world/leave", body)
 }
 
-func listRigidBodies() {
-	if len(os.Args) < 3 {
-		fmt.Println("Error: Missing required parameter")
+func bulkComponentOperation() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
 		os.Exit(1)
 	}
-	makeRequest("GET", "/sessions/" + os.Args[2] + "/physics/rigidbodies", nil)
+	var body interface{}
+	if len(os.Args) > 3 {
+		if err := json.Unmarshal([]byte(os.Args[4]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sessions/" + os.Args[2] + "/entities/" + os.Args[3] + "/components/bulk", body)
+}
+
+func setTraceModules() {
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/admin/logging/trace", body)
+}
+
+func setCanvas() {
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/browser/canvas", body)
 }

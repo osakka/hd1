@@ -199,7 +199,7 @@ created_via: "api"
 	}
 
 
-	logging.Info("world created successfully", map[string]interface{}{
+	logging.Info("world created", map[string]interface{}{
 		"world_id":     req.ID,
 		"name":         req.Name,
 		"environment":  req.Environment,

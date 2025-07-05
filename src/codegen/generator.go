@@ -990,7 +990,14 @@ func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error 
 	}
 	defer outputFile.Close()
 
-	if err := tmpl.Execute(outputFile, nil); err != nil {
+	// Pass configuration data to template
+	templateData := struct {
+		Config *config.HD1Config
+	}{
+		Config: config.Config,
+	}
+	
+	if err := tmpl.Execute(outputFile, templateData); err != nil {
 		return fmt.Errorf("failed to execute PlayCanvas shell template: %w", err)
 	}
 	
@@ -1023,7 +1030,14 @@ func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
 	}
 	defer outputFile.Close()
 
-	if err := tmpl.Execute(outputFile, nil); err != nil {
+	// Pass configuration data to template
+	templateData := struct {
+		Config *config.HD1Config
+	}{
+		Config: config.Config,
+	}
+	
+	if err := tmpl.Execute(outputFile, templateData); err != nil {
 		return fmt.Errorf("failed to execute PlayCanvas bridge template: %w", err)
 	}
 	

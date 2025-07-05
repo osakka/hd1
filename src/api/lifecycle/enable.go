@@ -38,7 +38,7 @@ func EnableEntityHandler(w http.ResponseWriter, r *http.Request, hub *server.Hub
 			"activated": true,
 			"visible": true,
 		},
-		"message": "Entity enabled successfully",
+		"message": "Entity enabled",
 	}
 	
 	writeJSONResponse(w, response, http.StatusOK)
@@ -64,7 +64,7 @@ func DisableEntityHandler(w http.ResponseWriter, r *http.Request, hub *server.Hu
 			"activated": false,
 			"visible": false,
 		},
-		"message": "Entity disabled successfully",
+		"message": "Entity disabled",
 	}
 	
 	writeJSONResponse(w, response, http.StatusOK)

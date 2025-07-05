@@ -143,9 +143,9 @@ func ListWorldsHandler(w http.ResponseWriter, r *http.Request, hub interface{}) 
 		})
 		// Continue with defaults if config fails to load
 		serverConfig = &ServerConfig{}
-		serverConfig.Defaults.DefaultWorld = "world_one"
-		serverConfig.Defaults.AutoJoinOnSessionCreate = true
-		serverConfig.Server.SyncEnvironmentOnJoin = true
+		serverConfig.Defaults.DefaultWorld = config.Config.Worlds.DefaultWorld
+		serverConfig.Defaults.AutoJoinOnSessionCreate = config.Config.Worlds.AutoJoinOnCreate
+		serverConfig.Server.SyncEnvironmentOnJoin = config.Config.Worlds.SyncOnJoin
 	}
 
 	// Read world configuration files

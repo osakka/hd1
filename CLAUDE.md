@@ -1,18 +1,18 @@
 # HD1 (Holodeck One) - Development Context
 
 ## Core Principles
-- **API-First**: HD1 exposes everything via unified API surface (82 endpoints)
+- **API-First**: HD1 exposes everything via unified API surface (86 endpoints)
 - **Specification-Driven**: 100% auto-generated from api.yaml
 - **Real-Time Sync**: WebSocket for state sync, API for commands
 - **Single Source of Truth**: No parallel implementations
 - **Quality Only**: Zero regressions, clean architecture
 - **"API = Control, WebSocket = Graph Extension"**
 
-## Current State (2025-07-04)
-HD1 v5.0.2 is a **production-ready API-first game engine** platform with **complete 3D avatar system** and **native GLB model loading**.
+## Current State (2025-07-05)
+HD1 v5.0.5 is a **production-ready API-first game engine** platform with **complete 3D avatar system** and **native GLB model loading**.
 
 ### ✅ Completed Features
-- **82 REST Endpoints**: Complete game engine control via HTTP + Avatar management
+- **86 REST Endpoints**: Complete game engine control via HTTP + Avatar management
 - **Real-Time WebSocket**: Entity lifecycle synchronization + avatar position updates
 - **PlayCanvas Integration**: Professional 3D rendering with ECS + native GLB asset loading
 - **3D Avatar System**: Production-ready multiplayer avatars with real GLB models
@@ -32,7 +32,7 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → Client Ren
 ```
 
 **Key Files:**
-- `src/api.yaml` - Single source of truth (82 total route endpoints, 59 unique paths)
+- `src/api.yaml` - Single source of truth (86 total route endpoints, 59 unique paths)
 - `src/auto_router.go` - Auto-generated routing
 - `src/codegen/templates/` - External template files
 - `share/worlds/*.yaml` - Scene configurations
@@ -62,7 +62,7 @@ HD1_HOST=0.0.0.0                          # Server bind host
 HD1_PORT=8080                             # Server bind port  
 HD1_API_BASE=http://0.0.0.0:8080/api     # External API base URL
 HD1_INTERNAL_API_BASE=http://localhost:8080/api  # Internal API communications
-HD1_VERSION=v5.0.1                       # HD1 version identifier
+HD1_VERSION=v5.0.5                       # HD1 version identifier
 HD1_DAEMON=true                           # Run in daemon mode
 
 # Directory Paths
@@ -225,4 +225,4 @@ defer memory.PutWebSocketUpdate(update)
 
 ---
 
-**HD1 v5.0.1**: Where OpenAPI specifications become immersive multiplayer game worlds with complete configuration management standardization.
+**HD1 v5.0.5**: Where OpenAPI specifications become immersive multiplayer game worlds with complete configuration management standardization.

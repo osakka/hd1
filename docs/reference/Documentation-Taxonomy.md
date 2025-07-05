@@ -1,6 +1,6 @@
 # HD1 Documentation Taxonomy
 
-**Documentation Classification System for HD1 v5.0.2**
+**Documentation Classification System for HD1 v5.0.5**
 
 ## 📂 Primary Categories
 
@@ -39,7 +39,7 @@
 1. **Factual Only** - 100% accurate to codebase
 2. **Audience-Specific** - Clear user vs developer vs operations content
 3. **Single Source of Truth** - No duplication across categories
-4. **Version Consistent** - All references to v5.0.2
+4. **Version Consistent** - All references to v5.0.5
 
 ### **Navigation Structure**
 - Each category has its own `README.md` as navigation hub

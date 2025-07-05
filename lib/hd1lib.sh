@@ -12,7 +12,7 @@
 
 # Configuration - respects environment variables and defaults from config system
 HD1_API_BASE="${HD1_API_BASE:-http://0.0.0.0:8080/api}"
-HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-session-19cdcfgj}}"
+HD1_SESSION_ID="${HD1_SESSION_ID:-${SESSION_ID:-session-f4c0080e82c9d12c}}"
 
 # Standard HTTP client with error handling
 hd1::api_call() {
@@ -40,6 +40,22 @@ hd1::api_call() {
 }
 
 
+# Auto-generated from POST /sessions
+hd1::create_session() {
+    hd1::api_call "POST" "/sessions"
+}
+
+# Auto-generated from GET /sessions
+hd1::list_sessions() {
+    hd1::api_call "GET" "/sessions"
+}
+
+# Auto-generated from GET /sessions/{sessionId}
+hd1::get_session() {
+    local session_id="${1:-$HD1_SESSION_ID}"
+    hd1::api_call "GET" "/sessions/$session_id"
+}
+
 # Auto-generated from PUT /sessions/{sessionId}/camera/position
 hd1::camera() {
     local x="$1" y="$2" z="$3"
@@ -60,16 +76,6 @@ EOF
     
     hd1::api_call "PUT" "/sessions/$HD1_SESSION_ID/camera/position" "$payload"
     echo "CAMERA: Positioned at ($x,$y,$z)"
-}
-
-# Auto-generated from GET /sessions
-hd1::list_sessions() {
-    hd1::api_call "GET" "/sessions"
-}
-
-# Auto-generated from POST /sessions
-hd1::create_session() {
-    hd1::api_call "POST" "/sessions"
 }
 
 # Auto-generated from POST /browser/canvas
@@ -98,12 +104,6 @@ EOF
 hd1::clear() {
     echo "CLEAR: Clearing HD1 scene..."
     hd1::canvas_control "clear"
-}
-
-# Auto-generated from GET /sessions/{sessionId}
-hd1::get_session() {
-    local session_id="${1:-$HD1_SESSION_ID}"
-    hd1::api_call "GET" "/sessions/$session_id"
 }
 
 

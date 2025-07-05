@@ -3,7 +3,7 @@
  * HD1 JavaScript PlayCanvas Bridge
  * ===================================================================
  *
- * HD1 v3.0 FEATURES:
+ * HD1 {{.Config.Server.Version}} FEATURES:
  * • PlayCanvas game engine integration
  * • World-based entity management via API
  * • WebSocket real-time synchronization
@@ -22,7 +22,7 @@ function getCurrentSessionId() {
 }
 
 function getCurrentWorldId() {
-    return window.currentWorldId || 'world_one';
+    return window.currentWorldId || '{{.Config.Worlds.DefaultWorld}}';
 }
 
 // PlayCanvas validation functions
@@ -55,28 +55,28 @@ const playcanvasValidation = {
  * Note: Direct entity creation is deprecated, use world YAML configuration
  */
 hd1.createEntityViaWorld = function(worldId, entityName, entityType, options = {}) {
-    console.warn('[HD1] Direct entity creation deprecated in v3.0');
+    console.warn('[HD1] Direct entity creation deprecated in {{.Config.Server.Version}}');
     console.info('[HD1] Use world YAML configuration for entity management');
     console.info(`[HD1] Entity: ${entityName} (${entityType}) in world ${worldId}`);
     console.info(`[HD1] Edit: /opt/hd1/share/worlds/${worldId}.yaml`);
     
-    return Promise.reject(new Error('Entity management via world YAML only in v3.0'));
+    return Promise.reject(new Error('Entity management via world YAML only in {{.Config.Server.Version}}'));
 };
 
 /**
- * HD1 v3.0: World lighting configuration
+ * HD1 {{.Config.Server.Version}}: World lighting configuration
  */
 hd1.configureWorldLighting = function(worldId, lightType, intensity = 1.0, color = '#ffffff') {
-    console.warn('[HD1] Direct lighting deprecated in v3.0');
+    console.warn('[HD1] Direct lighting deprecated in {{.Config.Server.Version}}');
     console.info('[HD1] Use world YAML configuration for lighting');
     console.info(`[HD1] Light: ${lightType} intensity=${intensity} color=${color}`);
     console.info(`[HD1] Edit: /opt/hd1/share/worlds/${worldId}.yaml`);
     
-    return Promise.reject(new Error('Lighting management via world YAML only in v3.0'));
+    return Promise.reject(new Error('Lighting management via world YAML only in {{.Config.Server.Version}}'));
 };
 
 /**
- * Join session to world (v3.0 API)
+ * Join session to world ({{.Config.Server.Version}} API)
  */
 hd1.joinSessionToWorld = function(sessionId, worldId) {
     const payload = {
@@ -124,7 +124,7 @@ hd1.verifyPlaycanvasIntegration = function() {
         websocketSynchronization: true,
         apiFirstArchitecture: true,
         yamlConfiguration: true,
-        hd1Version: 'v3.0'
+        hd1Version: '{{.Config.Server.Version}}'
     };
     
     console.log('[HD1] PlayCanvas Integration Status:', status);
@@ -136,5 +136,5 @@ if (typeof console !== 'undefined') {
     console.log('[HD1] PlayCanvas bridge loaded');
     console.log('[HD1] World-based entity management: ACTIVE');
     console.log('[HD1] PlayCanvas game engine integration: ACTIVE');
-    console.log('[HD1] HD1 v3.0 ready');
+    console.log('[HD1] HD1 {{.Config.Server.Version}} ready');
 }

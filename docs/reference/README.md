@@ -1,6 +1,6 @@
 # HD1 Reference Documentation
 
-**HD1 v5.0.1 - Complete Technical Reference**
+**HD1 v5.0.5 - Complete Technical Reference**
 
 This section provides comprehensive reference documentation for HD1, including complete API documentation, configuration guides, and technical specifications.
 

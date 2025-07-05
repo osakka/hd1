@@ -89,7 +89,7 @@ func LeaveSessionWorldHandler(w http.ResponseWriter, r *http.Request, hub interf
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"message": "Successfully left session world",
+		"message": "Left session world",
 	})
 }
 

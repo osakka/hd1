@@ -632,7 +632,7 @@ func (s *SessionStore) CreateSession() *Session {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	
-	sessionID := generateSessionID()
+	sessionID := create_unique_session_identifier()
 	session := &Session{
 		ID:        sessionID,
 		CreatedAt: time.Now(),
@@ -1260,8 +1260,8 @@ func (h *Hub) sendToClient(clientID string, message interface{}) error {
 
 // Legacy CoordinateError and ObjectError removed - entities use PlayCanvas validation
 
-// generateSessionID creates a unique session identifier
-func generateSessionID() string {
+// create_unique_session_identifier creates a unique session identifier
+func create_unique_session_identifier() string {
 	return "session-" + generateID(8)
 }
 

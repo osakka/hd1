@@ -4,7 +4,7 @@
 # HD1 PlayCanvas Shell Function Library
 # ===================================================================
 #
-# HD1 v3.0 FEATURES:
+# HD1 v5.0.5 FEATURES:
 # • PlayCanvas game engine integration via API
 # • World-based entity management
 # • Single source of truth architecture
@@ -19,28 +19,28 @@ source "${HD1_ROOT}/lib/hd1lib.sh" 2>/dev/null || {
     exit 1
 }
 
-# HD1 v3.0: Entity management via worlds, not direct creation
+# HD1 v5.0.5: Entity management via worlds, not direct creation
 hd1::create_entity_via_world() {
     local world_id="$1"
     local entity_name="$2"
     local entity_type="$3"
     shift 3
     
-    echo "INFO: HD1 v3.0 uses world-based entity management"
+    echo "INFO: HD1 v5.0.5 uses world-based entity management"
     echo "NOTE: Entities are defined in world YAML configuration"
     echo "ENTITY: ${entity_name} (${entity_type}) in world ${world_id}"
     echo "ACTION: Edit /opt/hd1/share/worlds/${world_id}.yaml to add entities"
     return 1
 }
 
-# HD1 v3.0: Light management via worlds
+# HD1 v5.0.5: Light management via worlds
 hd1::configure_world_lighting() {
     local world_id="$1"
     local light_type="$2"
     local intensity="$3"
     local color="$4"
     
-    echo "INFO: HD1 v3.0 lighting configured via world YAML"
+    echo "INFO: HD1 v5.0.5 lighting configured via world YAML"
     echo "NOTE: Edit world configuration for lighting changes"
     echo "LIGHT: ${light_type} intensity=${intensity} color=${color}"
     echo "ACTION: Update /opt/hd1/share/worlds/${world_id}.yaml lighting section"
@@ -49,7 +49,7 @@ hd1::configure_world_lighting() {
 
 # PlayCanvas capabilities inspection
 hd1::playcanvas_capabilities() {
-    echo "PLAYCANVAS: HD1 v3.0 Integration Capabilities"
+    echo "PLAYCANVAS: HD1 v5.0.5 Integration Capabilities"
     echo ""
     echo "Entity Management:"
     echo "  - World-based entity definitions (YAML)"
@@ -83,10 +83,10 @@ hd1::verify_playcanvas_integration() {
     echo "  [OK] API-first architecture: ACTIVE"
     echo "  [OK] YAML configuration: ACTIVE"
     echo ""
-    echo "STATUS: HD1 v3.0 ready"
+    echo "STATUS: HD1 v5.0.5 ready"
 }
 
 echo "HD1: PlayCanvas integration library loaded"
 echo "ARCH: World-based entity management"
 echo "ENGINE: PlayCanvas game engine"
-echo "VERSION: HD1 v3.0"
+echo "VERSION: HD1 v5.0.5"

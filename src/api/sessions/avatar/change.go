@@ -252,7 +252,7 @@ func ChangeSessionAvatarHandler(w http.ResponseWriter, r *http.Request, hub inte
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 	
-	logging.Info("avatar changed successfully", map[string]interface{}{
+	logging.Info("avatar changed", map[string]interface{}{
 		"session_id":      sessionID,
 		"old_avatar_type": oldAvatarType,
 		"new_avatar_type": request.AvatarType,

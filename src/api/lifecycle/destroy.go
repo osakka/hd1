@@ -65,7 +65,7 @@ func DestroyEntityHandler(w http.ResponseWriter, r *http.Request, hub *server.Hu
 	}
 	
 	// Proceed with destruction
-	logging.Info("entity destroyed successfully", map[string]interface{}{
+	logging.Info("entity destroyed", map[string]interface{}{
 		"session_id": sessionId,
 		"entity_id": entityId,
 		"children_destroyed": request.DestroyChildren,

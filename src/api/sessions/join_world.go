@@ -234,7 +234,7 @@ func JoinSessionWorldHandler(w http.ResponseWriter, r *http.Request, hub interfa
 		"session_id":   sessionID,
 		"client_count": clientCount,
 		"graph_state":  graphState,
-		"message":      "Successfully joined session world",
+		"message":      "Joined session world",
 	})
 }
 
