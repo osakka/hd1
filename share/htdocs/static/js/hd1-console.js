@@ -23,7 +23,7 @@ class HD1ConsoleManager {
             'input',
             'session',
             'websocket',
-            'channel',
+            'world',
             'stats'
         ];
         
@@ -188,7 +188,7 @@ class HD1ConsoleManager {
             case 'websocket':
                 return new ModuleClass(this.getModule('dom'));
                 
-            case 'channel':
+            case 'world':
                 return new ModuleClass(window.hd1API, this.getModule('dom'));
                 
             case 'stats':
@@ -290,24 +290,24 @@ class HD1ConsoleManager {
         const wsManager = this.getModule('websocket');
         if (wsManager) {
             // Route WebSocket messages to appropriate modules
-            wsManager.on('channel_update', (message) => {
-                const channelManager = this.getModule('channel');
-                if (channelManager && channelManager.handleChannelUpdate) {
-                    channelManager.handleChannelUpdate(message);
+            wsManager.on('world_update', (message) => {
+                const worldManager = this.getModule('world');
+                if (worldManager && worldManager.handleWorldUpdate) {
+                    worldManager.handleWorldUpdate(message);
                 }
             });
         }
 
-        // Channel changes update stats
-        const channelManager = this.getModule('channel');
-        if (channelManager) {
-            // Hook into channel switching to update UI
-            const originalSwitchChannel = channelManager.switchChannel.bind(channelManager);
-            channelManager.switchChannel = async (channelId) => {
-                const result = await originalSwitchChannel(channelId);
+        // World changes update stats
+        const worldManager = this.getModule('world');
+        if (worldManager) {
+            // Hook into world switching to update UI
+            const originalSwitchWorld = worldManager.switchWorld.bind(worldManager);
+            worldManager.switchWorld = async (worldId) => {
+                const result = await originalSwitchWorld(worldId);
                 if (result) {
-                    // Notify other modules of channel change
-                    this.notifyModules('channel_changed', { channelId });
+                    // Notify other modules of world change
+                    this.notifyModules('world_changed', { worldId });
                 }
                 return result;
             };

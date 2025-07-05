@@ -20,7 +20,7 @@ HD1 v5.0.2 is a **production-ready API-first game engine** platform with **compl
 - **Avatar Asset Delivery**: HTTP-based GLB asset serving with proper content-type headers
 - **Avatar Types**: CesiumMan robot (Claude) and Fox model (humans) from Khronos glTF samples
 - **Advanced Camera System**: Smooth movement, momentum, orbital mode with TAB toggle
-- **Channel System**: YAML-based scene configuration with 3 channels
+- **World System**: YAML-based scene configuration with 3 worlds
 - **Console UI**: Professional monitoring with smooth animations
 - **Vendor Cleanup**: Removed 1.1GB redundant directories, optimized structure
 - **Template Architecture**: 8 externalized templates for maintainable code generation
@@ -69,23 +69,23 @@ HD1_DAEMON=true                           # Run in daemon mode
 HD1_ROOT_DIR=/opt/hd1                     # HD1 root directory
 HD1_STATIC_DIR=/opt/hd1/share/htdocs/static  # Static files directory
 HD1_LOG_DIR=/opt/hd1/build/logs          # Log directory
-HD1_CHANNELS_DIR=/opt/hd1/share/channels # Channels configuration directory
+HD1_WORLDS_DIR=/opt/hd1/share/worlds # Worlds configuration directory
 HD1_AVATARS_DIR=/opt/hd1/share/avatars   # Avatars configuration directory
 
 # Logging Configuration  
 HD1_LOG_LEVEL=INFO                        # Logging level (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
 HD1_TRACE_MODULES=websocket,entities     # Comma-separated trace modules
 
-# Channel System
-HD1_CHANNELS_DEFAULT_CHANNEL=channel_one # Default channel
-HD1_CHANNELS_PROTECTED_LIST=channel_one,channel_two # Protected channels list
+# World System
+HD1_WORLDS_DEFAULT_WORLD=world_one # Default world
+HD1_WORLDS_PROTECTED_LIST=world_one,world_two # Protected worlds list
 ```
 
 ### Command-Line Flags (All with long options)
 ```bash
 ./hd1 --host=127.0.0.1 --port=8081 --daemon --log-level=DEBUG
 ./hd1 --root-dir=/custom/path --internal-api-base=http://api.internal:8080/api
-./hd1 --protected-channels=secure_one,secure_two --version=v1.0.0
+./hd1 --protected-worlds=secure_one,secure_two --version=v1.0.0
 ```
 
 ### .env File Support
@@ -100,7 +100,7 @@ HD1_DAEMON=false
 ## Console Features
 - **Smooth Animations**: 0.4s cubic-bezier expand/collapse
 - **Performance Monitoring**: CPU, memory, WebSocket stats
-- **Channel Switching**: Live channel selection
+- **World Switching**: Live world selection
 - **Entity Tracking**: Real-time entity counts + avatar count display
 - **Advanced Camera**: TAB toggle between free/orbital modes, smooth movement with momentum
 - **Avatar Sync**: Real-time multiplayer avatar position updates via WebSocket
@@ -131,7 +131,7 @@ HD1_DAEMON=false
 **Environment Variables**: 50+ HD1_* variables for complete configurability
 **Key Variables**:
 - `HD1_HOST`, `HD1_PORT` - Server binding configuration
-- `HD1_CHANNELS_DIR`, `HD1_AVATARS_DIR`, `HD1_RECORDINGS_DIR` - Path configuration
+- `HD1_WORLDS_DIR`, `HD1_AVATARS_DIR`, `HD1_RECORDINGS_DIR` - Path configuration
 - `HD1_WEBSOCKET_*` - WebSocket timeout and buffer configuration
 - `HD1_LOG_LEVEL`, `HD1_TRACE_MODULES` - Logging configuration
 
