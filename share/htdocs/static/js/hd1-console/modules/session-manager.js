@@ -214,6 +214,56 @@ class HD1SessionManager {
     }
     
     /**
+     * Re-associate WebSocket session after world switching
+     * CRITICAL FIX: Handle avatar control loss during world transitions
+     */
+    reAssociateAfterWorldSwitch() {
+        console.log('[HD1-Session] Re-associating WebSocket after world switch');
+        
+        // Reset retry counter for fresh attempts
+        this.wsAssociationRetries = 0;
+        
+        // Force immediate re-association
+        this.associateWebSocketSession();
+        
+        // CRITICAL FIX: Additional avatar control recovery
+        setTimeout(() => {
+            this.ensureAvatarControlRecovery();
+        }, 2000); // Give time for avatar creation
+    }
+    
+    /**
+     * Ensure avatar control is recovered after world switching
+     */
+    ensureAvatarControlRecovery() {
+        console.log('[HD1-Session] Ensuring avatar control recovery');
+        
+        // Check if PlayCanvas has loaded avatars but camera isn't bound
+        if (window.hd1GameEngine && window.cameraController) {
+            const avatarEntities = window.hd1GameEngine.root.children.filter(entity => 
+                entity.hd1Tags && entity.hd1Tags.includes('session-avatar')
+            );
+            
+            console.log(`[HD1-Session] Found ${avatarEntities.length} avatar entities after world switch`);
+            
+            if (avatarEntities.length > 0 && !window.cameraController.boundAvatar) {
+                console.log('[HD1-Session] Attempting to restore avatar camera binding');
+                
+                // Force camera controller to re-detect avatars
+                if (window.cameraController.updateAvailableAvatars) {
+                    window.cameraController.updateAvailableAvatars();
+                }
+                
+                // Set avatar-driven mode if avatars are available
+                if (window.cameraController.setAvatarDrivenMode) {
+                    window.cameraController.setAvatarDrivenMode();
+                    console.log('[HD1-Session] ✅ Avatar control restored after world switch');
+                }
+            }
+        }
+    }
+    
+    /**
      * Associate the WebSocket connection with this session for proper message broadcasting
      */
     associateWebSocketSession() {
@@ -225,21 +275,57 @@ class HD1SessionManager {
         // Get WebSocket manager and send session association message
         if (window.hd1ConsoleManager) {
             const wsManager = window.hd1ConsoleManager.getModule('websocket');
-            if (wsManager && wsManager.send) {
-                const associationMessage = {
-                    type: 'session_associate',
-                    session_id: this.sessionId
-                };
-                
-                if (wsManager.send(associationMessage)) {
-                    console.log(`[HD1-Session] ✅ WebSocket associated with session: ${this.sessionId}`);
-                } else {
-                    console.warn(`[HD1-Session] ❌ Failed to associate WebSocket with session: ${this.sessionId}`);
-                    // Retry association after WebSocket connects
-                    setTimeout(() => this.associateWebSocketSession(), 1000);
+            if (wsManager) {
+                // Check if WebSocket is connected
+                if (wsManager.isConnected && wsManager.send) {
+                    const associationMessage = {
+                        type: 'session_associate',
+                        session_id: this.sessionId
+                    };
+                    
+                    if (wsManager.send(associationMessage)) {
+                        console.log(`[HD1-Session] ✅ WebSocket associated with session: ${this.sessionId}`);
+                        
+                        // CRITICAL FIX: Reset association retry counter on successful association
+                        this.wsAssociationRetries = 0;
+                        
+                        // CRITICAL FIX: Track association success for world switching recovery
+                        this.lastAssociationTime = Date.now();
+                        
+                        return;
+                    }
                 }
+                
+                // WebSocket not connected or send failed - retry with exponential backoff
+                console.warn(`[HD1-Session] ❌ WebSocket not ready for session association: ${this.sessionId}`);
+                this.retryWebSocketAssociation();
             }
         }
+    }
+
+    /**
+     * Retry WebSocket association with exponential backoff
+     */
+    retryWebSocketAssociation() {
+        if (!this.wsAssociationRetries) {
+            this.wsAssociationRetries = 0;
+        }
+        
+        this.wsAssociationRetries++;
+        const maxRetries = 5;
+        const baseDelay = 1000; // 1 second
+        
+        if (this.wsAssociationRetries > maxRetries) {
+            console.error(`[HD1-Session] Failed to associate WebSocket after ${maxRetries} attempts`);
+            return;
+        }
+        
+        const delay = baseDelay * Math.pow(2, this.wsAssociationRetries - 1); // Exponential backoff
+        console.log(`[HD1-Session] Retrying WebSocket association in ${delay}ms (attempt ${this.wsAssociationRetries}/${maxRetries})`);
+        
+        setTimeout(() => {
+            this.associateWebSocketSession();
+        }, delay);
     }
 
     /**
@@ -403,6 +489,11 @@ class HD1SessionManager {
                 break;
             case 'rebootstrap_requested':
                 this.refreshSession();
+                break;
+            case 'world_switched':
+                // CRITICAL FIX: Handle world switching avatar control recovery
+                console.log('[HD1-Session] World switch detected, re-associating WebSocket');
+                this.reAssociateAfterWorldSwitch();
                 break;
         }
     }

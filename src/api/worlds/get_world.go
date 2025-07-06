@@ -33,9 +33,9 @@ func GetWorldHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 		return
 	}
 
-	// Validate world exists
+	// Validate world exists - use same pattern as list_worlds.go
 	worldsDir := "/opt/hd1/share/worlds"
-	configPath := filepath.Join(worldsDir, worldId, "config.yaml")
+	configPath := filepath.Join(worldsDir, worldId+".yaml")
 	
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		logging.Warn("world not found", map[string]interface{}{
@@ -60,13 +60,17 @@ func GetWorldHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 
 	// Parse YAML configuration using the same structs as list_worlds.go
 	var fullConfig struct {
-		ID          string `yaml:"id,omitempty"`
-		Name        string `yaml:"name"`
-		Description string `yaml:"description"`
-		Environment string `yaml:"environment"`
-		MaxClients  int    `yaml:"max_clients"`
-		Enabled     *bool  `yaml:"enabled"`
-		Priority    int    `yaml:"priority"`
+		World struct {
+			ID          string `yaml:"id"`
+			Name        string `yaml:"name"`
+			Description string `yaml:"description"`
+		} `yaml:"world"`
+		Settings struct {
+			MaxClients int `yaml:"max_clients"`
+		} `yaml:"settings"`
+		Environment struct {
+			Type string `yaml:"type"`
+		} `yaml:"environment"`
 		PlayCanvas *struct {
 			Scene struct {
 				AmbientLight interface{} `yaml:"ambientLight,omitempty"` // Can be string or []float64
@@ -105,20 +109,18 @@ func GetWorldHandler(w http.ResponseWriter, r *http.Request, hub interface{}) {
 
 	logging.Debug("world configuration loaded", map[string]interface{}{
 		"world_id": worldId,
-		"name":     fullConfig.Name,
+		"name":     fullConfig.World.Name,
 		"current_clients": currentClients,
 		"has_playcanvas":  fullConfig.PlayCanvas != nil,
 	})
 
 	// Build response with PlayCanvas configuration
 	worldResponse := map[string]interface{}{
-		"id":          worldId,
-		"name":        fullConfig.Name,
-		"description": fullConfig.Description,
-		"environment": fullConfig.Environment,
-		"max_clients": fullConfig.MaxClients,
-		"enabled":     fullConfig.Enabled,
-		"priority":    fullConfig.Priority,
+		"id":          fullConfig.World.ID,
+		"name":        fullConfig.World.Name,
+		"description": fullConfig.World.Description,
+		"environment": fullConfig.Environment.Type,
+		"max_clients": fullConfig.Settings.MaxClients,
 		"current_clients": currentClients,
 		"updated_at":      updatedAt,
 	}

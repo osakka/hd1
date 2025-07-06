@@ -28,7 +28,7 @@
 **WebGL/3D Native** → Professional PlayCanvas rendering engine  
 **Specification-Driven** → 100% auto-generated from OpenAPI specification (XVC Single Source of Truth)
 
-## 🚀 Current State: HD1 v5.0.5 (In Development)
+## 🚀 Current State: HD1 v5.0.6 (In Development)
 
 HD1 has a **complete API surface** for 3D engine control with **86 REST endpoints**, **advanced multiplayer avatar synchronization**, **complete configuration management standardization**, and **exotic memory optimization algorithms** delivering 60-80% allocation reduction. The foundation is built for the distributed services revolution.
 
@@ -217,7 +217,7 @@ make stop        # Stop daemon
 - **[Vision and Concepts](docs/user-guides/Vision.md)** - HD1 vision and core concepts
 
 ### **📊 Key Technical Facts**
-- **Version**: HD1 v5.0.5 (Production-ready API-first game engine)
+- **Version**: HD1 v5.0.6 (Production-ready API-first game engine with bulletproof avatar control)
 - **API Endpoints**: 86 REST endpoints (59 unique paths with multiple HTTP methods)
 - **Architecture**: PlayCanvas-powered 3D rendering with ECS
 - **Real-Time**: WebSocket synchronization for collaborative environments
@@ -228,7 +228,7 @@ make stop        # Stop daemon
 ## 🤝 Contributing & Community
 
 ### Project Status
-**HD1 v5.0.5**: API-first 3D engine platform in active development  
+**HD1 v5.0.6**: API-first 3D engine platform with comprehensive avatar control system  
 **Next Phase**: Service integration layer and distributed service ecosystem
 
 ### Architecture Philosophy (XVC Methodology)
@@ -245,5 +245,5 @@ make stop        # Stop daemon
 
 ---
 
-**HD1 v5.0.5** | MIT License | API-First 3D Engine for Distributed Services  
+**HD1 v5.0.6** | MIT License | API-First 3D Engine for Distributed Services  
 *Where distributed services meet immersive 3D experiences*

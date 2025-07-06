@@ -1102,9 +1102,10 @@ function createObjectFromData(objectData) {
             const sessionId = objectData.session_id || getCurrentSession();
             if (sessionId) {
                 console.log('[HD1] Session client avatar detected, checking session avatar configuration for:', sessionId);
-                // For now, default to claude_avatar for demo - in production this would query the session avatar API
-                avatarType = 'claude_avatar';
-                console.log('[HD1] Using default avatar type for session client:', avatarType);
+                
+                // CRITICAL FIX: Select avatar type based on current world
+                avatarType = getAvatarTypeForCurrentWorld();
+                console.log('[HD1] Using world-based avatar type for session client:', avatarType);
             }
         }
         
@@ -1262,13 +1263,13 @@ function createObjectFromData(objectData) {
 function deleteObjectByName(objectName) {
     if (!hd1GameEngine) {
         console.warn('[HD1] PlayCanvas engine not ready, cannot delete object:', objectName);
-        return;
+        return false;
     }
 
-    // 🛡️  AVATAR PROTECTION: Don't allow direct avatar deletion
+    // 🛡️ AVATAR PROTECTION: Don't allow direct avatar deletion
     if (objectName && (objectName.includes('session_client_') || objectName.includes('session_'))) {
-        console.warn(`[HD1] 🛡️  AVATAR PROTECTION: Blocked direct deletion of avatar object: ${objectName}`);
-        return;
+        console.warn(`[HD1] 🛡️ AVATAR PROTECTION: Blocked direct deletion of avatar object: ${objectName}`);
+        return true; // Return true to indicate "handled" (blocked but processed)
     }
 
     console.log('[HD1] Deleting PlayCanvas object:', objectName);
@@ -1283,8 +1284,22 @@ function deleteObjectByName(objectName) {
         entityToRemove.destroy();
         updateGameStats();
         console.log('[HD1] PlayCanvas object deleted:', objectName);
+        return true;
     } else {
-        console.warn('[HD1] PlayCanvas object not found for deletion:', objectName);
+        // CRITICAL FIX: Limit repeated warnings using throttling
+        if (!window.deletionWarnings) {
+            window.deletionWarnings = new Map();
+        }
+        
+        const warningKey = `missing_${objectName}`;
+        const lastWarning = window.deletionWarnings.get(warningKey) || 0;
+        const now = Date.now();
+        
+        if (now - lastWarning > 5000) { // Only warn every 5 seconds per entity
+            console.warn('[HD1] PlayCanvas object not found for deletion:', objectName);
+            window.deletionWarnings.set(warningKey, now);
+        }
+        return false;
     }
 }
 
@@ -1661,6 +1676,70 @@ window.triggerRebootstrap = function() {
         window.location.reload(true);
     }, 1000);
 };
+
+/**
+ * Get avatar type based on current world
+ * Returns appropriate avatar type for the active world/channel
+ */
+function getAvatarTypeForCurrentWorld() {
+    console.log('[HD1] Determining avatar type for current world');
+    
+    // Method 1: Get from localStorage (primary source) 
+    const currentWorldId = localStorage.getItem('hd1_current_world');
+    if (currentWorldId) {
+        const avatarType = getAvatarTypeForWorld(currentWorldId);
+        console.log(`[HD1] Avatar type from localStorage world ${currentWorldId}: ${avatarType}`);
+        return avatarType;
+    }
+    
+    // Method 2: Get from session storage (for world transitions)
+    const sessionWorldId = localStorage.getItem('hd1_session_world');
+    if (sessionWorldId) {
+        const avatarType = getAvatarTypeForWorld(sessionWorldId);
+        console.log(`[HD1] Avatar type from session world ${sessionWorldId}: ${avatarType}`);
+        return avatarType;
+    }
+    
+    // Method 3: Get from console manager world selection
+    if (window.hd1ConsoleManager) {
+        const worldManager = window.hd1ConsoleManager.getModule('world');
+        if (worldManager && worldManager.currentWorld && worldManager.currentWorld.id) {
+            const avatarType = getAvatarTypeForWorld(worldManager.currentWorld.id);
+            console.log(`[HD1] Avatar type from world manager ${worldManager.currentWorld.id}: ${avatarType}`);
+            return avatarType;
+        }
+    }
+    
+    // Method 4: Get from UI selector 
+    const selector = document.getElementById('channel-selector');
+    if (selector && selector.value) {
+        const avatarType = getAvatarTypeForWorld(selector.value);
+        console.log(`[HD1] Avatar type from UI selector ${selector.value}: ${avatarType}`);
+        return avatarType;
+    }
+    
+    // Last fallback: default avatar
+    console.warn('[HD1] Could not determine current world, using default avatar');
+    return 'claude_avatar';
+}
+
+/**
+ * Map world IDs to avatar types
+ */
+function getAvatarTypeForWorld(worldId) {
+    const worldAvatarMap = {
+        'world_one': 'humanoid_avatar',   // World 1: Humanoid avatar
+        'world_two': 'fox_avatar',        // World 2: Fox avatar  
+        'world_three': 'human_avatar',    // World 3: Human avatar
+        'channel_one': 'humanoid_avatar', // Legacy channel support
+        'channel_two': 'fox_avatar',
+        'channel_three': 'human_avatar'
+    };
+    
+    const avatarType = worldAvatarMap[worldId] || 'claude_avatar';
+    console.log(`[HD1] World ${worldId} mapped to avatar type: ${avatarType}`);
+    return avatarType;
+}
 
 // Allow manual triggering of object loading
 window.loadSessionObjects = loadExistingSessionObjects;

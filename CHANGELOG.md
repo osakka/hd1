@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [5.0.6] - 2025-07-06 - **🎮 Avatar Control System: Bulletproof World Transition Recovery**
+
+### **Comprehensive Avatar Control Fixes: Production-Ready Multiplayer Avatars**
+
+This release implements a bulletproof avatar control system that maintains seamless user control during world transitions, eliminates entity deletion storms, and ensures consistent avatar types across all worlds with surgical precision.
+
+### **Added - Avatar Control Recovery System**
+- **WebSocket Avatar Recreation Detection**: Automatic monitoring and recovery of avatars after world switching
+- **Session-WebSocket Re-association**: Robust retry mechanism with exponential backoff for connection recovery
+- **Avatar Registry Preservation**: Smart avatar tracking that survives world transitions without losing control state
+- **Camera Controller Rebinding**: Automatic restoration of avatar-driven camera mode after world switches
+
+### **Fixed - Critical Avatar Control Issues**
+- **Avatar Control Loss**: Users now maintain avatar control during world transitions
+- **Inconsistent Avatar Types**: Proper world-based avatar selection (humanoid in world_one, fox in world_two)
+- **WebSocket Association Failures**: Enhanced session manager with world-switch event handling
+- **Entity Deletion Storms**: Intelligent avatar deletion handling that allows legitimate server-driven deletions
+- **Avatar Disappearance**: Avatar entities properly recreated with correct types after world clearing
+
+### **Enhanced - WebSocket Management System**
+- **Smart Avatar Deletion Handling**: Replaced blocking with intelligent recreation tracking
+- **Avatar Registry Recovery**: Mark avatars as `pendingRecreation` instead of immediate removal
+- **Multi-source Avatar Type Detection**: Enhanced fallback chain for robust avatar type determination
+- **World-Switch Coordination**: Seamless communication between world and session managers
+
+### **Technical Implementation**
+- **Session Manager (`session-manager.js`)**: Added `reAssociateAfterWorldSwitch()` and `ensureAvatarControlRecovery()`
+- **WebSocket Manager (`websocket-manager.js`)**: Added `checkForAvatarRecreation()` with automatic camera rebinding
+- **World Manager (`world-manager.js`)**: Enhanced with world-switch event notifications
+- **PlayCanvas Integration (`hd1-playcanvas.js`)**: Improved `getAvatarTypeForCurrentWorld()` with multiple fallback methods
+
+### **Quality Standards Maintained**
+- **Zero Regressions**: All existing functionality preserved during avatar system enhancement
+- **Single Source of Truth**: Server-side avatar type logic perfectly synchronized with client-side selection
+- **Surgical Precision**: Targeted fixes without affecting unrelated systems
+- **Production Ready**: Comprehensive error handling and recovery mechanisms
+
+---
+
 ## [5.0.5] - 2025-07-05 - **📋 Architectural Decision Governance & Documentation Standards**
 
 ### **Comprehensive ADR Audit: Surgical Precision Governance Framework**

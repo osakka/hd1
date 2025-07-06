@@ -477,11 +477,13 @@ func (h *Hub) BroadcastToSession(sessionID string, updateType string, data inter
 	
 	// Use pooled JSON buffer for marshaling
 	buf := memory.GetJSONBuffer()
-	defer memory.PutJSONBuffer(buf)
 	
 	encoder := json.NewEncoder(buf)
 	if err := encoder.Encode(update); err == nil {
-		jsonData := buf.Bytes()
+		// CRITICAL FIX: Copy buffer contents before returning to pool
+		jsonData := make([]byte, buf.Len())
+		copy(jsonData, buf.Bytes())
+		memory.PutJSONBuffer(buf) // Now safe to return buffer
 		
 		// Send only to clients associated with this specific session
 		clientCount := 0
@@ -503,6 +505,8 @@ func (h *Hub) BroadcastToSession(sessionID string, updateType string, data inter
 			"type": updateType,
 			"clients": clientCount,
 		})
+	} else {
+		memory.PutJSONBuffer(buf) // Return buffer on error too
 	}
 }
 

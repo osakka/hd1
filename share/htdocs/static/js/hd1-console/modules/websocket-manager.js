@@ -50,6 +50,11 @@ class HD1WebSocketManager {
         this.avatarRecoveryAttempts = new Map(); // session_id -> attempt_count
         this.maxRecoveryAttempts = 3;
         this.healthCheckInterval = 5000; // Check every 5 seconds
+        
+        // Entity deletion storm protection
+        this.deletionAttempts = new Map(); // entity_id -> {count, lastAttempt}
+        this.maxDeletionAttempts = 3;
+        this.deletionCooldown = 5000; // 5 seconds
     }
 
     /**
@@ -464,39 +469,121 @@ class HD1WebSocketManager {
      * Handle entity deleted messages - PHASE 2: Pure graph extension  
      */
     handleEntityDeleted(message) {
-        console.log('[HD1-WebSocket] Entity deleted received:', message);
+        if (!message.data || !message.data.entity_id) {
+            return;
+        }
+
+        const entityId = message.data.entity_id;
+        const now = Date.now();
         
-        // 🔍 TRACE: Check if this is an avatar being deleted
-        if (message.data && message.data.entity_id) {
-            // 🛡️  AVATAR PROTECTION: Check if this is an avatar entity
-            const isAvatarEntity = message.data.entity_id.includes('session_client_') || message.data.entity_id.includes('session_');
-            
-            if (isAvatarEntity) {
-                console.error(`[HD1-WebSocket] 🚨 AVATAR DELETION BLOCKED: Avatar entity ${message.data.entity_id} deletion blocked for protection!`);
-                this.dom.addDebugEntry('ENTITY_DELETED', { ...message.data, blocked: true, reason: 'avatar_protection' });
+        // Track deletion attempts to prevent storms
+        const deletionKey = entityId;
+        const deletionInfo = this.deletionAttempts.get(deletionKey);
+        
+        if (deletionInfo) {
+            // Check if we're in cooldown period
+            if (now - deletionInfo.lastAttempt < this.deletionCooldown) {
+                console.debug(`[HD1-WebSocket] Deletion attempt blocked for ${entityId} (in cooldown)`);
                 return;
             }
             
-            // Check if this entity is in our avatar registry
-            for (const [session_id, registryEntry] of this.avatarRegistry.entries()) {
-                if (registryEntry.entity && (
-                    registryEntry.entity.name === message.data.entity_id ||
-                    registryEntry.entity.hd1Id === message.data.entity_id
-                )) {
-                    console.error(`[HD1-WebSocket] 🚨 AVATAR DELETION: Avatar entity ${message.data.entity_id} for session ${session_id} is being deleted via WebSocket!`);
-                    // Remove from registry
-                    this.avatarRegistry.delete(session_id);
-                    break;
-                }
+            // Check if we've exceeded max attempts
+            if (deletionInfo.count >= this.maxDeletionAttempts) {
+                console.warn(`[HD1-WebSocket] Too many deletion attempts for ${entityId}, ignoring further requests`);
+                return;
+            }
+            
+            // Update attempt count
+            deletionInfo.count++;
+            deletionInfo.lastAttempt = now;
+        } else {
+            // First deletion attempt
+            this.deletionAttempts.set(deletionKey, {
+                count: 1,
+                lastAttempt: now
+            });
+        }
+
+        console.log('[HD1-WebSocket] Entity deleted received:', entityId);
+        
+        // 🛡️ COMPREHENSIVE AVATAR PROTECTION: Check multiple patterns
+        let isAvatarEntity = false;
+        let avatarSessionId = null;
+        
+        // Check name patterns for avatars
+        if (entityId.includes('session_client_') || entityId.includes('session_') || entityId.includes('avatar_')) {
+            isAvatarEntity = true;
+        }
+        
+        // Check if this entity is in our avatar registry (more reliable check)
+        for (const [session_id, registryEntry] of this.avatarRegistry.entries()) {
+            if (registryEntry.entity && (
+                registryEntry.entity.name === entityId ||
+                registryEntry.entity.hd1Id === entityId
+            )) {
+                isAvatarEntity = true;
+                avatarSessionId = session_id;
+                console.error(`[HD1-WebSocket] 🚨 AVATAR DELETION: Avatar entity ${entityId} for session ${session_id} is being deleted via WebSocket!`);
+                // Remove from registry
+                this.avatarRegistry.delete(session_id);
+                break;
             }
         }
         
-        // Pure graph extension - automatically remove entity from PlayCanvas
-        if (window.hd1GameEngine && message.data && message.data.entity_id) {
-            this.destroyPlayCanvasEntityFromBroadcast(message.data.entity_id);
+        // ALLOW avatar deletions during world switching (server-driven)
+        if (isAvatarEntity) {
+            console.warn(`[HD1-WebSocket] 🔄 AVATAR DELETION: Avatar entity ${entityId} for session ${avatarSessionId} deleted during world switch`);
+            
+            // Don't remove from registry immediately - keep for recovery
+            // Mark as pending recreation instead
+            if (this.avatarRegistry.has(avatarSessionId)) {
+                const registryEntry = this.avatarRegistry.get(avatarSessionId);
+                registryEntry.pendingRecreation = true;
+                registryEntry.deletedAt = Date.now();
+                console.log(`[HD1-WebSocket] Avatar registry entry marked for recreation: ${avatarSessionId}`);
+            }
+            
+            // Allow PlayCanvas deletion to proceed
+            this.dom.addDebugEntry('ENTITY_DELETED', { 
+                entity_id: entityId,
+                session_id: avatarSessionId,
+                blocked: false, 
+                reason: 'world_switch_deletion' 
+            });
         }
         
-        this.dom.addDebugEntry('ENTITY_DELETED', message.data);
+        // Pure graph extension - automatically remove entity from PlayCanvas
+        if (window.hd1GameEngine && entityId) {
+            // First check if entity actually exists in PlayCanvas before attempting deletion
+            const entityExists = this.checkPlayCanvasEntityExists(entityId);
+            
+            if (entityExists) {
+                const success = this.destroyPlayCanvasEntityFromBroadcast(entityId);
+                
+                // Clear deletion tracking on successful deletion
+                if (success) {
+                    this.deletionAttempts.delete(deletionKey);
+                }
+                
+                // If this was an avatar deletion, trigger recovery check
+                if (isAvatarEntity) {
+                    console.log(`[HD1-WebSocket] Avatar entity deleted from PlayCanvas, scheduling recovery check`);
+                    setTimeout(() => {
+                        this.checkForAvatarRecreation(avatarSessionId);
+                    }, 3000); // Wait 3 seconds for new avatar to be created
+                }
+            } else {
+                // Entity doesn't exist in PlayCanvas - this is a phantom deletion
+                console.debug(`[HD1-WebSocket] Ignoring deletion for non-existent entity: ${entityId}`);
+                // Clear deletion tracking for phantom entities
+                this.deletionAttempts.delete(deletionKey);
+            }
+        }
+        
+        this.dom.addDebugEntry('ENTITY_DELETED', {
+            entity_id: entityId,
+            attempt_count: this.deletionAttempts.get(deletionKey)?.count || 0
+        });
     }
 
     /**
@@ -560,13 +647,29 @@ class HD1WebSocketManager {
     }
 
     /**
+     * Check if entity exists in PlayCanvas scene
+     */
+    checkPlayCanvasEntityExists(entityId) {
+        if (!window.hd1GameEngine) {
+            return false;
+        }
+        
+        // Check if entity exists in PlayCanvas scene graph
+        const entity = window.hd1GameEngine.root.children.find(entity => 
+            entity.name === entityId || entity.hd1Id === entityId
+        );
+        
+        return entity !== undefined;
+    }
+
+    /**
      * Destroy PlayCanvas entity from WebSocket broadcast (pure graph extension)
      */
     destroyPlayCanvasEntityFromBroadcast(entityId) {
         try {
             if (!window.deleteObjectByName) {
                 console.warn('[HD1-WebSocket] deleteObjectByName not available, cannot destroy entity');
-                return;
+                return false;
             }
             
             // 🔥 CRITICAL FIX: Don't allow avatar entity deletion via WebSocket!
@@ -575,14 +678,20 @@ class HD1WebSocketManager {
             
             if (isAvatarEntity) {
                 console.warn(`[HD1-WebSocket] 🛡️  AVATAR PROTECTION: Blocked deletion of avatar entity ${entityId} via WebSocket`);
-                return;
+                return true; // Return true to indicate "handled" (blocked but processed)
             }
             
             // Use existing PlayCanvas entity deletion function for non-avatar entities
-            window.deleteObjectByName(entityId);
-            console.log('[HD1-WebSocket] Entity removed from PlayCanvas:', entityId);
+            const success = window.deleteObjectByName(entityId);
+            if (success) {
+                console.log('[HD1-WebSocket] Entity removed from PlayCanvas:', entityId);
+                return true;
+            } else {
+                return false;
+            }
         } catch (error) {
             console.error('[HD1-WebSocket] Failed to destroy PlayCanvas entity from broadcast:', error);
+            return false;
         }
     }
 
@@ -1640,6 +1749,67 @@ class HD1WebSocketManager {
             
         } catch (error) {
             console.error(`[HD1-WebSocket] 🛡️ Avatar recovery failed for session ${sessionId}:`, error);
+        }
+    }
+    
+    /**
+     * Check for avatar recreation after world switching
+     * CRITICAL FIX: Restore avatar control after world transitions
+     */
+    checkForAvatarRecreation(sessionId) {
+        console.log(`[HD1-WebSocket] Checking for avatar recreation for session: ${sessionId}`);
+        
+        if (!this.avatarRegistry.has(sessionId)) {
+            console.log(`[HD1-WebSocket] No avatar registry entry for session: ${sessionId}`);
+            return;
+        }
+        
+        const registryEntry = this.avatarRegistry.get(sessionId);
+        if (!registryEntry.pendingRecreation) {
+            console.log(`[HD1-WebSocket] Avatar not pending recreation: ${sessionId}`);
+            return;
+        }
+        
+        // Look for new avatar entities in PlayCanvas
+        if (window.hd1GameEngine) {
+            const avatarEntities = window.hd1GameEngine.root.children.filter(entity => 
+                entity.hd1Tags && entity.hd1Tags.includes('session-avatar') &&
+                (entity.name.includes(sessionId) || entity.hd1Id?.includes(sessionId))
+            );
+            
+            console.log(`[HD1-WebSocket] Found ${avatarEntities.length} avatar entities for session ${sessionId}`);
+            
+            if (avatarEntities.length > 0) {
+                // Avatar has been recreated - update registry
+                const newAvatarEntity = avatarEntities[0]; // Use first found avatar
+                registryEntry.entity = newAvatarEntity;
+                registryEntry.pendingRecreation = false;
+                delete registryEntry.deletedAt;
+                
+                console.log(`[HD1-WebSocket] ✅ Avatar recreated for session ${sessionId}: ${newAvatarEntity.name}`);
+                
+                // Trigger camera system to rebind to avatar
+                if (window.cameraController) {
+                    console.log(`[HD1-WebSocket] Triggering camera controller avatar rebinding`);
+                    
+                    setTimeout(() => {
+                        if (window.cameraController.updateAvailableAvatars) {
+                            window.cameraController.updateAvailableAvatars();
+                        }
+                        
+                        if (window.cameraController.setAvatarDrivenMode) {
+                            window.cameraController.setAvatarDrivenMode();
+                            console.log(`[HD1-WebSocket] ✅ Avatar control restored for session ${sessionId}`);
+                        }
+                    }, 500); // Small delay to ensure avatar is fully loaded
+                }
+            } else {
+                console.log(`[HD1-WebSocket] Avatar not yet recreated for session ${sessionId}, will retry`);
+                // Schedule another check
+                setTimeout(() => {
+                    this.checkForAvatarRecreation(sessionId);
+                }, 2000);
+            }
         }
     }
 }

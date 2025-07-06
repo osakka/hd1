@@ -17,7 +17,7 @@ info:
     - Build fails if handlers missing
     - Zero manual routing - auto-generated from spec
     
-  version: 5.0.5
+  version: 5.0.6
   contact:
     name: Holodeck One 3D Engine
     

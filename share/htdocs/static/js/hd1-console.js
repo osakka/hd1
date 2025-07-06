@@ -21,8 +21,8 @@ class HD1ConsoleManager {
             'notification',
             'ui-state',
             'input',
-            'session',
             'websocket',
+            'session',
             'world',
             'stats'
         ];

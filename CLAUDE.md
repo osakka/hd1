@@ -8,8 +8,8 @@
 - **Quality Only**: Zero regressions, clean architecture
 - **"API = Control, WebSocket = Graph Extension"**
 
-## Current State (2025-07-05)
-HD1 v5.0.5 is a **production-ready API-first game engine** platform with **complete 3D avatar system** and **native GLB model loading**.
+## Current State (2025-07-06)
+HD1 v5.0.6 is a **production-ready API-first game engine** platform with **bulletproof avatar control system** and **seamless world transition recovery**.
 
 ### ✅ Completed Features
 - **86 REST Endpoints**: Complete game engine control via HTTP + Avatar management
@@ -20,7 +20,9 @@ HD1 v5.0.5 is a **production-ready API-first game engine** platform with **compl
 - **Avatar Asset Delivery**: HTTP-based GLB asset serving with proper content-type headers
 - **Avatar Types**: CesiumMan robot (Claude) and Fox model (humans) from Khronos glTF samples
 - **Advanced Camera System**: Smooth movement, momentum, orbital mode with TAB toggle
+- **Avatar Control Recovery**: Bulletproof system maintaining user control during world transitions
 - **World System**: YAML-based scene configuration with 3 worlds
+- **WebSocket Avatar Management**: Smart deletion handling and automatic recreation detection
 - **Console UI**: Professional monitoring with smooth animations
 - **Vendor Cleanup**: Removed 1.1GB redundant directories, optimized structure
 - **Template Architecture**: 8 externalized templates for maintainable code generation
@@ -38,11 +40,15 @@ HTTP APIs → Game Commands → Server State → WebSocket Events → Client Ren
 - `share/worlds/*.yaml` - Scene configurations
 - `share/htdocs/static/js/hd1-console/` - Modular console system
 - `share/htdocs/static/js/hd1-playcanvas.js` - 3D avatar system with native GLB loading
+- `share/htdocs/static/js/hd1-console/modules/session-manager.js` - Avatar control recovery system
+- `share/htdocs/static/js/hd1-console/modules/websocket-manager.js` - Smart avatar deletion and recreation handling
+- `share/htdocs/static/js/hd1-console/modules/world-manager.js` - World transition coordination
 - `src/api/avatars/asset.go` - GLB asset HTTP delivery with proper headers
 - `src/api/avatars/get.go` & `list.go` - Avatar specification and listing APIs
 - `share/avatars/*/model.glb` - GLB avatar models (CesiumMan, Fox)
 - `share/avatars/*/avatar.yaml` - Avatar configuration specifications
 - `src/api/camera/position.go` - Camera position API with avatar sync
+- `src/api/sessions/join_world.go` - Server-side avatar creation with proper world-based type selection
 
 ## Development Commands
 ```bash

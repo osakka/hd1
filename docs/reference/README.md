@@ -7,7 +7,7 @@ This section provides comprehensive reference documentation for HD1, including c
 ## 📚 **Reference Categories**
 
 ### **API Documentation**
-- **[API Specification](API-Specification.md)** - Complete API documentation (82 endpoints)
+- **[API Specification](API-Specification.md)** - Complete API documentation (86 endpoints)
 - **[Configuration](configuration.md)** - System configuration reference
 - **[CLI Reference](cli-reference.md)** - Command-line interface documentation
 
@@ -18,7 +18,7 @@ This section provides comprehensive reference documentation for HD1, including c
 
 ## 🔧 **API Overview**
 
-HD1 v5.0.1 provides **82 REST endpoints** covering complete game engine functionality:
+HD1 v5.0.5 provides **86 REST endpoints** covering complete game engine functionality:
 
 ### **Endpoint Categories**
 - **Sessions** (7 endpoints) - Session lifecycle and management
@@ -53,7 +53,7 @@ HD1 v5.0.1 provides **82 REST endpoints** covering complete game engine function
 - **Error Responses**: RFC 7807 Problem Details
 
 ### **API Versioning**
-- **Current Version**: v5.0.1
+- **Current Version**: v5.0.5
 - **API Stability**: Production-ready stable API
 - **Breaking Changes**: Semantic versioning for compatibility
 - **Deprecation Policy**: 2 major version deprecation notice
@@ -62,7 +62,7 @@ HD1 v5.0.1 provides **82 REST endpoints** covering complete game engine function
 
 | Category | Documentation | Description |
 |----------|---------------|-------------|
-| **Complete API** | [API Specification](API-Specification.md) | All 82 endpoints documented |
+| **Complete API** | [API Specification](API-Specification.md) | All 86 endpoints documented |
 | **Getting Started** | [User Guide](../user-guide/README.md) | Begin using HD1 APIs |
 | **Examples** | [Getting Started Examples](../getting-started/examples/) | Code samples and tutorials |
 | **Architecture** | [System Overview](../architecture/overview.md) | Technical architecture |
@@ -76,7 +76,7 @@ This reference documentation follows strict accuracy standards:
 1. **100% Factual** - All technical claims verified against codebase
 2. **Implementation Verified** - All endpoints tested and validated
 3. **Performance Measured** - All metrics based on actual measurements
-4. **Version Accurate** - Documentation matches v5.0.1 implementation
+4. **Version Accurate** - Documentation matches v5.0.5 implementation
 5. **Comprehensive** - Complete coverage of all system capabilities
 
 ---
@@ -85,6 +85,6 @@ This reference documentation follows strict accuracy standards:
 
 ---
 
-**HD1 v5.0.1** - API-First Game Engine Platform  
-**Reference Version**: 5.0.1 (Updated: 2025-07-03)  
-**API Status**: Production Ready (82 endpoints)
+**HD1 v5.0.5** - API-First Game Engine Platform  
+**Reference Version**: 5.0.5 (Updated: 2025-07-05)  
+**API Status**: Production Ready (86 endpoints)

@@ -11,8 +11,8 @@ HD1 applies this concept to **distributed services**. Instead of creating fictio
 ## From Vision to Reality
 
 ### Current State: Foundation In Development
-**HD1 v5.0.1** is developing the essential infrastructure:
-- **82 REST Endpoints**: Complete 3D engine control via HTTP APIs
+**HD1 v5.0.5** is developing the essential infrastructure:
+- **86 REST Endpoints**: Complete 3D engine control via HTTP APIs
 - **Real-Time Synchronization**: <10ms WebSocket state sync across clients
 - **Multi-User Architecture**: Collaborative environments with session isolation
 - **Professional 3D Rendering**: PlayCanvas engine with WebGL/WebXR support

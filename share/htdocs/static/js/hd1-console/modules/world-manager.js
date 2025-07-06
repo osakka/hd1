@@ -64,16 +64,16 @@ class HD1WorldManager {
      * Setup world selector dropdown
      */
     setupWorldSelector() {
-        if (!this.dom.exists('world-selector')) {
-            console.warn('[HD1-World] World selector element not found');
+        if (!this.dom.exists('channel-selector')) {
+            console.warn('[HD1-World] Channel selector element not found');
             return;
         }
 
         // Clear existing options
-        this.dom.setHTML('world-selector', '');
+        this.dom.setHTML('channel-selector', '');
         
         // Add default option
-        const selector = this.dom.get('world-selector');
+        const selector = this.dom.get('channel-selector');
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
         defaultOption.textContent = this.worlds.length > 0 ? 'Select World...' : 'No worlds available';
@@ -89,7 +89,7 @@ class HD1WorldManager {
         });
 
         // Setup change handler
-        this.dom.addEventListener('world-selector', 'change', (e) => {
+        this.dom.addEventListener('channel-selector', 'change', (e) => {
             const worldId = e.target.value;
             if (worldId) {
                 this.switchWorld(worldId);
@@ -181,6 +181,18 @@ class HD1WorldManager {
             // Update scene name in PlayCanvas panel
             this.updateSceneName(world.name);
             
+            // CRITICAL FIX: Notify session manager about world switch for avatar control recovery
+            if (window.hd1ConsoleManager) {
+                const sessionManager = window.hd1ConsoleManager.getModule('session');
+                if (sessionManager && sessionManager.handleEvent) {
+                    sessionManager.handleEvent('world_switched', {
+                        worldId: worldId,
+                        worldName: world.name,
+                        sessionId: sessionId
+                    });
+                }
+            }
+            
             console.log(`[HD1-World] Successfully switched to world: ${worldId}`);
             return true;
             
@@ -196,7 +208,7 @@ class HD1WorldManager {
      */
     updateWorldUI(worldData) {
         // Update world selector
-        const selector = this.dom.get('world-selector');
+        const selector = this.dom.get('channel-selector');
         if (selector) {
             selector.value = worldData.id;
         }
@@ -350,7 +362,7 @@ class HD1WorldManager {
         console.error(`[HD1-World] Error: ${message}`);
         
         // Update UI to show error state
-        this.dom.setHTML('world-selector', '<option value="">Error loading worlds</option>');
+        this.dom.setHTML('channel-selector', '<option value="">Error loading worlds</option>');
         
         // Log error
         this.dom.addDebugEntry('WORLD_ERROR', { message });
