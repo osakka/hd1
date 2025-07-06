@@ -1,4 +1,4 @@
-# ADR-028: Configuration Management Excellence
+# ADR-029: Configuration Management Excellence
 
 ## Status
 **ACCEPTED** - 2025-07-05

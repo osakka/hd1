@@ -1,8 +1,8 @@
 # HD1 API Reference
 
-**HD1 v5.0.5 - Complete API-First Game Engine Platform**
+**HD1 v5.0.6 - Complete API-First Game Engine Platform with Bulletproof Avatar Control**
 
-HD1 provides a comprehensive REST API for 3D game engine control with **86 REST endpoints** covering all aspects of world management, entity systems, avatar synchronization, and real-time multiplayer capabilities.
+HD1 provides a comprehensive REST API for 3D game engine control with **86 REST endpoints** covering all aspects of world management, entity systems, avatar synchronization, and real-time multiplayer capabilities. Features bulletproof avatar control system with seamless world transition recovery.
 
 ## API Overview
 
@@ -27,6 +27,14 @@ Core game engine functionality including entity management, physics, audio, and 
 #### Avatar System
 - `GET /sessions/{sessionId}/avatar` - Get session avatar
 - `POST /sessions/{sessionId}/avatar` - Set session avatar
+
+##### **Avatar Control Recovery (v5.0.6)**
+Bulletproof avatar control system with seamless world transition recovery:
+- **Smart Deletion Management**: Intelligent handling of avatar deletions during world switches
+- **Automatic Recreation Detection**: Monitors for avatar recreation after world transitions
+- **Camera Controller Integration**: Automatic restoration of avatar-driven camera mode
+- **World-Based Avatar Types**: Proper humanoid/fox avatar selection based on current world
+- **Registry Preservation**: Avatar state survives world transitions without data loss
 
 #### Component System
 - `GET /sessions/{sessionId}/entities/{entityId}/components` - List entity components

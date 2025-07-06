@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-  <title>HD1 System Architecture v5.0.5</title>
+  <title>HD1 System Architecture v5.0.6</title>
   
   <!-- Background -->
   <rect width="800" height="600" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
   
   <!-- Title -->
-  <text x="400" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#212529">HD1 (Holodeck One) - System Architecture v5.0.5</text>
-  <text x="400" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6c757d">API-First Game Engine Platform</text>
+  <text x="400" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#212529">HD1 (Holodeck One) - System Architecture v5.0.6</text>
+  <text x="400" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6c757d">API-First Game Engine Platform with Bulletproof Avatar Control</text>
   
   <!-- Client Layer -->
   <rect x="50" y="80" width="700" height="80" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>

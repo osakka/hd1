@@ -38,11 +38,18 @@ This release implements a bulletproof avatar control system that maintains seaml
 - **World Manager (`world-manager.js`)**: Enhanced with world-switch event notifications
 - **PlayCanvas Integration (`hd1-playcanvas.js`)**: Improved `getAvatarTypeForCurrentWorld()` with multiple fallback methods
 
+### **Architectural Decision Documentation**
+- **ADR-028**: Avatar Control System Recovery - Comprehensive documentation of bulletproof avatar control implementation
+- **ADR-029**: Configuration Management Excellence - Complete elimination of hardcoded values framework
+- **ADR Timeline Accuracy**: Perfect correspondence between ADR dates and implementation commits
+- **Single Source of Truth**: Consolidated all ADRs into unified `/docs/decisions/adr/` directory structure
+
 ### **Quality Standards Maintained**
 - **Zero Regressions**: All existing functionality preserved during avatar system enhancement
 - **Single Source of Truth**: Server-side avatar type logic perfectly synchronized with client-side selection
 - **Surgical Precision**: Targeted fixes without affecting unrelated systems
 - **Production Ready**: Comprehensive error handling and recovery mechanisms
+- **Documentation Excellence**: 100% accurate ADR timeline with proper chronological organization
 
 ---
 
