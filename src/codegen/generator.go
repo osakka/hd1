@@ -323,30 +323,17 @@ func main() {
 	logging.Info("generating Web UI client")
 	generateWebUIClient(spec, routes)
 
-	// Generate core shell functions from API specification
-	logging.Info("generating core shell functions from API spec")
-	if err := generateCoreShellFunctions(&spec, routes); err != nil {
-		logging.Error("core shell function generation failed", map[string]interface{}{
-			"error": err.Error(),
-		})
-	} else {
-		logging.Info("core shell functions generated", map[string]interface{}{
-			"output_path": "/opt/hd1/lib/hd1lib.sh",
-			"single_source_of_truth": true,
-			"source": "api.yaml",
-		})
-	}
+	// Core shell functions generation disabled for minimal Three.js build
+	// Shell integration is not needed for the current web-based Three.js console
 
 	logging.Info("code generation complete", map[string]interface{}{
 		"features": []string{
 			"API specification drives all routing",
 			"Auto-generated from API spec (SINGLE SOURCE)",
-			"Three.js schemas drive function bridge",
-			"Shell + JavaScript + CLI identical signatures",
 			"Three.js + WebGL direct integration",
 			"Zero manual route configuration needed",
 			"Web UI client auto-generated from spec",
-			"Change spec = change API + UI + shell functions automatically",
+			"Minimal build optimized for Three.js console",
 		},
 		"single_source_of_truth": true,
 	})
@@ -622,29 +609,15 @@ func generateWebUIClient(spec OpenAPISpec, routes []RouteInfo) {
 		return
 	}
 	
-	// Generate UI Component Library
-	if err := generateUIComponents(uiClientDir, spec, routes); err != nil {
-		logging.Error("failed to generate UI components", map[string]interface{}{
-			"error": err.Error(),
-		})
-		return
-	}
-	
-	// Generate Dynamic Form System
-	if err := generateFormSystem(uiClientDir, spec, routes); err != nil {
-		logging.Error("failed to generate form system", map[string]interface{}{
-			"error": err.Error(),
-		})
-		return
-	}
+	// UI Components and Form System generation disabled for minimal Three.js build
+	// These features are not needed for the current Three.js console implementation
 	
 	logging.Info("Web UI client generated", map[string]interface{}{
 		"endpoints_count": len(routes),
 		"features": []string{
 			"JavaScript API client auto-generated",
-			"UI components auto-generated",
-			"Dynamic forms auto-generated",
-			"Zero manual UI synchronization needed",
+			"Three.js integration auto-generated",
+			"Minimal build for Three.js console",
 		},
 		"single_source_of_truth": true,
 	})

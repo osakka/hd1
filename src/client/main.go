@@ -26,14 +26,14 @@ func main() {
 	command := os.Args[1]
 	
 	switch command {
-	case "submit-operation":
-		submitOperation()
-	case "get-full-sync":
-		getFullSync()
 	case "update-entity":
 		updateEntity()
 	case "delete-entity":
 		deleteEntity()
+	case "submit-operation":
+		submitOperation()
+	case "get-full-sync":
+		getFullSync()
 	case "move-avatar":
 		moveAvatar()
 	case "get-scene":
@@ -60,10 +60,10 @@ func main() {
 func showHelp() {
 	fmt.Println("HD1 Client - Auto-generated from API specification")
 	fmt.Println("Available commands:")
-	fmt.Println("  submit-operation - POST /sync/operations")
-	fmt.Println("  get-full-sync - GET /sync/full")
 	fmt.Println("  update-entity - PUT /threejs/entities/{entityId}")
 	fmt.Println("  delete-entity - DELETE /threejs/entities/{entityId}")
+	fmt.Println("  submit-operation - POST /sync/operations")
+	fmt.Println("  get-full-sync - GET /sync/full")
 	fmt.Println("  move-avatar - POST /threejs/avatars/{sessionId}/move")
 	fmt.Println("  get-scene - GET /threejs/scene")
 	fmt.Println("  update-scene - PUT /threejs/scene")
@@ -122,21 +122,6 @@ func makeRequest(method, path string, body interface{}) {
 }
 
 
-func submitOperation() {
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("POST", "/sync/operations", body)
-}
-
-func getFullSync() {
-	makeRequest("GET", "/sync/full", nil)
-}
-
 func updateEntity() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
@@ -158,6 +143,21 @@ func deleteEntity() {
 		os.Exit(1)
 	}
 	makeRequest("DELETE", "/threejs/entities/" + os.Args[2] + "", nil)
+}
+
+func submitOperation() {
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("POST", "/sync/operations", body)
+}
+
+func getFullSync() {
+	makeRequest("GET", "/sync/full", nil)
 }
 
 func moveAvatar() {
