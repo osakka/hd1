@@ -50,86 +50,56 @@ hd1_json_escape() {
 # SYNC OPERATIONS (Generated from spec)
 # ========================================
 
-
-# GET /sync/full - getFullSync
-hd1_getFullSync() {
-    hd1_request "GET" "/sync/full" "$1"
+{{range .SyncOperations}}
+# {{.Method}} {{.Path}} - {{.OperationID}}
+hd1_{{.OperationID}}() {
+    hd1_request "{{.Method}}" "{{.Path}}" "$1"
 }
-
-# GET /sync/stats - getSyncStats
-hd1_getSyncStats() {
-    hd1_request "GET" "/sync/stats" "$1"
-}
-
-# POST /sync/operations - submitOperation
-hd1_submitOperation() {
-    hd1_request "POST" "/sync/operations" "$1"
-}
-
-# GET /sync/missing/{from}/{to} - getMissingOperations
-hd1_getMissingOperations() {
-    hd1_request "GET" "/sync/missing/{from}/{to}" "$1"
-}
-
+{{end}}
 
 # ========================================
 # THREE.JS ENTITIES (Generated from spec)
 # ========================================
 
-
-# PUT /threejs/entities/{entityId} - updateEntity
-hd1_updateEntity() {
-    hd1_request "PUT" "/threejs/entities/{entityId}" "$1"
+{{range .ThreeJSEntities}}
+# {{.Method}} {{.Path}} - {{.OperationID}}
+hd1_{{.OperationID}}() {
+    hd1_request "{{.Method}}" "{{.Path}}" "$1"
 }
-
-# DELETE /threejs/entities/{entityId} - deleteEntity
-hd1_deleteEntity() {
-    hd1_request "DELETE" "/threejs/entities/{entityId}" "$1"
-}
-
-# POST /threejs/avatars/{sessionId}/move - moveAvatar
-hd1_moveAvatar() {
-    hd1_request "POST" "/threejs/avatars/{sessionId}/move" "$1"
-}
-
-# POST /threejs/entities - createEntity
-hd1_createEntity() {
-    hd1_request "POST" "/threejs/entities" "$1"
-}
-
-# GET /threejs/scene - getScene
-hd1_getScene() {
-    hd1_request "GET" "/threejs/scene" "$1"
-}
-
-# PUT /threejs/scene - updateScene
-hd1_updateScene() {
-    hd1_request "PUT" "/threejs/scene" "$1"
-}
-
+{{end}}
 
 # ========================================
 # AVATARS (Generated from spec)
 # ========================================
 
-
+{{range .Avatars}}
+# {{.Method}} {{.Path}} - {{.OperationID}}
+hd1_{{.OperationID}}() {
+    hd1_request "{{.Method}}" "{{.Path}}" "$1"
+}
+{{end}}
 
 # ========================================
 # SCENE MANAGEMENT (Generated from spec)
 # ========================================
 
-
+{{range .Scene}}
+# {{.Method}} {{.Path}} - {{.OperationID}}
+hd1_{{.OperationID}}() {
+    hd1_request "{{.Method}}" "{{.Path}}" "$1"
+}
+{{end}}
 
 # ========================================
 # SYSTEM (Generated from spec)
 # ========================================
 
-
-# GET /system/version - getVersion
-hd1_getVersion() {
-    hd1_request "GET" "/system/version" "$1"
+{{range .System}}
+# {{.Method}} {{.Path}} - {{.OperationID}}
+hd1_{{.OperationID}}() {
+    hd1_request "{{.Method}}" "{{.Path}}" "$1"
 }
-
+{{end}}
 
 # ========================================
 # CONVENIENCE FUNCTIONS

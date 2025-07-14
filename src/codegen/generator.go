@@ -228,10 +228,7 @@ func main() {
 		})
 	}
 
-	// Add server import
-	if !contains(imports, "holodeck1/server") {
-		imports = append(imports, "holodeck1/server")
-	}
+	// Note: server import is already included in template
 
 	// Generate router code
 	logging.Info("generating auto-router", map[string]interface{}{
@@ -253,14 +250,48 @@ func main() {
 	}
 	defer routerFile.Close()
 
+	// Organize routes by category for Three.js template
+	var syncOps, threeJSOps, avatarOps, sceneOps, systemOps []RouteInfo
+	for _, route := range routes {
+		if strings.HasPrefix(route.Path, "/sync") {
+			syncOps = append(syncOps, route)
+		} else if strings.HasPrefix(route.Path, "/threejs") {
+			threeJSOps = append(threeJSOps, route)
+		} else if strings.HasPrefix(route.Path, "/avatars") {
+			avatarOps = append(avatarOps, route)
+		} else if strings.HasPrefix(route.Path, "/scene") {
+			sceneOps = append(sceneOps, route)
+		} else if strings.HasPrefix(route.Path, "/system") {
+			systemOps = append(systemOps, route)
+		}
+	}
+
 	templateData := struct {
-		Routes       []RouteInfo
-		HandlerStubs []HandlerStub
-		Imports      []string
+		SyncOperations []RouteInfo
+		ThreeJSEntities []RouteInfo
+		Avatars []RouteInfo
+		Scene []RouteInfo
+		System []RouteInfo
+		Imports []string
+		TotalRoutes int
+		SyncOpsCount int
+		ThreeJSOpsCount int
+		AvatarOpsCount int
+		SceneOpsCount int
+		SystemOpsCount int
 	}{
-		Routes:       routes,
-		HandlerStubs: handlerStubs,
-		Imports:      imports,
+		SyncOperations: syncOps,
+		ThreeJSEntities: threeJSOps,
+		Avatars: avatarOps,
+		Scene: sceneOps,
+		System: systemOps,
+		Imports: imports,
+		TotalRoutes: len(routes),
+		SyncOpsCount: len(syncOps),
+		ThreeJSOpsCount: len(threeJSOps),
+		AvatarOpsCount: len(avatarOps),
+		SceneOpsCount: len(sceneOps),
+		SystemOpsCount: len(systemOps),
 	}
 
 	if err := tmpl.Execute(routerFile, templateData); err != nil {
@@ -298,9 +329,6 @@ func main() {
 		logging.Error("core shell function generation failed", map[string]interface{}{
 			"error": err.Error(),
 		})
-		logging.Warn("core shell function generation failed", map[string]interface{}{
-			"error": err.Error(),
-		})
 	} else {
 		logging.Info("core shell functions generated", map[string]interface{}{
 			"output_path": "/opt/hd1/lib/hd1lib.sh",
@@ -309,29 +337,13 @@ func main() {
 		})
 	}
 
-	// Advanced enhanced generation with A-Frame integration
-	logging.Info("generating A-Frame integration")
-	if err := generateEnhancedIntegration(spec, routes); err != nil {
-		logging.Error("enhanced integration generation failed", map[string]interface{}{
-			"error": err.Error(),
-		})
-		logging.Warn("enhanced generation failed", map[string]interface{}{
-			"error": err.Error(),
-		})
-	} else {
-		logging.Info("A-Frame integration generated", map[string]interface{}{
-			"shell_output": "/opt/hd1/lib/downstream/playcanvaslib.sh",
-			"javascript_output": "/opt/hd1/lib/downstream/playcanvaslib.js",
-		})
-	}
-
 	logging.Info("code generation complete", map[string]interface{}{
 		"features": []string{
 			"API specification drives all routing",
 			"Auto-generated from API spec (SINGLE SOURCE)",
-			"PlayCanvas schemas drive function bridge",
+			"Three.js schemas drive function bridge",
 			"Shell + JavaScript + CLI identical signatures",
-			"PlayCanvas + WebGL seamless integration",
+			"Three.js + WebGL direct integration",
 			"Zero manual route configuration needed",
 			"Web UI client auto-generated from spec",
 			"Change spec = change API + UI + shell functions automatically",
@@ -660,13 +672,37 @@ func generateJavaScriptAPIClient(outputDir string, spec OpenAPISpec, routes []Ro
 		jsMethods = append(jsMethods, method)
 	}
 	
+	// Organize methods by category for Three.js JavaScript template
+	var syncOps, threeJSOps, avatarOps, sceneOps, systemOps []JSMethod
+	for _, method := range jsMethods {
+		if strings.Contains(method.Comment, "/sync") {
+			syncOps = append(syncOps, method)
+		} else if strings.Contains(method.Comment, "/threejs") {
+			threeJSOps = append(threeJSOps, method)
+		} else if strings.Contains(method.Comment, "/avatars") {
+			avatarOps = append(avatarOps, method)
+		} else if strings.Contains(method.Comment, "/scene") {
+			sceneOps = append(sceneOps, method)
+		} else if strings.Contains(method.Comment, "/system") {
+			systemOps = append(systemOps, method)
+		}
+	}
+
 	tmplData := struct {
-		Methods []JSMethod
+		SyncOperations []JSMethod
+		ThreeJSEntities []JSMethod
+		Avatars []JSMethod
+		Scene []JSMethod
+		System []JSMethod
 	}{
-		Methods: jsMethods,
+		SyncOperations: syncOps,
+		ThreeJSEntities: threeJSOps,
+		Avatars: avatarOps,
+		Scene: sceneOps,
+		System: systemOps,
 	}
 	
-	tmpl, err := loadTemplate("templates/javascript/api-client.tmpl")
+	tmpl, err := loadTemplate("templates/javascript/threejs-client.tmpl")
 	if err != nil {
 		return fmt.Errorf("failed to load JavaScript API template: %w", err)
 	}
@@ -944,110 +980,6 @@ func generateFormSchemaJSON(route RouteInfo) string {
 	return schema
 }
 
-// generateEnhancedIntegration creates A-Frame bridge functions
-func generateEnhancedIntegration(spec OpenAPISpec, routes []RouteInfo) error {
-	logging.Info("generating enhanced A-Frame integration", map[string]interface{}{
-		"task": "upstream-downstream-api-bridge",
-	})
-	
-	// Create enhanced shell functions
-	if err := generateEnhancedShellFunctions(spec, routes); err != nil {
-		return fmt.Errorf("failed to generate enhanced shell functions: %w", err)
-	}
-	
-	// Create JavaScript function bridge
-	if err := generateJavaScriptBridge(spec, routes); err != nil {
-		return fmt.Errorf("failed to generate JavaScript bridge: %w", err)  
-	}
-	
-	return nil
-}
-
-// generateEnhancedShellFunctions creates shell functions with A-Frame integration
-func generateEnhancedShellFunctions(spec OpenAPISpec, routes []RouteInfo) error {
-	outputDir := "/opt/hd1/lib"
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
-	}
-	
-	// A-Frame capabilities mapping (used for documentation)
-	_ = map[string]interface{}{
-		"geometry_types": []string{"box", "sphere", "cylinder", "cone", "plane"},
-		"light_types": []string{"directional", "point", "ambient", "spot"},
-		"material_properties": []string{"color", "metalness", "roughness", "transparency", "emissive"},
-		"physics_bodies": []string{"dynamic", "static", "kinematic"},
-	}
-	
-	tmpl, err := loadTemplate("templates/shell/playcanvas-functions.tmpl")
-	if err != nil {
-		return fmt.Errorf("failed to load PlayCanvas shell template: %w", err)
-	}
-
-	outputPath := filepath.Join(outputDir, "downstream/playcanvaslib.sh")
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		return fmt.Errorf("failed to create enhanced shell functions file: %w", err)
-	}
-	defer outputFile.Close()
-
-	// Pass configuration data to template
-	templateData := struct {
-		Config *config.HD1Config
-	}{
-		Config: config.Config,
-	}
-	
-	if err := tmpl.Execute(outputFile, templateData); err != nil {
-		return fmt.Errorf("failed to execute PlayCanvas shell template: %w", err)
-	}
-	
-	// Set executable permissions
-	if err := os.Chmod(outputPath, 0755); err != nil {
-		return fmt.Errorf("failed to write enhanced shell functions: %w", err)
-	}
-	
-	logging.Info("enhanced shell functions generated", map[string]interface{}{
-		"output_path": outputPath,
-		"playcanvas_integration": true,
-	})
-	
-	return nil
-}
-
-// generateJavaScriptBridge creates JavaScript functions with identical signatures
-func generateJavaScriptBridge(spec OpenAPISpec, routes []RouteInfo) error {
-	outputDir := "/opt/hd1/lib"
-	
-	tmpl, err := loadTemplate("templates/javascript/playcanvas-bridge.tmpl")
-	if err != nil {
-		return fmt.Errorf("failed to load PlayCanvas bridge template: %w", err)
-	}
-
-	outputPath := filepath.Join(outputDir, "downstream/playcanvaslib.js")
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		return fmt.Errorf("failed to create JavaScript bridge file: %w", err)
-	}
-	defer outputFile.Close()
-
-	// Pass configuration data to template
-	templateData := struct {
-		Config *config.HD1Config
-	}{
-		Config: config.Config,
-	}
-	
-	if err := tmpl.Execute(outputFile, templateData); err != nil {
-		return fmt.Errorf("failed to execute PlayCanvas bridge template: %w", err)
-	}
-	
-	logging.Info("JavaScript function bridge generated", map[string]interface{}{
-		"output_path": outputPath,
-		"identical_signatures": true,
-	})
-	
-	return nil
-}
 
 // generateCoreShellFunctions creates hd1-functions.sh from API specification
 func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
@@ -1059,7 +991,7 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 	}
 	
 	// Generate core shell function library
-	tmpl, err := loadTemplate("templates/shell/core-functions.tmpl")
+	tmpl, err := loadTemplate("templates/shell/threejs-functions.tmpl")
 	if err != nil {
 		return fmt.Errorf("failed to load core shell template: %w", err)
 	}
@@ -1070,13 +1002,36 @@ func generateCoreShellFunctions(spec *OpenAPISpec, routes []RouteInfo) error {
 	}
 	defer outputFile.Close()
 
-	// Pass routes data and configuration defaults to template for dynamic generation
+	// Organize routes by category for Three.js shell template
+	var syncOps, threeJSOps, avatarOps, sceneOps, systemOps []RouteInfo
+	for _, route := range routes {
+		if strings.HasPrefix(route.Path, "/sync") {
+			syncOps = append(syncOps, route)
+		} else if strings.HasPrefix(route.Path, "/threejs") {
+			threeJSOps = append(threeJSOps, route)
+		} else if strings.HasPrefix(route.Path, "/avatars") {
+			avatarOps = append(avatarOps, route)
+		} else if strings.HasPrefix(route.Path, "/scene") {
+			sceneOps = append(sceneOps, route)
+		} else if strings.HasPrefix(route.Path, "/system") {
+			systemOps = append(systemOps, route)
+		}
+	}
+
 	templateData := struct {
-		Routes           []RouteInfo
+		SyncOperations []RouteInfo
+		ThreeJSEntities []RouteInfo
+		Avatars []RouteInfo
+		Scene []RouteInfo
+		System []RouteInfo
 		DefaultAPIBase   string
 		DefaultSessionID string
 	}{
-		Routes:           routes,
+		SyncOperations: syncOps,
+		ThreeJSEntities: threeJSOps,
+		Avatars: avatarOps,
+		Scene: sceneOps,
+		System: systemOps,
 		DefaultAPIBase:   config.GetAPIBase(),
 		DefaultSessionID: config.GetSessionDefaultID(),
 	}

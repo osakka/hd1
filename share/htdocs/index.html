@@ -1,170 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>HD1 v3.0 - Holodeck One</title>
-    <script src="/static/js/vendor/playcanvas.min.js"></script>
-    <script src="/static/js/hd1lib.js"></script>
-    <script src="/static/js/hd1-ui-components.js"></script>
-    <script src="/static/js/hd1-form-system.js"></script>
-    <link rel="stylesheet" href="/static/css/hd1-console.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HD1 - Three.js Engine</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00ff00;
+            font-size: 18px;
+            z-index: 1000;
+        }
+        
+        #hd1-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
 </head>
 <body>
-    <!-- PlayCanvas Game Engine Canvas -->
-    <canvas id="hd1-playcanvas-canvas" 
-            style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1;">
-    </canvas>
+    <div id="loading">HD1 Three.js Engine Loading...</div>
+    <canvas id="hd1-canvas"></canvas>
     
+    <!-- Three.js Library -->
+    <script src="/static/vendor/threejs/three.min.js"></script>
     
-    <div id="text-overlay"></div>
+    <!-- HD1 Three.js Components -->
+    <script src="/static/js/hd1-threejs.js"></script>
+    <script src="/static/js/hd1-sync.js"></script>
+    <script src="/static/js/hd1-console-new.js"></script>
     
-    <div id="debug-panel">
-        <div id="debug-header">
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span>Holodeck I</span>
-                <span class="version-text" id="api-version">v1.0.0</span>
-                <span class="js-version-text" id="js-version">loading...</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span id="refresh-timer" style="background: rgba(0, 255, 255, 0.02); color: rgba(0, 255, 255, 0.3); border: 1px solid transparent; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: normal; cursor: pointer; margin-left: 6px; transition: all 0.2s ease; user-select: none;" title="Time since last refresh - Click to rebootstrap system">0:00</span>
-                <span id="debug-collapse-icon">&#8681;</span>
-            </div>
-        </div>
-        
-        <!-- Always visible channel and stats -->
-        <div id="debug-persistent-content">
-            <div id="debug-channel-bar" style="background: rgba(0, 255, 255, 0.12); padding: 6px 8px; border-bottom: 1px solid rgba(0, 255, 255, 0.15); margin-bottom: 4px;">
-                <div style="width: 100%; display: flex; gap: 4px; align-items: center;">
-                    <select id="channel-selector" style="flex: 1;" title="Switch collaboration channels">
-                        <option value="">Loading channels...</option>
-                    </select>
-                    
-                    <!-- Avatar Vision Indicator -->
-                    <div id="avatar-vision-indicator" style="display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.2); border-radius: 4px; font-size: 10px; color: rgba(0, 255, 255, 0.8);">
-                        <span id="vision-type">👁️ Free</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Graph panels (hidden when collapsed) -->
-            <div id="debug-info-panels" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 4px;">
-                <div class="info-panel" id="fps-graph-panel">
-                    <div class="panel-title">FPS</div>
-                    <div class="panel-content" style="padding: 4px;">
-                        <canvas id="fps-graph-canvas"></canvas>
-                    </div>
-                </div>
-                <div class="info-panel" id="memory-graph-panel">
-                    <div class="panel-title">MEMORY</div>
-                    <div class="panel-content">
-                        <canvas id="memory-graph-canvas"></canvas>
-                    </div>
-                </div>
-                <div class="info-panel" id="latency-graph-panel">
-                    <div class="panel-title">LATENCY</div>
-                    <div class="panel-content">
-                        <canvas id="latency-graph-canvas"></canvas>
-                    </div>
-                </div>
-                <div class="info-panel" id="websocket-graph-panel">
-                    <div class="panel-title">WEBSOCKET</div>
-                    <div class="panel-content">
-                        <canvas id="websocket-graph-canvas"></canvas>
-                    </div>
-                </div>
-            </div>
+    <script>
+        // Initialize HD1 Three.js Engine
+        document.addEventListener('DOMContentLoaded', () => {
+            const loading = document.getElementById('loading');
             
-            <!-- Collapsed stats tiles (shown when collapsed) -->
-            <div id="debug-collapsed-stats" style="display: none; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 6px; height: 40px; margin: 8px;">
-                <div class="collapsed-stat-tile">
-                    <div class="collapsed-stat-value" id="collapsed-fps-value">--</div>
-                    <div class="collapsed-stat-label">FPS</div>
-                </div>
-                <div class="collapsed-stat-tile">
-                    <div class="collapsed-stat-value" id="collapsed-memory-value">--%</div>
-                    <div class="collapsed-stat-label">MEM</div>
-                </div>
-                <div class="collapsed-stat-tile">
-                    <div class="collapsed-stat-value" id="collapsed-latency-value">--ms</div>
-                    <div class="collapsed-stat-label">LAT</div>
-                </div>
-                <div class="collapsed-stat-tile">
-                    <div class="collapsed-stat-value" id="collapsed-rx-value">--</div>
-                    <div class="collapsed-stat-label">RX</div>
-                </div>
-                <div class="collapsed-stat-tile">
-                    <div class="collapsed-stat-value" id="collapsed-tx-value">--</div>
-                    <div class="collapsed-stat-label">TX</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Collapsible content -->
-        <div id="debug-content">
-            <div id="playcanvas-container">
-                <!-- PlayCanvas Controls (hidden until engine ready) -->
-                <div id="playcanvas-controls" style="display: none;">
-                    
-                    <div style="border-top: 1px solid rgba(0, 255, 255, 0.2); margin: 8px 0 0 0;"></div>
-                    <!-- Native PlayCanvas Stats Panel -->
-                    <div id="playcanvas-stats-panel">
-                        <div class="panel-title">
-                            PLAYCANVAS SCENE
-                            <span class="js-version-text" id="pc-scene-name" style="margin-left: 6px;">loading...</span>
-                        </div>
-                        <div class="panel-content" style="padding: 6px;">
-                            <div class="playcanvas-stats-grid">
-                                <div class="stat-group">
-                                    <div class="stat-label">Entities:</div>
-                                    <div class="stat-value" id="pc-entities-count">--</div>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-label">Active:</div>
-                                    <div class="stat-value" id="pc-active-entities">--</div>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-label">Avatars:</div>
-                                    <div class="stat-value" id="pc-avatar-entities">--</div>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-label">Sync Events:</div>
-                                    <div class="stat-value" id="pc-sync-events">--</div>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-label">Camera Pos:</div>
-                                    <div class="stat-value" id="pc-camera-position">--</div>
-                                </div>
-                                <div class="stat-group">
-                                    <div class="stat-label">Last Update:</div>
-                                    <div class="stat-value" id="pc-last-update">--</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="border-top: 1px solid rgba(0, 255, 255, 0.2); margin: 8px 0 0 0;"></div>
-            <div id="debug-log"></div>
-        </div>
-        <div id="debug-status-bar">
-            <div class="status-left">
-                <span id="status-connection-indicator" class="connecting"></span>
-                <span id="status-connection-text">Connecting</span>
-            </div>
-            <div class="status-right">
-                <span id="status-lock-indicator" class="unlocked"></span>
-                <span id="session-id-tag-status" style="display: none;" title="Click to copy session ID">---</span>
-                <span id="status-collapse-arrow">&#8679;</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Animated Notification Panel (slides from under console) -->
-    <div id="status-notification-panel" class="status-panel-hidden">
-        <div class="status-panel-content">
-            <div id="status-message-text"></div>
-        </div>
-    </div>
-    
-    <script src="/static/js/hd1-playcanvas.js"></script>
-    <script src="/static/js/hd1-console.js?v=${JS_VERSION}"></script>
+            try {
+                // Initialize HD1 Three.js Console
+                window.hd1Console = new HD1Console();
+                
+                // Hide loading screen
+                loading.style.display = 'none';
+                
+                console.log('HD1 Three.js Engine initialized successfully');
+            } catch (error) {
+                console.error('HD1 initialization failed:', error);
+                loading.textContent = 'HD1 initialization failed: ' + error.message;
+                loading.style.color = '#ff0000';
+            }
+        });
+    </script>
 </body>
 </html>

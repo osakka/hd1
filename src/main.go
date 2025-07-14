@@ -1,14 +1,14 @@
 // Package main provides the HD1 (Holodeck One) daemon entry point.
-// HD1 is an API-first game engine platform that exposes complete 3D game
-// development capabilities through 82 REST endpoints with real-time WebSocket
+// HD1 is an API-first Three.js game engine platform that exposes complete 3D game
+// development capabilities through REST endpoints with TCP-simple WebSocket
 // synchronization for collaborative 3D environments.
 //
 // Architecture:
 //   - Configuration system: Flags > Environment Variables > .env File > Defaults
 //   - Unified logging: Structured JSON logging with module-based tracing
-//   - WebSocket hub: Real-time client coordination and session management
+//   - WebSocket hub: TCP-simple sequence-based synchronization
 //   - API router: Auto-generated from OpenAPI specification
-//   - PlayCanvas integration: Professional 3D rendering engine
+//   - Three.js integration: Direct WebGL rendering with zero abstraction
 package main
 
 import (

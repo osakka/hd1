@@ -117,7 +117,7 @@ func (h *Hub) SendLog(level, message string, data interface{}) {
 	}
 
 	jsonData, _ := json.Marshal(logMsg)
-	h.BroadcastMessage(jsonData)
+	h.broadcastMessage(jsonData)
 }
 
 // Force reload all clients
@@ -127,7 +127,7 @@ func (h *Hub) ForceReload() {
 	}
 
 	jsonData, _ := json.Marshal(reloadMsg)
-	h.BroadcastMessage(jsonData)
+	h.broadcastMessage(jsonData)
 }
 
 // GetTimestamp returns a timestamp string for file naming

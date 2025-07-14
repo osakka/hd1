@@ -1,5 +1,5 @@
 # HD1 (Holodeck One) - Professional Build System
-# Single source of truth: api.yaml drives everything
+# Single source of truth: api.yaml drives Three.js transformation
 
 .PHONY: all clean generate build test run validate client logs status start stop restart daemon-start daemon-stop daemon-status
 
@@ -15,28 +15,25 @@ AVATARS_DIR = $(shell test -n "$$HD1_AVATARS_DIR" && echo "$$HD1_AVATARS_DIR" ||
 # Default target
 all: validate generate build
 
-# Generate router from specification
+# Generate router from Three.js specification
 generate:
-	@echo "GENERATING CODE FROM SPECIFICATION..."
+	@echo "GENERATING THREE.JS CODE FROM SPECIFICATION..."
 	go run codegen/generator.go
-	@echo "Auto-router generated from api.yaml"
-	@echo "COPYING PLAYCANVAS TO STATIC DIRECTORY..."
-	@mkdir -p $(SHARE_DIR)/htdocs/static/vendor/playcanvas
-	@if [ -d ../vendor/playcanvas/build ]; then \
-		cp -r ../vendor/playcanvas/build/* $(SHARE_DIR)/htdocs/static/vendor/playcanvas/; \
-		echo "PlayCanvas library copied to static directory"; \
-	elif [ -d ../vendor/playcanvas/src ]; then \
-		cp -r ../vendor/playcanvas/src $(SHARE_DIR)/htdocs/static/vendor/playcanvas/; \
-		echo "PlayCanvas source copied to static directory"; \
+	@echo "Three.js auto-router generated from api.yaml"
+	@echo "DOWNLOADING THREE.JS LIBRARY..."
+	@mkdir -p $(SHARE_DIR)/htdocs/static/vendor/threejs
+	@if [ ! -f $(SHARE_DIR)/htdocs/static/vendor/threejs/three.min.js ]; then \
+		curl -L -o $(SHARE_DIR)/htdocs/static/vendor/threejs/three.min.js https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.min.js; \
+		echo "Three.js r170 downloaded to static directory"; \
 	else \
-		echo "WARNING: PlayCanvas not found in vendor directory"; \
+		echo "Three.js already exists in static directory"; \
 	fi
 
-# Validate specification
+# Validate Three.js specification
 validate:
-	@echo "VALIDATING API SPECIFICATION..."
+	@echo "VALIDATING THREE.JS API SPECIFICATION..."
 	@if [ ! -f api.yaml ]; then echo "FATAL: api.yaml missing!"; exit 1; fi
-	@echo "Specification found"
+	@echo "Three.js specification found"
 
 # Build server with professional artifact management
 build: generate
@@ -80,12 +77,13 @@ client:
 	@chmod +x $(BIN_DIR)/hd1-client
 	@echo "HD1 client created -> $(BIN_DIR)/hd1-client"
 
-# Setup web resources
+# Setup Three.js web resources
 web:
-	@echo "SETTING UP WEB RESOURCES..."
+	@echo "SETTING UP THREE.JS WEB RESOURCES..."
 	@mkdir -p $(SHARE_DIR)/htdocs/static
-	@echo "Web resources already organized in $(SHARE_DIR)/htdocs/"
-	@echo "Note: Static files are served directly from $(SHARE_DIR)/htdocs/static/"
+	@$(MAKE) generate
+	@echo "Three.js web resources organized in $(SHARE_DIR)/htdocs/"
+	@echo "Note: Three.js files are served directly from $(SHARE_DIR)/htdocs/static/"
 
 # Professional development status
 build-status:
@@ -93,8 +91,8 @@ build-status:
 	@echo "================"
 	@if [ -f $(BIN_DIR)/hd1 ]; then echo "HD1 Binary: EXISTS ($(BIN_DIR)/hd1)"; else echo "HD1 Binary: MISSING"; fi
 	@if [ -f $(BIN_DIR)/hd1-client ]; then echo "HD1 Client: EXISTS ($(BIN_DIR)/hd1-client)"; else echo "HD1 Client: MISSING"; fi
-	@if [ -f api.yaml ]; then echo "API Spec: EXISTS"; else echo "API Spec: MISSING"; fi
-	@if [ -f auto_router.go ]; then echo "Auto Router: GENERATED"; else echo "Auto Router: NOT GENERATED"; fi
+	@if [ -f api.yaml ]; then echo "Three.js API Spec: EXISTS"; else echo "Three.js API Spec: MISSING"; fi
+	@if [ -f auto_router.go ]; then echo "Three.js Auto Router: GENERATED"; else echo "Three.js Auto Router: NOT GENERATED"; fi
 	@echo "Build artifacts in: $(BUILD_DIR)/"
 
 # Show recent logs
@@ -106,14 +104,14 @@ logs:
 
 # Clean all build artifacts
 clean:
-	@echo "CLEANING HD1 BUILD ARTIFACTS..."
+	@echo "CLEANING HD1 THREE.JS BUILD ARTIFACTS..."
 	@rm -rf $(BUILD_DIR)/bin/hd1 $(BUILD_DIR)/bin/hd1-client
 	@rm -f auto_router.go
 	@echo "Clean complete"
 
 # Deep clean - remove all build directories
 deep-clean:
-	@echo "DEEP CLEANING HD1 WORKSPACE..."
+	@echo "DEEP CLEANING HD1 THREE.JS WORKSPACE..."
 	@rm -rf $(BUILD_DIR)
 	@rm -f auto_router.go
 	@echo "Deep clean complete"
@@ -232,7 +230,7 @@ help:
 	@echo "  make status    - Show daemon status"
 	@echo ""
 	@echo "Development targets:"
-	@echo "  make generate  - Generate router from api.yaml"
+	@echo "  make generate  - Generate Three.js router from api.yaml"
 	@echo "  make client    - Create HD1 API client"
 	@echo "  make web       - Setup web resources"
 	@echo "  make build-status - Show build status"

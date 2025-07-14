@@ -213,16 +213,19 @@ func (c *Client) handleClientMessage(message []byte) {
 				"session_id": sessionID,
 			})
 			
-			if c.hub.store != nil {
-				// Join the session room (this handles duplicate prevention)
-				_, _, _ = c.hub.JoinSessionWorld(sessionID, fmt.Sprintf("%p", c), false)
-				
-				// Legacy object loading removed - entities now managed via worlds/PlayCanvas
-				// Session restoration handled by world manager when switching worlds
-				logging.Info("session connected, entities managed via worlds", map[string]interface{}{
-					"session_id": sessionID,
-				})
-			}
+			// Register client with the hub
+			c.hub.register <- c
+			c.sessionID = sessionID
+			
+			logging.Info("client joined session", map[string]interface{}{
+				"session_id": sessionID,
+				"client":     fmt.Sprintf("%p", c),
+			})
+			
+			// Session connected - entities managed via Three.js operations
+			logging.Info("session connected, Three.js operations active", map[string]interface{}{
+				"session_id": sessionID,
+			})
 		}
 		
 	case "interaction":
