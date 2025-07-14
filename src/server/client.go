@@ -1,12 +1,9 @@
 package server
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -157,14 +154,7 @@ func (c *Client) handleClientMessage(message []byte) {
 		}
 		
 	case "client_log":
-		var logMsg LogMessage
-		if err := json.Unmarshal(message, &logMsg); err == nil {
-			logging.Debug("client log message", map[string]interface{}{
-				"level": logMsg.Level,
-				"message": logMsg.Message,
-				"source": "browser",
-			})
-		}
+		// Client logging disabled for minimal build
 		
 	case "client_info":
 		var info ClientInfo
@@ -238,10 +228,7 @@ func (c *Client) handleClientMessage(message []byte) {
 		c.hub.broadcast <- message
 		
 	case "avatar_asset_request":
-		// Handle GLB asset request for avatars
-		if avatarType, ok := msg["avatar_type"].(string); ok {
-			c.handleAvatarAssetRequest(avatarType)
-		}
+		// Avatar asset requests not used in minimal build
 		
 	default:
 		// Regular 3D visualization message
@@ -249,70 +236,7 @@ func (c *Client) handleClientMessage(message []byte) {
 	}
 }
 
-// handleAvatarAssetRequest loads and sends GLB avatar assets via WebSocket.
-// Reads the GLB file from the avatars directory and sends it as base64-encoded data.
-// This maintains HD1's real-time architecture by delivering assets through WebSocket
-// rather than HTTP, ensuring coordinated asset loading with the session state.
-func (c *Client) handleAvatarAssetRequest(avatarType string) {
-	// Construct path to GLB asset file
-	avatarsDir := config.GetAvatarsDir()
-	glbPath := filepath.Join(avatarsDir, avatarType, "model.glb")
-	
-	// Read GLB file data
-	glbData, err := ioutil.ReadFile(glbPath)
-	if err != nil {
-		logging.Error("failed to read GLB asset", map[string]interface{}{
-			"avatar_type": avatarType,
-			"path": glbPath,
-			"error": err.Error(),
-		})
-		
-		// Send error response
-		errorResponse := map[string]interface{}{
-			"type": "avatar_asset_error",
-			"avatar_type": avatarType,
-			"error": "Failed to load avatar asset",
-		}
-		if jsonData, err := json.Marshal(errorResponse); err == nil {
-			select {
-			case c.send <- jsonData:
-			default:
-				// Client Go channel blocked, don't wait
-			}
-		}
-		return
-	}
-	
-	// Encode GLB data as base64
-	base64Data := base64.StdEncoding.EncodeToString(glbData)
-	
-	// Send asset response via WebSocket
-	assetResponse := map[string]interface{}{
-		"type": "avatar_asset_response",
-		"avatar_type": avatarType,
-		"data": base64Data,
-		"size": len(glbData),
-	}
-	
-	if jsonData, err := json.Marshal(assetResponse); err == nil {
-		select {
-		case c.send <- jsonData:
-			logging.Info("GLB asset sent via WebSocket", map[string]interface{}{
-				"avatar_type": avatarType,
-				"size_bytes": len(glbData),
-			})
-		default:
-			logging.Warn("failed to send GLB asset - client Go channel blocked", map[string]interface{}{
-				"avatar_type": avatarType,
-			})
-		}
-	} else {
-		logging.Error("failed to marshal GLB asset response", map[string]interface{}{
-			"avatar_type": avatarType,
-			"error": err.Error(),
-		})
-	}
-}
+// Avatar asset handling removed for minimal build
 
 // writePump handles outgoing WebSocket messages to the client.
 // It runs in a separate goroutine and manages the client's write lifecycle:

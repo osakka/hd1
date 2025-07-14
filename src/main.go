@@ -223,13 +223,8 @@ func create_required_build_directories() error {
 }
 
 func configure_file_logging(logFile string) error {
-	if logFile == "" {
-		// Default timestamped log file
-		logFile = filepath.Join(config.Config.Paths.LogDir, fmt.Sprintf("hd1_%s.log", 
-			server.GetTimestamp()))
-	}
-	
-	return server.SetupFileLogging(logFile)
+	// File logging disabled for minimal build
+	return nil
 }
 
 func write_process_identifier_file(pidFile string, pid ...int) error {
