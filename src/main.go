@@ -112,13 +112,12 @@ func main() {
 	
 	// Template-processed JavaScript files with API-driven versioning (must be before static handler)
 	http.HandleFunc("/static/js/hd1-console.js", server.ServeConsoleJS)
-	http.HandleFunc("/static/js/hd1-aframe.js", server.ServeAFrameJS)
 	
 	// Serve static files with proper cache control headers
 	fileServer := http.FileServer(http.Dir(config.GetStaticDir()))
 	http.Handle("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Skip template-processed files (they have their own handlers)
-		if r.URL.Path == "/static/js/hd1-console.js" || r.URL.Path == "/static/js/hd1-aframe.js" {
+		if r.URL.Path == "/static/js/hd1-console.js" {
 			http.NotFound(w, r) // This should never be reached due to HandleFunc precedence
 			return
 		}

@@ -23,26 +23,23 @@ func updateJSVersion() {
 	apiSpecPath := "api.yaml"
 	
 	// Include generated files that derive from API spec
-	aframePath := "../share/htdocs/static/js/hd1-aframe.js"
 	consoleJSPath := "../share/htdocs/static/js/hd1-console.js"
-	libJSPath := "../share/htdocs/static/js/hd1lib.js"
+	threeJSPath := "../share/htdocs/static/js/hd1-threejs.js"
 	indexPath := "../share/htdocs/index.html"
 
 	// PRIMARY: API specification hash (single source of truth)
 	apiSpecHash := getFileHash(apiSpecPath)
 	
 	// SECONDARY: Generated artifacts that should match API spec
-	aframeHash := getFileHash(aframePath)
 	consoleJSHash := getFileHash(consoleJSPath)
-	libJSHash := getFileHash(libJSPath)
+	threeJSHash := getFileHash(threeJSPath)
 	indexHash := getFileHash(indexPath)
 
 	// Version format: API-spec-hash + generated-artifacts
-	jsVersion = fmt.Sprintf("%s-%s-%s-%s-%s", 
+	jsVersion = fmt.Sprintf("%s-%s-%s-%s", 
 		apiSpecHash[:8],   // API specification drives everything
-		aframeHash[:8],    // A-Frame bridge (generated)
 		consoleJSHash[:8], // Console UI (generated)
-		libJSHash[:8],     // API client library (generated)
+		threeJSHash[:8],   // Three.js integration
 		indexHash[:8])     // Main UI template
 	jsVersionTime = time.Now()
 }

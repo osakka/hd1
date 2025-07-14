@@ -1,72 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HD1 - Three.js Engine</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: #000;
-            font-family: 'Courier New', monospace;
-        }
-        
-        #loading {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #00ff00;
-            font-size: 18px;
-            z-index: 1000;
-        }
-        
-        #hd1-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-    </style>
+    <title>HD1 Holodeck</title>
+    <script src="/static/vendor/threejs/three.min.js"></script>
+    <script src="/static/js/hd1-threejs.js"></script>
+    <link rel="stylesheet" href="/static/css/hd1-console.css">
 </head>
 <body>
-    <div id="loading">HD1 Three.js Engine Loading...</div>
-    <canvas id="hd1-canvas"></canvas>
+    <div id="holodeck-container">
+        <canvas id="holodeck-canvas"></canvas>
+    </div>
     
-    <!-- Three.js Library -->
-    <script src="/static/vendor/threejs/three.min.js"></script>
+    <div id="text-overlay"></div>
     
-    <!-- HD1 Three.js Components -->
-    <script src="/static/js/hd1lib.js"></script>
-    <script src="/static/js/hd1-threejs.js"></script>
-    <script src="/static/js/hd1-sync.js"></script>
-    <script src="/static/js/hd1-ui-components.js"></script>
-    <script src="/static/js/hd1-form-system.js"></script>
+    <div id="debug-panel">
+        <div id="debug-header">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span>HD1 Console</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span id="debug-collapse-icon">&#8679;</span>
+            </div>
+        </div>
+        <div id="debug-content">
+            <div id="debug-scene-bar">
+                <select id="debug-scene-select">
+                    <option value="">Select Scene...</option>
+                    <option value="empty">Empty Grid</option>
+                    <option value="basic-shapes">Basic Shapes</option>
+                </select>
+            </div>
+            <div id="debug-controls-bar">
+                <div class="control-buttons-container">
+                    <button id="rebootstrap-btn" class="control-btn rebootstrap-btn" title="Rebootstrap: Clear storage and reload page">REBOOTSTRAP</button>
+                </div>
+                <span id="recording-status" class="recording-status"></span>
+            </div>
+            <div id="debug-log"></div>
+        </div>
+        <div id="debug-status-bar">
+            <div class="status-left">
+                <span id="status-connection-indicator" class="connecting"></span>
+                <span id="status-connection-text">Connecting</span>
+            </div>
+            <div class="status-right">
+                <span id="status-lock-indicator" class="unlocked"></span>
+                <span id="session-id-tag-status" style="display: none;" title="Click to copy session ID">---</span>
+            </div>
+        </div>
+    </div>
+    
     <script src="/static/js/hd1-console.js"></script>
-    
-    <script>
-        // Initialize HD1 Three.js Engine
-        document.addEventListener('DOMContentLoaded', () => {
-            const loading = document.getElementById('loading');
-            
-            try {
-                // Initialize HD1 Three.js Console
-                window.hd1Console = new HD1Console();
-                
-                // Hide loading screen
-                loading.style.display = 'none';
-                
-                console.log('HD1 Three.js Engine initialized successfully');
-            } catch (error) {
-                console.error('HD1 initialization failed:', error);
-                loading.textContent = 'HD1 initialization failed: ' + error.message;
-                loading.style.color = '#ff0000';
-            }
-        });
-    </script>
 </body>
 </html>

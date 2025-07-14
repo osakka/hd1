@@ -1,0 +1,293 @@
+body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: monospace; }
+a-scene { display: block; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+#text-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    font-family: 'Arial', sans-serif;
+}
+
+.text-element {
+    position: absolute;
+    white-space: nowrap;
+    transform-origin: center center;
+    transition: all 0.3s ease;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-weight: bold;
+}
+
+.text-element.animate {
+    transition: transform 0.1s linear;
+}
+
+#debug-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 450px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #00ffff;
+    z-index: 100;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#debug-header {
+    background: rgba(0, 255, 255, 0.1);
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 20px;
+}
+
+#debug-scene-bar {
+    background: rgba(0, 255, 255, 0.08);
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    font-size: 9px;
+    transition: height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    overflow: hidden;
+    min-height: 20px;
+}
+
+#debug-scene-bar.collapsed {
+    height: 0;
+    padding: 0 8px;
+    opacity: 0;
+    min-height: 0;
+}
+
+#debug-controls-bar {
+    background: rgba(0, 255, 255, 0.05);
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 9px;
+    transition: height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    overflow: hidden;
+    min-height: 20px;
+}
+
+#debug-controls-bar.collapsed {
+    height: 0;
+    padding: 0 8px;
+    opacity: 0;
+    min-height: 0;
+}
+
+.control-buttons-container {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.control-btn {
+    background: rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    color: #00ffff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+    background: rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+}
+
+.control-btn.active {
+    background: rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+}
+
+.rebootstrap-btn {
+    background: rgba(255, 165, 0, 0.2);
+    border-color: rgba(255, 165, 0, 0.5);
+    color: #ff9500;
+}
+
+.rebootstrap-btn:hover {
+    background: rgba(255, 165, 0, 0.3);
+    box-shadow: 0 0 8px rgba(255, 165, 0, 0.4);
+}
+
+#debug-scene-select {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: #00ffff;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    flex: 1;
+    cursor: pointer;
+}
+
+#debug-scene-select:hover {
+    border-color: rgba(0, 255, 255, 0.5);
+}
+
+#debug-log {
+    padding: 8px;
+    height: 200px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    font-size: 9px;
+    line-height: 1.2;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    transition: height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+#debug-log.collapsed {
+    height: 0;
+    padding: 0 8px;
+    opacity: 0;
+}
+
+#debug-status-bar {
+    background: rgba(0, 255, 255, 0.1);
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8px;
+    flex-shrink: 0;
+    min-height: 16px;
+}
+
+.status-left, .status-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#status-connection-indicator, #status-lock-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+#status-connection-indicator.connecting {
+    background: #ff9500;
+    animation: pulse 1.5s infinite;
+}
+
+#status-connection-indicator.connected {
+    background: #00ff00;
+}
+
+#status-connection-indicator.disconnected {
+    background: #ff0000;
+    animation: flicker 1s infinite;
+}
+
+#status-connection-indicator.receiving {
+    background: #00ffff;
+    animation: pulse 0.5s infinite;
+}
+
+#status-lock-indicator.unlocked {
+    background: #00ff00;
+}
+
+#status-lock-indicator.locked {
+    background: #ff9500;
+}
+
+#session-id-tag-status {
+    cursor: pointer;
+    padding: 1px 3px;
+    border-radius: 2px;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    transition: all 0.2s ease;
+}
+
+#session-id-tag-status:hover {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.4);
+}
+
+.recording-status {
+    font-size: 8px;
+    color: #ff9500;
+    font-weight: bold;
+}
+
+.recording-status.recording {
+    color: #ff0000;
+    animation: pulse 1s infinite;
+}
+
+#debug-collapse-icon {
+    transition: transform 0.3s ease;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+#debug-collapse-icon.collapsed {
+    transform: rotate(180deg);
+}
+
+#debug-content {
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    overflow: hidden;
+}
+
+#debug-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+/* Scrollbar styling */
+#debug-log::-webkit-scrollbar {
+    width: 4px;
+}
+
+#debug-log::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#debug-log::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 2px;
+}
+
+#debug-log::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.5);
+}

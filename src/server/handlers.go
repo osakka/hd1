@@ -67,28 +67,3 @@ func ServeConsoleJS(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ServeAFrameJS serves the hd1-aframe.js with template processing and API-driven versioning
-func ServeAFrameJS(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	
-	// Check if template processor is initialized
-	if templateProcessor == nil {
-		logging.Error("template processor not initialized", map[string]interface{}{
-			"handler": "ServeAFrameJS",
-		})
-		http.Error(w, "Server configuration error", http.StatusInternalServerError)
-		return
-	}
-	
-	// Serve template-processed A-Frame JavaScript with API-driven cache busting
-	if err := templateProcessor.ServeTemplate(w, r, "static/js/hd1-aframe.js", "application/javascript"); err != nil {
-		logging.Error("failed to serve aframe template", map[string]interface{}{
-			"error": err.Error(),
-		})
-		http.Error(w, "Template processing failed", http.StatusInternalServerError)
-		return
-	}
-}
