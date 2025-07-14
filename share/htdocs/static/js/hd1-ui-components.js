@@ -17,93 +17,31 @@ class HD1UIComponents {
     initializeComponents() {
         console.log('🎨 Initializing auto-generated UI components...');
 
-        this.components.set('getfullsync', this.createGetFullSyncComponent());
-
-        this.components.set('getsyncstats', this.createGetSyncStatsComponent());
-
         this.components.set('updateentity', this.createUpdateEntityComponent());
 
         this.components.set('deleteentity', this.createDeleteEntityComponent());
 
         this.components.set('moveavatar', this.createMoveAvatarComponent());
 
+        this.components.set('updatescene', this.createUpdateSceneComponent());
+
+        this.components.set('getscene', this.createGetSceneComponent());
+
         this.components.set('getversion', this.createGetVersionComponent());
 
         this.components.set('submitoperation', this.createSubmitOperationComponent());
 
-        this.components.set('createentity', this.createCreateEntityComponent());
-
-        this.components.set('getscene', this.createGetSceneComponent());
-
-        this.components.set('updatescene', this.createUpdateSceneComponent());
-
         this.components.set('getmissingoperations', this.createGetMissingOperationsComponent());
+
+        this.components.set('getfullsync', this.createGetFullSyncComponent());
+
+        this.components.set('getsyncstats', this.createGetSyncStatsComponent());
+
+        this.components.set('createentity', this.createCreateEntityComponent());
 
         console.log('✅ UI components initialized');
     }
 
-
-    // Component for GET /sync/full
-    createGetFullSyncComponent() {
-        return {
-            name: 'getfullsync',
-            endpoint: '/sync/full',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>GetFullSync</h4><form id="getFullSync-form"><button type="submit">Execute</button></form><div id="getFullSync-result" class="result-area"></div></div>';
-                this.attachEventListeners('getfullsync', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getFullSync();
-                    this.showResult('getfullsync', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getfullsync', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /sync/stats
-    createGetSyncStatsComponent() {
-        return {
-            name: 'getsyncstats',
-            endpoint: '/sync/stats',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>GetSyncStats</h4><form id="getSyncStats-form"><button type="submit">Execute</button></form><div id="getSyncStats-result" class="result-area"></div></div>';
-                this.attachEventListeners('getsyncstats', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getSyncStats();
-                    this.showResult('getsyncstats', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getsyncstats', error);
-                    throw error;
-                }
-            }
-        };
-    }
 
     // Component for PUT /threejs/entities/{entityId}
     createUpdateEntityComponent() {
@@ -198,6 +136,68 @@ class HD1UIComponents {
         };
     }
 
+    // Component for PUT /threejs/scene
+    createUpdateSceneComponent() {
+        return {
+            name: 'updatescene',
+            endpoint: '/threejs/scene',
+            method: 'PUT',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>UpdateScene</h4><form id="updateScene-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="updateScene-result" class="result-area"></div></div>';
+                this.attachEventListeners('updatescene', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.updateScene(formData);
+                    this.showResult('updatescene', result);
+                    return result;
+                } catch (error) {
+                    this.showError('updatescene', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /threejs/scene
+    createGetSceneComponent() {
+        return {
+            name: 'getscene',
+            endpoint: '/threejs/scene',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>GetScene</h4><form id="getScene-form"><button type="submit">Execute</button></form><div id="getScene-result" class="result-area"></div></div>';
+                this.attachEventListeners('getscene', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.getScene();
+                    this.showResult('getscene', result);
+                    return result;
+                } catch (error) {
+                    this.showError('getscene', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
     // Component for GET /system/version
     createGetVersionComponent() {
         return {
@@ -260,99 +260,6 @@ class HD1UIComponents {
         };
     }
 
-    // Component for POST /threejs/entities
-    createCreateEntityComponent() {
-        return {
-            name: 'createentity',
-            endpoint: '/threejs/entities',
-            method: 'POST',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>CreateEntity</h4><form id="createEntity-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="createEntity-result" class="result-area"></div></div>';
-                this.attachEventListeners('createentity', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.createEntity(formData);
-                    this.showResult('createentity', result);
-                    return result;
-                } catch (error) {
-                    this.showError('createentity', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for GET /threejs/scene
-    createGetSceneComponent() {
-        return {
-            name: 'getscene',
-            endpoint: '/threejs/scene',
-            method: 'GET',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>GetScene</h4><form id="getScene-form"><button type="submit">Execute</button></form><div id="getScene-result" class="result-area"></div></div>';
-                this.attachEventListeners('getscene', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.getScene();
-                    this.showResult('getscene', result);
-                    return result;
-                } catch (error) {
-                    this.showError('getscene', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
-    // Component for PUT /threejs/scene
-    createUpdateSceneComponent() {
-        return {
-            name: 'updatescene',
-            endpoint: '/threejs/scene',
-            method: 'PUT',
-            
-            render: (containerId) => {
-                const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error('Container not found:', containerId);
-                    return;
-                }
-                
-                container.innerHTML = '<div class="hd1-component"><h4>UpdateScene</h4><form id="updateScene-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="updateScene-result" class="result-area"></div></div>';
-                this.attachEventListeners('updatescene', container);
-            },
-            
-            execute: async (formData) => {
-                try {
-                    const result = await this.api.updateScene(formData);
-                    this.showResult('updatescene', result);
-                    return result;
-                } catch (error) {
-                    this.showError('updatescene', error);
-                    throw error;
-                }
-            }
-        };
-    }
-
     // Component for GET /sync/missing/{from}/{to}
     createGetMissingOperationsComponent() {
         return {
@@ -378,6 +285,99 @@ class HD1UIComponents {
                     return result;
                 } catch (error) {
                     this.showError('getmissingoperations', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /sync/full
+    createGetFullSyncComponent() {
+        return {
+            name: 'getfullsync',
+            endpoint: '/sync/full',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>GetFullSync</h4><form id="getFullSync-form"><button type="submit">Execute</button></form><div id="getFullSync-result" class="result-area"></div></div>';
+                this.attachEventListeners('getfullsync', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.getFullSync();
+                    this.showResult('getfullsync', result);
+                    return result;
+                } catch (error) {
+                    this.showError('getfullsync', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for GET /sync/stats
+    createGetSyncStatsComponent() {
+        return {
+            name: 'getsyncstats',
+            endpoint: '/sync/stats',
+            method: 'GET',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>GetSyncStats</h4><form id="getSyncStats-form"><button type="submit">Execute</button></form><div id="getSyncStats-result" class="result-area"></div></div>';
+                this.attachEventListeners('getsyncstats', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.getSyncStats();
+                    this.showResult('getsyncstats', result);
+                    return result;
+                } catch (error) {
+                    this.showError('getsyncstats', error);
+                    throw error;
+                }
+            }
+        };
+    }
+
+    // Component for POST /threejs/entities
+    createCreateEntityComponent() {
+        return {
+            name: 'createentity',
+            endpoint: '/threejs/entities',
+            method: 'POST',
+            
+            render: (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
+                
+                container.innerHTML = '<div class="hd1-component"><h4>CreateEntity</h4><form id="createEntity-form"><div class="form-field"><label for="data">Request Body (JSON):</label><textarea name="data" placeholder="{}"></textarea></div><button type="submit">Execute</button></form><div id="createEntity-result" class="result-area"></div></div>';
+                this.attachEventListeners('createentity', container);
+            },
+            
+            execute: async (formData) => {
+                try {
+                    const result = await this.api.createEntity(formData);
+                    this.showResult('createentity', result);
+                    return result;
+                } catch (error) {
+                    this.showError('createentity', error);
                     throw error;
                 }
             }

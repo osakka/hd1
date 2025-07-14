@@ -57,20 +57,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /sync/full - getFullSync
-     */
-    async getFullSync() {
-        return this.request('GET', '/sync/full');
-    }
-
-    /**
-     * GET /sync/stats - getSyncStats
-     */
-    async getSyncStats() {
-        return this.request('GET', '/sync/stats');
-    }
-
-    /**
      * POST /sync/operations - submitOperation
      */
     async submitOperation(data = null) {
@@ -83,6 +69,20 @@ class HD1ThreeJSAPIClient {
     async getMissingOperations(param1, param2) {
         const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
         return this.request('GET', path);
+    }
+
+    /**
+     * GET /sync/full - getFullSync
+     */
+    async getFullSync() {
+        return this.request('GET', '/sync/full');
+    }
+
+    /**
+     * GET /sync/stats - getSyncStats
+     */
+    async getSyncStats() {
+        return this.request('GET', '/sync/stats');
     }
 
 
@@ -116,10 +116,10 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * POST /threejs/entities - createEntity
+     * PUT /threejs/scene - updateScene
      */
-    async createEntity(data = null) {
-        return this.request('POST', '/threejs/entities', data);
+    async updateScene(data = null) {
+        return this.request('PUT', '/threejs/scene', data);
     }
 
     /**
@@ -130,10 +130,10 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * PUT /threejs/scene - updateScene
+     * POST /threejs/entities - createEntity
      */
-    async updateScene(data = null) {
-        return this.request('PUT', '/threejs/scene', data);
+    async createEntity(data = null) {
+        return this.request('POST', '/threejs/entities', data);
     }
 
 

@@ -51,16 +51,6 @@ hd1_json_escape() {
 # ========================================
 
 
-# GET /sync/full - getFullSync
-hd1_getFullSync() {
-    hd1_request "GET" "/sync/full" "$1"
-}
-
-# GET /sync/stats - getSyncStats
-hd1_getSyncStats() {
-    hd1_request "GET" "/sync/stats" "$1"
-}
-
 # POST /sync/operations - submitOperation
 hd1_submitOperation() {
     hd1_request "POST" "/sync/operations" "$1"
@@ -69,6 +59,16 @@ hd1_submitOperation() {
 # GET /sync/missing/{from}/{to} - getMissingOperations
 hd1_getMissingOperations() {
     hd1_request "GET" "/sync/missing/{from}/{to}" "$1"
+}
+
+# GET /sync/full - getFullSync
+hd1_getFullSync() {
+    hd1_request "GET" "/sync/full" "$1"
+}
+
+# GET /sync/stats - getSyncStats
+hd1_getSyncStats() {
+    hd1_request "GET" "/sync/stats" "$1"
 }
 
 
@@ -92,9 +92,9 @@ hd1_moveAvatar() {
     hd1_request "POST" "/threejs/avatars/{sessionId}/move" "$1"
 }
 
-# POST /threejs/entities - createEntity
-hd1_createEntity() {
-    hd1_request "POST" "/threejs/entities" "$1"
+# PUT /threejs/scene - updateScene
+hd1_updateScene() {
+    hd1_request "PUT" "/threejs/scene" "$1"
 }
 
 # GET /threejs/scene - getScene
@@ -102,9 +102,9 @@ hd1_getScene() {
     hd1_request "GET" "/threejs/scene" "$1"
 }
 
-# PUT /threejs/scene - updateScene
-hd1_updateScene() {
-    hd1_request "PUT" "/threejs/scene" "$1"
+# POST /threejs/entities - createEntity
+hd1_createEntity() {
+    hd1_request "POST" "/threejs/entities" "$1"
 }
 
 

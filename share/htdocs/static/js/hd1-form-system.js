@@ -25,6 +25,11 @@ class HD1FormSystem {
         "submitText": "Execute POST",
         "fields": {"param1": {"type": "string", "title": "Parameter 1", "required": true}, "data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
+        this.formSchemas.set('updateSceneForm', {
+        "title": "UpdateScene",
+        "submitText": "Execute PUT",
+        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
+
         this.formSchemas.set('submitOperationForm', {
         "title": "SubmitOperation",
         "submitText": "Execute POST",
@@ -33,11 +38,6 @@ class HD1FormSystem {
         this.formSchemas.set('createEntityForm', {
         "title": "CreateEntity",
         "submitText": "Execute POST",
-        "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
-
-        this.formSchemas.set('updateSceneForm', {
-        "title": "UpdateScene",
-        "submitText": "Execute PUT",
         "fields": {"data": {"type": "string", "title": "Request Body (JSON)", "placeholder": "{}"}}});
 
         console.log('✅ Form schemas initialized');

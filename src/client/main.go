@@ -26,28 +26,28 @@ func main() {
 	command := os.Args[1]
 	
 	switch command {
-	case "get-full-sync":
-		getFullSync()
-	case "get-sync-stats":
-		getSyncStats()
 	case "update-entity":
 		updateEntity()
 	case "delete-entity":
 		deleteEntity()
 	case "move-avatar":
 		moveAvatar()
+	case "update-scene":
+		updateScene()
+	case "get-scene":
+		getScene()
 	case "get-version":
 		getVersion()
 	case "submit-operation":
 		submitOperation()
-	case "create-entity":
-		createEntity()
-	case "get-scene":
-		getScene()
-	case "update-scene":
-		updateScene()
 	case "get-missing-operations":
 		getMissingOperations()
+	case "get-full-sync":
+		getFullSync()
+	case "get-sync-stats":
+		getSyncStats()
+	case "create-entity":
+		createEntity()
 	case "help":
 		showHelp()
 	default:
@@ -60,17 +60,17 @@ func main() {
 func showHelp() {
 	fmt.Println("HD1 Client - Auto-generated from API specification")
 	fmt.Println("Available commands:")
-	fmt.Println("  get-full-sync - GET /sync/full")
-	fmt.Println("  get-sync-stats - GET /sync/stats")
 	fmt.Println("  update-entity - PUT /threejs/entities/{entityId}")
 	fmt.Println("  delete-entity - DELETE /threejs/entities/{entityId}")
 	fmt.Println("  move-avatar - POST /threejs/avatars/{sessionId}/move")
+	fmt.Println("  update-scene - PUT /threejs/scene")
+	fmt.Println("  get-scene - GET /threejs/scene")
 	fmt.Println("  get-version - GET /system/version")
 	fmt.Println("  submit-operation - POST /sync/operations")
-	fmt.Println("  create-entity - POST /threejs/entities")
-	fmt.Println("  get-scene - GET /threejs/scene")
-	fmt.Println("  update-scene - PUT /threejs/scene")
 	fmt.Println("  get-missing-operations - GET /sync/missing/{from}/{to}")
+	fmt.Println("  get-full-sync - GET /sync/full")
+	fmt.Println("  get-sync-stats - GET /sync/stats")
+	fmt.Println("  create-entity - POST /threejs/entities")
 
 }
 
@@ -122,14 +122,6 @@ func makeRequest(method, path string, body interface{}) {
 }
 
 
-func getFullSync() {
-	makeRequest("GET", "/sync/full", nil)
-}
-
-func getSyncStats() {
-	makeRequest("GET", "/sync/stats", nil)
-}
-
 func updateEntity() {
 	if len(os.Args) < 3 {
 		fmt.Println("Error: Missing required parameter")
@@ -168,6 +160,21 @@ func moveAvatar() {
 	makeRequest("POST", "/threejs/avatars/" + os.Args[2] + "/move", body)
 }
 
+func updateScene() {
+	var body interface{}
+	if len(os.Args) > 2 {
+		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	makeRequest("PUT", "/threejs/scene", body)
+}
+
+func getScene() {
+	makeRequest("GET", "/threejs/scene", nil)
+}
+
 func getVersion() {
 	makeRequest("GET", "/system/version", nil)
 }
@@ -183,6 +190,22 @@ func submitOperation() {
 	makeRequest("POST", "/sync/operations", body)
 }
 
+func getMissingOperations() {
+	if len(os.Args) < 4 {
+		fmt.Println("Error: Missing required parameters")
+		os.Exit(1)
+	}
+	makeRequest("GET", "/sync/missing/" + os.Args[2] + "/" + os.Args[3] + "", nil)
+}
+
+func getFullSync() {
+	makeRequest("GET", "/sync/full", nil)
+}
+
+func getSyncStats() {
+	makeRequest("GET", "/sync/stats", nil)
+}
+
 func createEntity() {
 	var body interface{}
 	if len(os.Args) > 2 {
@@ -192,27 +215,4 @@ func createEntity() {
 		}
 	}
 	makeRequest("POST", "/threejs/entities", body)
-}
-
-func getScene() {
-	makeRequest("GET", "/threejs/scene", nil)
-}
-
-func updateScene() {
-	var body interface{}
-	if len(os.Args) > 2 {
-		if err := json.Unmarshal([]byte(os.Args[2]), &body); err != nil {
-			fmt.Printf("Error parsing JSON: %v\n", err)
-			os.Exit(1)
-		}
-	}
-	makeRequest("PUT", "/threejs/scene", body)
-}
-
-func getMissingOperations() {
-	if len(os.Args) < 4 {
-		fmt.Println("Error: Missing required parameters")
-		os.Exit(1)
-	}
-	makeRequest("GET", "/sync/missing/" + os.Args[2] + "/" + os.Args[3] + "", nil)
 }
