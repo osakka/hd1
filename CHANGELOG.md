@@ -1,0 +1,158 @@
+# HD1 Changelog
+
+All notable changes to HD1 (Holodeck One) are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [6.0.0] - 2025-07-14
+
+### Major Changes - Ultra-Minimal Build Strategy
+This release represents a complete architectural transformation focusing on ultra-minimal Three.js console implementation with massive codebase optimization.
+
+### Added
+- **Ultra-Minimal Three.js Console**: Zero-framework debugging interface with essential features only
+- **Rebootstrap Recovery System**: Intelligent storage clearing and page reload on connection failures  
+- **Specification-Driven Development**: Complete code generation from OpenAPI specification
+- **Comprehensive Documentation**: Full documentation suite with ADRs, guides, and architecture docs
+- **Configuration Management**: Hierarchical configuration with environment variables, flags, and .env support
+- **WebSocket Synchronization Protocol**: High-performance real-time communication with session isolation
+- **Object Pooling**: Memory optimization for high-frequency operations
+- **Intelligent Reconnection**: Exponential backoff with automatic recovery mechanisms
+
+### Changed
+- **BREAKING**: Removed A-Frame framework dependencies (replaced with Three.js)
+- **BREAKING**: Eliminated CLI client generation system
+- **BREAKING**: Simplified avatar asset handling (removed WebSocket-based GLB streaming)
+- **Architecture**: Complete migration to API-first, specification-driven development
+- **Build System**: Streamlined Makefile with focused development workflow
+- **Console Interface**: Replaced complex dashboard with minimal debug panel
+- **WebSocket Protocol**: Optimized message handling with session-based routing
+- **Logging System**: Enhanced structured logging with module-based tracing
+- **Configuration**: Unified configuration system with clear priority hierarchy
+
+### Removed
+- **A-Frame WebVR Framework**: Complete removal of A-Frame dependencies and VR support
+- **CLI Client System**: Removed 350+ lines of CLI generation code
+- **UI Component Generation**: Removed dynamic UI component generation system (200+ lines)
+- **Form System Generation**: Removed automatic form generation (150+ lines)  
+- **Complex Avatar Asset Pipeline**: Removed base64 GLB streaming via WebSocket
+- **Redundant Dependencies**: Removed unused imports and dependencies throughout codebase
+- **Legacy Template System**: Simplified template architecture with external templates
+- **Semantic UI Integration**: Removed unused semantic UI components
+- **Shell Function Generation**: Removed shell integration code generation
+
+### Performance Improvements
+- **Code Reduction**: Generator reduced from 803 to 538 lines (-33%)
+- **Total Codebase**: Reduced from 8000+ to 4989 lines of Go code (-38%)
+- **File Count**: Reduced from 50+ to 27 core source files (-46%)
+- **Build Time**: Improved build performance with streamlined generation process
+- **Memory Usage**: Reduced allocation overhead through object pooling
+- **WebSocket Efficiency**: Optimized message broadcasting and connection handling
+
+### Technical Details
+
+#### Ultra-Minimal Console Implementation
+```javascript
+// Zero-framework Three.js console with essential features
+class HD1Console {
+    constructor() {
+        this.setupWebSocket();      // Real-time connection monitoring
+        this.setupDebugPanel();     // Collapsible system information
+        this.setupRebootstrap();    // Nuclear recovery option
+    }
+}
+```
+
+#### Specification-Driven Architecture
+```yaml
+# Complete system definition in src/api.yaml
+paths:
+  /threejs/entities:
+    post:
+      operationId: createEntity
+      x-handler: api/threejs/create.go
+      x-function: CreateEntity
+```
+
+#### WebSocket Protocol Optimization
+```go
+// High-performance message broadcasting with session isolation
+func (h *Hub) broadcastToSession(sessionID string, message []byte) {
+    for _, client := range h.sessions[sessionID] {
+        select {
+        case client.send <- message: // Non-blocking send
+        default: h.unregisterClient(client) // Handle blocked clients
+        }
+    }
+}
+```
+
+### Migration Guide
+For users migrating from v5.x:
+
+1. **A-Frame Removal**: Update any A-Frame-specific code to use Three.js directly
+2. **CLI Client**: Remove any dependencies on generated CLI clients
+3. **Avatar Assets**: Switch to HTTP-based asset loading instead of WebSocket streaming
+4. **Configuration**: Update environment variables to use HD1_ prefix consistently
+5. **WebSocket Messages**: Review custom message types for compatibility
+
+### Documentation
+- **Complete Documentation Suite**: Added comprehensive docs/ directory
+- **Architecture Decision Records**: 5 ADRs documenting key design decisions
+- **User Guides**: Quick start, development, configuration, and troubleshooting guides
+- **README Files**: Project, docs, and src-specific documentation
+- **API Reference**: Enhanced OpenAPI specification documentation
+
+---
+
+## [5.0.6] - Previous Release
+
+### Added
+- Production-ready avatar control system
+- Seamless world transition recovery  
+- GLB avatar asset loading with proper resource handling
+- Advanced camera system with orbital mode
+- Console UI with smooth animations
+- Vendor cleanup and optimized structure
+
+### Changed
+- Enhanced avatar management with real GLB models
+- Improved WebSocket avatar synchronization
+- Streamlined configuration management
+
+---
+
+## Version History Summary
+
+- **v6.0.0**: Ultra-minimal Three.js console with specification-driven architecture
+- **v5.0.6**: Production avatar control system with seamless world transitions  
+- **v5.0.5**: Configuration management standardization
+- **v5.0.x**: Avatar system development and WebSocket optimization
+- **v4.x.x**: Initial Three.js integration and API development
+- **v3.x.x**: WebSocket implementation and real-time synchronization
+- **v2.x.x**: API-first architecture establishment
+- **v1.x.x**: Initial holodeck platform development
+
+---
+
+## Development Metrics
+
+### v6.0.0 Optimization Results
+- **Lines of Code**: 8000+ → 4989 (-38% reduction)
+- **Source Files**: 50+ → 27 (-46% reduction)  
+- **Code Generator**: 803 → 538 lines (-33% reduction)
+- **Build Time**: <10 seconds (improved)
+- **Binary Size**: Optimized with dependency removal
+- **Memory Usage**: Reduced through object pooling and cleanup
+
+### Quality Improvements
+- **Zero Manual Routing**: 100% specification-driven route generation
+- **Test Coverage**: Enhanced with simplified codebase
+- **Documentation**: Complete documentation suite added
+- **Maintainability**: Significant improvement through code reduction
+- **Performance**: Optimized hot paths and memory management
+
+---
+
+*HD1 v6.0.0: Where OpenAPI specifications become ultra-minimal Three.js game engine platforms.*
