@@ -17,7 +17,7 @@ curl http://localhost:8080/api/system/version
 
 ## 🏗️ Architecture
 
-- **API-First Design**: 86 REST endpoints auto-generated from OpenAPI specification
+- **API-First Design**: 11 REST endpoints auto-generated from OpenAPI specification
 - **Real-Time Sync**: WebSocket hub with TCP-simple sequence-based synchronization  
 - **Three.js Integration**: Direct WebGL rendering with zero abstraction layers
 - **Specification-Driven**: Single source of truth in `src/api.yaml`
@@ -44,8 +44,8 @@ curl http://localhost:8080/api/system/version
 
 ## 📖 Documentation
 
-- **[Architecture Overview](docs/architecture/README.md)** - System design and components
-- **[User Guides](docs/guides/)** - Development and deployment guides
+- **[Architecture Overview](docs/architecture/overview.md)** - System design and components
+- **[User Guides](docs/guides/)** - Development and configuration guides
 - **[ADR](docs/adr/)** - Architectural decision records
 - **[API Reference](src/api.yaml)** - Complete OpenAPI specification
 
@@ -57,8 +57,8 @@ HD1 follows specification-driven development where `src/api.yaml` is the single 
 # Generate code from specification
 make generate
 
-# Run development build
-make dev
+# Build and start
+make build && make start
 
 # View logs
 make logs
