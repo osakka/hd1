@@ -10,6 +10,8 @@ bin/
 *.exe
 
 # Go build artifacts
+src/holodeck1
+src/client/main
 src/holodeck
 src/thd
 src/vws
