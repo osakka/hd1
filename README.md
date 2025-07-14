@@ -40,7 +40,7 @@ curl http://localhost:8080/api/system/version
 - **Rebootstrap**: Intelligent recovery system clearing storage on connection failures  
 - **Auto-Generation**: Complete routing, client libraries, and API documentation
 - **Configuration Management**: Environment variables, flags, and .env file support
-- **Production Ready**: Comprehensive logging, error handling, and performance optimization
+- **Development Features**: Comprehensive logging, error handling, and performance optimization
 
 ## 📖 Documentation
 
@@ -67,13 +67,13 @@ make logs
 ## 📊 Status
 
 **Current Version**: v6.0.0  
-**Build Status**: ✅ Production Ready  
+**Build Status**: ✅ Development Platform  
 **API Endpoints**: 11 active routes  
 **Code Quality**: Ultra-minimal optimized build
 
 ## 📄 License
 
-Professional holodeck platform - See documentation for details.
+Development platform - See documentation for details.
 
 ---
 

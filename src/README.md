@@ -51,7 +51,7 @@ make logs       # View logs
 - **Zero manual routing** - All routes generated from specification
 - **Ultra-minimal build** - Only essential code included
 - **Specification-driven** - Single source of truth in api.yaml
-- **Production-ready** - Comprehensive error handling and logging
+- **Development-focused** - Comprehensive error handling and logging
 
 ---
 

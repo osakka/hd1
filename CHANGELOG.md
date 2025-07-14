@@ -109,7 +109,7 @@ For users migrating from v5.x:
 ## [5.0.6] - Previous Release
 
 ### Added
-- Production-ready avatar control system
+- Avatar control system with seamless transitions
 - Seamless world transition recovery  
 - GLB avatar asset loading with proper resource handling
 - Advanced camera system with orbital mode

@@ -9,17 +9,17 @@
 - **"API = Control, WebSocket = Sync Extension"**
 
 ## Current State (2025-07-14)
-HD1 v5.0.7 is a **production-ready Three.js game engine** platform with **TCP-simple synchronization** and **pure WebGL rendering**.
+HD1 v5.0.7 is a **Three.js game engine development** platform with **TCP-simple synchronization** and **pure WebGL rendering**.
 
 ### ✅ Current Features
-- **Three.js Integration**: Professional 3D rendering with native Three.js r170
+- **Three.js Integration**: 3D rendering with native Three.js r170
 - **TCP-Simple Sync**: Sequence-based synchronization for bulletproof reliability
 - **Real-Time WebSocket**: Entity lifecycle synchronization with operation ordering
 - **Pure WebGL**: Direct Three.js Scene/Mesh/Material/Geometry operations
 - **Avatar System**: Real-time multiplayer avatars with position synchronization
 - **Entity Management**: Create/update/delete boxes, spheres, and custom geometries
 - **Scene Control**: Background colors, lighting, fog, and camera management
-- **Console UI**: Professional monitoring with Three.js statistics
+- **Console UI**: Debug monitoring with Three.js statistics
 - **HTTP Asset Delivery**: Direct GLB model serving with proper headers
 - **Configuration Management**: Complete system with priority order: Flags > Environment Variables > .env File > Defaults
 
@@ -140,7 +140,7 @@ HD1_DAEMON=false
 - **Performance Monitoring**: WebGL renderer statistics
 
 ## Three.js Integration
-**Production-Ready WebGL**: Direct Three.js r170 with zero abstraction layers
+**Development WebGL**: Direct Three.js r170 with zero abstraction layers
 
 ### Core Three.js Components
 - **Scene**: `new THREE.Scene()` - Root container for all objects

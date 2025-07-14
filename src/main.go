@@ -180,7 +180,7 @@ func main() {
 }
 
 func display_help_information() {
-	fmt.Println("HD1 (Holodeck One) - Professional 3D Holodeck Platform")
+	fmt.Println("HD1 (Holodeck One) - 3D Holodeck Development Platform")
 	fmt.Println("============================================================")
 	fmt.Println()
 	fmt.Println("USAGE:")

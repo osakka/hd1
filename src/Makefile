@@ -1,9 +1,9 @@
-# HD1 (Holodeck One) - Professional Build System
+# HD1 (Holodeck One) - Development Build System
 # Single source of truth: api.yaml drives Three.js transformation
 
 .PHONY: all clean generate build test run validate client logs status start stop restart daemon-start daemon-stop daemon-status
 
-# Professional build directory structure - Configuration-driven
+# Build directory structure - Configuration-driven
 BUILD_DIR = $(shell test -n "$$HD1_BUILD_DIR" && echo "$$HD1_BUILD_DIR" || echo "../build")
 BIN_DIR = $(BUILD_DIR)/bin
 LOG_DIR = $(shell test -n "$$HD1_LOG_DIR" && echo "$$HD1_LOG_DIR" || echo "$(BUILD_DIR)/logs")
@@ -35,7 +35,7 @@ validate:
 	@if [ ! -f api.yaml ]; then echo "FATAL: api.yaml missing!"; exit 1; fi
 	@echo "Three.js specification found"
 
-# Build server with professional artifact management
+# Build server with artifact management
 build: generate
 	@echo "BUILDING HD1 SERVER..."
 	@mkdir -p $(BIN_DIR)
@@ -55,13 +55,13 @@ test: build
 	kill $$SERVER_PID 2>/dev/null || true; \
 	echo "API tests complete"
 
-# Run server with professional logging
+# Run server with logging
 run: build
 	@echo "STARTING HD1 (Holodeck One)..."
 	@mkdir -p $(LOG_DIR) $(RUNTIME_DIR)
 	$(BIN_DIR)/hd1
 
-# Create client wrapper with professional paths
+# Create client wrapper with paths
 client:
 	@echo "CREATING HD1 API CLIENT..."
 	@mkdir -p $(BIN_DIR)
@@ -85,7 +85,7 @@ web:
 	@echo "Three.js web resources organized in $(SHARE_DIR)/htdocs/"
 	@echo "Note: Three.js files are served directly from $(SHARE_DIR)/htdocs/static/"
 
-# Professional development status
+# Development status
 build-status:
 	@echo "HD1 BUILD STATUS"
 	@echo "================"
@@ -116,7 +116,7 @@ deep-clean:
 	@rm -f auto_router.go
 	@echo "Deep clean complete"
 
-# Professional daemon control
+# Daemon control
 start: build
 	@echo "Starting HD1 daemon..."
 	@mkdir -p $(RUNTIME_DIR)
