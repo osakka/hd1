@@ -1,0 +1,959 @@
+openapi: 3.0.3
+info:
+  title: HD1 Universal 3D Interface API
+  description: |
+    Universal 3D interface platform enabling any service to render visual interfaces
+    in shared immersive environments. Supports web, mobile, LLM, and service clients.
+    
+    **UNIVERSAL INTERFACE PRINCIPLES:**
+    - Any service can register and render 3D interfaces
+    - Multi-tenant, multi-scene, multi-client architecture
+    - Real-time collaboration with sub-100ms latency
+    - AI-native with built-in LLM integration
+    - Cross-platform: web, mobile, AR/VR, desktop
+    - Event-driven service-to-service communication
+    
+    **TARGET CLIENTS:**
+    1. Web/Mobile Users - Interactive 3D experiences
+    2. LLMs - AI agents with visual understanding
+    3. Services - Any API becomes 3D interface
+    
+  version: 7.0.0
+  contact:
+    name: HD1 Universal Interface Engine
+    
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+  - url: https://api.hd1.universe/v7
+    description: Production server
+
+security:
+  - OAuth2: []
+  - ApiKey: []
+
+paths:
+  # ========================================
+  # SESSION MANAGEMENT (Multi-tenant)
+  # ========================================
+  /sessions:
+    get:
+      operationId: listSessions
+      summary: List all sessions
+      description: |
+        Lists all active sessions with filtering, pagination, and permissions.
+        Supports multi-tenant isolation and role-based access control.
+      parameters:
+        - name: filter
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, public, private]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Sessions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  sessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Session'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+    post:
+      operationId: createSession
+      summary: Create new session
+      description: |
+        Creates a new multi-user session with configurable permissions,
+        scene selection, and collaboration settings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+
+  /sessions/{sessionId}:
+    get:
+      operationId: getSession
+      summary: Get session details
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+    put:
+      operationId: updateSession
+      summary: Update session properties
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSessionRequest'
+      responses:
+        '200':
+          description: Session updated successfully
+    delete:
+      operationId: deleteSession
+      summary: Delete session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Session deleted successfully
+
+  /sessions/{sessionId}/join:
+    post:
+      operationId: joinSession
+      summary: Join session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinSessionRequest'
+      responses:
+        '200':
+          description: Successfully joined session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JoinSessionResponse'
+
+  /sessions/{sessionId}/participants:
+    get:
+      operationId: getSessionParticipants
+      summary: List session participants
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Participants retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  participants:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Participant'
+
+  # ========================================
+  # SERVICE INTEGRATION (Universal Registry)
+  # ========================================
+  /services:
+    get:
+      operationId: listServices
+      summary: List registered services
+      description: |
+        Lists all services registered in the universal interface platform.
+        Services can be web apps, APIs, LLMs, or any digital service.
+      responses:
+        '200':
+          description: Services retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  services:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+    post:
+      operationId: registerService
+      summary: Register new service
+      description: |
+        Registers a new service in the universal interface platform.
+        Service can then render 3D interfaces and participate in sessions.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterServiceRequest'
+      responses:
+        '201':
+          description: Service registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+
+  /services/{serviceId}/render:
+    post:
+      operationId: renderService
+      summary: Render service as 3D interface
+      description: |
+        Renders service UI as 3D elements in the specified session.
+        Supports mapping 2D interfaces to 3D spatial representations.
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderServiceRequest'
+      responses:
+        '200':
+          description: Service rendered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderServiceResponse'
+
+  /services/{serviceId}/3d-mapping:
+    post:
+      operationId: create3DMapping
+      summary: Map service UI to 3D space
+      description: |
+        Creates mapping between service's 2D UI elements and 3D spatial positions.
+        Enables automatic 3D interface generation from existing UIs.
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Create3DMappingRequest'
+      responses:
+        '201':
+          description: 3D mapping created successfully
+
+  # ========================================
+  # LLM INTEGRATION (AI-Native)
+  # ========================================
+  /llm/avatars:
+    post:
+      operationId: createLLMAvatar
+      summary: Create LLM avatar
+      description: |
+        Creates an intelligent 3D avatar controlled by an LLM.
+        Avatar can understand visual scenes and interact naturally.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLLMAvatarRequest'
+      responses:
+        '201':
+          description: LLM avatar created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMAvatarResponse'
+
+  /llm/interact:
+    post:
+      operationId: llmInteract
+      summary: LLM interaction endpoint
+      description: |
+        Enables natural language interaction with 3D scenes.
+        LLM can manipulate objects, answer questions, and provide assistance.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LLMInteractRequest'
+      responses:
+        '200':
+          description: LLM interaction processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMInteractResponse'
+
+  /llm/context/{sessionId}:
+    get:
+      operationId: getLLMContext
+      summary: Get scene context for LLM
+      description: |
+        Provides complete scene context to LLM for visual understanding.
+        Includes objects, spatial relationships, and user interactions.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scene context retrieved for LLM
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMContextResponse'
+
+  /llm/generate:
+    post:
+      operationId: generateLLMContent
+      summary: Generate 3D content via LLM
+      description: |
+        Uses LLM to generate 3D content based on natural language descriptions.
+        Can create objects, scenes, animations, and interactions.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateLLMContentRequest'
+      responses:
+        '200':
+          description: 3D content generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateLLMContentResponse'
+
+  # ========================================
+  # COLLABORATION (Real-time Multi-user)
+  # ========================================
+  /collaboration/sessions/{sessionId}/cursors:
+    get:
+      operationId: getSharedCursors
+      summary: Get shared cursors
+      description: |
+        Retrieves all shared 3D cursors in the session for multi-user collaboration.
+        Supports real-time cursor tracking and user presence.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shared cursors retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  cursors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SharedCursor'
+    post:
+      operationId: updateSharedCursor
+      summary: Update cursor position
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCursorRequest'
+      responses:
+        '200':
+          description: Cursor updated successfully
+
+  /collaboration/sessions/{sessionId}/voice:
+    post:
+      operationId: joinVoiceChat
+      summary: Join voice chat
+      description: |
+        Enables spatial voice chat with positional audio in 3D space.
+        Supports WebRTC peer-to-peer connections for low latency.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinVoiceChatRequest'
+      responses:
+        '200':
+          description: Voice chat joined successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JoinVoiceChatResponse'
+
+  /collaboration/sessions/{sessionId}/screen-share:
+    post:
+      operationId: startScreenShare
+      summary: Start screen sharing in 3D
+      description: |
+        Enables screen sharing as 3D surfaces in the virtual environment.
+        Supports multiple simultaneous screen shares with spatial positioning.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartScreenShareRequest'
+      responses:
+        '200':
+          description: Screen sharing started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartScreenShareResponse'
+
+  # ========================================
+  # ANALYTICS (Usage Insights)
+  # ========================================
+  /analytics/sessions/{sessionId}:
+    get:
+      operationId: getSessionAnalytics
+      summary: Get session analytics
+      description: |
+        Provides comprehensive analytics for session usage, performance,
+        and user behavior patterns.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session analytics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionAnalytics'
+
+  /analytics/services/{serviceId}:
+    get:
+      operationId: getServiceAnalytics
+      summary: Get service analytics
+      description: |
+        Provides analytics for service usage patterns, 3D interface effectiveness,
+        and user engagement metrics.
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Service analytics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAnalytics'
+
+  # ========================================
+  # ENHANCED EXISTING ENDPOINTS
+  # ========================================
+  /sync/operations:
+    post:
+      operationId: submitOperation
+      summary: Submit operation to global sequence
+      description: |
+        Enhanced operation submission with service attribution,
+        conflict resolution, and multi-session support.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnhancedOperation'
+      responses:
+        '200':
+          description: Operation submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationResponse'
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.hd1.universe/oauth/authorize
+          tokenUrl: https://auth.hd1.universe/oauth/token
+          scopes:
+            read: Read access
+            write: Write access
+            admin: Admin access
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        owner_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [active, inactive, archived]
+        visibility:
+          type: string
+          enum: [public, private, invite_only]
+        max_participants:
+          type: integer
+        current_participants:
+          type: integer
+        scenes:
+          type: array
+          items:
+            type: string
+        permissions:
+          $ref: '#/components/schemas/Permissions'
+        collaboration_settings:
+          $ref: '#/components/schemas/CollaborationSettings'
+
+    CreateSessionRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        visibility:
+          type: string
+          enum: [public, private, invite_only]
+          default: private
+        max_participants:
+          type: integer
+          default: 10
+        initial_scene:
+          type: string
+        collaboration_settings:
+          $ref: '#/components/schemas/CollaborationSettings'
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [web_app, api, llm, mobile_app, desktop_app]
+        endpoint:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, error]
+        capabilities:
+          type: array
+          items:
+            type: string
+        ui_mapping:
+          $ref: '#/components/schemas/UIMapping'
+        permissions:
+          $ref: '#/components/schemas/Permissions'
+        created_at:
+          type: string
+          format: date-time
+
+    RegisterServiceRequest:
+      type: object
+      required: [name, type, endpoint]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [web_app, api, llm, mobile_app, desktop_app]
+        endpoint:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        ui_mapping:
+          $ref: '#/components/schemas/UIMapping'
+
+    LLMAvatarRequest:
+      type: object
+      required: [name, llm_model]
+      properties:
+        name:
+          type: string
+        llm_model:
+          type: string
+        personality:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        visual_model:
+          type: string
+        voice_model:
+          type: string
+        position:
+          $ref: '#/components/schemas/Vector3'
+
+    RenderServiceRequest:
+      type: object
+      required: [session_id, ui_elements]
+      properties:
+        session_id:
+          type: string
+        ui_elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/UIElement'
+        position:
+          $ref: '#/components/schemas/Vector3'
+        scale:
+          $ref: '#/components/schemas/Vector3'
+        rotation:
+          $ref: '#/components/schemas/Vector3'
+
+    UIElement:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [button, panel, text, image, video, form]
+        content:
+          type: string
+        position:
+          $ref: '#/components/schemas/Vector3'
+        size:
+          $ref: '#/components/schemas/Vector2'
+        style:
+          type: object
+        interactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Interaction'
+
+    UIMapping:
+      type: object
+      properties:
+        mapping_type:
+          type: string
+          enum: [automatic, manual, hybrid]
+        element_mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementMapping'
+        spatial_layout:
+          $ref: '#/components/schemas/SpatialLayout'
+
+    ElementMapping:
+      type: object
+      properties:
+        ui_element_id:
+          type: string
+        spatial_position:
+          $ref: '#/components/schemas/Vector3'
+        spatial_size:
+          $ref: '#/components/schemas/Vector3'
+        interaction_type:
+          type: string
+          enum: [click, hover, drag, gesture]
+
+    SpatialLayout:
+      type: object
+      properties:
+        layout_type:
+          type: string
+          enum: [grid, circular, organic, custom]
+        spacing:
+          type: number
+        orientation:
+          $ref: '#/components/schemas/Vector3'
+        bounds:
+          $ref: '#/components/schemas/BoundingBox'
+
+    BoundingBox:
+      type: object
+      properties:
+        min:
+          $ref: '#/components/schemas/Vector3'
+        max:
+          $ref: '#/components/schemas/Vector3'
+
+    CollaborationSettings:
+      type: object
+      properties:
+        voice_enabled:
+          type: boolean
+          default: true
+        screen_share_enabled:
+          type: boolean
+          default: true
+        shared_cursors_enabled:
+          type: boolean
+          default: true
+        annotations_enabled:
+          type: boolean
+          default: true
+        real_time_sync:
+          type: boolean
+          default: true
+
+    SharedCursor:
+      type: object
+      properties:
+        user_id:
+          type: string
+        position:
+          $ref: '#/components/schemas/Vector3'
+        rotation:
+          $ref: '#/components/schemas/Vector3'
+        color:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    Permissions:
+      type: object
+      properties:
+        read:
+          type: boolean
+        write:
+          type: boolean
+        admin:
+          type: boolean
+        collaborate:
+          type: boolean
+        moderate:
+          type: boolean
+
+    EnhancedOperation:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [avatar_move, entity_create, entity_update, entity_delete, scene_update, service_render, llm_interact]
+        session_id:
+          type: string
+        service_id:
+          type: string
+        user_id:
+          type: string
+        data:
+          type: object
+        conflict_resolution:
+          type: string
+          enum: [last_writer_wins, operational_transform, custom]
+        priority:
+          type: integer
+          minimum: 0
+          maximum: 10
+
+    SessionAnalytics:
+      type: object
+      properties:
+        session_id:
+          type: string
+        duration:
+          type: integer
+        participant_count:
+          type: integer
+        interactions:
+          type: integer
+        services_used:
+          type: array
+          items:
+            type: string
+        performance_metrics:
+          $ref: '#/components/schemas/PerformanceMetrics'
+        user_engagement:
+          $ref: '#/components/schemas/UserEngagement'
+
+    PerformanceMetrics:
+      type: object
+      properties:
+        average_latency:
+          type: number
+        frame_rate:
+          type: number
+        bandwidth_usage:
+          type: number
+        error_rate:
+          type: number
+
+    UserEngagement:
+      type: object
+      properties:
+        interaction_rate:
+          type: number
+        session_duration:
+          type: number
+        return_rate:
+          type: number
+        satisfaction_score:
+          type: number
+
+    Vector2:
+      type: object
+      properties:
+        x:
+          type: number
+        y:
+          type: number
+      required: [x, y]
+
+    Vector3:
+      type: object
+      properties:
+        x:
+          type: number
+        y:
+          type: number
+        z:
+          type: number
+      required: [x, y, z]
+
+    Interaction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [click, hover, drag, gesture, voice, gaze]
+        handler:
+          type: string
+        parameters:
+          type: object
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        has_more:
+          type: boolean
+
+    # Additional response schemas
+    SessionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        session:
+          $ref: '#/components/schemas/Session'
+
+    ServiceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        service:
+          $ref: '#/components/schemas/Service'
+
+    OperationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        seq_num:
+          type: integer
+        message:
+          type: string
