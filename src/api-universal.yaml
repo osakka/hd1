@@ -1,0 +1,668 @@
+openapi: 3.0.3
+info:
+  title: HD1 Universal 3D Interface Platform API
+  description: |
+    Complete API specification for HD1 as a universal 3D interface platform.
+    This represents the target state after all four implementation phases.
+    
+    **TRANSFORMATION SUMMARY:**
+    - Phase 1: Foundation (11 → 30 endpoints)
+    - Phase 2: Collaboration (30 → 60 endpoints)  
+    - Phase 3: AI Integration (60 → 80 endpoints)
+    - Phase 4: Universal Platform (80 → 100+ endpoints)
+    
+    **UNIVERSAL INTERFACE PRINCIPLES:**
+    - Any service can register and render 3D interfaces
+    - Multi-tenant, multi-scene, multi-client architecture
+    - Real-time collaboration with sub-100ms latency
+    - AI-native with built-in LLM integration
+    - Cross-platform: web, mobile, AR/VR, desktop
+    - Event-driven service-to-service communication
+    
+  version: 7.0.0
+  contact:
+    name: HD1 Universal Interface Platform
+    
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+  - url: https://api.hd1.universe/v7
+    description: Production server
+
+security:
+  - OAuth2: []
+  - ApiKey: []
+  - JWT: []
+
+paths:
+  # ========================================
+  # PHASE 1: FOUNDATION (11 → 30 endpoints)
+  # ========================================
+  
+  # Session Management (8 endpoints)
+  /sessions:
+    get:
+      summary: List all sessions
+      operationId: listSessions
+    post:
+      summary: Create new session
+      operationId: createSession
+      
+  /sessions/{sessionId}:
+    get:
+      summary: Get session details
+      operationId: getSession
+    put:
+      summary: Update session
+      operationId: updateSession
+    delete:
+      summary: Delete session
+      operationId: deleteSession
+      
+  /sessions/{sessionId}/join:
+    post:
+      summary: Join session
+      operationId: joinSession
+      
+  /sessions/{sessionId}/participants:
+    get:
+      summary: Get session participants
+      operationId: getSessionParticipants
+      
+  /sessions/{sessionId}/leave:
+    post:
+      summary: Leave session
+      operationId: leaveSession
+
+  # Service Registry (6 endpoints)
+  /services:
+    get:
+      summary: List registered services
+      operationId: listServices
+    post:
+      summary: Register new service
+      operationId: registerService
+      
+  /services/{serviceId}:
+    get:
+      summary: Get service details
+      operationId: getService
+    put:
+      summary: Update service
+      operationId: updateService
+    delete:
+      summary: Delete service
+      operationId: deleteService
+      
+  /services/{serviceId}/health:
+    get:
+      summary: Check service health
+      operationId: checkServiceHealth
+
+  # Authentication (5 endpoints)
+  /auth/login:
+    post:
+      summary: User login
+      operationId: login
+      
+  /auth/logout:
+    post:
+      summary: User logout
+      operationId: logout
+      
+  /auth/refresh:
+    post:
+      summary: Refresh token
+      operationId: refreshToken
+      
+  /auth/sso/{provider}/login:
+    get:
+      summary: SSO login
+      operationId: ssoLogin
+      
+  /auth/sso/{provider}/callback:
+    get:
+      summary: SSO callback
+      operationId: ssoCallback
+
+  # ========================================
+  # PHASE 2: COLLABORATION (30 → 60 endpoints)
+  # ========================================
+  
+  # Real-time Collaboration (10 endpoints)
+  /collaboration/sessions/{sessionId}/cursors:
+    get:
+      summary: Get shared cursors
+      operationId: getSharedCursors
+    post:
+      summary: Update cursor position
+      operationId: updateSharedCursor
+      
+  /collaboration/sessions/{sessionId}/voice:
+    post:
+      summary: Join voice chat
+      operationId: joinVoiceChat
+    delete:
+      summary: Leave voice chat
+      operationId: leaveVoiceChat
+      
+  /collaboration/sessions/{sessionId}/screen-share:
+    post:
+      summary: Start screen sharing
+      operationId: startScreenShare
+    delete:
+      summary: Stop screen sharing
+      operationId: stopScreenShare
+      
+  /collaboration/sessions/{sessionId}/annotations:
+    get:
+      summary: Get annotations
+      operationId: getAnnotations
+    post:
+      summary: Create annotation
+      operationId: createAnnotation
+      
+  /collaboration/sessions/{sessionId}/locks:
+    get:
+      summary: Get object locks
+      operationId: getObjectLocks
+    post:
+      summary: Lock object
+      operationId: lockObject
+
+  # WebRTC Management (8 endpoints)
+  /webrtc/sessions/{sessionId}/peers:
+    get:
+      summary: Get peer connections
+      operationId: getPeerConnections
+      
+  /webrtc/sessions/{sessionId}/offer:
+    post:
+      summary: Create WebRTC offer
+      operationId: createWebRTCOffer
+      
+  /webrtc/sessions/{sessionId}/answer:
+    post:
+      summary: Create WebRTC answer
+      operationId: createWebRTCAnswer
+      
+  /webrtc/sessions/{sessionId}/ice-candidate:
+    post:
+      summary: Add ICE candidate
+      operationId: addICECandidate
+      
+  /webrtc/sessions/{sessionId}/data-channel:
+    post:
+      summary: Create data channel
+      operationId: createDataChannel
+      
+  /webrtc/sessions/{sessionId}/stats:
+    get:
+      summary: Get WebRTC stats
+      operationId: getWebRTCStats
+      
+  /webrtc/sessions/{sessionId}/close:
+    post:
+      summary: Close peer connection
+      operationId: closePeerConnection
+      
+  /webrtc/turn-credentials:
+    get:
+      summary: Get TURN credentials
+      operationId: getTURNCredentials
+
+  # Asset Management (7 endpoints)
+  /assets:
+    get:
+      summary: List assets
+      operationId: listAssets
+    post:
+      summary: Upload asset
+      operationId: uploadAsset
+      
+  /assets/{assetId}:
+    get:
+      summary: Get asset details
+      operationId: getAsset
+    put:
+      summary: Update asset
+      operationId: updateAsset
+    delete:
+      summary: Delete asset
+      operationId: deleteAsset
+      
+  /assets/{assetId}/stream:
+    get:
+      summary: Stream asset
+      operationId: streamAsset
+      
+  /assets/{assetId}/versions:
+    get:
+      summary: Get asset versions
+      operationId: getAssetVersions
+
+  # User Management (5 endpoints)
+  /users:
+    get:
+      summary: List users
+      operationId: listUsers
+    post:
+      summary: Create user
+      operationId: createUser
+      
+  /users/{userId}:
+    get:
+      summary: Get user details
+      operationId: getUser
+    put:
+      summary: Update user
+      operationId: updateUser
+    delete:
+      summary: Delete user
+      operationId: deleteUser
+
+  # ========================================
+  # PHASE 3: AI INTEGRATION (60 → 80 endpoints)
+  # ========================================
+  
+  # LLM Avatar System (8 endpoints)
+  /llm/avatars:
+    get:
+      summary: List LLM avatars
+      operationId: listLLMAvatars
+    post:
+      summary: Create LLM avatar
+      operationId: createLLMAvatar
+      
+  /llm/avatars/{avatarId}:
+    get:
+      summary: Get LLM avatar
+      operationId: getLLMAvatar
+    put:
+      summary: Update LLM avatar
+      operationId: updateLLMAvatar
+    delete:
+      summary: Delete LLM avatar
+      operationId: deleteLLMAvatar
+      
+  /llm/avatars/{avatarId}/interact:
+    post:
+      summary: Interact with LLM avatar
+      operationId: interactWithLLMAvatar
+      
+  /llm/avatars/{avatarId}/memory:
+    get:
+      summary: Get avatar memory
+      operationId: getAvatarMemory
+    post:
+      summary: Update avatar memory
+      operationId: updateAvatarMemory
+
+  # AI Content Generation (6 endpoints)
+  /llm/generate:
+    post:
+      summary: Generate AI content
+      operationId: generateAIContent
+      
+  /llm/generate/object:
+    post:
+      summary: Generate 3D object
+      operationId: generateObject
+      
+  /llm/generate/scene:
+    post:
+      summary: Generate 3D scene
+      operationId: generateScene
+      
+  /llm/generate/texture:
+    post:
+      summary: Generate texture
+      operationId: generateTexture
+      
+  /llm/generate/animation:
+    post:
+      summary: Generate animation
+      operationId: generateAnimation
+      
+  /llm/generate/material:
+    post:
+      summary: Generate material
+      operationId: generateMaterial
+
+  # Computer Vision (4 endpoints)
+  /vision/analyze:
+    post:
+      summary: Analyze scene
+      operationId: analyzeScene
+      
+  /vision/question:
+    post:
+      summary: Answer visual question
+      operationId: answerVisualQuestion
+      
+  /vision/detect:
+    post:
+      summary: Detect objects
+      operationId: detectObjects
+      
+  /vision/relationships:
+    post:
+      summary: Analyze spatial relationships
+      operationId: analyzeSpatialRelationships
+
+  # Analytics (2 endpoints)
+  /analytics/sessions/{sessionId}:
+    get:
+      summary: Get session analytics
+      operationId: getSessionAnalytics
+      
+  /analytics/services/{serviceId}:
+    get:
+      summary: Get service analytics
+      operationId: getServiceAnalytics
+
+  # ========================================
+  # PHASE 4: UNIVERSAL PLATFORM (80 → 100+ endpoints)
+  # ========================================
+  
+  # Plugin System (10 endpoints)
+  /plugins:
+    get:
+      summary: List plugins
+      operationId: listPlugins
+    post:
+      summary: Install plugin
+      operationId: installPlugin
+      
+  /plugins/{pluginId}:
+    get:
+      summary: Get plugin details
+      operationId: getPlugin
+    put:
+      summary: Update plugin
+      operationId: updatePlugin
+    delete:
+      summary: Uninstall plugin
+      operationId: uninstallPlugin
+      
+  /plugins/{pluginId}/start:
+    post:
+      summary: Start plugin
+      operationId: startPlugin
+      
+  /plugins/{pluginId}/stop:
+    post:
+      summary: Stop plugin
+      operationId: stopPlugin
+      
+  /plugins/{pluginId}/health:
+    get:
+      summary: Check plugin health
+      operationId: checkPluginHealth
+      
+  /plugins/marketplace:
+    get:
+      summary: Browse plugin marketplace
+      operationId: browsePluginMarketplace
+      
+  /plugins/marketplace/{pluginId}:
+    get:
+      summary: Get marketplace plugin
+      operationId: getMarketplacePlugin
+
+  # Webhook System (8 endpoints)
+  /webhooks:
+    get:
+      summary: List webhooks
+      operationId: listWebhooks
+    post:
+      summary: Create webhook
+      operationId: createWebhook
+      
+  /webhooks/{webhookId}:
+    get:
+      summary: Get webhook
+      operationId: getWebhook
+    put:
+      summary: Update webhook
+      operationId: updateWebhook
+    delete:
+      summary: Delete webhook
+      operationId: deleteWebhook
+      
+  /webhooks/{webhookId}/test:
+    post:
+      summary: Test webhook
+      operationId: testWebhook
+      
+  /webhooks/{webhookId}/deliveries:
+    get:
+      summary: Get webhook deliveries
+      operationId: getWebhookDeliveries
+      
+  /webhooks/events:
+    get:
+      summary: List available events
+      operationId: listWebhookEvents
+
+  # Enterprise Features (6 endpoints)
+  /enterprise/sso/providers:
+    get:
+      summary: List SSO providers
+      operationId: listSSOProviders
+    post:
+      summary: Create SSO provider
+      operationId: createSSOProvider
+      
+  /enterprise/sso/providers/{providerId}:
+    get:
+      summary: Get SSO provider
+      operationId: getSSOProvider
+    put:
+      summary: Update SSO provider
+      operationId: updateSSOProvider
+    delete:
+      summary: Delete SSO provider
+      operationId: deleteSSOProvider
+      
+  /enterprise/audit:
+    get:
+      summary: Get audit logs
+      operationId: getAuditLogs
+
+  # Cross-Platform Clients (4 endpoints)
+  /clients/mobile/config:
+    get:
+      summary: Get mobile client config
+      operationId: getMobileClientConfig
+      
+  /clients/desktop/config:
+    get:
+      summary: Get desktop client config
+      operationId: getDesktopClientConfig
+      
+  /clients/ar/config:
+    get:
+      summary: Get AR client config
+      operationId: getARClientConfig
+      
+  /clients/vr/config:
+    get:
+      summary: Get VR client config
+      operationId: getVRClientConfig
+
+  # Developer Portal (4 endpoints)
+  /developer/docs:
+    get:
+      summary: Get API documentation
+      operationId: getAPIDocs
+      
+  /developer/examples:
+    get:
+      summary: Get code examples
+      operationId: getCodeExamples
+      
+  /developer/sdk:
+    get:
+      summary: Get SDK downloads
+      operationId: getSDKDownloads
+      
+  /developer/support:
+    get:
+      summary: Get developer support
+      operationId: getDeveloperSupport
+
+  # ========================================
+  # CORE SYNC OPERATIONS (Enhanced)
+  # ========================================
+  /sync/operations:
+    post:
+      summary: Submit operation to global sequence
+      operationId: submitOperation
+      
+  /sync/missing/{from}/{to}:
+    get:
+      summary: Get missing operations
+      operationId: getMissingOperations
+      
+  /sync/full:
+    get:
+      summary: Get full sync for new client
+      operationId: getFullSync
+      
+  /sync/stats:
+    get:
+      summary: Get synchronization statistics
+      operationId: getSyncStats
+
+  # ========================================
+  # THREE.JS ENTITIES (Enhanced)
+  # ========================================
+  /threejs/entities:
+    post:
+      summary: Create Three.js entity
+      operationId: createEntity
+      
+  /threejs/entities/{entityId}:
+    put:
+      summary: Update Three.js entity
+      operationId: updateEntity
+    delete:
+      summary: Delete Three.js entity
+      operationId: deleteEntity
+      
+  /threejs/avatars/{sessionId}/move:
+    post:
+      summary: Move avatar
+      operationId: moveAvatar
+      
+  /threejs/scene:
+    get:
+      summary: Get current scene state
+      operationId: getScene
+    put:
+      summary: Update scene properties
+      operationId: updateScene
+      
+  /system/version:
+    get:
+      summary: Get system version
+      operationId: getVersion
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.hd1.universe/oauth/authorize
+          tokenUrl: https://auth.hd1.universe/oauth/token
+          scopes:
+            read: Read access
+            write: Write access
+            admin: Admin access
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Core schemas from existing API
+    Vector3:
+      type: object
+      properties:
+        x: { type: number }
+        y: { type: number }
+        z: { type: number }
+      required: [x, y, z]
+      
+    # Additional schemas for universal platform
+    Session:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        owner_id: { type: string, format: uuid }
+        status: { type: string, enum: [active, inactive, archived] }
+        visibility: { type: string, enum: [public, private, invite_only] }
+        max_participants: { type: integer }
+        current_participants: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        
+    Service:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        type: { type: string, enum: [web_app, api, llm, mobile_app, desktop_app] }
+        endpoint: { type: string }
+        status: { type: string, enum: [active, inactive, error] }
+        capabilities: { type: array, items: { type: string } }
+        created_at: { type: string, format: date-time }
+        
+    LLMAvatar:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        llm_model: { type: string }
+        personality: { type: string }
+        capabilities: { type: array, items: { type: string } }
+        position: { $ref: '#/components/schemas/Vector3' }
+        session_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        
+    Plugin:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        version: { type: string }
+        description: { type: string }
+        author: { type: string }
+        status: { type: string, enum: [loaded, running, stopped, error] }
+        created_at: { type: string, format: date-time }
+        
+    Webhook:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        url: { type: string }
+        events: { type: array, items: { type: string } }
+        active: { type: boolean }
+        created_at: { type: string, format: date-time }
+
+# Total endpoints: 100+ (actual count based on implementation)
+# - Phase 1: 19 new endpoints (session management, service registry, auth)
+# - Phase 2: 30 new endpoints (collaboration, WebRTC, assets, users) 
+# - Phase 3: 20 new endpoints (LLM avatars, AI generation, vision, analytics)
+# - Phase 4: 32 new endpoints (plugins, webhooks, enterprise, cross-platform)
+# - Core: 11 existing endpoints (enhanced)
+# Total: 112 endpoints in universal platform
