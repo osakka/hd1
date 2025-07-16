@@ -60,14 +60,6 @@ func NewHub() *Hub {
 func (h *Hub) Run() {
 	go h.handleOperations()
 	
-	// Start client lifecycle cleanup ticker (single source of truth)
-	cleanupTicker := time.NewTicker(30 * time.Second)
-	go func() {
-		for range cleanupTicker.C {
-			h.cleanupInactiveClients()
-		}
-	}()
-	
 	for {
 		select {
 		case client := <-h.register:
@@ -133,50 +125,6 @@ func (h *Hub) unregisterClient(client *Client) {
 			"client_id":    client.GetClientID(),
 			"avatar_id":    client.GetAvatarID(),
 			"avatar_count": h.avatarRegistry.GetAvatarCount(),
-		})
-	}
-}
-
-// cleanupInactiveClients removes clients that haven't responded to ping/pong within threshold
-// Uses single source of truth: getPongWait() configuration for timeout
-func (h *Hub) cleanupInactiveClients() {
-	h.mutex.Lock()
-	defer h.mutex.Unlock()
-	
-	pongTimeout := config.GetWebSocketPongTimeout()
-	cutoff := time.Now().Add(-pongTimeout)
-	
-	var expiredClients []*Client
-	for client := range h.clients {
-		if client.lastSeen.Before(cutoff) {
-			expiredClients = append(expiredClients, client)
-		}
-	}
-	
-	for _, client := range expiredClients {
-		logging.Info("client expired due to inactivity", map[string]interface{}{
-			"client_id":    client.GetClientID(),
-			"avatar_id":    client.GetAvatarID(),
-			"last_seen":    client.lastSeen,
-			"timeout":      pongTimeout,
-			"expired_by":   time.Since(client.lastSeen),
-		})
-		
-		// Remove from clients map
-		delete(h.clients, client)
-		
-		// Cleanup avatar
-		h.avatarRegistry.RemoveAvatar(client.GetClientID())
-		
-		// Close connection
-		client.conn.Close()
-	}
-	
-	if len(expiredClients) > 0 {
-		logging.Info("inactive clients cleaned up", map[string]interface{}{
-			"cleaned_count":  len(expiredClients),
-			"remaining_count": len(h.clients),
-			"timeout_used":    pongTimeout,
 		})
 	}
 }
