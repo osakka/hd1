@@ -22,6 +22,9 @@ type Hub struct {
 	unregister chan *Client
 	mutex      stdSync.RWMutex
 	
+	// Avatar management
+	avatarRegistry *AvatarRegistry
+	
 	// Message routing
 	broadcast chan []byte
 }
@@ -38,13 +41,18 @@ type Message struct {
 
 // NewHub creates a new TCP-simple WebSocket hub
 func NewHub() *Hub {
-	return &Hub{
+	hub := &Hub{
 		sync:       sync.NewReliableSync(),
 		clients:    make(map[*Client]bool),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		broadcast:  make(chan []byte, 1000),
 	}
+	
+	// Initialize avatar registry
+	hub.avatarRegistry = NewAvatarRegistry(hub)
+	
+	return hub
 }
 
 // Run starts the hub's main loop
@@ -77,20 +85,26 @@ func (h *Hub) handleOperations() {
 	}
 }
 
-// registerClient adds a client to the hub
+// registerClient adds a client to the hub and creates an avatar
 func (h *Hub) registerClient(client *Client) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 	
 	h.clients[client] = true
 	
-	logging.Info("client registered", map[string]interface{}{
+	// Automatically create avatar for connected client
+	avatar := h.avatarRegistry.CreateAvatar(client)
+	
+	logging.Info("client registered with avatar", map[string]interface{}{
 		"client_count": len(h.clients),
 		"session_id":   client.sessionID,
+		"client_id":    client.GetClientID(),
+		"avatar_id":    avatar.ID,
+		"avatar_count": h.avatarRegistry.GetAvatarCount(),
 	})
 }
 
-// unregisterClient removes a client from the hub
+// unregisterClient removes a client from the hub and cleans up avatar
 func (h *Hub) unregisterClient(client *Client) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
@@ -99,9 +113,17 @@ func (h *Hub) unregisterClient(client *Client) {
 		delete(h.clients, client)
 		close(client.send)
 		
-		logging.Info("client unregistered", map[string]interface{}{
+		// Remove avatar when client disconnects
+		if avatarID := client.GetAvatarID(); avatarID != "" {
+			h.avatarRegistry.RemoveAvatar(avatarID)
+		}
+		
+		logging.Info("client unregistered with avatar cleanup", map[string]interface{}{
 			"client_count": len(h.clients),
 			"session_id":   client.sessionID,
+			"client_id":    client.GetClientID(),
+			"avatar_id":    client.GetAvatarID(),
+			"avatar_count": h.avatarRegistry.GetAvatarCount(),
 		})
 	}
 }
@@ -172,4 +194,9 @@ func (h *Hub) GetFullSync() []*sync.Operation {
 // GetMissingOperations returns operations in a range
 func (h *Hub) GetMissingOperations(from, to uint64) []*sync.Operation {
 	return h.sync.GetOperationsInRange(from, to)
+}
+
+// GetAvatarRegistry returns the avatar registry
+func (h *Hub) GetAvatarRegistry() *AvatarRegistry {
+	return h.avatarRegistry
 }

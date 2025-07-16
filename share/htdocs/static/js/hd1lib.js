@@ -57,6 +57,13 @@ class HD1ThreeJSAPIClient {
 
 
     /**
+     * POST /sync/operations - submitOperation
+     */
+    async submitOperation(data = null) {
+        return this.request('POST', '/sync/operations', data);
+    }
+
+    /**
      * GET /sync/missing/{from}/{to} - getMissingOperations
      */
     async getMissingOperations(param1, param2) {
@@ -72,13 +79,6 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * POST /sync/operations - submitOperation
-     */
-    async submitOperation(data = null) {
-        return this.request('POST', '/sync/operations', data);
-    }
-
-    /**
      * GET /sync/stats - getSyncStats
      */
     async getSyncStats() {
@@ -87,53 +87,31 @@ class HD1ThreeJSAPIClient {
 
 
     // ========================================
-    // THREE.JS ENTITIES (Generated from spec)
+    // ENTITIES (Generated from spec)
     // ========================================
 
 
     /**
-     * PUT /threejs/entities/{entityId} - updateEntity
+     * POST /entities - createEntity
+     */
+    async createEntity(data = null) {
+        return this.request('POST', '/entities', data);
+    }
+
+    /**
+     * PUT /entities/{entityId} - updateEntity
      */
     async updateEntity(param1, data = null) {
-        const path = this.extractPathParams('/threejs/entities/{entityId}', [param1]);
+        const path = this.extractPathParams('/entities/{entityId}', [param1]);
         return this.request('PUT', path, data);
     }
 
     /**
-     * DELETE /threejs/entities/{entityId} - deleteEntity
+     * DELETE /entities/{entityId} - deleteEntity
      */
     async deleteEntity(param1) {
-        const path = this.extractPathParams('/threejs/entities/{entityId}', [param1]);
+        const path = this.extractPathParams('/entities/{entityId}', [param1]);
         return this.request('DELETE', path);
-    }
-
-    /**
-     * POST /threejs/entities - createEntity
-     */
-    async createEntity(data = null) {
-        return this.request('POST', '/threejs/entities', data);
-    }
-
-    /**
-     * POST /threejs/avatars/{sessionId}/move - moveAvatar
-     */
-    async moveAvatar(param1, data = null) {
-        const path = this.extractPathParams('/threejs/avatars/{sessionId}/move', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    /**
-     * PUT /threejs/scene - updateScene
-     */
-    async updateScene(data = null) {
-        return this.request('PUT', '/threejs/scene', data);
-    }
-
-    /**
-     * GET /threejs/scene - getScene
-     */
-    async getScene() {
-        return this.request('GET', '/threejs/scene');
     }
 
 
@@ -142,11 +120,63 @@ class HD1ThreeJSAPIClient {
     // ========================================
 
 
+    /**
+     * PUT /avatars/{avatarId} - updateAvatar
+     */
+    async updateAvatar(param1, data = null) {
+        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
+        return this.request('PUT', path, data);
+    }
+
+    /**
+     * DELETE /avatars/{avatarId} - removeAvatar
+     */
+    async removeAvatar(param1) {
+        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
+        return this.request('DELETE', path);
+    }
+
+    /**
+     * POST /avatars/{sessionId}/move - moveAvatar
+     */
+    async moveAvatar(param1, data = null) {
+        const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
+        return this.request('POST', path, data);
+    }
+
+    /**
+     * GET /avatars - getAvatars
+     */
+    async getAvatars() {
+        return this.request('GET', '/avatars');
+    }
+
+    /**
+     * POST /avatars - createAvatar
+     */
+    async createAvatar(data = null) {
+        return this.request('POST', '/avatars', data);
+    }
+
 
     // ========================================
     // SCENE MANAGEMENT (Generated from spec)
     // ========================================
 
+
+    /**
+     * PUT /scene - updateScene
+     */
+    async updateScene(data = null) {
+        return this.request('PUT', '/scene', data);
+    }
+
+    /**
+     * GET /scene - getScene
+     */
+    async getScene() {
+        return this.request('GET', '/scene');
+    }
 
 
     // ========================================

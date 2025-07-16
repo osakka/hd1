@@ -186,6 +186,12 @@ func (m *Manager) GetSession(ctx context.Context, sessionID uuid.UUID) (*Session
 }
 
 func (m *Manager) ListSessions(ctx context.Context, filter *SessionFilter) ([]*Session, error) {
+	// If no database connection, return empty list
+	if m.db == nil {
+		logging.Debug("no database connection, returning empty sessions list", nil)
+		return []*Session{}, nil
+	}
+	
 	query := `
 		SELECT id, name, description, owner_id, created_at, updated_at, status, 
 		       visibility, max_participants, current_participants, settings, metadata

@@ -172,9 +172,9 @@ paths:
       x-function: "GetSyncStats"
 
   # ========================================
-  # THREE.JS ENTITIES
+  # ENTITIES
   # ========================================
-  /threejs/entities:
+  /entities:
     post:
       operationId: createEntity
       summary: Create Three.js entity
@@ -219,10 +219,10 @@ paths:
                   seq_num:
                     type: integer
                     example: 1234
-      x-handler: "api/threejs/entities.go"
+      x-handler: "api/entities/handlers.go"
       x-function: "CreateEntity"
 
-  /threejs/entities/{entityId}:
+  /entities/{entityId}:
     put:
       operationId: updateEntity
       summary: Update Three.js entity
@@ -267,7 +267,7 @@ paths:
                   seq_num:
                     type: integer
                     example: 1235
-      x-handler: "api/threejs/entities.go"
+      x-handler: "api/entities/handlers.go"
       x-function: "UpdateEntity"
 
     delete:
@@ -297,13 +297,146 @@ paths:
                   seq_num:
                     type: integer
                     example: 1236
-      x-handler: "api/threejs/entities.go"
+      x-handler: "api/entities/handlers.go"
       x-function: "DeleteEntity"
 
   # ========================================
-  # AVATARS
+  # AVATARS (Connected Clients)
   # ========================================
-  /threejs/avatars/{sessionId}/move:
+  /avatars:
+    get:
+      operationId: getAvatars
+      summary: List all avatars in scene
+      description: |
+        Returns all connected avatars (clients) in the current scene.
+        Each avatar represents a connected user/client.
+      responses:
+        '200':
+          description: List of avatars
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  avatars:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Avatar'
+      x-handler: "api/avatars/handlers.go"
+      x-function: "GetAvatars"
+    post:
+      operationId: createAvatar
+      summary: Create/join avatar
+      description: |
+        Creates a new avatar for the current client/session.
+        This represents joining the scene.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Avatar display name
+                position:
+                  $ref: '#/components/schemas/Vector3'
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+                  description: Client capabilities (WebGL, WebXR, etc.)
+      responses:
+        '200':
+          description: Avatar created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  avatar_id:
+                    type: string
+                  seq_num:
+                    type: integer
+      x-handler: "api/avatars/handlers.go"
+      x-function: "CreateAvatar"
+
+  /avatars/{avatarId}:
+    put:
+      operationId: updateAvatar
+      summary: Update avatar
+      description: |
+        Updates avatar position, rotation, or properties.
+        Submits avatar_update operation to the global sequence.
+      parameters:
+        - name: avatarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Avatar ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position:
+                  $ref: '#/components/schemas/Vector3'
+                rotation:
+                  $ref: '#/components/schemas/Vector3'
+                animation:
+                  type: string
+                  description: Animation state (walk, idle, etc.)
+      responses:
+        '200':
+          description: Avatar updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  seq_num:
+                    type: integer
+      x-handler: "api/avatars/handlers.go"
+      x-function: "UpdateAvatar"
+    delete:
+      operationId: removeAvatar
+      summary: Remove avatar
+      description: |
+        Removes avatar from scene (disconnect client).
+        Submits avatar_remove operation to the global sequence.
+      parameters:
+        - name: avatarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Avatar ID
+      responses:
+        '200':
+          description: Avatar removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  seq_num:
+                    type: integer
+      x-handler: "api/avatars/handlers.go"
+      x-function: "RemoveAvatar"
+
+  /avatars/{sessionId}/move:
     post:
       operationId: moveAvatar
       summary: Move avatar
@@ -347,13 +480,13 @@ paths:
                   seq_num:
                     type: integer
                     example: 1237
-      x-handler: "api/threejs/avatars.go"
+      x-handler: "api/avatars/handlers.go"
       x-function: "MoveAvatar"
 
   # ========================================
   # SCENE MANAGEMENT
   # ========================================
-  /threejs/scene:
+  /scene:
     get:
       operationId: getScene
       summary: Get current scene state
@@ -376,7 +509,7 @@ paths:
                   current_sequence:
                     type: integer
                     example: 1234
-      x-handler: "api/threejs/scene.go"
+      x-handler: "api/scene/handlers.go"
       x-function: "GetScene"
 
     put:
@@ -422,7 +555,7 @@ paths:
                   seq_num:
                     type: integer
                     example: 1238
-      x-handler: "api/threejs/scene.go"
+      x-handler: "api/scene/handlers.go"
       x-function: "UpdateScene"
 
   # ========================================
@@ -459,6 +592,48 @@ paths:
 
 components:
   schemas:
+    Avatar:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique avatar ID
+        name:
+          type: string
+          description: Avatar display name
+        position:
+          $ref: '#/components/schemas/Vector3'
+        rotation:
+          $ref: '#/components/schemas/Vector3'
+        animation:
+          type: string
+          description: Current animation state
+        capabilities:
+          type: array
+          items:
+            type: string
+          description: Client capabilities
+        client_info:
+          type: object
+          properties:
+            platform:
+              type: string
+              description: Client platform (web, mobile, desktop)
+            version:
+              type: string
+              description: Client version
+            user_agent:
+              type: string
+              description: User agent string
+        connected_at:
+          type: string
+          format: date-time
+          description: When avatar joined the scene
+        last_seen:
+          type: string
+          format: date-time
+          description: Last activity timestamp
+    
     Operation:
       type: object
       properties:

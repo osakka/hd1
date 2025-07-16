@@ -27,8 +27,12 @@ import (
 	"github.com/gorilla/mux"
 	"holodeck1/logging"
 	"holodeck1/server"
-{{range .Imports}}
-	"{{.}}"{{end}}
+
+	"holodeck1/api/sync"
+	"holodeck1/api/entities"
+	"holodeck1/api/avatars"
+	"holodeck1/api/scene"
+	"holodeck1/api/system"
 )
 
 // APIRouter manages all auto-generated Three.js routes
@@ -78,22 +82,22 @@ func (ar *APIRouter) setupRoutes() {
 	api.HandleFunc("{{.Path}}", sync.{{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
 	
 	// ========================================
-	// THREE.JS ENTITIES (Generated from spec)
+	// ENTITIES (Generated from spec)
 	// ========================================
-{{range .ThreeJSEntities}}
-	api.HandleFunc("{{.Path}}", threejs.{{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
+{{range .Entities}}
+	api.HandleFunc("{{.Path}}", entities.{{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
 	
 	// ========================================
 	// AVATARS (Generated from spec)
 	// ========================================
 {{range .Avatars}}
-	api.HandleFunc("{{.Path}}", {{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
+	api.HandleFunc("{{.Path}}", avatars.{{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
 	
 	// ========================================
 	// SCENE MANAGEMENT (Generated from spec)
 	// ========================================
 {{range .Scene}}
-	api.HandleFunc("{{.Path}}", {{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
+	api.HandleFunc("{{.Path}}", scene.{{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
 	
 	// ========================================
 	// SYSTEM (Generated from spec)
@@ -104,10 +108,10 @@ func (ar *APIRouter) setupRoutes() {
 		system.{{.HandlerFunc}}(w, r, hub)
 	}).Methods("{{.Method}}"){{end}}
 	
-	logging.Info("Three.js API routes configured", map[string]interface{}{
+	logging.Info("HD1 API routes configured", map[string]interface{}{
 		"total_routes": {{.TotalRoutes}},
 		"sync_ops": {{.SyncOpsCount}},
-		"threejs_ops": {{.ThreeJSOpsCount}},
+		"entity_ops": {{.EntityOpsCount}},
 		"avatar_ops": {{.AvatarOpsCount}},
 		"scene_ops": {{.SceneOpsCount}},
 		"system_ops": {{.SystemOpsCount}},

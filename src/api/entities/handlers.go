@@ -1,4 +1,4 @@
-package threejs
+package entities
 
 import (
 	"encoding/json"
@@ -7,17 +7,11 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"holodeck1/api/shared"
 	"holodeck1/logging"
-	"holodeck1/server"
 	"holodeck1/sync"
 )
 
-// Vector3 represents a 3D vector
-type Vector3 struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
-	Z float64 `json:"z"`
-}
 
 // Geometry represents Three.js geometry
 type Geometry struct {
@@ -43,9 +37,9 @@ type Material struct {
 type CreateEntityRequest struct {
 	Geometry Geometry `json:"geometry"`
 	Material Material `json:"material"`
-	Position *Vector3 `json:"position,omitempty"`
-	Rotation *Vector3 `json:"rotation,omitempty"`
-	Scale    *Vector3 `json:"scale,omitempty"`
+	Position *shared.Vector3 `json:"position,omitempty"`
+	Rotation *shared.Vector3 `json:"rotation,omitempty"`
+	Scale    *shared.Vector3 `json:"scale,omitempty"`
 	Visible  *bool    `json:"visible,omitempty"`
 }
 
@@ -58,9 +52,9 @@ type CreateEntityResponse struct {
 
 // UpdateEntityRequest represents the request to update an entity
 type UpdateEntityRequest struct {
-	Position *Vector3  `json:"position,omitempty"`
-	Rotation *Vector3  `json:"rotation,omitempty"`
-	Scale    *Vector3  `json:"scale,omitempty"`
+	Position *shared.Vector3  `json:"position,omitempty"`
+	Rotation *shared.Vector3  `json:"rotation,omitempty"`
+	Scale    *shared.Vector3  `json:"scale,omitempty"`
 	Visible  *bool     `json:"visible,omitempty"`
 	Material *Material `json:"material,omitempty"`
 }
@@ -101,7 +95,7 @@ func CreateEntity(w http.ResponseWriter, r *http.Request) {
 	entityID := generateEntityID()
 
 	// Get client ID
-	clientID := getClientID(r)
+	clientID := shared.GetClientID(r)
 
 	// Create operation data
 	operationData := map[string]interface{}{
@@ -133,7 +127,7 @@ func CreateEntity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get hub and submit operation
-	hub := getHubFromContext(r)
+	hub := shared.GetHubFromContext(r)
 	if hub == nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -184,7 +178,7 @@ func UpdateEntity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get client ID
-	clientID := getClientID(r)
+	clientID := shared.GetClientID(r)
 
 	// Create operation data
 	operationData := map[string]interface{}{
@@ -217,7 +211,7 @@ func UpdateEntity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get hub and submit operation
-	hub := getHubFromContext(r)
+	hub := shared.GetHubFromContext(r)
 	if hub == nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -252,7 +246,7 @@ func DeleteEntity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get client ID
-	clientID := getClientID(r)
+	clientID := shared.GetClientID(r)
 
 	// Create operation
 	operation := &sync.Operation{
@@ -265,7 +259,7 @@ func DeleteEntity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get hub and submit operation
-	hub := getHubFromContext(r)
+	hub := shared.GetHubFromContext(r)
 	if hub == nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -327,18 +321,3 @@ func generateEntityID() string {
 	return "entity-" + time.Now().Format("20060102150405") + "-" + fmt.Sprintf("%d", time.Now().UnixNano()%10000)
 }
 
-func getClientID(r *http.Request) string {
-	if clientID := r.Header.Get("X-Client-ID"); clientID != "" {
-		return clientID
-	}
-	return "api-client-" + time.Now().Format("20060102150405")
-}
-
-func getHubFromContext(r *http.Request) *server.Hub {
-	if hub := r.Context().Value("hub"); hub != nil {
-		if h, ok := hub.(*server.Hub); ok {
-			return h
-		}
-	}
-	return nil
-}

@@ -1,10 +1,11 @@
-package threejs
+package scene
 
 import (
 	"encoding/json"
 	"net/http"
 	"time"
 
+	"holodeck1/api/shared"
 	"holodeck1/logging"
 	"holodeck1/sync"
 )
@@ -38,7 +39,7 @@ type UpdateSceneResponse struct {
 // GetScene handles GET /api/threejs/scene
 func GetScene(w http.ResponseWriter, r *http.Request) {
 	// Get hub from context
-	hub := getHubFromContext(r)
+	hub := shared.GetHubFromContext(r)
 	if hub == nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -80,7 +81,7 @@ func UpdateScene(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get client ID
-	clientID := getClientID(r)
+	clientID := shared.GetClientID(r)
 
 	// Create operation data
 	operationData := map[string]interface{}{}
@@ -112,7 +113,7 @@ func UpdateScene(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get hub and submit operation
-	hub := getHubFromContext(r)
+	hub := shared.GetHubFromContext(r)
 	if hub == nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return

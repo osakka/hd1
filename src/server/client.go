@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -63,6 +64,36 @@ type Client struct {
 	info      *ClientInfo
 	lastSeen  time.Time
 	sessionID string  // HD1 session isolation
+	clientID  string  // Unique client identifier
+	avatarID  string  // Avatar ID when connected
+}
+
+// generateClientID generates a unique client identifier
+func generateClientID() string {
+	return fmt.Sprintf("client-%d-%d", time.Now().Unix(), rand.Intn(100000))
+}
+
+// GetClientID returns the client's unique identifier
+func (c *Client) GetClientID() string {
+	if c.clientID == "" {
+		c.clientID = generateClientID()
+	}
+	return c.clientID
+}
+
+// GetSessionID returns the client's session ID
+func (c *Client) GetSessionID() string {
+	return c.sessionID
+}
+
+// SetAvatarID sets the client's avatar ID
+func (c *Client) SetAvatarID(avatarID string) {
+	c.avatarID = avatarID
+}
+
+// GetAvatarID returns the client's avatar ID
+func (c *Client) GetAvatarID() string {
+	return c.avatarID
 }
 
 // readPump handles incoming WebSocket messages from the client.
@@ -284,7 +315,16 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, config.GetWebSocketClientWorldBuffer())}
+	client := &Client{
+		hub:  hub, 
+		conn: conn, 
+		send: make(chan []byte, config.GetWebSocketClientWorldBuffer()),
+	}
+	
+	// Generate client ID immediately
+	client.GetClientID()
+	
+	// Register client (this will automatically create avatar)
 	client.hub.register <- client
 	
 	go client.writePump()
