@@ -111,6 +111,7 @@ func (c *Client) readPump() {
 	c.conn.SetReadLimit(getMaxMessageSize())
 	c.conn.SetReadDeadline(time.Now().Add(getPongWait()))
 	c.conn.SetPongHandler(func(string) error {
+		c.lastSeen = time.Now()
 		c.conn.SetReadDeadline(time.Now().Add(getPongWait()))
 		return nil
 	})
@@ -125,6 +126,9 @@ func (c *Client) readPump() {
 			}
 			break
 		}
+		
+		// Update last seen time for any message activity
+		c.lastSeen = time.Now()
 		
 		// Handle special client messages
 		c.handleClientMessage(message)
