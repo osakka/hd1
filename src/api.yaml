@@ -17,7 +17,7 @@ info:
     - Clients apply operations in order
     - Scene state = result of operations 1...N
     
-  version: 6.0.0
+  version: 0.7.0
   contact:
     name: HD1 Three.js Engine
     
@@ -580,7 +580,7 @@ paths:
                     example: true
                   version:
                     type: string
-                    example: "6.0.0"
+                    example: "0.7.0"
                   engine:
                     type: string
                     example: "Three.js"

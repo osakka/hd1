@@ -188,7 +188,7 @@ run_test_phase() {
 
 # Function to run all test phases
 run_all_tests() {
-    log "Starting comprehensive test suite for HD1 v7.0.0"
+    log "Starting comprehensive test suite for HD1 v0.7.0"
     
     local failed_tests=()
     
@@ -365,7 +365,7 @@ generate_test_report() {
     <div class="header">
         <h1>HD1 (Holodeck One) Test Report</h1>
         <p>Generated: $(date)</p>
-        <p>Version: v7.0.0</p>
+        <p>Version: v0.7.0</p>
     </div>
     
     <div class="section">

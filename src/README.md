@@ -55,4 +55,4 @@ make logs       # View logs
 
 ---
 
-*Source code for HD1 v6.0.0 - Specification-driven Three.js platform*
+*Source code for HD1 v0.7.0 - Specification-driven Three.js platform*

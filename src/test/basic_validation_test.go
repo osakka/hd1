@@ -164,7 +164,7 @@ func TestTestRunner(t *testing.T) {
 	t.Run("Test Configuration", func(t *testing.T) {
 		// Validate test configuration constants
 		assert.NotEmpty(t, "holodeck1", "Module name defined")
-		assert.NotEmpty(t, "v7.0.0", "Version defined")
+		assert.NotEmpty(t, "v0.7.0", "Version defined")
 	})
 }
 

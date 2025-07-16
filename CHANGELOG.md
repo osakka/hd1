@@ -5,7 +5,41 @@ All notable changes to HD1 (Holodeck One) are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [6.0.0] - 2025-07-14
+## [0.7.0] - 2025-07-16
+
+### Major Changes - Clean HD1-Native API Architecture
+This release completes the transformation to a clean, intuitive HD1-native API architecture with WebSocket-driven avatar lifecycle management.
+
+### Added
+- **Clean HD1-Native API Paths**: Resource-focused endpoints without implementation details
+  - `/api/avatars` (previously `/api/threejs/avatars`)
+  - `/api/entities` (previously `/api/threejs/entities`)
+  - `/api/scene` (previously `/api/threejs/scene`)
+- **WebSocket-Driven Avatar Lifecycle**: Automatic avatar creation/cleanup on connection/disconnection
+- **Avatar Registry System**: In-memory avatar state management tied to WebSocket connections
+- **Resource-Based File Organization**: Clean separation of concerns with dedicated handler packages
+- **Shared API Utilities**: Common helper functions for consistent request handling
+
+### Changed
+- **BREAKING**: API paths no longer expose Three.js implementation details
+- **Architecture**: Resource-based handler organization (`api/avatars/`, `api/entities/`, `api/scene/`)
+- **Avatar Management**: Automatic lifecycle tied to WebSocket connections instead of manual creation
+- **Code Generation**: Updated templates for clean package prefixes and method names
+- **JavaScript Client**: Intuitive method names (`api.getAvatars()` vs `api.getThreeJSAvatars()`)
+- **Version Numbering**: Standardized to semantic versioning (0.x.x format)
+
+### Improved
+- **Developer Experience**: Clean, intuitive API paths that feel HD1-native
+- **Real-time Updates**: Avatar position/animation updates through registry system
+- **Code Organization**: Logical separation of API concerns by resource type
+- **Maintainability**: Shared utilities reduce code duplication across handlers
+
+### Fixed
+- **Consistent Versioning**: Aligned all version references to semantic versioning scheme
+- **API Response Consistency**: Standardized response formats across all endpoints
+- **WebSocket Integration**: Seamless avatar lifecycle management without manual intervention
+
+## [0.6.0] - 2025-07-14
 
 ### Major Changes - Ultra-Minimal Build Strategy
 This release represents a complete architectural transformation focusing on ultra-minimal Three.js console implementation with massive codebase optimization.

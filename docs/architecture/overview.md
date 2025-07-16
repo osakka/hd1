@@ -145,4 +145,4 @@ HD1 (Holodeck One) is an API-first, specification-driven Three.js game engine pl
 
 ---
 
-*Architecture documentation for HD1 v6.0.0*
+*Architecture documentation for HD1 v0.7.0*

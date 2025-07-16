@@ -1,6 +1,6 @@
 # HD1 (Holodeck One) Test Suite
 
-This directory contains the comprehensive test suite for HD1 v7.0.0, the universal 3D interface platform.
+This directory contains the comprehensive test suite for HD1 v0.7.0, the universal 3D interface platform.
 
 ## Overview
 
@@ -478,4 +478,4 @@ For test-related questions or issues:
 
 ---
 
-*HD1 v7.0.0 Test Suite - Comprehensive testing for the universal 3D interface platform*
+*HD1 v0.7.0 Test Suite - Comprehensive testing for the universal 3D interface platform*

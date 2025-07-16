@@ -441,4 +441,4 @@ For performance problems, include:
 
 ---
 
-*Troubleshooting Guide for HD1 v6.0.0 - Three.js Game Engine Platform*
+*Troubleshooting Guide for HD1 v0.7.0 - Three.js Game Engine Platform*

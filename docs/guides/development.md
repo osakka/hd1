@@ -476,4 +476,4 @@ go tool pprof http://localhost:8080/debug/pprof/profile
 
 ---
 
-*Development Guide for HD1 v6.0.0 - Three.js Game Engine Platform*
+*Development Guide for HD1 v0.7.0 - Three.js Game Engine Platform*

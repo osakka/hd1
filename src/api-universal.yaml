@@ -19,7 +19,7 @@ info:
     - Cross-platform: web, mobile, AR/VR, desktop
     - Event-driven service-to-service communication
     
-  version: 7.0.0
+  version: 0.7.0
   contact:
     name: HD1 Universal Interface Platform
     

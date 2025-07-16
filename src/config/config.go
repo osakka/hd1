@@ -166,7 +166,7 @@ func (c *HD1Config) loadDefaults() {
 	c.Server.Port = "8080"
 	c.Server.APIBase = "http://0.0.0.0:8080/api"
 	c.Server.InternalAPIBase = "http://localhost:8080/api"
-	c.Server.Version = "v5.0.5"
+	c.Server.Version = "v0.7.0"
 	
 	// Path defaults - configurable root directory
 	rootDir := "/opt/hd1"
@@ -963,7 +963,7 @@ func GetVersion() string {
 	if Config != nil {
 		return Config.Server.Version
 	}
-	return "v5.0.5" // fallback
+	return "v0.7.0" // fallback
 }
 
 // Avatars configuration getters

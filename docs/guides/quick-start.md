@@ -40,7 +40,7 @@ curl http://localhost:8080/api/system/version
 
 # Expected response:
 {
-  "api_version": "6.0.0",
+  "api_version": "0.7.0",
   "js_version": "...",
   "build_timestamp": "...",
   "title": "HD1 (Holodeck One) Three.js API"
@@ -231,4 +231,4 @@ ws.onmessage = (event) => {
 
 ---
 
-*Quick Start Guide for HD1 v6.0.0 - Three.js Game Engine Platform*
+*Quick Start Guide for HD1 v0.7.0 - Three.js Game Engine Platform*

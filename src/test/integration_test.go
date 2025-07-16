@@ -321,7 +321,7 @@ func setupFullRouter(db *database.DB, hub *server.Hub) *mux.Router {
 	// Health check
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok","version":"v7.0.0"}`))
+		w.Write([]byte(`{"status":"ok","version":"v0.7.0"}`))
 	}).Methods("GET")
 
 	return router
@@ -509,7 +509,7 @@ func verifyPlatformHealth(t *testing.T, baseURL string, resources map[string]str
 	require.NoError(t, err)
 
 	assert.Equal(t, "ok", healthResponse["status"])
-	assert.Equal(t, "v7.0.0", healthResponse["version"])
+	assert.Equal(t, "v0.7.0", healthResponse["version"])
 
 	// TODO: Add more health checks for individual components
 	// This would verify that all created resources are still accessible

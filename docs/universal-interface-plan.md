@@ -17,12 +17,12 @@ Transform HD1 from a Three.js game engine into the **universal 3D interface plat
 
 ## Technical Architecture Evolution
 
-### Current Architecture (HD1 v6.0.0)
+### Current Architecture (HD1 v0.6.0)
 ```
 Single Session → Three.js Operations → WebSocket Sync → Client Rendering
 ```
 
-### Target Architecture (HD1 v7.0.0)
+### Target Architecture (HD1 v0.7.0)
 ```
 Universal Service Registry
         ↓
@@ -347,4 +347,4 @@ This plan positions HD1 as the definitive platform for 3D interface development,
 
 ---
 
-*HD1 v7.0.0: Where every service becomes a 3D interface in the universal spatial computing platform.*
+*HD1 v0.7.0: Where every service becomes a 3D interface in the universal spatial computing platform.*

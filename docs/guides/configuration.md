@@ -26,7 +26,7 @@ HD1_API_BASE=http://0.0.0.0:8080/api     # External API base URL
 HD1_INTERNAL_API_BASE=http://localhost:8080/api  # Internal API communications
 
 # Process management  
-HD1_VERSION=v6.0.0                       # HD1 version identifier
+HD1_VERSION=v0.7.0                       # HD1 version identifier
 HD1_DAEMON=true                          # Run in daemon mode (default: false)
 HD1_PID_FILE=/opt/hd1/build/hd1.pid     # PID file location
 ```
@@ -385,4 +385,4 @@ HD1_LOG_FILE=/var/log/hd1/hd1.log  # Secure log file location
 
 ---
 
-*Configuration Guide for HD1 v6.0.0 - Three.js Game Engine Platform*
+*Configuration Guide for HD1 v0.7.0 - Three.js Game Engine Platform*

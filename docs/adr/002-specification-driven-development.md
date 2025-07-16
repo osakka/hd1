@@ -48,7 +48,7 @@ func generateFromSpecification() {
 openapi: 3.0.0
 info:
   title: "HD1 (Holodeck One) Three.js API"
-  version: "6.0.0"
+  version: "0.7.0"
 x-code-generation:
   strict-validation: true
   auto-routing: true

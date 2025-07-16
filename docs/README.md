@@ -38,7 +38,7 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 ## 🔍 Quick Navigation
 
-### Current Platform (v6.0.0)
+### Current Platform (v0.6.0)
 **For Developers:**
 - Start with [Quick Start Guide](guides/quick-start.md)
 - Review [Development Guide](guides/development.md)
@@ -54,7 +54,7 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 - Configure via [Configuration Guide](guides/configuration.md)
 - Use [Troubleshooting Guide](guides/troubleshooting.md)
 
-### Universal Platform (v7.0.0 Vision)
+### Universal Platform (v0.7.0 Vision)
 **For Strategists:**
 - Review [Universal Platform Plan](universal-interface-plan.md)
 - Study [ADR-006](adr/006-universal-3d-interface-transformation.md)
@@ -80,13 +80,13 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 ## 🔄 Platform Evolution
 
-### Current State (v6.0.0)
+### Current State (v0.6.0)
 - **11 API Endpoints**: Ultra-minimal Three.js platform
 - **Single-tenant**: Basic WebSocket synchronization
 - **Web-only**: Three.js client with debug console
 - **Development platform**: Optimized for simplicity
 
-### Target State (v7.0.0)
+### Target State (v0.7.0)
 - **100+ API Endpoints**: Universal 3D interface platform
 - **Multi-tenant**: Thousands of concurrent sessions
 - **Cross-platform**: Web, mobile, desktop, AR/VR
@@ -101,7 +101,7 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 ## 🔄 Keeping Documentation Updated
 
-This documentation reflects both the current state of HD1 v6.0.0 and the strategic vision for v7.0.0. When making changes:
+This documentation reflects both the current state of HD1 v0.6.0 and the strategic vision for v0.7.0. When making changes:
 
 1. Update relevant guides for user-facing changes
 2. Create new ADRs for significant architectural decisions
@@ -111,5 +111,5 @@ This documentation reflects both the current state of HD1 v6.0.0 and the strateg
 
 ---
 
-*Documentation for HD1 v6.0.0 - Ultra-minimal Three.js game engine platform*  
-*Strategic vision for HD1 v7.0.0 - Universal 3D interface platform where every service becomes a 3D interface*
+*Documentation for HD1 v0.6.0 - Ultra-minimal Three.js game engine platform*  
+*Strategic vision for HD1 v0.7.0 - Universal 3D interface platform where every service becomes a 3D interface*

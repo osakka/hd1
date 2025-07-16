@@ -9,7 +9,7 @@
 - **Single Source of Truth**: Centralized database with incremental schemas
 
 ## Current State (2025-07-15)
-HD1 v7.0.0 is a **universal 3D interface platform** with complete **multi-tenant architecture**, **real-time collaboration**, **AI integration**, **cross-platform support**, and **enterprise features**.
+HD1 v0.7.0 is a **universal 3D interface platform** with complete **multi-tenant architecture**, **real-time collaboration**, **AI integration**, **cross-platform support**, and **enterprise features**.
 
 ### ✅ Current Features
 - **Three.js Integration**: 3D rendering with native Three.js r170
@@ -114,7 +114,7 @@ HD1_HOST=0.0.0.0                          # Server bind host
 HD1_PORT=8080                             # Server bind port  
 HD1_API_BASE=http://0.0.0.0:8080/api     # External API base URL
 HD1_INTERNAL_API_BASE=http://localhost:8080/api  # Internal API communications
-HD1_VERSION=v5.0.7                       # HD1 version identifier
+HD1_VERSION=v0.7.0                       # HD1 version identifier
 HD1_DAEMON=true                           # Run in daemon mode
 
 # Directory Paths
@@ -253,4 +253,4 @@ HD1_LOG_LEVEL=TRACE HD1_TRACE_MODULES=websocket,sync,threejs ./hd1
 
 ---
 
-**HD1 v7.0.0**: The universal 3D interface platform where any service becomes an immersive experience.
+**HD1 v0.7.0**: The universal 3D interface platform where any service becomes an immersive experience.
