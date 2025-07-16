@@ -3,6 +3,8 @@
  * Pure Three.js implementation with zero abstraction layers
  */
 
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
 class HD1ThreeJS {
     constructor(canvasId = 'hd1-canvas') {
         this.canvas = document.getElementById(canvasId);
@@ -37,6 +39,7 @@ class HD1ThreeJS {
         this.animate();
         
         console.log('[HD1-ThreeJS] Scene manager initialized');
+        console.log('[HD1-ThreeJS] Three.js version:', THREE.REVISION);
     }
     
     setupRenderer() {
@@ -44,7 +47,7 @@ class HD1ThreeJS {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     }
     
@@ -424,7 +427,17 @@ class HD1ThreeJS {
     }
 }
 
-// Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = HD1ThreeJS;
-}
+// Initialize HD1ThreeJS when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Create global instance for compatibility
+    window.HD1ThreeJS = HD1ThreeJS;
+    
+    // Auto-initialize with default canvas
+    if (document.getElementById('holodeck-canvas')) {
+        window.hd1ThreeJS = new HD1ThreeJS('holodeck-canvas');
+        console.log('[HD1] Three.js scene manager initialized with ES modules');
+    }
+});
+
+// Export for ES modules
+export default HD1ThreeJS;

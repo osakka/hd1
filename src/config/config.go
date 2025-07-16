@@ -1093,3 +1093,12 @@ func GetSyncVectorClockPrecision() int {
 	}
 	return 64 // fallback
 }
+
+// GetString returns a configuration value as string (used by database package)
+func GetString(key, fallback string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return fallback
+	}
+	return value
+}

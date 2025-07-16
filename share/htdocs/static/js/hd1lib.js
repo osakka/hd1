@@ -57,13 +57,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * POST /sync/operations - submitOperation
-     */
-    async submitOperation(data = null) {
-        return this.request('POST', '/sync/operations', data);
-    }
-
-    /**
      * GET /sync/missing/{from}/{to} - getMissingOperations
      */
     async getMissingOperations(param1, param2) {
@@ -76,6 +69,13 @@ class HD1ThreeJSAPIClient {
      */
     async getFullSync() {
         return this.request('GET', '/sync/full');
+    }
+
+    /**
+     * POST /sync/operations - submitOperation
+     */
+    async submitOperation(data = null) {
+        return this.request('POST', '/sync/operations', data);
     }
 
     /**
@@ -92,10 +92,11 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * POST /threejs/entities - createEntity
+     * PUT /threejs/entities/{entityId} - updateEntity
      */
-    async createEntity(data = null) {
-        return this.request('POST', '/threejs/entities', data);
+    async updateEntity(param1, data = null) {
+        const path = this.extractPathParams('/threejs/entities/{entityId}', [param1]);
+        return this.request('PUT', path, data);
     }
 
     /**
@@ -107,11 +108,10 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * PUT /threejs/entities/{entityId} - updateEntity
+     * POST /threejs/entities - createEntity
      */
-    async updateEntity(param1, data = null) {
-        const path = this.extractPathParams('/threejs/entities/{entityId}', [param1]);
-        return this.request('PUT', path, data);
+    async createEntity(data = null) {
+        return this.request('POST', '/threejs/entities', data);
     }
 
     /**
@@ -123,17 +123,17 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * GET /threejs/scene - getScene
-     */
-    async getScene() {
-        return this.request('GET', '/threejs/scene');
-    }
-
-    /**
      * PUT /threejs/scene - updateScene
      */
     async updateScene(data = null) {
         return this.request('PUT', '/threejs/scene', data);
+    }
+
+    /**
+     * GET /threejs/scene - getScene
+     */
+    async getScene() {
+        return this.request('GET', '/threejs/scene');
     }
 
 
