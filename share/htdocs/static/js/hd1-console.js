@@ -20,25 +20,31 @@ let apiClient = null;
 
 // Status management
 function setStatus(status, message) {
-    // Update connection text only (removed connection indicator)
+    // Update connection text and indicator
     switch(status) {
         case 'connecting':
             statusConnectionText.textContent = 'Connecting';
+            statusConnectionIndicator.className = 'connecting';
             break;
         case 'connected':
             statusConnectionText.textContent = 'Connected';
+            statusConnectionIndicator.className = 'connected';
             break;
         case 'disconnected':
             statusConnectionText.textContent = 'Disconnected';
+            statusConnectionIndicator.className = 'disconnected';
             break;
         case 'error':
             statusConnectionText.textContent = 'Error';
+            statusConnectionIndicator.className = 'disconnected';
             break;
         case 'receiving':
             statusConnectionText.textContent = 'Receiving';
+            statusConnectionIndicator.className = 'receiving';
             break;
         default:
             statusConnectionText.textContent = 'Unknown';
+            statusConnectionIndicator.className = 'disconnected';
     }
 }
 
