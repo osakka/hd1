@@ -24,11 +24,12 @@
 class HD1ThreeJSAPIClient {
     constructor(baseURL = '/api', clientId = null) {
         this.baseURL = baseURL;
-        this.clientId = clientId || this.generateClientId();
+        this.clientId = clientId; // Server-provided client ID only
     }
 
-    generateClientId() {
-        return 'client-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
+    // Set client ID from server (called when WebSocket receives client_init)
+    setClientId(clientId) {
+        this.clientId = clientId;
     }
 
     async request(path, options = {}) {

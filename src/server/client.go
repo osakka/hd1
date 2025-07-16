@@ -322,7 +322,33 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Generate client ID immediately
-	client.GetClientID()
+	clientID := client.GetClientID()
+	
+	// Send client ID to browser for unified identification
+	initMessage := map[string]interface{}{
+		"type":      "client_init",
+		"client_id": clientID,
+		"message":   "Client ID assigned by server",
+	}
+	
+	if initData, err := json.Marshal(initMessage); err == nil {
+		select {
+		case client.send <- initData:
+			logging.Info("client ID sent to browser", map[string]interface{}{
+				"client_id": clientID,
+			})
+		default:
+			logging.Error("failed to send client ID to browser", map[string]interface{}{
+				"client_id": clientID,
+				"error":     "send channel blocked",
+			})
+		}
+	} else {
+		logging.Error("failed to marshal client init message", map[string]interface{}{
+			"client_id": clientID,
+			"error":     err.Error(),
+		})
+	}
 	
 	// Register client (this will automatically create avatar)
 	client.hub.register <- client

@@ -16,6 +16,7 @@ let reconnectTimeout;
 let clientId = null;
 let sessionId = null;
 let avatarId = null;
+let apiClient = null;
 
 // Status management
 function setStatus(status, message) {
@@ -102,11 +103,20 @@ function connectWebSocket() {
             const data = JSON.parse(event.data);
             addDebug('WS_MSG', data);
             
-            // Capture client/session/avatar IDs from server messages
-            if (data.client_id) {
+            // Handle client initialization from server
+            if (data.type === 'client_init' && data.client_id) {
                 clientId = data.client_id;
+                
+                // Update API client with server-provided client ID
+                if (apiClient) {
+                    apiClient.setClientId(clientId);
+                }
+                
                 updateRebootstrapButton();
+                addDebug('CLIENT_INIT', 'Server-provided client ID: ' + clientId);
             }
+            
+            // Capture session/avatar IDs from server messages
             if (data.session_id) {
                 sessionId = data.session_id;
                 updateRebootstrapButton();
@@ -222,12 +232,10 @@ rebootstrapBtn.addEventListener('click', function() {
 function initConsole() {
     addDebug('INIT', 'HD1 Three.js Console initializing...');
     
-    // Initialize API client and get client ID
+    // Initialize API client without client ID (server will provide it via WebSocket)
     if (window.HD1ThreeJSAPIClient) {
-        const apiClient = new window.HD1ThreeJSAPIClient();
-        clientId = apiClient.clientId;
-        updateRebootstrapButton();
-        addDebug('CLIENT_ID', clientId);
+        apiClient = new window.HD1ThreeJSAPIClient();
+        addDebug('API_CLIENT', 'API client initialized, waiting for server-provided client ID');
     }
     
     connectWebSocket();
