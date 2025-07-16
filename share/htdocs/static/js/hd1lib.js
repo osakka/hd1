@@ -65,6 +65,14 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
+     * GET /sync/missing/{from}/{to} - getMissingOperations
+     */
+    async getMissingOperations(param1, param2) {
+        const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
+        return this.request('GET', path);
+    }
+
+    /**
      * GET /sync/full - getFullSync
      */
     async getFullSync() {
@@ -76,14 +84,6 @@ class HD1ThreeJSAPIClient {
      */
     async getSyncStats() {
         return this.request('GET', '/sync/stats');
-    }
-
-    /**
-     * GET /sync/missing/{from}/{to} - getMissingOperations
-     */
-    async getMissingOperations(param1, param2) {
-        const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
-        return this.request('GET', path);
     }
 
 
@@ -122,6 +122,22 @@ class HD1ThreeJSAPIClient {
 
 
     /**
+     * PUT /avatars/{avatarId} - updateAvatar
+     */
+    async updateAvatar(param1, data = null) {
+        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
+        return this.request('PUT', path, data);
+    }
+
+    /**
+     * DELETE /avatars/{avatarId} - removeAvatar
+     */
+    async removeAvatar(param1) {
+        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
+        return this.request('DELETE', path);
+    }
+
+    /**
      * POST /avatars/{sessionId}/move - moveAvatar
      */
     async moveAvatar(param1, data = null) {
@@ -141,22 +157,6 @@ class HD1ThreeJSAPIClient {
      */
     async createAvatar(data = null) {
         return this.request('POST', '/avatars', data);
-    }
-
-    /**
-     * PUT /avatars/{avatarId} - updateAvatar
-     */
-    async updateAvatar(param1, data = null) {
-        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
-        return this.request('PUT', path, data);
-    }
-
-    /**
-     * DELETE /avatars/{avatarId} - removeAvatar
-     */
-    async removeAvatar(param1) {
-        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
-        return this.request('DELETE', path);
     }
 
 

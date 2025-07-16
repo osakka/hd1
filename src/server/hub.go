@@ -7,7 +7,6 @@ import (
 	stdSync "sync"
 	"time"
 
-	"holodeck1/config"
 	"holodeck1/logging"
 	"holodeck1/sync"
 )
@@ -86,23 +85,33 @@ func (h *Hub) handleOperations() {
 	}
 }
 
-// registerClient adds a client to the hub and creates an avatar
+// registerClient adds a client to the hub and creates an avatar (if not reconnecting)
 func (h *Hub) registerClient(client *Client) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 	
 	h.clients[client] = true
 	
-	// Automatically create avatar for connected client
-	avatar := h.avatarRegistry.CreateAvatar(client)
-	
-	logging.Info("client registered with avatar", map[string]interface{}{
-		"client_count": len(h.clients),
-		"session_id":   client.sessionID,
-		"client_id":    client.GetClientID(),
-		"avatar_id":    avatar.ID,
-		"avatar_count": h.avatarRegistry.GetAvatarCount(),
-	})
+	// Only create avatar if client doesn't already have one (not a reconnection)
+	if client.GetAvatarID() == "" {
+		avatar := h.avatarRegistry.CreateAvatar(client)
+		
+		logging.Info("client registered with new avatar", map[string]interface{}{
+			"client_count": len(h.clients),
+			"session_id":   client.sessionID,
+			"client_id":    client.GetClientID(),
+			"avatar_id":    avatar.ID,
+			"avatar_count": h.avatarRegistry.GetAvatarCount(),
+		})
+	} else {
+		logging.Info("client registered with existing avatar", map[string]interface{}{
+			"client_count": len(h.clients),
+			"session_id":   client.sessionID,
+			"client_id":    client.GetClientID(),
+			"avatar_id":    client.GetAvatarID(),
+			"avatar_count": h.avatarRegistry.GetAvatarCount(),
+		})
+	}
 }
 
 // unregisterClient removes a client from the hub and cleans up avatar

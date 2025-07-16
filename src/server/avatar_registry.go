@@ -104,6 +104,46 @@ func (ar *AvatarRegistry) CreateAvatar(client *Client) *Avatar {
 	return avatar
 }
 
+// FindAvatarByClientID finds an avatar by client ID
+func (ar *AvatarRegistry) FindAvatarByClientID(clientID string) *Avatar {
+	ar.mutex.RLock()
+	defer ar.mutex.RUnlock()
+	
+	for _, avatar := range ar.avatars {
+		if avatar.ClientID == clientID {
+			return avatar
+		}
+	}
+	return nil
+}
+
+// ReconnectClient reconnects an existing client to an avatar
+func (ar *AvatarRegistry) ReconnectClient(clientID string, newClient *Client) *Avatar {
+	ar.mutex.Lock()
+	defer ar.mutex.Unlock()
+	
+	// Find existing avatar
+	for _, avatar := range ar.avatars {
+		if avatar.ClientID == clientID {
+			// Update client reference
+			avatar.Client = newClient
+			avatar.LastSeen = time.Now()
+			
+			// Set client's avatar ID
+			newClient.SetAvatarID(avatar.ID)
+			
+			logging.Info("client reconnected to existing avatar", map[string]interface{}{
+				"avatar_id":  avatar.ID,
+				"client_id":  clientID,
+				"session_id": newClient.GetSessionID(),
+			})
+			
+			return avatar
+		}
+	}
+	return nil
+}
+
 // RemoveAvatar removes an avatar when client disconnects
 func (ar *AvatarRegistry) RemoveAvatar(avatarID string) {
 	ar.mutex.Lock()

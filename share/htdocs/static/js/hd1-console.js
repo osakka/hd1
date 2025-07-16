@@ -94,6 +94,16 @@ function connectWebSocket() {
             clearTimeout(reconnectTimeout);
             reconnectTimeout = null;
         }
+        
+        // Send existing client ID for reconnection if we have one
+        if (clientId) {
+            const reconnectMsg = {
+                type: 'client_reconnect',
+                client_id: clientId
+            };
+            ws.send(JSON.stringify(reconnectMsg));
+            addDebug('CLIENT_RECONNECT', 'Sent existing client ID: ' + clientId);
+        }
     };
     
     ws.onmessage = function(event) {
@@ -114,6 +124,19 @@ function connectWebSocket() {
                 
                 updateRebootstrapButton();
                 addDebug('CLIENT_INIT', 'Server-provided client ID: ' + clientId);
+            }
+            
+            // Handle successful client reconnection
+            if (data.type === 'client_reconnect_success' && data.client_id) {
+                clientId = data.client_id;
+                
+                // Update API client with reconnected client ID
+                if (apiClient) {
+                    apiClient.setClientId(clientId);
+                }
+                
+                updateRebootstrapButton();
+                addDebug('CLIENT_RECONNECT_SUCCESS', 'Reconnected with client ID: ' + clientId + ', avatar ID: ' + data.avatar_id);
             }
             
             // Capture session/avatar IDs from server messages

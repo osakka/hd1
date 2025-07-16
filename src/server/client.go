@@ -96,6 +96,41 @@ func (c *Client) GetAvatarID() string {
 	return c.avatarID
 }
 
+// ensureRegistered ensures the client is registered with the hub (lazy registration)
+func (c *Client) ensureRegistered() {
+	// Check if client is already registered by checking if it's in the hub's clients map
+	c.hub.mutex.RLock()
+	_, isRegistered := c.hub.clients[c]
+	c.hub.mutex.RUnlock()
+	
+	if !isRegistered {
+		// Register client and send client_init message
+		c.hub.register <- c
+		
+		// Send client ID to browser
+		clientID := c.GetClientID()
+		initMessage := map[string]interface{}{
+			"type":      "client_init",
+			"client_id": clientID,
+			"message":   "Client ID assigned by server",
+		}
+		
+		if initData, err := json.Marshal(initMessage); err == nil {
+			select {
+			case c.send <- initData:
+				logging.Info("late client ID sent to browser", map[string]interface{}{
+					"client_id": clientID,
+				})
+			default:
+				logging.Error("failed to send late client ID to browser", map[string]interface{}{
+					"client_id": clientID,
+					"error":     "send channel blocked",
+				})
+			}
+		}
+	}
+}
+
 // readPump handles incoming WebSocket messages from the client.
 // It runs in a separate goroutine and manages the client's read lifecycle:
 // - Sets connection limits and deadlines for message size and pong timeouts
@@ -161,6 +196,44 @@ func (c *Client) handleClientMessage(message []byte) {
 	}
 	
 	switch msgType {
+	case "client_reconnect":
+		// Handle client reconnection with existing client ID
+		if existingClientID, ok := msg["client_id"].(string); ok {
+			// Try to reconnect to existing avatar
+			if avatar := c.hub.avatarRegistry.ReconnectClient(existingClientID, c); avatar != nil {
+				// Set client ID to the existing one
+				c.clientID = existingClientID
+				
+				// Register client with hub (since we skipped it in ServeWS)
+				c.hub.register <- c
+				
+				// Send confirmation back to client
+				confirmMsg := map[string]interface{}{
+					"type":      "client_reconnect_success",
+					"client_id": existingClientID,
+					"avatar_id": avatar.ID,
+					"message":   "Reconnected to existing avatar",
+				}
+				if jsonData, err := json.Marshal(confirmMsg); err == nil {
+					select {
+					case c.send <- jsonData:
+						logging.Info("client reconnection confirmed", map[string]interface{}{
+							"client_id": existingClientID,
+							"avatar_id": avatar.ID,
+						})
+					default:
+						// Client Go channel blocked, don't wait
+					}
+				}
+				return // Don't broadcast this message
+			} else {
+				logging.Info("client reconnection failed, creating new identity", map[string]interface{}{
+					"requested_client_id": existingClientID,
+				})
+				// Avatar not found, client will get new client_init message
+			}
+		}
+		
 	case "version_check":
 		clientVersion, _ := msg["js_version"].(string)
 		serverVersion := GetJSVersion()
@@ -238,8 +311,8 @@ func (c *Client) handleClientMessage(message []byte) {
 				"session_id": sessionID,
 			})
 			
-			// Register client with the hub
-			c.hub.register <- c
+			// Ensure client is registered
+			c.ensureRegistered()
 			c.sessionID = sessionID
 			
 			logging.Info("client joined session", map[string]interface{}{
@@ -266,6 +339,9 @@ func (c *Client) handleClientMessage(message []byte) {
 		// Avatar asset requests not used in minimal build
 		
 	default:
+		// Ensure client is registered if not already (for first non-reconnect message)
+		c.ensureRegistered()
+		
 		// Regular 3D visualization message
 		c.hub.broadcast <- message
 	}
@@ -354,8 +430,8 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	
-	// Register client (this will automatically create avatar)
-	client.hub.register <- client
+	// Don't register client immediately - wait for potential reconnection message
+	// Client will be registered either via reconnection or via first regular message
 	
 	go client.writePump()
 	go client.readPump()
