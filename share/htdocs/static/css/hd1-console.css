@@ -228,6 +228,12 @@ body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: m
     transform: rotate(180deg);
 }
 
+.header-btn {
+    font-size: 7px;
+    padding: 1px 4px;
+    margin-right: 6px;
+}
+
 #debug-content {
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
     overflow: hidden;

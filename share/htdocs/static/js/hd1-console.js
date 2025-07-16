@@ -13,12 +13,13 @@ let ws;
 let reconnectAttempts = 0;
 let maxReconnectAttempts = 99;
 let reconnectTimeout;
+let clientId = null;
+let sessionId = null;
+let avatarId = null;
 
 // Status management
 function setStatus(status, message) {
-    statusConnectionIndicator.className = status;
-    statusConnectionIndicator.setAttribute('data-status', message || status);
-    
+    // Update connection text only (removed connection indicator)
     switch(status) {
         case 'connecting':
             statusConnectionText.textContent = 'Connecting';
@@ -100,6 +101,20 @@ function connectWebSocket() {
         try {
             const data = JSON.parse(event.data);
             addDebug('WS_MSG', data);
+            
+            // Capture client/session/avatar IDs from server messages
+            if (data.client_id) {
+                clientId = data.client_id;
+                updateRebootstrapButton();
+            }
+            if (data.session_id) {
+                sessionId = data.session_id;
+                updateRebootstrapButton();
+            }
+            if (data.avatar_id) {
+                avatarId = data.avatar_id;
+                updateRebootstrapButton();
+            }
         } catch (error) {
             addDebug('WS_ERROR', 'Failed to parse message: ' + error.message);
         }
@@ -157,19 +172,6 @@ function triggerRebootstrap() {
     }, 1000);
 }
 
-// Scene loading (simplified for basic shapes demo)
-function loadScene(sceneName) {
-    addDebug('SCENE_LOAD', {scene: sceneName});
-    
-    if (sceneName === 'empty') {
-        // Clear scene
-        addDebug('SCENE_CLEAR', 'Scene cleared');
-    } else if (sceneName === 'basic-shapes') {
-        // Demo scene
-        addDebug('SCENE_DEMO', 'Basic shapes demo loaded');
-    }
-}
-
 // Console panel collapse functionality
 let debugCollapsed = false;
 
@@ -190,14 +192,23 @@ debugHeader.addEventListener('click', function() {
     addDebug('CONSOLE_TOGGLE', {collapsed: debugCollapsed});
 });
 
-// Scene selector
-const debugSceneSelect = document.getElementById('debug-scene-select');
-debugSceneSelect.addEventListener('change', function() {
-    const selectedScene = this.value;
-    if (selectedScene) {
-        loadScene(selectedScene);
+// Update rebootstrap button with current session/avatar/client ID
+function updateRebootstrapButton() {
+    const btn = document.getElementById('rebootstrap-btn');
+    if (avatarId) {
+        btn.textContent = avatarId;
+        btn.title = `Rebootstrap: Avatar ${avatarId} - Clear storage and reload page`;
+    } else if (sessionId) {
+        btn.textContent = sessionId;
+        btn.title = `Rebootstrap: Session ${sessionId} - Clear storage and reload page`;
+    } else if (clientId) {
+        btn.textContent = clientId;
+        btn.title = `Rebootstrap: Client ${clientId} - Clear storage and reload page`;
+    } else {
+        btn.textContent = 'REBOOTSTRAP';
+        btn.title = 'Rebootstrap: Clear storage and reload page';
     }
-});
+}
 
 // Rebootstrap button
 const rebootstrapBtn = document.getElementById('rebootstrap-btn');
@@ -210,6 +221,15 @@ rebootstrapBtn.addEventListener('click', function() {
 // Initialize console
 function initConsole() {
     addDebug('INIT', 'HD1 Three.js Console initializing...');
+    
+    // Initialize API client and get client ID
+    if (window.HD1ThreeJSAPIClient) {
+        const apiClient = new window.HD1ThreeJSAPIClient();
+        clientId = apiClient.clientId;
+        updateRebootstrapButton();
+        addDebug('CLIENT_ID', clientId);
+    }
+    
     connectWebSocket();
     addDebug('READY', 'HD1 Three.js Console ready');
 }

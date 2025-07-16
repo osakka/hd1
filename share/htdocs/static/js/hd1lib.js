@@ -57,13 +57,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * POST /sync/operations - submitOperation
-     */
-    async submitOperation(data = null) {
-        return this.request('POST', '/sync/operations', data);
-    }
-
-    /**
      * GET /sync/missing/{from}/{to} - getMissingOperations
      */
     async getMissingOperations(param1, param2) {
@@ -83,6 +76,13 @@ class HD1ThreeJSAPIClient {
      */
     async getSyncStats() {
         return this.request('GET', '/sync/stats');
+    }
+
+    /**
+     * POST /sync/operations - submitOperation
+     */
+    async submitOperation(data = null) {
+        return this.request('POST', '/sync/operations', data);
     }
 
 
@@ -121,30 +121,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * PUT /avatars/{avatarId} - updateAvatar
-     */
-    async updateAvatar(param1, data = null) {
-        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
-        return this.request('PUT', path, data);
-    }
-
-    /**
-     * DELETE /avatars/{avatarId} - removeAvatar
-     */
-    async removeAvatar(param1) {
-        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
-        return this.request('DELETE', path);
-    }
-
-    /**
-     * POST /avatars/{sessionId}/move - moveAvatar
-     */
-    async moveAvatar(param1, data = null) {
-        const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    /**
      * GET /avatars - getAvatars
      */
     async getAvatars() {
@@ -158,6 +134,30 @@ class HD1ThreeJSAPIClient {
         return this.request('POST', '/avatars', data);
     }
 
+    /**
+     * DELETE /avatars/{avatarId} - removeAvatar
+     */
+    async removeAvatar(param1) {
+        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
+        return this.request('DELETE', path);
+    }
+
+    /**
+     * PUT /avatars/{avatarId} - updateAvatar
+     */
+    async updateAvatar(param1, data = null) {
+        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
+        return this.request('PUT', path, data);
+    }
+
+    /**
+     * POST /avatars/{sessionId}/move - moveAvatar
+     */
+    async moveAvatar(param1, data = null) {
+        const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
+        return this.request('POST', path, data);
+    }
+
 
     // ========================================
     // SCENE MANAGEMENT (Generated from spec)
@@ -165,17 +165,17 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * PUT /scene - updateScene
-     */
-    async updateScene(data = null) {
-        return this.request('PUT', '/scene', data);
-    }
-
-    /**
      * GET /scene - getScene
      */
     async getScene() {
         return this.request('GET', '/scene');
+    }
+
+    /**
+     * PUT /scene - updateScene
+     */
+    async updateScene(data = null) {
+        return this.request('PUT', '/scene', data);
     }
 
 
