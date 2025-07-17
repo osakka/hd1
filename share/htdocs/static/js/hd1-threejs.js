@@ -128,7 +128,12 @@ class HD1ThreeJS {
                     this.sprint = true;
                     break;
                 case 'Escape':
-                    this.exitPointerLock();
+                    // Toggle mouse-look mode: enter if not active, exit if active
+                    if (this.mouseLook) {
+                        this.exitPointerLock();
+                    } else {
+                        this.requestPointerLock();
+                    }
                     break;
             }
         });
