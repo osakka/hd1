@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"holodeck1/config"
 	"holodeck1/database"
 	"holodeck1/logging"
 )
@@ -514,4 +515,82 @@ func (m *Manager) UpdateLastSeen(ctx context.Context, sessionID uuid.UUID, userI
 	}
 
 	return nil
+}
+
+func (m *Manager) CleanupInactiveSessions(ctx context.Context) {
+	// Get inactivity timeout from config
+	inactivityTimeout := config.GetSessionInactivityTimeout()
+	
+	// Update participants who haven't been seen recently
+	updateQuery := `
+		UPDATE participants 
+		SET left_at = NOW() 
+		WHERE left_at IS NULL 
+		AND last_seen < NOW() - INTERVAL '%d seconds'
+	`
+	
+	result, err := m.db.ExecContext(ctx, fmt.Sprintf(updateQuery, int(inactivityTimeout.Seconds())))
+	if err != nil {
+		logging.Error("failed to cleanup inactive participants", map[string]interface{}{
+			"error": err.Error(),
+		})
+		return
+	}
+	
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected > 0 {
+		logging.Info("cleaned up inactive participants", map[string]interface{}{
+			"participants_removed": rowsAffected,
+			"inactivity_timeout":   inactivityTimeout.String(),
+		})
+	}
+	
+	// Update sessions that have no active participants
+	sessionUpdateQuery := `
+		UPDATE sessions 
+		SET status = 'inactive' 
+		WHERE status = 'active' 
+		AND id NOT IN (
+			SELECT DISTINCT session_id 
+			FROM participants 
+			WHERE left_at IS NULL
+		)
+	`
+	
+	sessionResult, err := m.db.ExecContext(ctx, sessionUpdateQuery)
+	if err != nil {
+		logging.Error("failed to mark sessions as inactive", map[string]interface{}{
+			"error": err.Error(),
+		})
+		return
+	}
+	
+	sessionRowsAffected, _ := sessionResult.RowsAffected()
+	if sessionRowsAffected > 0 {
+		logging.Info("marked sessions as inactive", map[string]interface{}{
+			"sessions_marked_inactive": sessionRowsAffected,
+		})
+	}
+}
+
+func (m *Manager) StartCleanupWorker(ctx context.Context) {
+	cleanupInterval := config.GetSessionCleanupInterval()
+	
+	logging.Info("starting session cleanup worker", map[string]interface{}{
+		"cleanup_interval":   cleanupInterval.String(),
+		"inactivity_timeout": config.GetSessionInactivityTimeout().String(),
+	})
+	
+	ticker := time.NewTicker(cleanupInterval)
+	defer ticker.Stop()
+	
+	for {
+		select {
+		case <-ctx.Done():
+			logging.Info("session cleanup worker stopped", nil)
+			return
+		case <-ticker.C:
+			m.CleanupInactiveSessions(ctx)
+		}
+	}
 }

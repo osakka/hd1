@@ -1,12 +1,14 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"holodeck1/config"
 	"holodeck1/logging"
@@ -207,6 +209,15 @@ func (c *Client) handleClientMessage(message []byte) {
 				
 				// Register client with hub (since we skipped it in ServeWS)
 				c.hub.register <- c
+				
+				// Update last_seen for session management
+				if c.hub.sessionManager != nil && c.sessionID != "" {
+					if sessionUUID, err := uuid.Parse(c.sessionID); err == nil {
+						if userUUID, err := uuid.Parse(existingClientID); err == nil {
+							go c.hub.sessionManager.UpdateLastSeen(context.Background(), sessionUUID, userUUID)
+						}
+					}
+				}
 				
 				// Send confirmation back to client
 				confirmMsg := map[string]interface{}{

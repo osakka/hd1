@@ -3,9 +3,12 @@
 package server
 
 import (
+	"context"
 	stdSync "sync"
 
+	"holodeck1/config"
 	"holodeck1/logging"
+	"holodeck1/session"
 	"holodeck1/sync"
 )
 
@@ -23,6 +26,9 @@ type Hub struct {
 	// Avatar management
 	avatarRegistry *AvatarRegistry
 	
+	// Session management
+	sessionManager *session.Manager
+	
 	// Message routing - REMOVED: Using sync system directly
 }
 
@@ -37,12 +43,13 @@ type Message struct {
 }
 
 // NewHub creates a new TCP-simple WebSocket hub
-func NewHub() *Hub {
+func NewHub(sessionManager *session.Manager) *Hub {
 	hub := &Hub{
-		sync:       sync.NewReliableSync(),
-		clients:    make(map[*Client]bool),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
+		sync:           sync.NewReliableSync(),
+		clients:        make(map[*Client]bool),
+		register:       make(chan *Client),
+		unregister:     make(chan *Client),
+		sessionManager: sessionManager,
 	}
 	
 	// Initialize avatar registry
@@ -51,10 +58,24 @@ func NewHub() *Hub {
 	return hub
 }
 
-// Run starts the hub's main loop
-func (h *Hub) Run() {
+// Run starts the hub's main loop and cleanup workers
+func (h *Hub) Run(ctx context.Context) {
+	// Start session cleanup worker (if database available)
+	if h.sessionManager != nil {
+		go h.sessionManager.StartCleanupWorker(ctx)
+		logging.Info("session cleanup worker started", map[string]interface{}{
+			"cleanup_interval":   config.GetSessionCleanupInterval().String(),
+			"inactivity_timeout": config.GetSessionInactivityTimeout().String(),
+		})
+	} else {
+		logging.Info("session cleanup worker disabled - no database connection", nil)
+	}
+	
 	for {
 		select {
+		case <-ctx.Done():
+			logging.Info("hub shutting down", nil)
+			return
 		case client := <-h.register:
 			h.registerClient(client)
 			

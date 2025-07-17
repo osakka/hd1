@@ -78,13 +78,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * POST /sync/operations - submitOperation
-     */
-    async submitOperation(data = null) {
-        return this.request('POST', '/sync/operations', data);
-    }
-
-    /**
      * GET /sync/missing/{from}/{to} - getMissingOperations
      */
     async getMissingOperations(param1, param2) {
@@ -97,6 +90,13 @@ class HD1ThreeJSAPIClient {
      */
     async getFullSync() {
         return this.request('GET', '/sync/full');
+    }
+
+    /**
+     * POST /sync/operations - submitOperation
+     */
+    async submitOperation(data = null) {
+        return this.request('POST', '/sync/operations', data);
     }
 
     /**
