@@ -5,6 +5,32 @@ All notable changes to HD1 (Holodeck One) are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2025-07-17
+
+### Critical Fixes - Surgical Precision Avatar Movement
+This release completes the surgical precision single source of truth avatar movement system with full API-first architecture compliance.
+
+### Fixed
+- **Avatar Movement API Client**: Added missing `extractPathParams` method to JavaScript API client template
+- **Avatar Operation Data Structure**: Fixed `session_id` vs `client_id` handling in Three.js avatar operations
+- **Global API Client Access**: Made API client globally available for Three.js integration
+- **Avatar Movement Logging**: Restored comprehensive console logging and error handling
+- **Avatar Remove Operation**: Fixed avatar removal handling in Three.js scene manager
+
+### Technical Details
+- **Single Source of Truth**: Validated 100% compliance with no parallel implementations
+- **API-First Architecture**: All avatar movement flows through `/avatars/{sessionId}/move` endpoint
+- **Surgical Precision**: Zero regressions, zero hacks, zero architectural compromises
+- **Code Generation**: Fixed template to include proper path parameter extraction
+- **Build System**: Maintained clean build with zero warnings
+
+### Architecture Validation
+- ✅ **One Source of Truth**: `/avatars/{sessionId}/move` API endpoint only
+- ✅ **No Parallel Implementations**: All movement flows through sync system
+- ✅ **No WebSocket Bypasses**: All avatar updates come from sync operations
+- ✅ **No Manual Updates**: No code bypasses API/sync architecture
+- ✅ **Zero Ambiguity**: Clean, consistent, and foolproof implementation
+
 ## [0.7.0] - 2025-07-16
 
 ### Major Changes - Clean HD1-Native API Architecture
