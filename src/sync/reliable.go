@@ -108,6 +108,13 @@ func (rs *ReliableSync) UnregisterClient(clientID string) {
 	}
 }
 
+// GetCurrentSequence returns the current sequence number
+func (rs *ReliableSync) GetCurrentSequence() uint64 {
+	rs.mutex.RLock()
+	defer rs.mutex.RUnlock()
+	return rs.nextSeqNum - 1
+}
+
 // GetMissingOperations returns operations from 'from' to 'to' (inclusive)
 func (rs *ReliableSync) GetMissingOperations(from, to uint64) []*Operation {
 	rs.mutex.RLock()
@@ -158,13 +165,7 @@ func (rs *ReliableSync) GetClientLastSeen(clientID string) uint64 {
 	return rs.clientLastSeen[clientID]
 }
 
-// GetCurrentSequence returns the current sequence number
-func (rs *ReliableSync) GetCurrentSequence() uint64 {
-	rs.mutex.RLock()
-	defer rs.mutex.RUnlock()
-	
-	return rs.nextSeqNum - 1
-}
+// GetCurrentSequence - REMOVED: Duplicate method, already exists above
 
 // broadcastOperation sends operation to all connected clients
 func (rs *ReliableSync) broadcastOperation(op *Operation) {

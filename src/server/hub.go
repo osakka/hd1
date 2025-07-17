@@ -3,9 +3,7 @@
 package server
 
 import (
-	"encoding/json"
 	stdSync "sync"
-	"time"
 
 	"holodeck1/logging"
 	"holodeck1/sync"
@@ -25,8 +23,7 @@ type Hub struct {
 	// Avatar management
 	avatarRegistry *AvatarRegistry
 	
-	// Message routing
-	broadcast chan []byte
+	// Message routing - REMOVED: Using sync system directly
 }
 
 // Message represents a WebSocket message
@@ -46,7 +43,6 @@ func NewHub() *Hub {
 		clients:    make(map[*Client]bool),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		broadcast:  make(chan []byte, 1000),
 	}
 	
 	// Initialize avatar registry
@@ -57,8 +53,6 @@ func NewHub() *Hub {
 
 // Run starts the hub's main loop
 func (h *Hub) Run() {
-	go h.handleOperations()
-	
 	for {
 		select {
 		case client := <-h.register:
@@ -66,24 +60,11 @@ func (h *Hub) Run() {
 			
 		case client := <-h.unregister:
 			h.unregisterClient(client)
-			
-		case message := <-h.broadcast:
-			h.broadcastMessage(message)
 		}
 	}
 }
 
-// handleOperations processes sync operations
-func (h *Hub) handleOperations() {
-	for {
-		time.Sleep(10 * time.Millisecond) // Small delay to prevent busy waiting
-		// Process any pending operations from sync system
-		operations := h.sync.GetPendingOperations()
-		for _, op := range operations {
-			h.broadcastOperation(op)
-		}
-	}
-}
+// handleOperations - REMOVED: Using sync system directly instead of polling
 
 // registerClient adds a client to the hub and creates an avatar (if not reconnecting)
 func (h *Hub) registerClient(client *Client) {
@@ -92,11 +73,21 @@ func (h *Hub) registerClient(client *Client) {
 	
 	h.clients[client] = true
 	
+	// Register client with sync system - SINGLE SOURCE OF TRUTH
+	syncChan := h.sync.RegisterClient(client.GetClientID())
+	client.syncChan = syncChan
+	
+	// Start sync forwarding goroutine
+	go client.forwardSyncOperations()
+	
+	// Send initial sync for existing operations
+	client.sendInitialSync()
+	
 	// Only create avatar if client doesn't already have one (not a reconnection)
 	if client.GetAvatarID() == "" {
 		avatar := h.avatarRegistry.CreateAvatar(client)
 		
-		logging.Info("client registered with new avatar", map[string]interface{}{
+		logging.Info("client registered with new avatar and sync channel", map[string]interface{}{
 			"client_count": len(h.clients),
 			"session_id":   client.sessionID,
 			"client_id":    client.GetClientID(),
@@ -104,7 +95,7 @@ func (h *Hub) registerClient(client *Client) {
 			"avatar_count": h.avatarRegistry.GetAvatarCount(),
 		})
 	} else {
-		logging.Info("client registered with existing avatar", map[string]interface{}{
+		logging.Info("client registered with existing avatar and sync channel", map[string]interface{}{
 			"client_count": len(h.clients),
 			"session_id":   client.sessionID,
 			"client_id":    client.GetClientID(),
@@ -123,12 +114,15 @@ func (h *Hub) unregisterClient(client *Client) {
 		delete(h.clients, client)
 		close(client.send)
 		
+		// Unregister from sync system - SINGLE SOURCE OF TRUTH
+		h.sync.UnregisterClient(client.GetClientID())
+		
 		// Remove avatar when client disconnects
 		if avatarID := client.GetAvatarID(); avatarID != "" {
 			h.avatarRegistry.RemoveAvatar(avatarID)
 		}
 		
-		logging.Info("client unregistered with avatar cleanup", map[string]interface{}{
+		logging.Info("client unregistered with avatar cleanup and sync cleanup", map[string]interface{}{
 			"client_count": len(h.clients),
 			"session_id":   client.sessionID,
 			"client_id":    client.GetClientID(),
@@ -138,38 +132,8 @@ func (h *Hub) unregisterClient(client *Client) {
 	}
 }
 
-// broadcastMessage sends a message to all clients
-func (h *Hub) broadcastMessage(message []byte) {
-	h.mutex.RLock()
-	defer h.mutex.RUnlock()
-	
-	for client := range h.clients {
-		select {
-		case client.send <- message:
-		default:
-			// Client channel is full, disconnect it
-			h.unregisterClient(client)
-		}
-	}
-}
-
-// broadcastOperation sends an operation to all clients
-func (h *Hub) broadcastOperation(op *sync.Operation) {
-	msg := Message{
-		Type:      "operation",
-		Operation: op,
-	}
-	
-	data, err := json.Marshal(msg)
-	if err != nil {
-		logging.Error("failed to marshal operation", map[string]interface{}{
-			"error": err.Error(),
-		})
-		return
-	}
-	
-	h.broadcast <- data
-}
+// broadcastMessage - REMOVED: Using sync system directly instead
+// broadcastOperation - REMOVED: Using sync system directly instead
 
 // SubmitOperation submits an operation to the sync system
 func (h *Hub) SubmitOperation(op *sync.Operation) {

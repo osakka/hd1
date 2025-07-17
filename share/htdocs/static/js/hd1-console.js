@@ -143,6 +143,14 @@ function connectWebSocket() {
                 
                 updateRebootstrapButton();
                 addDebug('CLIENT_INIT', 'Server-provided client ID: ' + clientId);
+                
+                // Automatically join default session for real-time sync
+                const sessionMessage = {
+                    type: 'session_associate',
+                    session_id: 'default'
+                };
+                ws.send(JSON.stringify(sessionMessage));
+                addDebug('SESSION_JOIN', 'Automatically joined default session for sync');
             }
             
             // Handle successful client reconnection
@@ -157,6 +165,17 @@ function connectWebSocket() {
                 
                 updateRebootstrapButton();
                 addDebug('CLIENT_RECONNECT_SUCCESS', 'Reconnected with client ID: ' + clientId + ', avatar ID: ' + data.avatar_id);
+            }
+            
+            // Handle sync operations from server
+            if (data.type === 'sync_operation' && data.operation) {
+                // Forward sync operation to Three.js scene manager
+                if (window.hd1ThreeJS) {
+                    window.hd1ThreeJS.applyOperation(data.operation);
+                    addDebug('SYNC_OP', 'Applied operation: ' + data.operation.type + ' seq:' + data.operation.seq_num);
+                } else {
+                    addDebug('SYNC_OP_ERROR', 'Three.js scene manager not available');
+                }
             }
             
             // Capture session/avatar IDs from server messages

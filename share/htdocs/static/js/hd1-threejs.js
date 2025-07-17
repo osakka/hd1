@@ -39,6 +39,9 @@ class HD1ThreeJS {
         // Start render loop
         this.animate();
         
+        // Make globally accessible for sync operations
+        window.hd1ThreeJS = this;
+        
         console.log('[HD1-ThreeJS] Scene manager initialized');
         console.log('[HD1-ThreeJS] Three.js version:', THREE.REVISION);
     }
@@ -221,11 +224,9 @@ class HD1ThreeJS {
     }
     
     sendAvatarPosition() {
-        // Send avatar position update via WebSocket if connected
-        if (window.ws && window.ws.readyState === WebSocket.OPEN && window.clientId) {
-            const positionUpdate = {
-                type: 'avatar_move',
-                client_id: window.clientId,
+        // Send avatar position update via API endpoint - SINGLE SOURCE OF TRUTH
+        if (window.apiClient && window.clientId) {
+            const positionData = {
                 position: {
                     x: this.camera.position.x,
                     y: this.camera.position.y,
@@ -237,7 +238,11 @@ class HD1ThreeJS {
                     z: this.camera.rotation.z
                 }
             };
-            window.ws.send(JSON.stringify(positionUpdate));
+            
+            // Use auto-generated API client to call /avatars/{sessionId}/move
+            window.apiClient.moveAvatar(window.clientId, positionData).catch(error => {
+                console.warn('[HD1-ThreeJS] Avatar move failed:', error);
+            });
         }
     }
     
@@ -266,7 +271,7 @@ class HD1ThreeJS {
     applyOperation(operation) {
         switch (operation.type) {
             case 'avatar_move':
-                this.updateAvatar(operation.data.session_id, operation.data);
+                this.updateAvatar(operation.data.client_id, operation.data);
                 break;
             case 'entity_create':
                 this.createEntity(operation.data.id, operation.data);

@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 	"holodeck1/config"
 	"holodeck1/logging"
+	"holodeck1/sync"
 )
 
 // WebSocket configuration functions (using config system)
@@ -66,6 +67,7 @@ type Client struct {
 	sessionID string  // HD1 session isolation
 	clientID  string  // Unique client identifier
 	avatarID  string  // Avatar ID when connected
+	syncChan  chan *sync.Operation  // Sync system channel - SINGLE SOURCE OF TRUTH
 }
 
 // generateClientID generates a unique client identifier
@@ -184,14 +186,13 @@ func (c *Client) readPump() {
 func (c *Client) handleClientMessage(message []byte) {
 	var msg map[string]interface{}
 	if err := json.Unmarshal(message, &msg); err != nil {
-		// Not JSON, broadcast as regular message
-		c.hub.broadcast <- message
+		// Not JSON, skip invalid message
 		return
 	}
 	
 	msgType, ok := msg["type"].(string)
 	if !ok {
-		c.hub.broadcast <- message
+		// No type field, skip invalid message
 		return
 	}
 	
@@ -332,8 +333,7 @@ func (c *Client) handleClientMessage(message []byte) {
 		if err := json.Unmarshal(message, &interaction); err == nil {
 			logging.Debug("user interaction", interaction)
 		}
-		// Broadcast interaction to other systems that might be listening
-		c.hub.broadcast <- message
+		// Interaction messages - handled locally, no sync needed
 		
 	case "avatar_asset_request":
 		// Avatar asset requests not used in minimal build
@@ -342,8 +342,65 @@ func (c *Client) handleClientMessage(message []byte) {
 		// Ensure client is registered if not already (for first non-reconnect message)
 		c.ensureRegistered()
 		
-		// Regular 3D visualization message
-		c.hub.broadcast <- message
+		// Regular 3D visualization message - REMOVED: Using sync system directly
+	}
+}
+
+// forwardSyncOperations listens to sync channel and forwards operations to WebSocket
+func (c *Client) forwardSyncOperations() {
+	for operation := range c.syncChan {
+		// Convert sync operation to WebSocket message
+		message := map[string]interface{}{
+			"type":      "sync_operation",
+			"operation": operation,
+		}
+		
+		if messageData, err := json.Marshal(message); err == nil {
+			select {
+			case c.send <- messageData:
+				logging.Trace("websocket", "sync operation forwarded to client", map[string]interface{}{
+					"client_id": c.GetClientID(),
+					"seq_num":   operation.SeqNum,
+					"op_type":   operation.Type,
+				})
+			default:
+				logging.Error("sync operation dropped - client send channel blocked", map[string]interface{}{
+					"client_id": c.GetClientID(),
+					"seq_num":   operation.SeqNum,
+					"op_type":   operation.Type,
+				})
+			}
+		}
+	}
+}
+
+// sendInitialSync sends existing operations to newly connected client
+func (c *Client) sendInitialSync() {
+	// Get all operations from sequence 1 to current
+	currentSeq := c.hub.sync.GetCurrentSequence()
+	if currentSeq > 0 {
+		missingOps := c.hub.sync.GetMissingOperations(1, currentSeq)
+		
+		logging.Info("sending initial sync to client", map[string]interface{}{
+			"client_id":     c.GetClientID(),
+			"operations":    len(missingOps),
+			"from_seq":      1,
+			"to_seq":        currentSeq,
+		})
+		
+		for _, op := range missingOps {
+			// Send each operation via sync channel (will be forwarded by forwardSyncOperations)
+			select {
+			case c.syncChan <- op:
+				// Operation sent successfully
+			default:
+				logging.Error("initial sync operation dropped - sync channel blocked", map[string]interface{}{
+					"client_id": c.GetClientID(),
+					"seq_num":   op.SeqNum,
+					"op_type":   op.Type,
+				})
+			}
+		}
 	}
 }
 

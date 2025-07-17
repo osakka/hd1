@@ -177,6 +177,33 @@ func (ar *AvatarRegistry) RemoveAvatar(avatarID string) {
 	ar.hub.SubmitOperation(operation)
 }
 
+// UpdateAvatarPosition updates an avatar's position in the registry
+func (ar *AvatarRegistry) UpdateAvatarPosition(avatarID string, positionData map[string]interface{}) {
+	ar.mutex.Lock()
+	defer ar.mutex.Unlock()
+	
+	if avatar, exists := ar.avatars[avatarID]; exists {
+		// Update position from WebSocket data
+		if x, ok := positionData["x"].(float64); ok {
+			avatar.Position.X = x
+		}
+		if y, ok := positionData["y"].(float64); ok {
+			avatar.Position.Y = y
+		}
+		if z, ok := positionData["z"].(float64); ok {
+			avatar.Position.Z = z
+		}
+		
+		// Update last seen time
+		avatar.LastSeen = time.Now()
+		
+		logging.Trace("avatar", "position updated", map[string]interface{}{
+			"avatar_id": avatarID,
+			"position":  positionData,
+		})
+	}
+}
+
 // GetAvatar gets an avatar by ID
 func (ar *AvatarRegistry) GetAvatar(avatarID string) (*Avatar, bool) {
 	ar.mutex.RLock()
