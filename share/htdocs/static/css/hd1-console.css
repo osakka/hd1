@@ -146,6 +146,37 @@ body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: m
     transition: height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
 }
 
+/* Custom scrollbar styling for console */
+#debug-log {
+    /* Firefox scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 255, 0.3) rgba(0, 0, 0, 0.5);
+}
+
+/* WebKit browsers (Chrome, Safari) */
+#debug-log::-webkit-scrollbar {
+    width: 8px;
+}
+
+#debug-log::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+}
+
+#debug-log::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 2px;
+    border: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+#debug-log::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.5);
+}
+
+#debug-log::-webkit-scrollbar-corner {
+    background: rgba(0, 0, 0, 0.5);
+}
+
 #debug-log.collapsed {
     height: 0;
     padding: 0 8px;
@@ -169,10 +200,10 @@ body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: m
     gap: 4px;
 }
 
-#status-connection-indicator, #status-lock-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+#status-connection-indicator, #status-lock-indicator, #status-mouselook-indicator {
+    width: 12px;
+    height: 4px;
+    border-radius: 1px;
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -193,6 +224,15 @@ body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: m
 #status-connection-indicator.receiving {
     background: #00ffff;
     animation: pulse 0.5s infinite;
+}
+
+#status-mouselook-indicator.off {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#status-mouselook-indicator.active {
+    background: #ff9500;
 }
 
 #status-lock-indicator.unlocked {

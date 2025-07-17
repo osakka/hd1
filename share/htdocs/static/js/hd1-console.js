@@ -8,6 +8,7 @@ const debugCollapseIcon = document.getElementById('debug-collapse-icon');
 const statusConnectionIndicator = document.getElementById('status-connection-indicator');
 const statusConnectionText = document.getElementById('status-connection-text');
 const statusLockIndicator = document.getElementById('status-lock-indicator');
+const statusMouselookIndicator = document.getElementById('status-mouselook-indicator');
 
 let ws;
 let reconnectAttempts = 0;
@@ -47,6 +48,16 @@ function setStatus(status, message) {
             statusConnectionIndicator.className = 'disconnected';
     }
 }
+
+// Mouse look status management
+function setMouselookStatus(active) {
+    if (statusMouselookIndicator) {
+        statusMouselookIndicator.className = active ? 'active' : 'off';
+    }
+}
+
+// Make globally available
+window.setMouselookStatus = setMouselookStatus;
 
 // Debug logging function
 function addDebug(command, data = null) {
@@ -90,6 +101,7 @@ function connectWebSocket() {
     setStatus('connecting');
     
     ws = new WebSocket(wsUrl);
+    window.ws = ws; // Make globally available
     
     ws.onopen = function() {
         addDebug('WS_OPEN', 'WebSocket connected');
@@ -122,6 +134,7 @@ function connectWebSocket() {
             // Handle client initialization from server
             if (data.type === 'client_init' && data.client_id) {
                 clientId = data.client_id;
+                window.clientId = clientId; // Make globally available
                 
                 // Update API client with server-provided client ID
                 if (apiClient) {
@@ -135,6 +148,7 @@ function connectWebSocket() {
             // Handle successful client reconnection
             if (data.type === 'client_reconnect_success' && data.client_id) {
                 clientId = data.client_id;
+                window.clientId = clientId; // Make globally available
                 
                 // Update API client with reconnected client ID
                 if (apiClient) {

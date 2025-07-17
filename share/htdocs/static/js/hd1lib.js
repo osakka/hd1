@@ -122,6 +122,20 @@ class HD1ThreeJSAPIClient {
 
 
     /**
+     * GET /avatars - getAvatars
+     */
+    async getAvatars() {
+        return this.request('GET', '/avatars');
+    }
+
+    /**
+     * POST /avatars - createAvatar
+     */
+    async createAvatar(data = null) {
+        return this.request('POST', '/avatars', data);
+    }
+
+    /**
      * PUT /avatars/{avatarId} - updateAvatar
      */
     async updateAvatar(param1, data = null) {
@@ -143,20 +157,6 @@ class HD1ThreeJSAPIClient {
     async moveAvatar(param1, data = null) {
         const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
         return this.request('POST', path, data);
-    }
-
-    /**
-     * GET /avatars - getAvatars
-     */
-    async getAvatars() {
-        return this.request('GET', '/avatars');
-    }
-
-    /**
-     * POST /avatars - createAvatar
-     */
-    async createAvatar(data = null) {
-        return this.request('POST', '/avatars', data);
     }
 
 

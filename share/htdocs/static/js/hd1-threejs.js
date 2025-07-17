@@ -28,6 +28,7 @@ class HD1ThreeJS {
         // Camera controls
         this.controls = null;
         this.cameraTarget = new THREE.Vector3(0, 0, 0);
+        this.lastTime = 0;
         
         // Initialize scene
         this.setupRenderer();
@@ -76,64 +77,168 @@ class HD1ThreeJS {
     }
     
     setupCamera() {
-        this.camera.position.set(5, 5, 5);
-        this.camera.lookAt(0, 0, 0);
+        // FPS camera setup
+        this.camera.position.set(0, 1.6, 0); // Human eye height
+        this.camera.rotation.order = 'YXZ';   // Yaw-Pitch-Roll order
         
-        // Simple orbit controls
-        this.enableOrbitControls();
+        // FPS controls state
+        this.keys = {};
+        this.mouseLook = false;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.pitch = 0;
+        this.yaw = 0;
+        this.moveSpeed = 5.0;
+        this.sprintMultiplier = 2.0;
+        this.mouseSensitivity = 0.002;
+        
+        // Movement direction vectors
+        this.moveForward = false;
+        this.moveBackward = false;
+        this.moveLeft = false;
+        this.moveRight = false;
+        this.sprint = false;
+        
+        // FPS controls
+        this.enableFPSControls();
     }
     
-    enableOrbitControls() {
-        // Basic orbit controls without external dependencies
-        let isMouseDown = false;
-        let mouseX = 0;
-        let mouseY = 0;
-        let cameraDistance = 10;
-        let cameraAngleX = 0;
-        let cameraAngleY = 0;
-        
-        this.canvas.addEventListener('mousedown', (e) => {
-            isMouseDown = true;
-            mouseX = e.clientX;
-            mouseY = e.clientY;
+    enableFPSControls() {
+        // Keyboard controls
+        document.addEventListener('keydown', (event) => {
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
+            
+            switch (event.code) {
+                case 'KeyW':
+                    this.moveForward = true;
+                    break;
+                case 'KeyS':
+                    this.moveBackward = true;
+                    break;
+                case 'KeyA':
+                    this.moveLeft = true;
+                    break;
+                case 'KeyD':
+                    this.moveRight = true;
+                    break;
+                case 'ShiftLeft':
+                    this.sprint = true;
+                    break;
+                case 'Escape':
+                    this.exitPointerLock();
+                    break;
+            }
         });
         
-        this.canvas.addEventListener('mouseup', () => {
-            isMouseDown = false;
+        document.addEventListener('keyup', (event) => {
+            switch (event.code) {
+                case 'KeyW':
+                    this.moveForward = false;
+                    break;
+                case 'KeyS':
+                    this.moveBackward = false;
+                    break;
+                case 'KeyA':
+                    this.moveLeft = false;
+                    break;
+                case 'KeyD':
+                    this.moveRight = false;
+                    break;
+                case 'ShiftLeft':
+                    this.sprint = false;
+                    break;
+            }
         });
         
-        this.canvas.addEventListener('mousemove', (e) => {
-            if (!isMouseDown) return;
-            
-            const deltaX = e.clientX - mouseX;
-            const deltaY = e.clientY - mouseY;
-            
-            cameraAngleX -= deltaY * 0.01;
-            cameraAngleY -= deltaX * 0.01;
-            
-            // Limit vertical rotation
-            cameraAngleX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cameraAngleX));
-            
-            this.updateCameraPosition(cameraDistance, cameraAngleX, cameraAngleY);
-            
-            mouseX = e.clientX;
-            mouseY = e.clientY;
+        // Mouse controls
+        this.canvas.addEventListener('click', () => {
+            this.requestPointerLock();
         });
         
-        this.canvas.addEventListener('wheel', (e) => {
-            cameraDistance += e.deltaY * 0.01;
-            cameraDistance = Math.max(2, Math.min(50, cameraDistance));
-            this.updateCameraPosition(cameraDistance, cameraAngleX, cameraAngleY);
+        document.addEventListener('pointerlockchange', () => {
+            this.mouseLook = document.pointerLockElement === this.canvas;
+            
+            // Update mouse look indicator
+            if (window.setMouselookStatus) {
+                window.setMouselookStatus(this.mouseLook);
+            }
+        });
+        
+        document.addEventListener('mousemove', (event) => {
+            if (!this.mouseLook) return;
+            
+            const movementX = event.movementX || 0;
+            const movementY = event.movementY || 0;
+            
+            this.yaw -= movementX * this.mouseSensitivity;
+            this.pitch -= movementY * this.mouseSensitivity;
+            
+            // Limit pitch to prevent flipping
+            this.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitch));
+            
+            // Update camera rotation
+            this.camera.rotation.set(this.pitch, this.yaw, 0);
         });
     }
     
-    updateCameraPosition(distance, angleX, angleY) {
-        const x = distance * Math.cos(angleX) * Math.cos(angleY);
-        const y = distance * Math.sin(angleX);
-        const z = distance * Math.cos(angleX) * Math.sin(angleY);
+    requestPointerLock() {
+        if (this.canvas.requestPointerLock) {
+            this.canvas.requestPointerLock();
+        }
+    }
+    
+    exitPointerLock() {
+        if (document.exitPointerLock) {
+            document.exitPointerLock();
+        }
+    }
+    
+    updateMovement(deltaTime) {
+        if (!this.mouseLook) return; // Only move when mouse look is active
         
-        this.camera.position.set(x, y, z);
-        this.camera.lookAt(this.cameraTarget);
+        // Calculate movement speed with sprint modifier
+        const speed = this.moveSpeed * (this.sprint ? this.sprintMultiplier : 1.0) * deltaTime;
+        
+        // Get camera direction vectors
+        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
+        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
+        
+        // Calculate movement vector
+        const moveVector = new THREE.Vector3();
+        
+        if (this.moveForward) moveVector.add(forward.clone().multiplyScalar(speed));
+        if (this.moveBackward) moveVector.add(forward.clone().multiplyScalar(-speed));
+        if (this.moveLeft) moveVector.add(right.clone().multiplyScalar(-speed));
+        if (this.moveRight) moveVector.add(right.clone().multiplyScalar(speed));
+        
+        // Apply movement to camera
+        this.camera.position.add(moveVector);
+        
+        // Send position update to server if movement occurred
+        if (moveVector.length() > 0) {
+            this.sendAvatarPosition();
+        }
+    }
+    
+    sendAvatarPosition() {
+        // Send avatar position update via WebSocket if connected
+        if (window.ws && window.ws.readyState === WebSocket.OPEN && window.clientId) {
+            const positionUpdate = {
+                type: 'avatar_move',
+                client_id: window.clientId,
+                position: {
+                    x: this.camera.position.x,
+                    y: this.camera.position.y,
+                    z: this.camera.position.z
+                },
+                rotation: {
+                    x: this.camera.rotation.x,
+                    y: this.camera.rotation.y,
+                    z: this.camera.rotation.z
+                }
+            };
+            window.ws.send(JSON.stringify(positionUpdate));
+        }
     }
     
     setupEventListeners() {
@@ -144,8 +249,16 @@ class HD1ThreeJS {
         });
     }
     
-    animate() {
-        requestAnimationFrame(() => this.animate());
+    animate(currentTime = 0) {
+        requestAnimationFrame((time) => this.animate(time));
+        
+        // Calculate delta time
+        const deltaTime = this.lastTime ? (currentTime - this.lastTime) / 1000 : 0;
+        this.lastTime = currentTime;
+        
+        // Update movement
+        this.updateMovement(deltaTime);
+        
         this.renderer.render(this.scene, this.camera);
     }
     
