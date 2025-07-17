@@ -197,7 +197,13 @@ class HD1ThreeJS {
     }
     
     updateMovement(deltaTime) {
-        if (!this.mouseLook) return; // Only move when mouse look is active
+        if (!this.mouseLook) {
+            // Debug: Show why movement isn't working
+            if (this.moveForward || this.moveBackward || this.moveLeft || this.moveRight) {
+                console.log('[HD1-ThreeJS] Movement blocked - click canvas to enable mouse look first!');
+            }
+            return; // Only move when mouse look is active
+        }
         
         // Calculate movement speed with sprint modifier
         const speed = this.moveSpeed * (this.sprint ? this.sprintMultiplier : 1.0) * deltaTime;
@@ -219,12 +225,27 @@ class HD1ThreeJS {
         
         // Send position update to server if movement occurred
         if (moveVector.length() > 0) {
+            console.log('[HD1-ThreeJS] Movement detected:', {
+                position: {x: this.camera.position.x, y: this.camera.position.y, z: this.camera.position.z},
+                apiClient: !!window.apiClient,
+                clientId: window.clientId
+            });
             this.sendAvatarPosition();
         }
     }
     
     sendAvatarPosition() {
         // Send avatar position update via API endpoint - SINGLE SOURCE OF TRUTH
+        if (!window.apiClient) {
+            console.warn('[HD1-ThreeJS] API client not available - position update skipped');
+            return;
+        }
+        
+        if (!window.clientId) {
+            console.warn('[HD1-ThreeJS] Client ID not available - position update skipped');
+            return;
+        }
+        
         if (window.apiClient && window.clientId) {
             const positionData = {
                 position: {
@@ -240,9 +261,17 @@ class HD1ThreeJS {
             };
             
             // Use auto-generated API client to call /avatars/{sessionId}/move
-            window.apiClient.moveAvatar(window.clientId, positionData).catch(error => {
-                console.warn('[HD1-ThreeJS] Avatar move failed:', error);
-            });
+            window.apiClient.moveAvatar(window.clientId, positionData)
+                .then(response => {
+                    console.log('[HD1-ThreeJS] Avatar moved:', {
+                        position: positionData.position,
+                        seq_num: response.seq_num,
+                        client_id: window.clientId
+                    });
+                })
+                .catch(error => {
+                    console.warn('[HD1-ThreeJS] Avatar move failed:', error);
+                });
         }
     }
     
@@ -271,7 +300,13 @@ class HD1ThreeJS {
     applyOperation(operation) {
         switch (operation.type) {
             case 'avatar_move':
-                this.updateAvatar(operation.data.client_id, operation.data);
+                this.updateAvatar(operation.data.session_id || operation.data.client_id, operation.data);
+                break;
+            case 'avatar_create':
+                this.createAvatar(operation.data.session_id || operation.data.client_id || operation.data.avatar_id, operation.data);
+                break;
+            case 'avatar_remove':
+                this.removeAvatar(operation.data.session_id || operation.data.client_id || operation.data.avatar_id);
                 break;
             case 'entity_create':
                 this.createEntity(operation.data.id, operation.data);
@@ -348,6 +383,20 @@ class HD1ThreeJS {
         
         const hue = (hash % 360) / 360;
         return new THREE.Color().setHSL(hue, 0.7, 0.5);
+    }
+    
+    removeAvatar(sessionId) {
+        const avatar = this.avatars.get(sessionId);
+        if (avatar) {
+            this.scene.remove(avatar);
+            this.avatars.delete(sessionId);
+            
+            // Clean up geometry and material
+            if (avatar.geometry) avatar.geometry.dispose();
+            if (avatar.material) avatar.material.dispose();
+            
+            console.log('[HD1-ThreeJS] Avatar removed:', sessionId);
+        }
     }
     
     updateAvatarAnimation(avatar, animation) {

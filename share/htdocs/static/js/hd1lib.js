@@ -32,18 +32,23 @@ class HD1ThreeJSAPIClient {
         this.clientId = clientId;
     }
 
-    async request(path, options = {}) {
+    async request(method, path, data = null) {
         const url = this.baseURL + path;
         const headers = {
             'Content-Type': 'application/json',
-            'X-Client-ID': this.clientId,
-            ...options.headers
+            'X-Client-ID': this.clientId
         };
 
-        const response = await fetch(url, {
-            ...options,
-            headers
-        });
+        const options = {
+            method: method,
+            headers: headers
+        };
+
+        if (data && (method === 'POST' || method === 'PUT')) {
+            options.body = JSON.stringify(data);
+        }
+
+        const response = await fetch(url, options);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -52,17 +57,25 @@ class HD1ThreeJSAPIClient {
         return response.json();
     }
 
+    extractPathParams(pathTemplate, params) {
+        let path = pathTemplate;
+        let paramIndex = 0;
+        
+        // Replace path parameters like {sessionId} with actual values
+        path = path.replace(/\{[^}]+\}/g, () => {
+            if (paramIndex < params.length) {
+                return params[paramIndex++];
+            }
+            throw new Error(`Missing parameter for path template: ${pathTemplate}`);
+        });
+        
+        return path;
+    }
+
     // ========================================
     // SYNC OPERATIONS (Generated from spec)
     // ========================================
 
-
-    /**
-     * POST /sync/operations - submitOperation
-     */
-    async submitOperation(data = null) {
-        return this.request('POST', '/sync/operations', data);
-    }
 
     /**
      * GET /sync/missing/{from}/{to} - getMissingOperations
@@ -86,11 +99,25 @@ class HD1ThreeJSAPIClient {
         return this.request('GET', '/sync/stats');
     }
 
+    /**
+     * POST /sync/operations - submitOperation
+     */
+    async submitOperation(data = null) {
+        return this.request('POST', '/sync/operations', data);
+    }
+
 
     // ========================================
     // ENTITIES (Generated from spec)
     // ========================================
 
+
+    /**
+     * POST /entities - createEntity
+     */
+    async createEntity(data = null) {
+        return this.request('POST', '/entities', data);
+    }
 
     /**
      * PUT /entities/{entityId} - updateEntity
@@ -108,18 +135,25 @@ class HD1ThreeJSAPIClient {
         return this.request('DELETE', path);
     }
 
-    /**
-     * POST /entities - createEntity
-     */
-    async createEntity(data = null) {
-        return this.request('POST', '/entities', data);
-    }
-
 
     // ========================================
     // AVATARS (Generated from spec)
     // ========================================
 
+
+    /**
+     * GET /avatars - getAvatars
+     */
+    async getAvatars() {
+        return this.request('GET', '/avatars');
+    }
+
+    /**
+     * POST /avatars - createAvatar
+     */
+    async createAvatar(data = null) {
+        return this.request('POST', '/avatars', data);
+    }
 
     /**
      * PUT /avatars/{avatarId} - updateAvatar
@@ -143,20 +177,6 @@ class HD1ThreeJSAPIClient {
     async moveAvatar(param1, data = null) {
         const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
         return this.request('POST', path, data);
-    }
-
-    /**
-     * GET /avatars - getAvatars
-     */
-    async getAvatars() {
-        return this.request('GET', '/avatars');
-    }
-
-    /**
-     * POST /avatars - createAvatar
-     */
-    async createAvatar(data = null) {
-        return this.request('POST', '/avatars', data);
     }
 
 

@@ -297,7 +297,8 @@ function initConsole() {
     // Initialize API client without client ID (server will provide it via WebSocket)
     if (window.HD1ThreeJSAPIClient) {
         apiClient = new window.HD1ThreeJSAPIClient();
-        addDebug('API_CLIENT', 'API client initialized, waiting for server-provided client ID');
+        window.apiClient = apiClient; // Make globally available for Three.js
+        addDebug('API_CLIENT', 'API client initialized and made globally available');
     }
     
     connectWebSocket();

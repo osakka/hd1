@@ -32,24 +32,44 @@ class HD1ThreeJSAPIClient {
         this.clientId = clientId;
     }
 
-    async request(path, options = {}) {
+    async request(method, path, data = null) {
         const url = this.baseURL + path;
         const headers = {
             'Content-Type': 'application/json',
-            'X-Client-ID': this.clientId,
-            ...options.headers
+            'X-Client-ID': this.clientId
         };
 
-        const response = await fetch(url, {
-            ...options,
-            headers
-        });
+        const options = {
+            method: method,
+            headers: headers
+        };
+
+        if (data && (method === 'POST' || method === 'PUT')) {
+            options.body = JSON.stringify(data);
+        }
+
+        const response = await fetch(url, options);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
         return response.json();
+    }
+
+    extractPathParams(pathTemplate, params) {
+        let path = pathTemplate;
+        let paramIndex = 0;
+        
+        // Replace path parameters like {sessionId} with actual values
+        path = path.replace(/\{[^}]+\}/g, () => {
+            if (paramIndex < params.length) {
+                return params[paramIndex++];
+            }
+            throw new Error(`Missing parameter for path template: ${pathTemplate}`);
+        });
+        
+        return path;
     }
 
     // ========================================
