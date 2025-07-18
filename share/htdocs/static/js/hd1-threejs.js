@@ -483,8 +483,10 @@ class HD1ThreeJS {
         let avatar = this.avatars.get(sessionId);
         
         if (!avatar) {
-            avatar = this.createAvatar(sessionId, data);
-            this.avatars.set(sessionId, avatar);
+            // Don't auto-create avatars for move operations
+            // Avatars should only be created by explicit avatar_create operations
+            console.log('[HD1-ThreeJS] Ignoring movement for unknown avatar:', sessionId);
+            return;
         }
         
         // Update position
