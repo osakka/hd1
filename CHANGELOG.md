@@ -42,6 +42,12 @@ This release achieves surgical precision avatar lifecycle management with automa
 - ✅ **Security Compliant**: Proper browser security model compliance
 - ✅ **Zero Regressions**: All existing functionality preserved and enhanced
 
+### Migration from v0.7.1
+- **Automatic**: No breaking changes, all existing functionality preserved
+- **Mobile Users**: Touch controls automatically available on mobile devices
+- **Configuration**: Optional session timeout configuration via `HD1_SESSION_INACTIVITY_TIMEOUT`
+- **API**: All 15 REST endpoints remain unchanged
+
 ## [0.7.1] - 2025-07-17
 
 ### Critical Fixes - Surgical Precision Avatar Movement
@@ -196,7 +202,7 @@ For users migrating from v5.x:
 
 ### Documentation
 - **Complete Documentation Suite**: Added comprehensive docs/ directory
-- **Architecture Decision Records**: 5 ADRs documenting key design decisions
+- **Architecture Decision Records**: 6 ADRs documenting key design decisions
 - **User Guides**: Quick start, development, configuration, and troubleshooting guides
 - **README Files**: Project, docs, and src-specific documentation
 - **API Reference**: Enhanced OpenAPI specification documentation

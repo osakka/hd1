@@ -4,22 +4,24 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 ## 📚 Documentation Structure
 
-### Strategic Planning
+### 🔍 Navigation & Reference
+- **[VERSION.md](VERSION.md)** - Single source of truth for version information
+- **[INDEX.md](INDEX.md)** - Complete cross-reference index
+- **[API Endpoints](api/ENDPOINTS.md)** - Complete API reference (15 endpoints)
+
+### 📋 Strategic Planning
 - **[Universal Platform Plan](universal-interface-plan.md)** - Complete transformation strategy and business plan
 - **[Implementation Plans](implementation/)** - Detailed phase-by-phase implementation guides
 
-### Architecture
+### 🏗️ Architecture
 - **[System Overview](architecture/overview.md)** - High-level system design
-- **[API Design](architecture/api-design.md)** - REST API architecture  
-- **[WebSocket Protocol](architecture/websocket.md)** - Real-time communication
-- **[Three.js Integration](architecture/threejs.md)** - WebGL rendering system
+- **[API Specification](../src/api.yaml)** - Current API specification (v0.7.2)
+- **[Future API Specification](api/universal-interface-spec.yaml)** - Target universal interface API
 
-### User Guides
+### 📖 User Guides
 - **[Quick Start](guides/quick-start.md)** - Get up and running
 - **[Development Guide](guides/development.md)** - Building and extending HD1
-- **[Deployment Guide](guides/deployment.md)** - Production deployment
 - **[Configuration Guide](guides/configuration.md)** - Environment and settings
-- **[API Usage Guide](guides/api-usage.md)** - Using the REST API
 - **[Troubleshooting](guides/troubleshooting.md)** - Common issues and solutions
 
 ### Architectural Decision Records (ADR)
@@ -38,23 +40,22 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 ## 🔍 Quick Navigation
 
-### Current Platform (v0.6.0)
+### Current Platform (v0.7.2)
 **For Developers:**
 - Start with [Quick Start Guide](guides/quick-start.md)
 - Review [Development Guide](guides/development.md)
-- Understand [API Design](architecture/api-design.md)
+- Understand [System Overview](architecture/overview.md)
 
 **For Architects:**
 - Read [System Overview](architecture/overview.md)
 - Review all [ADRs](adr/) for design decisions
-- Study [WebSocket Protocol](architecture/websocket.md)
+- Study [API Specification](../src/api.yaml)
 
 **For Operations:**
-- Follow [Deployment Guide](guides/deployment.md)
 - Configure via [Configuration Guide](guides/configuration.md)
 - Use [Troubleshooting Guide](guides/troubleshooting.md)
 
-### Universal Platform (v0.7.0 Vision)
+### Universal Platform (Future Vision)
 **For Strategists:**
 - Review [Universal Platform Plan](universal-interface-plan.md)
 - Study [ADR-006](adr/006-universal-3d-interface-transformation.md)
@@ -62,7 +63,7 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 **For Engineers:**
 - Follow [Implementation Plans](implementation/) for detailed technical specifications
-- Review [Universal API Specification](../src/api-universal.yaml) for target endpoints
+- Review [Future API Specification](api/universal-interface-spec.yaml) for target endpoints
 - Understand phased transformation approach
 
 **For Service Providers:**
@@ -80,13 +81,13 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 ## 🔄 Platform Evolution
 
-### Current State (v0.6.0)
-- **11 API Endpoints**: Ultra-minimal Three.js platform
-- **Single-tenant**: Basic WebSocket synchronization
-- **Web-only**: Three.js client with debug console
-- **Development platform**: Optimized for simplicity
+### Current State (v0.7.2)
+- **15 API Endpoints**: Three.js platform with avatar lifecycle management
+- **Multi-tenant**: Session-based architecture with cleanup
+- **Cross-platform**: Web with mobile touch controls
+- **Production-ready**: Avatar cleanup, mobile support, security compliance
 
-### Target State (v0.7.0)
+### Target State (Future Vision)
 - **100+ API Endpoints**: Universal 3D interface platform
 - **Multi-tenant**: Thousands of concurrent sessions
 - **Cross-platform**: Web, mobile, desktop, AR/VR
@@ -101,7 +102,7 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 ## 🔄 Keeping Documentation Updated
 
-This documentation reflects both the current state of HD1 v0.6.0 and the strategic vision for v0.7.0. When making changes:
+This documentation reflects both the current state of HD1 v0.7.2 and the strategic vision for the universal platform. When making changes:
 
 1. Update relevant guides for user-facing changes
 2. Create new ADRs for significant architectural decisions
@@ -111,5 +112,5 @@ This documentation reflects both the current state of HD1 v0.6.0 and the strateg
 
 ---
 
-*Documentation for HD1 v0.6.0 - Ultra-minimal Three.js game engine platform*  
-*Strategic vision for HD1 v0.7.0 - Universal 3D interface platform where every service becomes a 3D interface*
+*Documentation for HD1 v0.7.2 - Three.js platform with avatar lifecycle management and mobile controls*  
+*Strategic vision for Universal 3D Interface Platform - where every service becomes a 3D interface*

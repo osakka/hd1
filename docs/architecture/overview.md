@@ -6,7 +6,7 @@ HD1 (Holodeck One) is an API-first, specification-driven Three.js game engine pl
 
 ### 1. API-First Design
 - **Single Source of Truth**: Complete system defined in `src/api.yaml` OpenAPI specification
-- **86 REST Endpoints**: Comprehensive game engine control via HTTP
+- **15 REST Endpoints**: Three.js platform with avatar lifecycle management
 - **Auto-Generation**: All routing, client libraries, and documentation generated from spec
 - **Zero Manual Configuration**: Routes, handlers, and validation automatically maintained
 
