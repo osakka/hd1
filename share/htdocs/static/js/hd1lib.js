@@ -78,6 +78,13 @@ class HD1ThreeJSAPIClient {
 
 
     /**
+     * GET /sync/full - getFullSync
+     */
+    async getFullSync() {
+        return this.request('GET', '/sync/full');
+    }
+
+    /**
      * POST /sync/operations - submitOperation
      */
     async submitOperation(data = null) {
@@ -89,13 +96,6 @@ class HD1ThreeJSAPIClient {
      */
     async getSyncStats() {
         return this.request('GET', '/sync/stats');
-    }
-
-    /**
-     * GET /sync/full - getFullSync
-     */
-    async getFullSync() {
-        return this.request('GET', '/sync/full');
     }
 
     /**
@@ -113,20 +113,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /entities - getEntities
-     */
-    async getEntities() {
-        return this.request('GET', '/entities');
-    }
-
-    /**
-     * POST /entities - createEntityWithGeometry
-     */
-    async createEntityWithGeometry(data = null) {
-        return this.request('POST', '/entities', data);
-    }
-
-    /**
      * PUT /entities/{entityId} - updateEntity
      */
     async updateEntity(param1, data = null) {
@@ -142,6 +128,20 @@ class HD1ThreeJSAPIClient {
         return this.request('DELETE', path);
     }
 
+    /**
+     * GET /entities - getEntities
+     */
+    async getEntities() {
+        return this.request('GET', '/entities');
+    }
+
+    /**
+     * POST /entities - createEntityWithGeometry
+     */
+    async createEntityWithGeometry(data = null) {
+        return this.request('POST', '/entities', data);
+    }
+
 
     // ========================================
     // AVATARS (Generated from spec)
@@ -149,17 +149,11 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /avatars - getAvatars
+     * DELETE /avatars/{avatarId} - removeAvatar
      */
-    async getAvatars() {
-        return this.request('GET', '/avatars');
-    }
-
-    /**
-     * POST /avatars - createAvatar
-     */
-    async createAvatar(data = null) {
-        return this.request('POST', '/avatars', data);
+    async removeAvatar(param1) {
+        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
+        return this.request('DELETE', path);
     }
 
     /**
@@ -171,19 +165,25 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * DELETE /avatars/{avatarId} - removeAvatar
-     */
-    async removeAvatar(param1) {
-        const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
-        return this.request('DELETE', path);
-    }
-
-    /**
      * POST /avatars/{sessionId}/move - moveAvatar
      */
     async moveAvatar(param1, data = null) {
         const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
         return this.request('POST', path, data);
+    }
+
+    /**
+     * POST /avatars - createAvatar
+     */
+    async createAvatar(data = null) {
+        return this.request('POST', '/avatars', data);
+    }
+
+    /**
+     * GET /avatars - getAvatars
+     */
+    async getAvatars() {
+        return this.request('GET', '/avatars');
     }
 
 

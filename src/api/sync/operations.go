@@ -33,6 +33,8 @@ func SubmitOperation(w http.ResponseWriter, r *http.Request) {
 
 	// Validate operation type
 	validTypes := map[string]bool{
+		"avatar_create": true,
+		"avatar_remove": true,
 		"avatar_move":   true,
 		"entity_create": true,
 		"entity_update": true,

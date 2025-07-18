@@ -61,13 +61,14 @@ type ClientInfo struct {
 }
 
 type Client struct {
-	hub       *Hub
-	conn      *websocket.Conn
-	send      chan []byte
-	info      *ClientInfo
-	lastSeen  time.Time
-	hd1ID     string  // Single unified identifier - SINGLE SOURCE OF TRUTH
-	syncChan  chan *sync.Operation  // Sync system channel - SINGLE SOURCE OF TRUTH
+	hub            *Hub
+	conn           *websocket.Conn
+	send           chan []byte
+	info           *ClientInfo
+	lastSeen       time.Time
+	hd1ID          string  // Single unified identifier - SINGLE SOURCE OF TRUTH
+	avatarCreated  bool    // Track if avatar has been created for this client
+	syncChan       chan *sync.Operation  // Sync system channel - SINGLE SOURCE OF TRUTH
 }
 
 // generateHD1ID generates a unified HD1 identifier
@@ -83,12 +84,20 @@ func (c *Client) GetHD1ID() string {
 	return c.hd1ID
 }
 
-// Legacy compatibility methods - all map to hd1ID for single source of truth
+// Legacy compatibility methods - maintain avatar creation tracking
 func (c *Client) GetClientID() string { return c.GetHD1ID() }
 func (c *Client) GetSessionID() string { return c.GetHD1ID() }
-func (c *Client) GetAvatarID() string { return c.GetHD1ID() }
+func (c *Client) GetAvatarID() string { 
+	if c.avatarCreated {
+		return c.GetHD1ID()
+	}
+	return ""
+}
 func (c *Client) SetSessionID(id string) { c.hd1ID = id }
-func (c *Client) SetAvatarID(id string) { c.hd1ID = id }
+func (c *Client) SetAvatarID(id string) { 
+	c.hd1ID = id
+	c.avatarCreated = true
+}
 
 // ensureRegistered ensures the client is registered with the hub (lazy registration)
 func (c *Client) ensureRegistered() {

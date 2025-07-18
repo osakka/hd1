@@ -42,7 +42,7 @@ paths:
               properties:
                 type:
                   type: string
-                  enum: [avatar_move, entity_create, entity_update, entity_delete, scene_update]
+                  enum: [avatar_create, avatar_remove, avatar_move, entity_create, entity_update, entity_delete, scene_update]
                   description: Type of operation
                 data:
                   type: object
