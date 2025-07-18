@@ -454,13 +454,13 @@ class HD1ThreeJS {
     applyOperation(operation) {
         switch (operation.type) {
             case 'avatar_move':
-                this.updateAvatar(operation.data.session_id || operation.data.client_id, operation.data);
+                this.updateAvatar(operation.client_id, operation.data);
                 break;
             case 'avatar_create':
-                this.createAvatar(operation.data.session_id || operation.data.client_id || operation.data.avatar_id, operation.data);
+                this.createAvatar(operation.client_id, operation.data);
                 break;
             case 'avatar_remove':
-                this.removeAvatar(operation.data.session_id || operation.data.client_id || operation.data.avatar_id);
+                this.removeAvatar(operation.client_id);
                 break;
             case 'entity_create':
                 this.createEntity(operation.data.id, operation.data);
@@ -483,10 +483,10 @@ class HD1ThreeJS {
         let avatar = this.avatars.get(sessionId);
         
         if (!avatar) {
-            // Don't auto-create avatars for move operations
-            // Avatars should only be created by explicit avatar_create operations
-            console.log('[HD1-ThreeJS] Ignoring movement for unknown avatar:', sessionId);
-            return;
+            // Avatar doesn't exist - this shouldn't happen with proper operation ordering
+            console.log('[HD1-ThreeJS] Avatar not found for movement, creating:', sessionId);
+            avatar = this.createAvatar(sessionId, data);
+            this.avatars.set(sessionId, avatar);
         }
         
         // Update position
