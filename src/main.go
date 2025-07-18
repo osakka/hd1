@@ -24,6 +24,7 @@ import (
 	"holodeck1/config"
 	"holodeck1/database"
 	"holodeck1/logging"
+	"holodeck1/router"
 	"holodeck1/server"
 	"holodeck1/session"
 )
@@ -124,8 +125,8 @@ func main() {
 		server.ServeWS(hub, w, r)
 	})
 	
-	// REVOLUTIONARY: Auto-generated API router from specification
-	apiRouter := NewAPIRouter(hub)
+	// Auto-generated API router from specification
+	apiRouter := router.NewAPIRouter(hub)
 	http.Handle("/api/", apiRouter)
 	
 	// Template-processed JavaScript files with API-driven versioning (must be before static handler)

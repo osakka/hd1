@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"holodeck1/api/shared"
 	"holodeck1/logging"
+	"holodeck1/server"
 	"holodeck1/sync"
 )
 
@@ -69,6 +70,41 @@ type UpdateEntityResponse struct {
 type DeleteEntityResponse struct {
 	Success bool   `json:"success"`
 	SeqNum  uint64 `json:"seq_num"`
+}
+
+// GetEntitiesResponse represents the response for getting all entities
+type GetEntitiesResponse struct {
+	Success  bool        `json:"success"`
+	Entities []EntityInfo `json:"entities"`
+}
+
+// EntityInfo represents basic entity information
+type EntityInfo struct {
+	ID       string           `json:"id"`
+	Geometry Geometry         `json:"geometry"`
+	Material Material         `json:"material"`
+	Position *shared.Vector3  `json:"position,omitempty"`
+	Rotation *shared.Vector3  `json:"rotation,omitempty"`
+	Scale    *shared.Vector3  `json:"scale,omitempty"`
+	Visible  bool            `json:"visible"`
+}
+
+// GetEntities retrieves all entities
+func GetEntities(w http.ResponseWriter, r *http.Request) {
+	hub := r.Context().Value("hub").(*server.Hub)
+	if hub == nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	// For now, return empty list - would need to implement entity storage
+	response := GetEntitiesResponse{
+		Success:  true,
+		Entities: []EntityInfo{},
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
 // CreateEntity handles POST /api/threejs/entities

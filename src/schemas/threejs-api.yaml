@@ -1,0 +1,183 @@
+openapi: 3.0.3
+info:
+    title: Three.js Geometry API
+    description: Auto-generated Three.js geometry API from TypeScript definitions
+    version: 1.0.0
+paths:
+    /entities:
+        post:
+            description: Create a 3D entity using any Three.js geometry type
+            operationId: createEntityWithGeometry
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                geometry:
+                                    oneOf:
+                                        - properties:
+                                            bevelEnabled:
+                                                default: false
+                                                description: Enable bevel
+                                                type: boolean
+                                            bevelOffset:
+                                                default: 0
+                                                description: Bevel offset
+                                                type: number
+                                            bevelSegments:
+                                                default: 3
+                                                description: Bevel segments
+                                                type: integer
+                                            bevelSize:
+                                                default: 0.01
+                                                description: Bevel size
+                                                type: number
+                                            bevelThickness:
+                                                default: 0.02
+                                                description: Bevel thickness
+                                                type: number
+                                            curveSegments:
+                                                default: 4
+                                                description: Number of curve segments
+                                                type: integer
+                                            depth:
+                                                default: 0.1
+                                                description: Depth of extrusion
+                                                type: number
+                                            size:
+                                                default: 1
+                                                description: Size of the text
+                                                type: number
+                                            text:
+                                                description: The text to render
+                                                type: string
+                                            type:
+                                                const: text
+                                                type: string
+                                          required:
+                                            - type
+                                          type: object
+                                        - properties:
+                                            depth:
+                                                default: 1
+                                                description: Depth of the box
+                                                type: number
+                                            depthSegments:
+                                                default: 1
+                                                description: Depth segments
+                                                type: integer
+                                            height:
+                                                default: 1
+                                                description: Height of the box
+                                                type: number
+                                            heightSegments:
+                                                default: 1
+                                                description: Height segments
+                                                type: integer
+                                            type:
+                                                const: box
+                                                type: string
+                                            width:
+                                                default: 1
+                                                description: Width of the box
+                                                type: number
+                                            widthSegments:
+                                                default: 1
+                                                description: Width segments
+                                                type: integer
+                                          required:
+                                            - type
+                                          type: object
+                                        - properties:
+                                            heightSegments:
+                                                default: 16
+                                                description: Height segments
+                                                type: integer
+                                            radius:
+                                                default: 1
+                                                description: Radius of the sphere
+                                                type: number
+                                            type:
+                                                const: sphere
+                                                type: string
+                                            widthSegments:
+                                                default: 32
+                                                description: Width segments
+                                                type: integer
+                                          required:
+                                            - type
+                                          type: object
+                                        - properties:
+                                            height:
+                                                default: 1
+                                                description: Height of cylinder
+                                                type: number
+                                            radialSegments:
+                                                default: 8
+                                                description: Radial segments
+                                                type: integer
+                                            radiusBottom:
+                                                default: 1
+                                                description: Bottom radius
+                                                type: number
+                                            radiusTop:
+                                                default: 1
+                                                description: Top radius
+                                                type: number
+                                            type:
+                                                const: cylinder
+                                                type: string
+                                          required:
+                                            - type
+                                          type: object
+                                    properties:
+                                        type:
+                                            enum:
+                                                - text
+                                                - box
+                                                - sphere
+                                                - cylinder
+                                            type: string
+                                    type: object
+                                material:
+                                    properties:
+                                        color:
+                                            example: '#777777'
+                                            type: string
+                                        type:
+                                            enum:
+                                                - basic
+                                                - phong
+                                                - standard
+                                            type: string
+                                    type: object
+                                position:
+                                    properties:
+                                        x:
+                                            type: number
+                                        "y":
+                                            type: number
+                                        z:
+                                            type: number
+                                    type: object
+                            type: object
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                properties:
+                                    entity_id:
+                                        type: string
+                                    seq_num:
+                                        type: integer
+                                    success:
+                                        type: boolean
+                                type: object
+                    description: Entity created successfully
+            summary: Create entity with Three.js geometry
+            x-function: CreateEntity
+            x-handler: api/entities/handlers.go
+components:
+    schemas: {}

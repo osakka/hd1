@@ -85,10 +85,11 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * GET /sync/stats - getSyncStats
+     * GET /sync/missing/{from}/{to} - getMissingOperations
      */
-    async getSyncStats() {
-        return this.request('GET', '/sync/stats');
+    async getMissingOperations(param1, param2) {
+        const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
+        return this.request('GET', path);
     }
 
     /**
@@ -99,11 +100,10 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * GET /sync/missing/{from}/{to} - getMissingOperations
+     * GET /sync/stats - getSyncStats
      */
-    async getMissingOperations(param1, param2) {
-        const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
-        return this.request('GET', path);
+    async getSyncStats() {
+        return this.request('GET', '/sync/stats');
     }
 
 
@@ -113,9 +113,16 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * POST /entities - createEntity
+     * GET /entities - getEntities
      */
-    async createEntity(data = null) {
+    async getEntities() {
+        return this.request('GET', '/entities');
+    }
+
+    /**
+     * POST /entities - createEntityWithGeometry
+     */
+    async createEntityWithGeometry(data = null) {
         return this.request('POST', '/entities', data);
     }
 
@@ -221,7 +228,7 @@ class HD1ThreeJSAPIClient {
      * Create a box entity with default material
      */
     async createBox(width = 1, height = 1, depth = 1, color = '#777777', position = {x: 0, y: 0, z: 0}) {
-        return this.createEntity({
+        return this.createEntityWithGeometry({
             geometry: {
                 type: 'box',
                 width: width,
@@ -240,7 +247,7 @@ class HD1ThreeJSAPIClient {
      * Create a sphere entity with default material
      */
     async createSphere(radius = 0.5, color = '#777777', position = {x: 0, y: 0, z: 0}) {
-        return this.createEntity({
+        return this.createEntityWithGeometry({
             geometry: {
                 type: 'sphere',
                 radius: radius

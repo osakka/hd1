@@ -1,0 +1,575 @@
+openapi: 3.0.3
+info:
+  title: HD1 Core API
+  description: |
+    HD1 core functionality: synchronization, session management, and avatar lifecycle.
+    This schema contains HD1-specific operations, excluding Three.js geometry which is 
+    auto-generated from Three.js TypeScript definitions.
+    
+    **CORE PRINCIPLES:**
+    - Single source of truth for HD1 operations
+    - Sequence-based synchronization (TCP-simple)
+    - Session-based avatar lifecycle management
+    - Zero manual geometry definitions
+    
+  version: 0.7.2
+  contact:
+    name: HD1 Core Engine
+    
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+paths:
+  # ========================================
+  # SYNC OPERATIONS
+  # ========================================
+  /sync/operations:
+    post:
+      operationId: submitOperation
+      summary: Submit operation to global sequence
+      description: |
+        Submits an operation to the global sequence for synchronization.
+        Operation receives a sequence number and is broadcast to all clients.
+      x-handler: "api/sync/operations.go"
+      x-function: "SubmitOperation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [avatar_move, entity_create, entity_update, entity_delete, scene_update]
+                  description: Type of operation
+                data:
+                  type: object
+                  description: Operation-specific data
+              required:
+                - type
+                - data
+      responses:
+        '200':
+          description: Operation submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  seq_num:
+                    type: integer
+                    example: 1234
+                    description: Sequence number assigned to operation
+
+  /sync/missing/{from}/{to}:
+    get:
+      operationId: getMissingOperations
+      summary: Get missing operations in range
+      description: |
+        Retrieves operations between two sequence numbers.
+        Used for client synchronization when gaps are detected.
+      x-handler: "api/sync/missing.go"
+      x-function: "GetMissingOperations"
+      parameters:
+        - name: from
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Starting sequence number
+        - name: to
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Ending sequence number
+      responses:
+        '200':
+          description: Missing operations retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  operations:
+                    type: array
+                    items:
+                      type: object
+
+  /sync/full:
+    get:
+      operationId: getFullSync
+      summary: Get full synchronization data
+      description: |
+        Retrieves all operations for complete client synchronization.
+        Used when client needs to rebuild complete state.
+      x-handler: "api/sync/full.go"
+      x-function: "GetFullSync"
+      responses:
+        '200':
+          description: Full sync data retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  operations:
+                    type: array
+                    items:
+                      type: object
+
+  /sync/stats:
+    get:
+      operationId: getSyncStats
+      summary: Get synchronization statistics
+      description: |
+        Returns statistics about the synchronization system.
+      x-handler: "api/sync/stats.go"
+      x-function: "GetSyncStats"
+      responses:
+        '200':
+          description: Sync statistics retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  stats:
+                    type: object
+                    properties:
+                      next_sequence:
+                        type: integer
+                        example: 1235
+                      stored_operations:
+                        type: integer
+                        example: 1234
+                      connected_clients:
+                        type: integer
+                        example: 3
+
+  # ========================================
+  # AVATAR OPERATIONS
+  # ========================================
+  /avatars:
+    get:
+      operationId: getAvatars
+      summary: Get all avatars
+      description: |
+        Retrieves all active avatars in the system.
+      x-handler: "api/avatars/handlers.go"
+      x-function: "GetAvatars"
+      responses:
+        '200':
+          description: Avatars retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  avatars:
+                    type: array
+                    items:
+                      type: object
+
+    post:
+      operationId: createAvatar
+      summary: Create new avatar
+      description: |
+        Creates a new avatar in the system.
+      x-handler: "api/avatars/handlers.go"
+      x-function: "CreateAvatar"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Avatar name
+                position:
+                  type: object
+                  properties:
+                    x:
+                      type: number
+                    y:
+                      type: number
+                    z:
+                      type: number
+      responses:
+        '200':
+          description: Avatar created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  avatar_id:
+                    type: string
+                  seq_num:
+                    type: integer
+
+  /avatars/{avatarId}:
+    put:
+      operationId: updateAvatar
+      summary: Update avatar properties
+      description: |
+        Updates an existing avatar's properties.
+      x-handler: "api/avatars/handlers.go"
+      x-function: "UpdateAvatar"
+      parameters:
+        - name: avatarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Avatar identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                position:
+                  type: object
+                  properties:
+                    x:
+                      type: number
+                    y:
+                      type: number
+                    z:
+                      type: number
+      responses:
+        '200':
+          description: Avatar updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  seq_num:
+                    type: integer
+
+    delete:
+      operationId: removeAvatar
+      summary: Remove avatar
+      description: |
+        Removes an avatar from the system.
+      x-handler: "api/avatars/handlers.go"
+      x-function: "RemoveAvatar"
+      parameters:
+        - name: avatarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Avatar identifier
+      responses:
+        '200':
+          description: Avatar removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  seq_num:
+                    type: integer
+
+  /avatars/{sessionId}/move:
+    post:
+      operationId: moveAvatar
+      summary: Move avatar position
+      description: |
+        Updates avatar position and rotation for real-time movement.
+      x-handler: "api/avatars/handlers.go"
+      x-function: "MoveAvatar"
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Session identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position:
+                  type: object
+                  properties:
+                    x:
+                      type: number
+                    y:
+                      type: number
+                    z:
+                      type: number
+                rotation:
+                  type: object
+                  properties:
+                    x:
+                      type: number
+                    y:
+                      type: number
+                    z:
+                      type: number
+      responses:
+        '200':
+          description: Avatar moved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  seq_num:
+                    type: integer
+
+  # ========================================
+  # SCENE MANAGEMENT
+  # ========================================
+  /scene:
+    get:
+      operationId: getScene
+      summary: Get scene configuration
+      description: |
+        Retrieves current scene configuration.
+      x-handler: "api/scene/handlers.go"
+      x-function: "GetScene"
+      responses:
+        '200':
+          description: Scene configuration retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  scene:
+                    type: object
+
+    put:
+      operationId: updateScene
+      summary: Update scene configuration
+      description: |
+        Updates scene properties like background, lighting, fog.
+      x-handler: "api/scene/handlers.go"
+      x-function: "UpdateScene"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                background:
+                  type: string
+                  description: Background color
+                  example: "#000000"
+                fog:
+                  type: object
+                  properties:
+                    color:
+                      type: string
+                    near:
+                      type: number
+                    far:
+                      type: number
+      responses:
+        '200':
+          description: Scene updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  seq_num:
+                    type: integer
+
+  # ========================================
+  # ENTITY OPERATIONS
+  # ========================================
+  /entities:
+    get:
+      operationId: getEntities
+      summary: Get all entities
+      description: |
+        Retrieves all entities in the system.
+      x-handler: "api/entities/handlers.go"
+      x-function: "GetEntities"
+      responses:
+        '200':
+          description: Entities retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  entities:
+                    type: array
+                    items:
+                      type: object
+
+  /entities/{entityId}:
+    put:
+      operationId: updateEntity
+      summary: Update entity properties
+      description: |
+        Updates an existing entity's properties.
+      x-handler: "api/entities/handlers.go"
+      x-function: "UpdateEntity"
+      parameters:
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Entity identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position:
+                  type: object
+                  properties:
+                    x:
+                      type: number
+                    y:
+                      type: number
+                    z:
+                      type: number
+                rotation:
+                  type: object
+                  properties:
+                    x:
+                      type: number
+                    y:
+                      type: number
+                    z:
+                      type: number
+                scale:
+                  type: object
+                  properties:
+                    x:
+                      type: number
+                    y:
+                      type: number
+                    z:
+                      type: number
+                visible:
+                  type: boolean
+      responses:
+        '200':
+          description: Entity updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  seq_num:
+                    type: integer
+
+    delete:
+      operationId: deleteEntity
+      summary: Delete entity
+      description: |
+        Deletes an entity from the system.
+      x-handler: "api/entities/handlers.go"
+      x-function: "DeleteEntity"
+      parameters:
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Entity identifier
+      responses:
+        '200':
+          description: Entity deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  seq_num:
+                    type: integer
+
+  # ========================================
+  # SYSTEM OPERATIONS
+  # ========================================
+  /system/version:
+    get:
+      operationId: getVersion
+      summary: Get system version
+      description: |
+        Returns HD1 system version information.
+      x-handler: "api/system/version.go"
+      x-function: "GetVersionHandler"
+      responses:
+        '200':
+          description: Version information retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  api_version:
+                    type: string
+                    example: "0.7.2"
+                  js_version:
+                    type: string
+                  build_timestamp:
+                    type: string
+                  title:
+                    type: string

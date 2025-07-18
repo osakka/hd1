@@ -19,7 +19,7 @@ all: validate generate build
 generate:
 	@echo "GENERATING THREE.JS CODE FROM SPECIFICATION..."
 	go run codegen/generator.go
-	@echo "Three.js auto-router generated from api.yaml"
+	@echo "Three.js auto-router generated from unified API schema"
 	@echo "DOWNLOADING THREE.JS LIBRARY..."
 	@mkdir -p $(SHARE_DIR)/htdocs/static/vendor/threejs
 	@if [ ! -f $(SHARE_DIR)/htdocs/static/vendor/threejs/three.min.js ]; then \
@@ -29,11 +29,12 @@ generate:
 		echo "Three.js already exists in static directory"; \
 	fi
 
-# Validate Three.js specification
+# Validate schema directory structure
 validate:
-	@echo "VALIDATING THREE.JS API SPECIFICATION..."
-	@if [ ! -f api.yaml ]; then echo "FATAL: api.yaml missing!"; exit 1; fi
-	@echo "Three.js specification found"
+	@echo "VALIDATING SCHEMA DIRECTORY STRUCTURE..."
+	@if [ ! -d schemas ]; then echo "FATAL: schemas directory missing!"; exit 1; fi
+	@if [ ! -f schemas/hd1-api.yaml ]; then echo "FATAL: schemas/hd1-api.yaml missing!"; exit 1; fi
+	@echo "Schema directory structure validated"
 
 # Build server with artifact management
 build: generate
@@ -91,8 +92,9 @@ build-status:
 	@echo "================"
 	@if [ -f $(BIN_DIR)/hd1 ]; then echo "HD1 Binary: EXISTS ($(BIN_DIR)/hd1)"; else echo "HD1 Binary: MISSING"; fi
 	@if [ -f $(BIN_DIR)/hd1-client ]; then echo "HD1 Client: EXISTS ($(BIN_DIR)/hd1-client)"; else echo "HD1 Client: MISSING"; fi
-	@if [ -f api.yaml ]; then echo "Three.js API Spec: EXISTS"; else echo "Three.js API Spec: MISSING"; fi
-	@if [ -f auto_router.go ]; then echo "Three.js Auto Router: GENERATED"; else echo "Three.js Auto Router: NOT GENERATED"; fi
+	@if [ -f schemas/hd1-api.yaml ]; then echo "HD1 API Schema: EXISTS"; else echo "HD1 API Schema: MISSING"; fi
+	@if [ -f $(BUILD_DIR)/api.yaml ]; then echo "Unified API Schema: GENERATED"; else echo "Unified API Schema: NOT GENERATED"; fi
+	@if [ -f router/auto_router.go ]; then echo "Three.js Auto Router: GENERATED"; else echo "Three.js Auto Router: NOT GENERATED"; fi
 	@echo "Build artifacts in: $(BUILD_DIR)/"
 
 # Show recent logs
@@ -106,14 +108,14 @@ logs:
 clean:
 	@echo "CLEANING HD1 THREE.JS BUILD ARTIFACTS..."
 	@rm -rf $(BUILD_DIR)/bin/hd1 $(BUILD_DIR)/bin/hd1-client
-	@rm -f auto_router.go
+	@rm -f router/auto_router.go
 	@echo "Clean complete"
 
 # Deep clean - remove all build directories
 deep-clean:
 	@echo "DEEP CLEANING HD1 THREE.JS WORKSPACE..."
 	@rm -rf $(BUILD_DIR)
-	@rm -f auto_router.go
+	@rm -f router/auto_router.go
 	@echo "Deep clean complete"
 
 # Daemon control
@@ -230,7 +232,7 @@ help:
 	@echo "  make status    - Show daemon status"
 	@echo ""
 	@echo "Development targets:"
-	@echo "  make generate  - Generate Three.js router from api.yaml"
+	@echo "  make generate  - Generate Three.js router from unified API schema"
 	@echo "  make client    - Create HD1 API client"
 	@echo "  make web       - Setup web resources"
 	@echo "  make build-status - Show build status"
