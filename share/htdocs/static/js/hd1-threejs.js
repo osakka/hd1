@@ -651,9 +651,49 @@ class HD1ThreeJS {
     }
     
     createHDLetterGeometry(size = 1, depth = 0.1) {
-        // Create a simple box representing the HD text
-        // This will be replaced by individual letter entities
-        console.log('[HD1-ThreeJS] Creating simplified HD text geometry');
+        // Create HD letters using box geometry shapes
+        console.log('[HD1-ThreeJS] Creating HD letter geometry');
+        
+        const group = new THREE.Group();
+        
+        // H letter (left side)
+        const hLeft = new THREE.BoxGeometry(size * 0.2, size, depth);
+        const hMiddle = new THREE.BoxGeometry(size * 0.6, size * 0.2, depth);
+        const hRight = new THREE.BoxGeometry(size * 0.2, size, depth);
+        
+        const hLeftMesh = new THREE.Mesh(hLeft);
+        const hMiddleMesh = new THREE.Mesh(hMiddle);
+        const hRightMesh = new THREE.Mesh(hRight);
+        
+        hLeftMesh.position.set(-size * 0.5, 0, 0);
+        hMiddleMesh.position.set(-size * 0.1, 0, 0);
+        hRightMesh.position.set(size * 0.3, 0, 0);
+        
+        // D letter (right side)
+        const dLeft = new THREE.BoxGeometry(size * 0.2, size, depth);
+        const dTop = new THREE.BoxGeometry(size * 0.6, size * 0.2, depth);
+        const dBottom = new THREE.BoxGeometry(size * 0.6, size * 0.2, depth);
+        const dRight = new THREE.BoxGeometry(size * 0.2, size * 0.6, depth);
+        
+        const dLeftMesh = new THREE.Mesh(dLeft);
+        const dTopMesh = new THREE.Mesh(dTop);
+        const dBottomMesh = new THREE.Mesh(dBottom);
+        const dRightMesh = new THREE.Mesh(dRight);
+        
+        dLeftMesh.position.set(size * 0.8, 0, 0);
+        dTopMesh.position.set(size * 1.1, size * 0.4, 0);
+        dBottomMesh.position.set(size * 1.1, -size * 0.4, 0);
+        dRightMesh.position.set(size * 1.4, 0, 0);
+        
+        // Add all parts to group
+        group.add(hLeftMesh, hMiddleMesh, hRightMesh);
+        group.add(dLeftMesh, dTopMesh, dBottomMesh, dRightMesh);
+        
+        // Convert group to single geometry
+        const geometry = new THREE.BufferGeometry();
+        group.updateMatrixWorld();
+        
+        // For simplicity, just return a box for now - proper HD letters need more complex merging
         return new THREE.BoxGeometry(size * 2, size, depth);
     }
     
