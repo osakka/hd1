@@ -98,7 +98,7 @@ func (h *Hub) registerClient(client *Client) {
 	h.clients[client] = true
 	
 	// Register client with sync system - SINGLE SOURCE OF TRUTH
-	syncChan := h.sync.RegisterClient(client.GetClientID())
+	syncChan := h.sync.RegisterClient(client.GetHD1ID())
 	client.syncChan = syncChan
 	
 	// Start sync forwarding goroutine
@@ -113,7 +113,7 @@ func (h *Hub) registerClient(client *Client) {
 		
 		logging.Info("client registered with new avatar and sync channel", map[string]interface{}{
 			"client_count": len(h.clients),
-			"session_id":   client.sessionID,
+			"hd1_id":       client.GetHD1ID(),
 			"client_id":    client.GetClientID(),
 			"avatar_id":    avatar.ID,
 			"avatar_count": h.avatarRegistry.GetAvatarCount(),
@@ -121,7 +121,7 @@ func (h *Hub) registerClient(client *Client) {
 	} else {
 		logging.Info("client registered with existing avatar and sync channel", map[string]interface{}{
 			"client_count": len(h.clients),
-			"session_id":   client.sessionID,
+			"hd1_id":       client.GetHD1ID(),
 			"client_id":    client.GetClientID(),
 			"avatar_id":    client.GetAvatarID(),
 			"avatar_count": h.avatarRegistry.GetAvatarCount(),
@@ -139,7 +139,7 @@ func (h *Hub) unregisterClient(client *Client) {
 		close(client.send)
 		
 		// Unregister from sync system - SINGLE SOURCE OF TRUTH
-		h.sync.UnregisterClient(client.GetClientID())
+		h.sync.UnregisterClient(client.GetHD1ID())
 		
 		// Remove avatar when client disconnects
 		if avatarID := client.GetAvatarID(); avatarID != "" {
@@ -148,7 +148,7 @@ func (h *Hub) unregisterClient(client *Client) {
 		
 		logging.Info("client unregistered with avatar cleanup and sync cleanup", map[string]interface{}{
 			"client_count": len(h.clients),
-			"session_id":   client.sessionID,
+			"hd1_id":       client.GetHD1ID(),
 			"client_id":    client.GetClientID(),
 			"avatar_id":    client.GetAvatarID(),
 			"avatar_count": h.avatarRegistry.GetAvatarCount(),

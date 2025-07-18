@@ -52,8 +52,8 @@ func (ar *AvatarRegistry) CreateAvatar(client *Client) *Avatar {
 	ar.mutex.Lock()
 	defer ar.mutex.Unlock()
 
-	// Generate unique avatar ID
-	avatarID := fmt.Sprintf("avatar-%s", client.GetClientID())
+	// Use unified HD1 ID as avatar ID - single source of truth
+	avatarID := client.GetHD1ID()
 	
 	// Default spawn position
 	position := Vector3{X: 0, Y: 0, Z: 0}
@@ -61,8 +61,8 @@ func (ar *AvatarRegistry) CreateAvatar(client *Client) *Avatar {
 	// Create avatar
 	avatar := &Avatar{
 		ID:           avatarID,
-		ClientID:     client.GetClientID(),
-		Name:         fmt.Sprintf("User_%s", client.GetClientID()[:8]),
+		ClientID:     client.GetHD1ID(),
+		Name:         fmt.Sprintf("User_%s", client.GetHD1ID()[:8]),
 		Position:     position,
 		Animation:    "idle",
 		Capabilities: []string{"WebGL", "WebSocket"},
@@ -80,17 +80,17 @@ func (ar *AvatarRegistry) CreateAvatar(client *Client) *Avatar {
 
 	logging.Info("avatar created", map[string]interface{}{
 		"avatar_id":  avatarID,
-		"client_id":  client.GetClientID(),
+		"hd1_id":     client.GetHD1ID(),
 		"session_id": client.GetSessionID(),
 		"position":   fmt.Sprintf("%.2f,%.2f,%.2f", position.X, position.Y, position.Z),
 	})
 
 	// Submit avatar_create operation to sync system
 	operation := &syncPkg.Operation{
-		ClientID: client.GetClientID(),
+		ClientID: client.GetHD1ID(),
 		Type:     "avatar_create",
 		Data: map[string]interface{}{
-			"avatar_id":    avatarID,
+			"hd1_id":       avatarID,
 			"name":         avatar.Name,
 			"position":     avatar.Position,
 			"capabilities": avatar.Capabilities,
@@ -169,7 +169,7 @@ func (ar *AvatarRegistry) RemoveAvatar(avatarID string) {
 		ClientID: avatar.ClientID,
 		Type:     "avatar_remove",
 		Data: map[string]interface{}{
-			"avatar_id": avatarID,
+			"hd1_id": avatarID,
 		},
 		Timestamp: time.Now(),
 	}
@@ -199,8 +199,7 @@ func (ar *AvatarRegistry) RemoveAvatarByClientID(clientID string) bool {
 				ClientID: clientID,
 				Type:     "avatar_remove",
 				Data: map[string]interface{}{
-					"avatar_id": avatarID,
-					"client_id": clientID,
+					"hd1_id": avatarID,
 				},
 				Timestamp: time.Now(),
 			}

@@ -73,7 +73,7 @@ func CreateAvatar(w http.ResponseWriter, r *http.Request) {
 
 	// Create operation data
 	operationData := map[string]interface{}{
-		"avatar_id":    avatarID,
+		"hd1_id":       avatarID,
 		"name":         req.Name,
 		"position":     req.Position,
 		"capabilities": req.Capabilities,
@@ -147,7 +147,7 @@ func UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 
 	// Create operation data for sync
 	operationData := map[string]interface{}{
-		"avatar_id": avatarID,
+		"hd1_id": avatarID,
 	}
 
 	// Prepare updates for registry
@@ -222,7 +222,7 @@ func RemoveAvatar(w http.ResponseWriter, r *http.Request) {
 
 	// Create operation data
 	operationData := map[string]interface{}{
-		"avatar_id": avatarID,
+		"hd1_id": avatarID,
 	}
 
 	// Create operation
@@ -292,8 +292,8 @@ func MoveAvatar(w http.ResponseWriter, r *http.Request) {
 
 	// Create operation data
 	operationData := map[string]interface{}{
-		"session_id": sessionID,
-		"position":   req.Position,
+		"hd1_id":   sessionID,  // sessionID is actually the hd1_id
+		"position": req.Position,
 	}
 
 	// Add optional properties

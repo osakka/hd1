@@ -66,39 +66,29 @@ type Client struct {
 	send      chan []byte
 	info      *ClientInfo
 	lastSeen  time.Time
-	sessionID string  // HD1 session isolation
-	clientID  string  // Unique client identifier
-	avatarID  string  // Avatar ID when connected
+	hd1ID     string  // Single unified identifier - SINGLE SOURCE OF TRUTH
 	syncChan  chan *sync.Operation  // Sync system channel - SINGLE SOURCE OF TRUTH
 }
 
-// generateClientID generates a unique client identifier
-func generateClientID() string {
-	return fmt.Sprintf("client-%d-%d", time.Now().Unix(), rand.Intn(100000))
+// generateHD1ID generates a unified HD1 identifier
+func generateHD1ID() string {
+	return fmt.Sprintf("hd1-%d-%d", time.Now().Unix(), rand.Intn(100000))
 }
 
-// GetClientID returns the client's unique identifier
-func (c *Client) GetClientID() string {
-	if c.clientID == "" {
-		c.clientID = generateClientID()
+// GetHD1ID returns the unified HD1 identifier
+func (c *Client) GetHD1ID() string {
+	if c.hd1ID == "" {
+		c.hd1ID = generateHD1ID()
 	}
-	return c.clientID
+	return c.hd1ID
 }
 
-// GetSessionID returns the client's session ID
-func (c *Client) GetSessionID() string {
-	return c.sessionID
-}
-
-// SetAvatarID sets the client's avatar ID
-func (c *Client) SetAvatarID(avatarID string) {
-	c.avatarID = avatarID
-}
-
-// GetAvatarID returns the client's avatar ID
-func (c *Client) GetAvatarID() string {
-	return c.avatarID
-}
+// Legacy compatibility methods - all map to hd1ID for single source of truth
+func (c *Client) GetClientID() string { return c.GetHD1ID() }
+func (c *Client) GetSessionID() string { return c.GetHD1ID() }
+func (c *Client) GetAvatarID() string { return c.GetHD1ID() }
+func (c *Client) SetSessionID(id string) { c.hd1ID = id }
+func (c *Client) SetAvatarID(id string) { c.hd1ID = id }
 
 // ensureRegistered ensures the client is registered with the hub (lazy registration)
 func (c *Client) ensureRegistered() {
@@ -205,14 +195,14 @@ func (c *Client) handleClientMessage(message []byte) {
 			// Try to reconnect to existing avatar
 			if avatar := c.hub.avatarRegistry.ReconnectClient(existingClientID, c); avatar != nil {
 				// Set client ID to the existing one
-				c.clientID = existingClientID
+				c.hd1ID = existingClientID
 				
 				// Register client with hub (since we skipped it in ServeWS)
 				c.hub.register <- c
 				
 				// Update last_seen for session management
-				if c.hub.sessionManager != nil && c.sessionID != "" {
-					if sessionUUID, err := uuid.Parse(c.sessionID); err == nil {
+				if c.hub.sessionManager != nil && c.hd1ID != "" {
+					if sessionUUID, err := uuid.Parse(c.hd1ID); err == nil {
 						if userUUID, err := uuid.Parse(existingClientID); err == nil {
 							go c.hub.sessionManager.UpdateLastSeen(context.Background(), sessionUUID, userUUID)
 						}
@@ -318,14 +308,14 @@ func (c *Client) handleClientMessage(message []byte) {
 	case "session_associate":
 		// Associate this client with a specific HD1 session
 		if sessionID, ok := msg["session_id"].(string); ok {
-			c.sessionID = sessionID
+			c.hd1ID = sessionID
 			logging.Info("client session associated", map[string]interface{}{
 				"session_id": sessionID,
 			})
 			
 			// Ensure client is registered
 			c.ensureRegistered()
-			c.sessionID = sessionID
+			c.hd1ID = sessionID
 			
 			logging.Info("client joined session", map[string]interface{}{
 				"session_id": sessionID,

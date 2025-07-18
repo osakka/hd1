@@ -454,13 +454,13 @@ class HD1ThreeJS {
     applyOperation(operation) {
         switch (operation.type) {
             case 'avatar_move':
-                this.updateAvatar(operation.client_id, operation.data);
+                this.updateAvatar(operation.data.hd1_id || operation.client_id, operation.data);
                 break;
             case 'avatar_create':
-                this.createAvatar(operation.client_id, operation.data);
+                this.createAvatar(operation.data.hd1_id || operation.client_id, operation.data);
                 break;
             case 'avatar_remove':
-                this.removeAvatar(operation.client_id);
+                this.removeAvatar(operation.data.hd1_id || operation.client_id);
                 break;
             case 'entity_create':
                 this.createEntity(operation.data.id, operation.data);
