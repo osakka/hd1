@@ -151,6 +151,9 @@ function connectWebSocket() {
                 };
                 ws.send(JSON.stringify(sessionMessage));
                 addDebug('SESSION_JOIN', 'Automatically joined default session for sync');
+                
+                // Request full sync to get all existing operations
+                requestFullSync();
             }
             
             // Handle successful client reconnection
@@ -289,6 +292,37 @@ rebootstrapBtn.addEventListener('click', function() {
         triggerRebootstrap();
     }
 });
+
+// Request full sync from server
+async function requestFullSync() {
+    if (!apiClient) {
+        addDebug('BOOTSTRAP_ERROR', 'API client not available');
+        return;
+    }
+    
+    try {
+        addDebug('BOOTSTRAP_START', 'Requesting full sync...');
+        const response = await apiClient.getFullSync();
+        
+        if (response.success && response.operations) {
+            addDebug('BOOTSTRAP_SUCCESS', `Received ${response.operations.length} operations`);
+            
+            // Apply all operations to Three.js scene
+            if (window.hd1ThreeJS) {
+                for (const opWrapper of response.operations) {
+                    window.hd1ThreeJS.applyOperation(opWrapper.operation);
+                }
+                addDebug('BOOTSTRAP_APPLIED', `Applied ${response.operations.length} operations to scene`);
+            } else {
+                addDebug('BOOTSTRAP_ERROR', 'Three.js scene manager not available');
+            }
+        } else {
+            addDebug('BOOTSTRAP_ERROR', 'Failed to get full sync: ' + JSON.stringify(response));
+        }
+    } catch (error) {
+        addDebug('BOOTSTRAP_ERROR', 'Full sync request failed: ' + error.message);
+    }
+}
 
 // Initialize console
 function initConsole() {
