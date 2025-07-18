@@ -453,34 +453,6 @@ class HD1ThreeJS {
         this.renderer.render(this.scene, this.camera);
     }
     
-    // Operation handlers - called by sync system
-    applyOperation(operation) {
-        switch (operation.type) {
-            case 'avatar_move':
-                this.updateAvatar(operation.data.hd1_id || operation.client_id, operation.data);
-                break;
-            case 'avatar_create':
-                this.createAvatar(operation.data.hd1_id || operation.client_id, operation.data);
-                break;
-            case 'avatar_remove':
-                this.removeAvatar(operation.data.hd1_id || operation.client_id);
-                break;
-            case 'entity_create':
-                this.createEntity(operation.data.id, operation.data);
-                break;
-            case 'entity_update':
-                this.updateEntity(operation.data.id, operation.data);
-                break;
-            case 'entity_delete':
-                this.deleteEntity(operation.data.id);
-                break;
-            case 'scene_update':
-                this.updateScene(operation.data);
-                break;
-            default:
-                console.warn('[HD1-ThreeJS] Unknown operation type:', operation.type);
-        }
-    }
     
     updateAvatar(sessionId, data) {
         let avatar = this.avatars.get(sessionId);
