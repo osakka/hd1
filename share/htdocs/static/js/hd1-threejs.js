@@ -50,6 +50,9 @@ class HD1ThreeJS {
         
         console.log('[HD1-ThreeJS] Scene manager initialized');
         console.log('[HD1-ThreeJS] Three.js version:', THREE.REVISION);
+        
+        // Request full sync once Three.js is ready
+        this.requestFullSyncWhenReady();
     }
     
     async loadFontModules() {
@@ -391,12 +394,12 @@ class HD1ThreeJS {
     sendAvatarPosition() {
         // Send avatar position update via API endpoint - SINGLE SOURCE OF TRUTH
         if (!window.apiClient) {
-            console.warn('[HD1-ThreeJS] API client not available - position update skipped');
+            // Client not ready yet - silently skip without warning
             return;
         }
         
         if (!window.clientId) {
-            console.warn('[HD1-ThreeJS] Client ID not available - position update skipped');
+            // Client ID not available yet - silently skip without warning
             return;
         }
         
@@ -822,6 +825,61 @@ class HD1ThreeJS {
         
         this.renderer.dispose();
         console.log('[HD1-ThreeJS] Scene manager disposed');
+    }
+    
+    // Request full sync when Three.js client is ready
+    async requestFullSyncWhenReady() {
+        // Wait for API client and clientId to be available
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max wait
+        
+        const waitForReady = () => {
+            attempts++;
+            
+            if (window.apiClient && window.clientId) {
+                console.log('[HD1-ThreeJS] Ready to request full sync');
+                this.requestFullSync();
+                return;
+            }
+            
+            if (attempts >= maxAttempts) {
+                console.warn('[HD1-ThreeJS] Timeout waiting for API client and client ID');
+                return;
+            }
+            
+            // Wait 100ms and try again
+            setTimeout(waitForReady, 100);
+        };
+        
+        setTimeout(waitForReady, 100); // Start checking after 100ms
+    }
+    
+    // Request full sync from server
+    async requestFullSync() {
+        if (!window.apiClient) {
+            console.warn('[HD1-ThreeJS] API client not available for full sync');
+            return;
+        }
+        
+        try {
+            console.log('[HD1-ThreeJS] Requesting full sync...');
+            const response = await window.apiClient.getFullSync();
+            
+            if (response.success && response.operations) {
+                console.log(`[HD1-ThreeJS] Received ${response.operations.length} operations for bootstrap`);
+                
+                // Apply all operations to scene
+                for (const opWrapper of response.operations) {
+                    this.handleSyncOperation(opWrapper.operation);
+                }
+                
+                console.log(`[HD1-ThreeJS] Applied ${response.operations.length} operations to scene`);
+            } else {
+                console.error('[HD1-ThreeJS] Failed to get full sync:', response);
+            }
+        } catch (error) {
+            console.error('[HD1-ThreeJS] Full sync request failed:', error);
+        }
     }
     
     // Handle sync operations - SINGLE SOURCE OF TRUTH

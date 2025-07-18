@@ -305,7 +305,7 @@ async function requestFullSync() {
             // Apply all operations to Three.js scene
             if (window.hd1ThreeJS) {
                 for (const opWrapper of response.operations) {
-                    window.hd1ThreeJS.applyOperation(opWrapper.operation);
+                    window.hd1ThreeJS.handleSyncOperation(opWrapper.operation);
                 }
                 addDebug('BOOTSTRAP_APPLIED', `Applied ${response.operations.length} operations to scene`);
             } else {
