@@ -177,6 +177,41 @@ func (ar *AvatarRegistry) RemoveAvatar(avatarID string) {
 	ar.hub.SubmitOperation(operation)
 }
 
+// RemoveAvatarByClientID removes an avatar by client ID (for session cleanup)
+func (ar *AvatarRegistry) RemoveAvatarByClientID(clientID string) bool {
+	ar.mutex.Lock()
+	defer ar.mutex.Unlock()
+	
+	// Find avatar by client ID
+	for avatarID, avatar := range ar.avatars {
+		if avatar.ClientID == clientID {
+			// Remove from registry
+			delete(ar.avatars, avatarID)
+			
+			logging.Info("avatar removed by client ID", map[string]interface{}{
+				"avatar_id": avatarID,
+				"client_id": clientID,
+				"duration":  time.Since(avatar.ConnectedAt).String(),
+			})
+			
+			// Submit avatar_remove operation to sync system
+			operation := &syncPkg.Operation{
+				ClientID: clientID,
+				Type:     "avatar_remove",
+				Data: map[string]interface{}{
+					"avatar_id": avatarID,
+					"client_id": clientID,
+				},
+				Timestamp: time.Now(),
+			}
+			
+			ar.hub.SubmitOperation(operation)
+			return true
+		}
+	}
+	return false
+}
+
 // UpdateAvatarPosition updates an avatar's position in the registry
 func (ar *AvatarRegistry) UpdateAvatarPosition(avatarID string, positionData map[string]interface{}) {
 	ar.mutex.Lock()

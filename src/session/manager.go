@@ -13,8 +13,14 @@ import (
 	"holodeck1/logging"
 )
 
+// AvatarRegistryInterface defines the interface for avatar cleanup
+type AvatarRegistryInterface interface {
+	RemoveAvatarByClientID(clientID string) bool
+}
+
 type Manager struct {
-	db *database.DB
+	db             *database.DB
+	avatarRegistry AvatarRegistryInterface
 }
 
 type Session struct {
@@ -77,6 +83,11 @@ type SessionFilter struct {
 
 func NewManager(db *database.DB) *Manager {
 	return &Manager{db: db}
+}
+
+// SetAvatarRegistry sets the avatar registry for cleanup operations
+func (m *Manager) SetAvatarRegistry(registry AvatarRegistryInterface) {
+	m.avatarRegistry = registry
 }
 
 func (m *Manager) CreateSession(ctx context.Context, req *CreateSessionRequest) (*Session, error) {
@@ -521,6 +532,35 @@ func (m *Manager) CleanupInactiveSessions(ctx context.Context) {
 	// Get inactivity timeout from config
 	inactivityTimeout := config.GetSessionInactivityTimeout()
 	
+	// Get inactive participant client IDs before updating
+	selectQuery := `
+		SELECT user_id::text as client_id
+		FROM participants 
+		WHERE left_at IS NULL 
+		AND last_seen < NOW() - INTERVAL '%d seconds'
+	`
+	
+	rows, err := m.db.QueryContext(ctx, fmt.Sprintf(selectQuery, int(inactivityTimeout.Seconds())))
+	if err != nil {
+		logging.Error("failed to query inactive participants", map[string]interface{}{
+			"error": err.Error(),
+		})
+		return
+	}
+	defer rows.Close()
+	
+	var inactiveClientIDs []string
+	for rows.Next() {
+		var clientID string
+		if err := rows.Scan(&clientID); err != nil {
+			logging.Error("failed to scan inactive participant", map[string]interface{}{
+				"error": err.Error(),
+			})
+			continue
+		}
+		inactiveClientIDs = append(inactiveClientIDs, clientID)
+	}
+	
 	// Update participants who haven't been seen recently
 	updateQuery := `
 		UPDATE participants 
@@ -543,6 +583,21 @@ func (m *Manager) CleanupInactiveSessions(ctx context.Context) {
 			"participants_removed": rowsAffected,
 			"inactivity_timeout":   inactivityTimeout.String(),
 		})
+		
+		// Remove avatars for inactive participants
+		if m.avatarRegistry != nil {
+			avatarsRemoved := 0
+			for _, clientID := range inactiveClientIDs {
+				if m.avatarRegistry.RemoveAvatarByClientID(clientID) {
+					avatarsRemoved++
+				}
+			}
+			if avatarsRemoved > 0 {
+				logging.Info("cleaned up inactive avatars", map[string]interface{}{
+					"avatars_removed": avatarsRemoved,
+				})
+			}
+		}
 	}
 	
 	// Update sessions that have no active participants

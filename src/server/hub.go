@@ -62,6 +62,9 @@ func NewHub(sessionManager *session.Manager) *Hub {
 func (h *Hub) Run(ctx context.Context) {
 	// Start session cleanup worker (if database available)
 	if h.sessionManager != nil {
+		// Connect session manager to avatar registry for cleanup
+		h.sessionManager.SetAvatarRegistry(h.avatarRegistry)
+		
 		go h.sessionManager.StartCleanupWorker(ctx)
 		logging.Info("session cleanup worker started", map[string]interface{}{
 			"cleanup_interval":   config.GetSessionCleanupInterval().String(),
