@@ -128,11 +128,9 @@ class HD1ThreeJS {
                     this.sprint = true;
                     break;
                 case 'Escape':
-                    // Toggle mouse-look mode: enter if not active, exit if active
+                    // Only exit pointer lock on Escape - can't enter without user gesture
                     if (this.mouseLook) {
                         this.exitPointerLock();
-                    } else {
-                        this.requestPointerLock();
                     }
                     break;
             }
@@ -187,6 +185,57 @@ class HD1ThreeJS {
             // Update camera rotation
             this.camera.rotation.set(this.pitch, this.yaw, 0);
         });
+        
+        // Touch controls for mobile
+        this.canvas.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            this.touchStartX = event.touches[0].clientX;
+            this.touchStartY = event.touches[0].clientY;
+        });
+        
+        this.canvas.addEventListener('touchmove', (event) => {
+            event.preventDefault();
+            if (!this.touchStartX || !this.touchStartY) return;
+            
+            const touchX = event.touches[0].clientX;
+            const touchY = event.touches[0].clientY;
+            
+            const deltaX = touchX - this.touchStartX;
+            const deltaY = touchY - this.touchStartY;
+            
+            // Right side of screen: camera look
+            if (this.touchStartX > window.innerWidth / 2) {
+                this.yaw -= deltaX * this.mouseSensitivity;
+                this.pitch -= deltaY * this.mouseSensitivity;
+                
+                // Limit pitch to prevent flipping
+                this.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitch));
+                
+                // Update camera rotation
+                this.camera.rotation.set(this.pitch, this.yaw, 0);
+            }
+            // Left side of screen: movement
+            else {
+                const moveThreshold = 30;
+                this.moveForward = deltaY < -moveThreshold;
+                this.moveBackward = deltaY > moveThreshold;
+                this.moveLeft = deltaX < -moveThreshold;
+                this.moveRight = deltaX > moveThreshold;
+            }
+            
+            this.touchStartX = touchX;
+            this.touchStartY = touchY;
+        });
+        
+        this.canvas.addEventListener('touchend', () => {
+            this.touchStartX = null;
+            this.touchStartY = null;
+            // Stop movement on touch end
+            this.moveForward = false;
+            this.moveBackward = false;
+            this.moveLeft = false;
+            this.moveRight = false;
+        });
     }
     
     requestPointerLock() {
@@ -202,12 +251,12 @@ class HD1ThreeJS {
     }
     
     updateMovement(deltaTime) {
-        if (!this.mouseLook) {
+        if (!this.mouseLook && !this.touchStartX) {
             // Debug: Show why movement isn't working
             if (this.moveForward || this.moveBackward || this.moveLeft || this.moveRight) {
-                console.log('[HD1-ThreeJS] Movement blocked - click canvas to enable mouse look first!');
+                console.log('[HD1-ThreeJS] Movement blocked - click canvas or touch to enable!');
             }
-            return; // Only move when mouse look is active
+            return; // Only move when mouse look is active or touch is active
         }
         
         // Calculate movement speed with sprint modifier
