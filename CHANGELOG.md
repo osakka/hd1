@@ -5,6 +5,43 @@ All notable changes to HD1 (Holodeck One) are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2025-07-18
+
+### Major Enhancements - Complete Avatar Lifecycle Management
+This release achieves surgical precision avatar lifecycle management with automatic cleanup, mobile touch controls, and comprehensive single source of truth architecture.
+
+### Added
+- **Avatar Lifecycle Management**: Automatic cleanup of inactive avatars via session inactivity timeout
+- **Mobile Touch Controls**: Left side for movement, right side for camera look with seamless desktop/mobile experience
+- **Session-Avatar Integration**: Avatar registry connected to session cleanup worker for surgical precision cleanup
+- **Pointer Lock Security**: Fixed user gesture requirements for browser security compliance
+- **Enhanced Error Handling**: Comprehensive error handling for avatar operations and cleanup processes
+
+### Changed
+- **Avatar Cleanup Architecture**: Session manager now drives avatar cleanup through interface pattern
+- **Mobile UX**: Touch controls enable full 3D navigation without external keyboards
+- **Pointer Lock Behavior**: Escape key now only exits (no entry) to comply with browser security
+- **Code Generation**: Auto-generated API client method ordering improved for consistency
+
+### Fixed
+- **Browser Security Compliance**: Removed pointer lock request from keyboard events (user gesture required)
+- **Avatar Persistence**: Avatars now properly cleaned up when sessions become inactive
+- **Single Source of Truth**: Avatar registry cleanup integrated with session database lifecycle
+- **Mobile Touch Navigation**: Proper touch event handling for both movement and camera controls
+
+### Technical Details
+- **Interface Pattern**: `AvatarRegistryInterface` enables clean session-avatar coupling
+- **Cleanup Query**: Pre-query inactive participants before database update for avatar cleanup
+- **Touch Controls**: Screen-split approach (left=move, right=look) for intuitive mobile UX
+- **Error Prevention**: Eliminated "NotAllowedError" and "SecurityError" from pointer lock operations
+
+### Architecture Validation
+- ✅ **Single Source of Truth**: Session database drives avatar lifecycle
+- ✅ **No Parallel Implementations**: All avatar cleanup flows through session manager
+- ✅ **Mobile-First**: Touch controls work seamlessly alongside desktop controls
+- ✅ **Security Compliant**: Proper browser security model compliance
+- ✅ **Zero Regressions**: All existing functionality preserved and enhanced
+
 ## [0.7.1] - 2025-07-17
 
 ### Critical Fixes - Surgical Precision Avatar Movement

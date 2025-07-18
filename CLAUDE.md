@@ -8,15 +8,18 @@
 - **Cross-Platform**: Web, mobile, desktop clients with plugin architecture
 - **Single Source of Truth**: Centralized database with incremental schemas
 
-## Current State (2025-07-17)
-HD1 v0.7.1 is a **universal 3D interface platform** with complete **multi-tenant architecture**, **real-time collaboration**, **AI integration**, **cross-platform support**, and **enterprise features**. The latest release achieves surgical precision single source of truth avatar movement with zero architectural compromises.
+## Current State (2025-07-18)
+HD1 v0.7.2 is a **universal 3D interface platform** with complete **multi-tenant architecture**, **real-time collaboration**, **AI integration**, **cross-platform support**, and **enterprise features**. The latest release achieves surgical precision single source of truth avatar lifecycle management with automatic cleanup, mobile touch controls, and zero architectural compromises.
 
 ### ✅ Current Features
 - **Three.js Integration**: 3D rendering with native Three.js r170
 - **TCP-Simple Sync**: Sequence-based synchronization for bulletproof reliability
 - **Real-Time WebSocket**: Entity lifecycle synchronization with operation ordering
 - **Pure WebGL**: Direct Three.js Scene/Mesh/Material/Geometry operations
-- **Avatar System**: Real-time multiplayer avatars with surgical precision single source of truth movement
+- **Avatar System**: Real-time multiplayer avatars with surgical precision single source of truth lifecycle management
+- **Avatar Cleanup**: Automatic cleanup of inactive avatars via session inactivity timeout
+- **Mobile Touch Controls**: Left side for movement, right side for camera look
+- **FPS Controls**: WASD movement, mouse look, Escape key to exit pointer lock
 - **Entity Management**: Create/update/delete boxes, spheres, and custom geometries
 - **Scene Control**: Background colors, lighting, fog, and camera management
 - **Console UI**: Debug monitoring with Three.js statistics
@@ -87,21 +90,22 @@ Client Operations → Sequence Assignment → WebSocket Broadcast → Client App
 **Pure Three.js Operations**: Direct Scene/Mesh/Material/Geometry manipulation
 
 ### Entity Operations
-- **Create**: `POST /api/threejs/entities` - Create boxes, spheres, custom geometries
-- **Update**: `PUT /api/threejs/entities/{id}` - Modify position, rotation, scale, materials
-- **Delete**: `DELETE /api/threejs/entities/{id}` - Remove from scene
-- **List**: `GET /api/threejs/entities` - Get all entities
+- **Create**: `POST /api/entities` - Create boxes, spheres, custom geometries
+- **Update**: `PUT /api/entities/{id}` - Modify position, rotation, scale, materials
+- **Delete**: `DELETE /api/entities/{id}` - Remove from scene
 
 ### Avatar System
-- **Move**: `POST /api/threejs/avatars/{sessionId}/move` - Real-time position updates
-- **Create**: `POST /api/threejs/avatars` - Spawn avatar in scene
-- **List**: `GET /api/threejs/avatars` - Get all active avatars
+- **Move**: `POST /api/avatars/{sessionId}/move` - Real-time position updates
+- **Create**: `POST /api/avatars` - Spawn avatar in scene
+- **List**: `GET /api/avatars` - Get all active avatars
+- **Remove**: `DELETE /api/avatars/{avatarId}` - Remove avatar manually
+- **Cleanup**: Automatic cleanup via session inactivity timeout
 
 ### Scene Management
-- **Background**: `PUT /api/threejs/scene` - Set background color
-- **Lighting**: `PUT /api/threejs/scene/lighting` - Configure lights
-- **Fog**: `PUT /api/threejs/scene/fog` - Add atmospheric effects
-- **Camera**: `PUT /api/threejs/scene/camera` - Control camera position/rotation
+- **Background**: `PUT /api/scene` - Set background color
+- **Lighting**: `PUT /api/scene/lighting` - Configure lights
+- **Fog**: `PUT /api/scene/fog` - Add atmospheric effects
+- **Camera**: `PUT /api/scene/camera` - Control camera position/rotation
 
 ## Configuration Management System
 

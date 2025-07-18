@@ -2,7 +2,7 @@
 
 HD1 is the **universal 3D interface platform** where any service, application, or AI system can render immersive 3D interfaces for their users.
 
-## 🚀 Current State (v0.7.1)
+## 🚀 Current State (v0.7.2)
 
 **Complete Universal Platform Implementation:**
 - **100+ API Endpoints**: Full-featured platform with comprehensive coverage
@@ -11,6 +11,8 @@ HD1 is the **universal 3D interface platform** where any service, application, o
 - **AI Integration**: LLM avatars with content generation
 - **Cross-Platform**: Web, mobile, desktop clients with plugin architecture
 - **Enterprise Features**: Organizations, RBAC, analytics, security & compliance
+- **Avatar Lifecycle Management**: Automatic cleanup with session inactivity timeout
+- **Mobile Touch Controls**: Left side movement, right side camera look
 
 ```bash
 # Build and start HD1

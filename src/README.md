@@ -15,6 +15,8 @@ src/
 ├── config/            # Configuration management system
 ├── logging/           # Structured logging with module tracing
 ├── server/            # WebSocket hub and client management
+├── session/           # Session management and avatar cleanup
+├── sync/              # TCP-simple reliable synchronization
 └── threejs/           # Three.js bridge and utilities
 ```
 
