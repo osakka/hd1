@@ -14,9 +14,7 @@ let ws;
 let reconnectAttempts = 0;
 let maxReconnectAttempts = 99;
 let reconnectTimeout;
-let clientId = null;
-let sessionId = null;
-let avatarId = null;
+let hd1Id = null;
 let apiClient = null;
 
 // Status management
@@ -113,14 +111,14 @@ function connectWebSocket() {
             reconnectTimeout = null;
         }
         
-        // Send existing client ID for reconnection if we have one
-        if (clientId) {
+        // Send existing hd1_id for reconnection if we have one
+        if (hd1Id) {
             const reconnectMsg = {
                 type: 'client_reconnect',
-                client_id: clientId
+                hd1_id: hd1Id
             };
             ws.send(JSON.stringify(reconnectMsg));
-            addDebug('CLIENT_RECONNECT', 'Sent existing client ID: ' + clientId);
+            addDebug('CLIENT_RECONNECT', 'Sent existing hd1_id: ' + hd1Id);
         }
     };
     
@@ -132,37 +130,37 @@ function connectWebSocket() {
             addDebug('WS_MSG', data);
             
             // Handle client initialization from server
-            if (data.type === 'client_init' && data.client_id) {
-                clientId = data.client_id;
-                window.clientId = clientId; // Make globally available
+            if (data.type === 'client_init' && data.hd1_id) {
+                hd1Id = data.hd1_id;
+                window.hd1Id = hd1Id; // Make globally available
                 
-                // Update API client with server-provided client ID
+                // Update API client with server-provided hd1_id
                 if (apiClient) {
-                    apiClient.setClientId(clientId);
+                    apiClient.setHd1Id(hd1Id);
                 }
                 
                 updateRebootstrapButton();
-                addDebug('CLIENT_INIT', 'Server-provided client ID: ' + clientId);
+                addDebug('CLIENT_INIT', 'Server-provided hd1_id: ' + hd1Id);
                 
                 // Client is already initialized with proper hd1_id - no need to join separate session
-                addDebug('HD1_READY', 'Client initialized with unified HD1 ID: ' + clientId);
+                addDebug('HD1_READY', 'Client initialized with unified HD1 ID: ' + hd1Id);
                 
                 // Request full sync to get all existing operations
                 requestFullSync();
             }
             
             // Handle successful client reconnection
-            if (data.type === 'client_reconnect_success' && data.client_id) {
-                clientId = data.client_id;
-                window.clientId = clientId; // Make globally available
+            if (data.type === 'client_reconnect_success' && data.hd1_id) {
+                hd1Id = data.hd1_id;
+                window.hd1Id = hd1Id; // Make globally available
                 
-                // Update API client with reconnected client ID
+                // Update API client with reconnected hd1_id
                 if (apiClient) {
-                    apiClient.setClientId(clientId);
+                    apiClient.setHd1Id(hd1Id);
                 }
                 
                 updateRebootstrapButton();
-                addDebug('CLIENT_RECONNECT_SUCCESS', 'Reconnected with client ID: ' + clientId + ', avatar ID: ' + data.avatar_id);
+                addDebug('CLIENT_RECONNECT_SUCCESS', 'Reconnected with hd1_id: ' + hd1Id);
             }
             
             // Handle sync operations from server
@@ -176,15 +174,6 @@ function connectWebSocket() {
                 }
             }
             
-            // Capture session/avatar IDs from server messages
-            if (data.session_id) {
-                sessionId = data.session_id;
-                updateRebootstrapButton();
-            }
-            if (data.avatar_id) {
-                avatarId = data.avatar_id;
-                updateRebootstrapButton();
-            }
         } catch (error) {
             addDebug('WS_ERROR', 'Failed to parse message: ' + error.message);
         }
@@ -262,18 +251,12 @@ debugHeader.addEventListener('click', function() {
     addDebug('CONSOLE_TOGGLE', {collapsed: debugCollapsed});
 });
 
-// Update rebootstrap button with current session/avatar/client ID
+// Update rebootstrap button with current hd1_id
 function updateRebootstrapButton() {
     const btn = document.getElementById('rebootstrap-btn');
-    if (avatarId) {
-        btn.textContent = avatarId;
-        btn.title = `Rebootstrap: Avatar ${avatarId} - Clear storage and reload page`;
-    } else if (sessionId) {
-        btn.textContent = sessionId;
-        btn.title = `Rebootstrap: Session ${sessionId} - Clear storage and reload page`;
-    } else if (clientId) {
-        btn.textContent = clientId;
-        btn.title = `Rebootstrap: Client ${clientId} - Clear storage and reload page`;
+    if (hd1Id) {
+        btn.textContent = hd1Id;
+        btn.title = `Rebootstrap: HD1 ${hd1Id} - Clear storage and reload page`;
     } else {
         btn.textContent = 'REBOOTSTRAP';
         btn.title = 'Rebootstrap: Clear storage and reload page';

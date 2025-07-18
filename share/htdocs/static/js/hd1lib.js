@@ -22,21 +22,21 @@
  */
 
 class HD1ThreeJSAPIClient {
-    constructor(baseURL = '/api', clientId = null) {
+    constructor(baseURL = '/api', hd1Id = null) {
         this.baseURL = baseURL;
-        this.clientId = clientId; // Server-provided client ID only
+        this.hd1Id = hd1Id; // Server-provided hd1_id only
     }
 
-    // Set client ID from server (called when WebSocket receives client_init)
-    setClientId(clientId) {
-        this.clientId = clientId;
+    // Set hd1_id from server (called when WebSocket receives client_init)
+    setHd1Id(hd1Id) {
+        this.hd1Id = hd1Id;
     }
 
     async request(method, path, data = null) {
         const url = this.baseURL + path;
         const headers = {
             'Content-Type': 'application/json',
-            'X-Client-ID': this.clientId
+            'X-HD1-ID': this.hd1Id
         };
 
         const options = {

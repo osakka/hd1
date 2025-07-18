@@ -382,11 +382,6 @@ class HD1ThreeJS {
         
         // Send position update to server if movement occurred
         if (moveVector.length() > 0) {
-            console.log('[HD1-ThreeJS] Movement detected:', {
-                position: {x: this.camera.position.x, y: this.camera.position.y, z: this.camera.position.z},
-                apiClient: !!window.apiClient,
-                clientId: window.clientId
-            });
             this.sendAvatarPosition();
         }
     }
@@ -398,12 +393,12 @@ class HD1ThreeJS {
             return;
         }
         
-        if (!window.clientId) {
-            // Client ID not available yet - silently skip without warning
+        if (!window.hd1Id) {
+            // HD1 ID not available yet - silently skip without warning
             return;
         }
         
-        if (window.apiClient && window.clientId) {
+        if (window.apiClient && window.hd1Id) {
             const positionData = {
                 position: {
                     x: this.camera.position.x,
@@ -417,13 +412,13 @@ class HD1ThreeJS {
                 }
             };
             
-            // Use auto-generated API client to call /avatars/{sessionId}/move
-            window.apiClient.moveAvatar(window.clientId, positionData)
+            // Use auto-generated API client to call /avatars/{hd1Id}/move
+            window.apiClient.moveAvatar(window.hd1Id, positionData)
                 .then(response => {
                     console.log('[HD1-ThreeJS] Avatar moved:', {
                         position: positionData.position,
                         seq_num: response.seq_num,
-                        client_id: window.clientId
+                        hd1_id: window.hd1Id
                     });
                 })
                 .catch(error => {
@@ -801,21 +796,21 @@ class HD1ThreeJS {
     
     // Request full sync when Three.js client is ready
     async requestFullSyncWhenReady() {
-        // Wait for API client and clientId to be available
+        // Wait for API client and hd1Id to be available
         let attempts = 0;
         const maxAttempts = 50; // 5 seconds max wait
         
         const waitForReady = () => {
             attempts++;
             
-            if (window.apiClient && window.clientId) {
+            if (window.apiClient && window.hd1Id) {
                 console.log('[HD1-ThreeJS] Ready to request full sync');
                 this.requestFullSync();
                 return;
             }
             
             if (attempts >= maxAttempts) {
-                console.warn('[HD1-ThreeJS] Timeout waiting for API client and client ID');
+                console.warn('[HD1-ThreeJS] Timeout waiting for API client and hd1_id');
                 return;
             }
             
