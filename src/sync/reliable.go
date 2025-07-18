@@ -197,6 +197,15 @@ func (rs *ReliableSync) cleanup() {
 		}
 	}
 	
+	// Only cleanup if we have active clients that have seen operations
+	// If minLastSeen is 0, it means we have new clients that haven't seen anything yet
+	if minLastSeen == 0 {
+		logging.Debug("skipping cleanup - new clients present", map[string]interface{}{
+			"min_last_seen": minLastSeen,
+		})
+		return
+	}
+	
 	// Keep operations after (minLastSeen - 1000) to provide buffer
 	keepAfter := minLastSeen - 1000
 	if keepAfter < 1 {
