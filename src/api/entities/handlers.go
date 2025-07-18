@@ -107,7 +107,7 @@ func GetEntities(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// For now, return empty list - would need to implement entity storage
+	// Entities are managed by sync system only - no local storage needed
 	response := GetEntitiesResponse{
 		Success:  true,
 		Entities: []EntityInfo{},
@@ -116,6 +116,55 @@ func GetEntities(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
+
+// Helper functions to convert between data formats
+func convertToGeometry(data map[string]interface{}) Geometry {
+	geometry := Geometry{}
+	
+	if t, ok := data["type"].(string); ok {
+		geometry.Type = t
+	}
+	if width, ok := data["width"].(float64); ok {
+		geometry.Width = width
+	}
+	if height, ok := data["height"].(float64); ok {
+		geometry.Height = height
+	}
+	if depth, ok := data["depth"].(float64); ok {
+		geometry.Depth = depth
+	}
+	if radius, ok := data["radius"].(float64); ok {
+		geometry.Radius = radius
+	}
+	if text, ok := data["text"].(string); ok {
+		geometry.Text = text
+	}
+	if size, ok := data["size"].(float64); ok {
+		geometry.Size = size
+	}
+	
+	return geometry
+}
+
+func convertToMaterial(data map[string]interface{}) Material {
+	material := Material{}
+	
+	if t, ok := data["type"].(string); ok {
+		material.Type = t
+	}
+	if color, ok := data["color"].(string); ok {
+		material.Color = color
+	}
+	if transparent, ok := data["transparent"].(bool); ok {
+		material.Transparent = transparent
+	}
+	if opacity, ok := data["opacity"].(float64); ok {
+		material.Opacity = opacity
+	}
+	
+	return material
+}
+
 
 // CreateEntity handles POST /api/threejs/entities
 func CreateEntity(w http.ResponseWriter, r *http.Request) {

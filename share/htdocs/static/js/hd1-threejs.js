@@ -783,6 +783,136 @@ class HD1ThreeJS {
         this.renderer.dispose();
         console.log('[HD1-ThreeJS] Scene manager disposed');
     }
+    
+    // Handle sync operations - SINGLE SOURCE OF TRUTH
+    handleSyncOperation(operation) {
+        console.log('[HD1-ThreeJS] Handling sync operation:', operation.type, operation);
+        
+        switch (operation.type) {
+            case 'entity_create':
+                this.handleEntityCreate(operation.data);
+                break;
+            case 'entity_update':
+                this.handleEntityUpdate(operation.data);
+                break;
+            case 'entity_delete':
+                this.handleEntityDelete(operation.data);
+                break;
+            case 'avatar_create':
+                this.handleAvatarCreate(operation.data);
+                break;
+            case 'avatar_move':
+                this.handleAvatarMove(operation.data);
+                break;
+            case 'avatar_remove':
+                this.handleAvatarRemove(operation.data);
+                break;
+            case 'scene_update':
+                this.handleSceneUpdate(operation.data);
+                break;
+            default:
+                console.warn('[HD1-ThreeJS] Unknown operation type:', operation.type);
+        }
+    }
+    
+    handleEntityCreate(data) {
+        const geometry = this.createGeometry(data.geometry);
+        const material = this.createMaterial(data.material);
+        const mesh = new THREE.Mesh(geometry, material);
+        
+        // Set position
+        if (data.position) {
+            mesh.position.set(data.position.x, data.position.y, data.position.z);
+        }
+        
+        // Set rotation
+        if (data.rotation) {
+            mesh.rotation.set(data.rotation.x, data.rotation.y, data.rotation.z);
+        }
+        
+        // Set scale
+        if (data.scale) {
+            mesh.scale.set(data.scale.x, data.scale.y, data.scale.z);
+        }
+        
+        // Set visibility
+        if (data.visible !== undefined) {
+            mesh.visible = data.visible;
+        }
+        
+        // Add to scene and track
+        this.scene.add(mesh);
+        this.objects.set(data.id, mesh);
+        
+        console.log('[HD1-ThreeJS] Entity created:', data.id);
+    }
+    
+    handleEntityUpdate(data) {
+        const mesh = this.objects.get(data.id);
+        if (!mesh) return;
+        
+        // Update position
+        if (data.position) {
+            mesh.position.set(data.position.x, data.position.y, data.position.z);
+        }
+        
+        // Update rotation
+        if (data.rotation) {
+            mesh.rotation.set(data.rotation.x, data.rotation.y, data.rotation.z);
+        }
+        
+        // Update scale
+        if (data.scale) {
+            mesh.scale.set(data.scale.x, data.scale.y, data.scale.z);
+        }
+        
+        // Update visibility
+        if (data.visible !== undefined) {
+            mesh.visible = data.visible;
+        }
+        
+        console.log('[HD1-ThreeJS] Entity updated:', data.id);
+    }
+    
+    handleEntityDelete(data) {
+        const mesh = this.objects.get(data.id);
+        if (mesh) {
+            this.scene.remove(mesh);
+            this.objects.delete(data.id);
+            console.log('[HD1-ThreeJS] Entity deleted:', data.id);
+        }
+    }
+    
+    handleAvatarCreate(data) {
+        const avatar = this.createAvatar(data.hd1_id, data);
+        this.avatars.set(data.hd1_id, avatar);
+        console.log('[HD1-ThreeJS] Avatar created:', data.hd1_id);
+    }
+    
+    handleAvatarMove(data) {
+        this.updateAvatar(data.hd1_id, data);
+    }
+    
+    handleAvatarRemove(data) {
+        this.removeAvatar(data.hd1_id);
+    }
+    
+    handleSceneUpdate(data) {
+        // Update scene properties
+        if (data.background) {
+            this.scene.background = new THREE.Color(data.background);
+        }
+        
+        if (data.fog) {
+            this.scene.fog = new THREE.Fog(
+                data.fog.color,
+                data.fog.near,
+                data.fog.far
+            );
+        }
+        
+        console.log('[HD1-ThreeJS] Scene updated');
+    }
 }
 
 // Initialize HD1ThreeJS when DOM is ready

@@ -79,36 +79,36 @@ func (ar *APIRouter) setupRoutes() {
 	// SYNC OPERATIONS (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/sync/full", sync.GetFullSync).Methods("GET")
+	api.HandleFunc("/sync/missing/{from}/{to}", sync.GetMissingOperations).Methods("GET")
 	api.HandleFunc("/sync/operations", sync.SubmitOperation).Methods("POST")
 	api.HandleFunc("/sync/stats", sync.GetSyncStats).Methods("GET")
-	api.HandleFunc("/sync/missing/{from}/{to}", sync.GetMissingOperations).Methods("GET")
+	api.HandleFunc("/sync/full", sync.GetFullSync).Methods("GET")
 	
 	// ========================================
 	// ENTITIES (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/entities/{entityId}", entities.UpdateEntity).Methods("PUT")
-	api.HandleFunc("/entities/{entityId}", entities.DeleteEntity).Methods("DELETE")
 	api.HandleFunc("/entities", entities.GetEntities).Methods("GET")
 	api.HandleFunc("/entities", entities.CreateEntity).Methods("POST")
+	api.HandleFunc("/entities/{entityId}", entities.UpdateEntity).Methods("PUT")
+	api.HandleFunc("/entities/{entityId}", entities.DeleteEntity).Methods("DELETE")
 	
 	// ========================================
 	// AVATARS (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/avatars/{avatarId}", avatars.RemoveAvatar).Methods("DELETE")
-	api.HandleFunc("/avatars/{avatarId}", avatars.UpdateAvatar).Methods("PUT")
 	api.HandleFunc("/avatars/{sessionId}/move", avatars.MoveAvatar).Methods("POST")
 	api.HandleFunc("/avatars", avatars.CreateAvatar).Methods("POST")
 	api.HandleFunc("/avatars", avatars.GetAvatars).Methods("GET")
+	api.HandleFunc("/avatars/{avatarId}", avatars.UpdateAvatar).Methods("PUT")
+	api.HandleFunc("/avatars/{avatarId}", avatars.RemoveAvatar).Methods("DELETE")
 	
 	// ========================================
 	// SCENE MANAGEMENT (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/scene", scene.UpdateScene).Methods("PUT")
 	api.HandleFunc("/scene", scene.GetScene).Methods("GET")
+	api.HandleFunc("/scene", scene.UpdateScene).Methods("PUT")
 	
 	// ========================================
 	// SYSTEM (Generated from spec)

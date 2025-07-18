@@ -169,7 +169,7 @@ function connectWebSocket() {
             if (data.type === 'sync_operation' && data.operation) {
                 // Forward sync operation to Three.js scene manager
                 if (window.hd1ThreeJS) {
-                    window.hd1ThreeJS.applyOperation(data.operation);
+                    window.hd1ThreeJS.handleSyncOperation(data.operation);
                     addDebug('SYNC_OP', 'Applied operation: ' + data.operation.type + ' seq:' + data.operation.seq_num);
                 } else {
                     addDebug('SYNC_OP_ERROR', 'Three.js scene manager not available');

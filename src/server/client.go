@@ -481,8 +481,8 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	
-	// Don't register client immediately - wait for potential reconnection message
-	// Client will be registered either via reconnection or via first regular message
+	// Register client immediately - SINGLE SOURCE OF TRUTH
+	hub.register <- client
 	
 	go client.writePump()
 	go client.readPump()
