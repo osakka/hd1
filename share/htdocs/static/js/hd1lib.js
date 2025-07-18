@@ -36,7 +36,7 @@ class HD1ThreeJSAPIClient {
         const url = this.baseURL + path;
         const headers = {
             'Content-Type': 'application/json',
-            'X-HD1-ID': this.hd1Id
+            'X-Client-ID': this.hd1Id // Server expects X-Client-ID header
         };
 
         const options = {
