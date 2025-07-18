@@ -78,25 +78,11 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /sync/full - getFullSync
-     */
-    async getFullSync() {
-        return this.request('GET', '/sync/full');
-    }
-
-    /**
      * GET /sync/missing/{from}/{to} - getMissingOperations
      */
     async getMissingOperations(param1, param2) {
         const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
         return this.request('GET', path);
-    }
-
-    /**
-     * POST /sync/operations - submitOperation
-     */
-    async submitOperation(data = null) {
-        return this.request('POST', '/sync/operations', data);
     }
 
     /**
@@ -106,6 +92,20 @@ class HD1ThreeJSAPIClient {
         return this.request('GET', '/sync/stats');
     }
 
+    /**
+     * GET /sync/full - getFullSync
+     */
+    async getFullSync() {
+        return this.request('GET', '/sync/full');
+    }
+
+    /**
+     * POST /sync/operations - submitOperation
+     */
+    async submitOperation(data = null) {
+        return this.request('POST', '/sync/operations', data);
+    }
+
 
     // ========================================
     // ENTITIES (Generated from spec)
@@ -113,17 +113,17 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /entities - getEntities
-     */
-    async getEntities() {
-        return this.request('GET', '/entities');
-    }
-
-    /**
      * POST /entities - createEntityWithGeometry
      */
     async createEntityWithGeometry(data = null) {
         return this.request('POST', '/entities', data);
+    }
+
+    /**
+     * GET /entities - getEntities
+     */
+    async getEntities() {
+        return this.request('GET', '/entities');
     }
 
     /**
@@ -149,6 +149,13 @@ class HD1ThreeJSAPIClient {
 
 
     /**
+     * POST /avatars - createAvatar
+     */
+    async createAvatar(data = null) {
+        return this.request('POST', '/avatars', data);
+    }
+
+    /**
      * GET /avatars - getAvatars
      */
     async getAvatars() {
@@ -156,10 +163,11 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * POST /avatars - createAvatar
+     * POST /avatars/{sessionId}/move - moveAvatar
      */
-    async createAvatar(data = null) {
-        return this.request('POST', '/avatars', data);
+    async moveAvatar(param1, data = null) {
+        const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
+        return this.request('POST', path, data);
     }
 
     /**
@@ -176,14 +184,6 @@ class HD1ThreeJSAPIClient {
     async removeAvatar(param1) {
         const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
         return this.request('DELETE', path);
-    }
-
-    /**
-     * POST /avatars/{sessionId}/move - moveAvatar
-     */
-    async moveAvatar(param1, data = null) {
-        const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
-        return this.request('POST', path, data);
     }
 
 

@@ -25,6 +25,12 @@ class HD1ThreeJS {
         this.materials = new Map();    // material_id -> THREE.Material
         this.geometries = new Map();   // geometry_id -> THREE.Geometry
         
+        // Font loading
+        this.fontLoader = null;
+        this.loadedFont = null;
+        this.pendingTextEntities = new Map(); // Store entities waiting for font
+        this.loadFontModules();
+        
         // Camera controls
         this.controls = null;
         this.cameraTarget = new THREE.Vector3(0, 0, 0);
@@ -44,6 +50,102 @@ class HD1ThreeJS {
         
         console.log('[HD1-ThreeJS] Scene manager initialized');
         console.log('[HD1-ThreeJS] Three.js version:', THREE.REVISION);
+    }
+    
+    async loadFontModules() {
+        try {
+            // Import FontLoader and TextGeometry dynamically
+            const fontLoaderModule = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/FontLoader.js');
+            const textGeometryModule = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/geometries/TextGeometry.js');
+            
+            this.FontLoader = fontLoaderModule.FontLoader;
+            this.TextGeometry = textGeometryModule.TextGeometry;
+            
+            console.log('[HD1-ThreeJS] Font modules loaded');
+            
+            // Now load the font
+            this.loadFont();
+        } catch (error) {
+            console.error('[HD1-ThreeJS] Failed to load font modules:', error);
+            console.log('[HD1-ThreeJS] Text rendering will use placeholder boxes');
+        }
+    }
+
+    loadFont() {
+        if (!this.FontLoader) {
+            console.log('[HD1-ThreeJS] FontLoader not available, using placeholder');
+            return;
+        }
+        
+        this.fontLoader = new this.FontLoader();
+        
+        // Load Helvetiker font (commonly used Three.js font)
+        this.fontLoader.load(
+            'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',
+            (font) => {
+                this.loadedFont = font;
+                console.log('[HD1-ThreeJS] Font loaded successfully');
+                
+                // Process any pending text geometries
+                this.processPendingTextGeometries();
+            },
+            (progress) => {
+                console.log('[HD1-ThreeJS] Font loading progress:', progress);
+            },
+            (error) => {
+                console.error('[HD1-ThreeJS] Font loading failed:', error);
+                console.log('[HD1-ThreeJS] Falling back to placeholder text rendering');
+            }
+        );
+    }
+    
+    processPendingTextGeometries() {
+        // Process any text entities that were created before the font loaded
+        console.log('[HD1-ThreeJS] Processing pending text geometries:', this.pendingTextEntities.size);
+        
+        this.pendingTextEntities.forEach((entityData, entityId) => {
+            // Recreate the entity with proper text geometry
+            this.recreateTextEntity(entityId, entityData);
+        });
+        
+        this.pendingTextEntities.clear();
+    }
+    
+    recreateTextEntity(entityId, entityData) {
+        // Remove the placeholder entity if it exists
+        const existingEntity = this.objects.get(entityId);
+        if (existingEntity) {
+            this.scene.remove(existingEntity);
+            
+            // Dispose of old geometry and material
+            if (existingEntity.geometry) existingEntity.geometry.dispose();
+            if (existingEntity.material) existingEntity.material.dispose();
+        }
+        
+        // Create new entity with proper text geometry
+        const geometry = this.createGeometry(entityData.geometry);
+        const material = this.createMaterial(entityData.material);
+        
+        const entity = new THREE.Mesh(geometry, material);
+        entity.castShadow = true;
+        entity.receiveShadow = true;
+        
+        // Apply transform
+        if (entityData.position) {
+            entity.position.set(entityData.position.x, entityData.position.y, entityData.position.z);
+        }
+        if (entityData.rotation) {
+            entity.rotation.set(entityData.rotation.x, entityData.rotation.y, entityData.rotation.z);
+        }
+        if (entityData.scale) {
+            entity.scale.set(entityData.scale.x, entityData.scale.y, entityData.scale.z);
+        }
+        
+        // Add to scene and track
+        this.scene.add(entity);
+        this.objects.set(entityId, entity);
+        
+        console.log('[HD1-ThreeJS] Text entity recreated with proper geometry:', entityId);
     }
     
     setupRenderer() {
@@ -467,6 +569,12 @@ class HD1ThreeJS {
     }
     
     createEntity(id, data) {
+        // If this is a text entity and font is not loaded, store for later
+        if (data.geometry && data.geometry.type === 'text' && !this.loadedFont) {
+            console.log('[HD1-ThreeJS] Text entity created before font loaded, storing for later:', id);
+            this.pendingTextEntities.set(id, data);
+        }
+        
         // Create geometry
         const geometry = this.createGeometry(data.geometry);
         
@@ -568,6 +676,44 @@ class HD1ThreeJS {
                     geometryData.height || 1,
                     geometryData.radialSegments || 8
                 );
+            case 'text':
+                const text = geometryData.text || 'TEXT';
+                const size = geometryData.size || 1;
+                const depth = geometryData.depth || 0.1;
+                
+                console.log('[HD1-ThreeJS] Creating text geometry:', text);
+                
+                // If font is loaded, create real TextGeometry
+                if (this.loadedFont && this.TextGeometry) {
+                    const textGeometry = new this.TextGeometry(text, {
+                        font: this.loadedFont,
+                        size: size,
+                        depth: depth,
+                        curveSegments: geometryData.curveSegments || 12,
+                        bevelEnabled: geometryData.bevelEnabled || false,
+                        bevelThickness: geometryData.bevelThickness || 0.03,
+                        bevelSize: geometryData.bevelSize || 0.02,
+                        bevelOffset: geometryData.bevelOffset || 0,
+                        bevelSegments: geometryData.bevelSegments || 5
+                    });
+                    
+                    // Center the text geometry
+                    textGeometry.computeBoundingBox();
+                    const centerOffsetX = -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x);
+                    const centerOffsetY = -0.5 * (textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y);
+                    textGeometry.translate(centerOffsetX, centerOffsetY, 0);
+                    
+                    console.log('[HD1-ThreeJS] Real text geometry created for:', text);
+                    return textGeometry;
+                } else {
+                    // Font not loaded yet, create placeholder
+                    console.log('[HD1-ThreeJS] Font not loaded, creating placeholder for:', text);
+                    return new THREE.BoxGeometry(
+                        size * text.length * 0.6,  // Approximate text width
+                        size,                       // Text height
+                        depth                       // Text depth
+                    );
+                }
             default:
                 return new THREE.BoxGeometry(1, 1, 1);
         }

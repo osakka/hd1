@@ -16,12 +16,22 @@ import (
 
 // Geometry represents Three.js geometry
 type Geometry struct {
-	Type     string  `json:"type"`
-	Width    float64 `json:"width,omitempty"`
-	Height   float64 `json:"height,omitempty"`
-	Depth    float64 `json:"depth,omitempty"`
-	Radius   float64 `json:"radius,omitempty"`
-	Segments int     `json:"segments,omitempty"`
+	Type            string  `json:"type"`
+	Width           float64 `json:"width,omitempty"`
+	Height          float64 `json:"height,omitempty"`
+	Depth           float64 `json:"depth,omitempty"`
+	Radius          float64 `json:"radius,omitempty"`
+	Segments        int     `json:"segments,omitempty"`
+	
+	// Text geometry parameters
+	Text            string  `json:"text,omitempty"`
+	Size            float64 `json:"size,omitempty"`
+	BevelEnabled    bool    `json:"bevelEnabled,omitempty"`
+	BevelSize       float64 `json:"bevelSize,omitempty"`
+	BevelThickness  float64 `json:"bevelThickness,omitempty"`
+	BevelSegments   int     `json:"bevelSegments,omitempty"`
+	CurveSegments   int     `json:"curveSegments,omitempty"`
+	BevelOffset     float64 `json:"bevelOffset,omitempty"`
 }
 
 // Material represents Three.js material
@@ -326,10 +336,16 @@ func validateGeometry(geom Geometry) error {
 		"sphere":   true,
 		"plane":    true,
 		"cylinder": true,
+		"text":     true,
 	}
 
 	if !validTypes[geom.Type] {
 		return fmt.Errorf("invalid geometry type: %s", geom.Type)
+	}
+
+	// Validate text geometry specific requirements
+	if geom.Type == "text" && geom.Text == "" {
+		return fmt.Errorf("text geometry requires text parameter")
 	}
 
 	return nil
