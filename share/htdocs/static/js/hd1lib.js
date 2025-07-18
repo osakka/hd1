@@ -78,21 +78,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /sync/missing/{from}/{to} - getMissingOperations
-     */
-    async getMissingOperations(param1, param2) {
-        const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
-        return this.request('GET', path);
-    }
-
-    /**
-     * GET /sync/full - getFullSync
-     */
-    async getFullSync() {
-        return this.request('GET', '/sync/full');
-    }
-
-    /**
      * POST /sync/operations - submitOperation
      */
     async submitOperation(data = null) {
@@ -104,6 +89,21 @@ class HD1ThreeJSAPIClient {
      */
     async getSyncStats() {
         return this.request('GET', '/sync/stats');
+    }
+
+    /**
+     * GET /sync/full - getFullSync
+     */
+    async getFullSync() {
+        return this.request('GET', '/sync/full');
+    }
+
+    /**
+     * GET /sync/missing/{from}/{to} - getMissingOperations
+     */
+    async getMissingOperations(param1, param2) {
+        const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
+        return this.request('GET', path);
     }
 
 
@@ -193,17 +193,17 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /scene - getScene
-     */
-    async getScene() {
-        return this.request('GET', '/scene');
-    }
-
-    /**
      * PUT /scene - updateScene
      */
     async updateScene(data = null) {
         return this.request('PUT', '/scene', data);
+    }
+
+    /**
+     * GET /scene - getScene
+     */
+    async getScene() {
+        return this.request('GET', '/scene');
     }
 
 

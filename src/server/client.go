@@ -306,27 +306,11 @@ func (c *Client) handleClientMessage(message []byte) {
 		})
 
 	case "session_associate":
-		// Associate this client with a specific HD1 session
-		if sessionID, ok := msg["session_id"].(string); ok {
-			c.hd1ID = sessionID
-			logging.Info("client session associated", map[string]interface{}{
-				"session_id": sessionID,
-			})
-			
-			// Ensure client is registered
-			c.ensureRegistered()
-			c.hd1ID = sessionID
-			
-			logging.Info("client joined session", map[string]interface{}{
-				"session_id": sessionID,
-				"client":     fmt.Sprintf("%p", c),
-			})
-			
-			// Session connected - entities managed via Three.js operations
-			logging.Info("session connected, Three.js operations active", map[string]interface{}{
-				"session_id": sessionID,
-			})
-		}
+		// Legacy session association - eliminated for unified HD1 ID system
+		// Client already has proper hd1_id, no need to override it
+		logging.Info("legacy session_associate ignored - using unified HD1 ID", map[string]interface{}{
+			"hd1_id": c.GetHD1ID(),
+		})
 		
 	case "interaction":
 		c.lastSeen = time.Now()

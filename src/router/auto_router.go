@@ -79,10 +79,10 @@ func (ar *APIRouter) setupRoutes() {
 	// SYNC OPERATIONS (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/sync/missing/{from}/{to}", sync.GetMissingOperations).Methods("GET")
-	api.HandleFunc("/sync/full", sync.GetFullSync).Methods("GET")
 	api.HandleFunc("/sync/operations", sync.SubmitOperation).Methods("POST")
 	api.HandleFunc("/sync/stats", sync.GetSyncStats).Methods("GET")
+	api.HandleFunc("/sync/full", sync.GetFullSync).Methods("GET")
+	api.HandleFunc("/sync/missing/{from}/{to}", sync.GetMissingOperations).Methods("GET")
 	
 	// ========================================
 	// ENTITIES (Generated from spec)
@@ -107,8 +107,8 @@ func (ar *APIRouter) setupRoutes() {
 	// SCENE MANAGEMENT (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/scene", scene.GetScene).Methods("GET")
 	api.HandleFunc("/scene", scene.UpdateScene).Methods("PUT")
+	api.HandleFunc("/scene", scene.GetScene).Methods("GET")
 	
 	// ========================================
 	// SYSTEM (Generated from spec)

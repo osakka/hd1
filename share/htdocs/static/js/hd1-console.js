@@ -144,13 +144,8 @@ function connectWebSocket() {
                 updateRebootstrapButton();
                 addDebug('CLIENT_INIT', 'Server-provided client ID: ' + clientId);
                 
-                // Automatically join default session for real-time sync
-                const sessionMessage = {
-                    type: 'session_associate',
-                    session_id: 'default'
-                };
-                ws.send(JSON.stringify(sessionMessage));
-                addDebug('SESSION_JOIN', 'Automatically joined default session for sync');
+                // Client is already initialized with proper hd1_id - no need to join separate session
+                addDebug('HD1_READY', 'Client initialized with unified HD1 ID: ' + clientId);
                 
                 // Request full sync to get all existing operations
                 requestFullSync();
