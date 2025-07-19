@@ -23,6 +23,10 @@ ADRs serve as the **single source of truth** for architectural decisions, ensuri
 | [007](007-single-source-truth-avatar-management.md) | 2025-07-17 | Single Source of Truth Avatar Management | Accepted | Architecture |
 | [008](008-unified-hd1-id-system.md) | 2025-07-18 | Unified HD1 ID System | Accepted | Critical |
 | [009](009-template-system-consistency.md) | 2025-07-19 | Template System Consistency | Accepted | Build Quality |
+| [010](010-database-elimination-stateless-architecture.md) | 2025-07-19 | Database Elimination for Stateless Architecture | Accepted | Transformation |
+| [011](011-enterprise-bloat-elimination.md) | 2025-07-19 | Enterprise Bloat Elimination | Accepted | Transformation |
+| [012](012-threejs-api-expansion-strategy.md) | 2025-07-19 | Three.js API Expansion Strategy | Accepted | Transformation |
+| [013](013-pure-webgl-rest-platform-vision.md) | 2025-07-19 | Pure WebGL REST Platform Vision | Accepted | Strategic |
 
 ## Architectural Principles
 
