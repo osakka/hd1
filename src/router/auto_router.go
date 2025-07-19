@@ -33,6 +33,12 @@ import (
 	"holodeck1/api/avatars"
 	"holodeck1/api/scene"
 	"holodeck1/api/system"
+	"holodeck1/api/geometries"
+	"holodeck1/api/materials"
+	"holodeck1/api/lights"
+	"holodeck1/api/cameras"
+	"holodeck1/api/animations"
+	"holodeck1/api/textures"
 )
 
 // APIRouter manages all auto-generated Three.js routes
@@ -79,36 +85,45 @@ func (ar *APIRouter) setupRoutes() {
 	// SYNC OPERATIONS (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/sync/full", sync.GetFullSync).Methods("GET")
+	api.HandleFunc("/sync/operations", sync.SubmitOperation).Methods("POST")
 	api.HandleFunc("/sync/missing/{from}/{to}", sync.GetMissingOperations).Methods("GET")
 	api.HandleFunc("/sync/stats", sync.GetSyncStats).Methods("GET")
-	api.HandleFunc("/sync/operations", sync.SubmitOperation).Methods("POST")
+	api.HandleFunc("/sync/full", sync.GetFullSync).Methods("GET")
 	
 	// ========================================
 	// ENTITIES (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/entities", entities.CreateEntity).Methods("POST")
-	api.HandleFunc("/entities", entities.GetEntities).Methods("GET")
 	api.HandleFunc("/entities/{entityId}", entities.UpdateEntity).Methods("PUT")
 	api.HandleFunc("/entities/{entityId}", entities.DeleteEntity).Methods("DELETE")
+	api.HandleFunc("/entities", entities.GetEntities).Methods("GET")
+	api.HandleFunc("/entities", entities.CreateEntity).Methods("POST")
 	
 	// ========================================
 	// AVATARS (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/avatars", avatars.GetAvatars).Methods("GET")
-	api.HandleFunc("/avatars", avatars.CreateAvatar).Methods("POST")
 	api.HandleFunc("/avatars/{avatarId}", avatars.UpdateAvatar).Methods("PUT")
 	api.HandleFunc("/avatars/{avatarId}", avatars.RemoveAvatar).Methods("DELETE")
 	api.HandleFunc("/avatars/{sessionId}/move", avatars.MoveAvatar).Methods("POST")
+	api.HandleFunc("/avatars", avatars.GetAvatars).Methods("GET")
+	api.HandleFunc("/avatars", avatars.CreateAvatar).Methods("POST")
 	
 	// ========================================
 	// SCENE MANAGEMENT (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/scene", scene.GetScene).Methods("GET")
 	api.HandleFunc("/scene", scene.UpdateScene).Methods("PUT")
+	api.HandleFunc("/scene", scene.GetScene).Methods("GET")
+	
+	// ========================================
+	// MATERIALS (Generated from spec)
+	// ========================================
+
+	api.HandleFunc("/materials/basic", materials.CreateBasicMaterial).Methods("POST")
+	api.HandleFunc("/materials/phong", materials.CreatePhongMaterial).Methods("POST")
+	api.HandleFunc("/materials/physical", materials.CreatePhysicalMaterial).Methods("POST")
+	api.HandleFunc("/materials/standard", materials.CreateStandardMaterial).Methods("POST")
 	
 	// ========================================
 	// SYSTEM (Generated from spec)
@@ -119,12 +134,73 @@ func (ar *APIRouter) setupRoutes() {
 		system.GetVersionHandler(w, r, hub)
 	}).Methods("GET")
 	
+	// ========================================
+	// THREE.JS GEOMETRY ENDPOINTS
+	// ========================================
+	
+	api.HandleFunc("/geometries/box", geometries.CreateBoxGeometry).Methods("POST")
+	api.HandleFunc("/geometries/sphere", geometries.CreateSphereGeometry).Methods("POST")
+	api.HandleFunc("/geometries/cylinder", geometries.CreateCylinderGeometry).Methods("POST")
+	api.HandleFunc("/geometries/cone", geometries.CreateConeGeometry).Methods("POST")
+	api.HandleFunc("/geometries/torus", geometries.CreateTorusGeometry).Methods("POST")
+	api.HandleFunc("/geometries/torusknot", geometries.CreateTorusKnotGeometry).Methods("POST")
+	api.HandleFunc("/geometries/plane", geometries.CreatePlaneGeometry).Methods("POST")
+	api.HandleFunc("/geometries/ring", geometries.CreateRingGeometry).Methods("POST")
+	api.HandleFunc("/geometries/circle", geometries.CreateCircleGeometry).Methods("POST")
+	api.HandleFunc("/geometries/capsule", geometries.CreateCapsuleGeometry).Methods("POST")
+	
+	// ========================================
+	// THREE.JS MATERIAL ENDPOINTS
+	// ========================================
+	
+	api.HandleFunc("/materials/basic", materials.CreateBasicMaterial).Methods("POST")
+	api.HandleFunc("/materials/phong", materials.CreatePhongMaterial).Methods("POST")
+	api.HandleFunc("/materials/standard", materials.CreateStandardMaterial).Methods("POST")
+	api.HandleFunc("/materials/physical", materials.CreatePhysicalMaterial).Methods("POST")
+	
+	// ========================================
+	// THREE.JS LIGHTING ENDPOINTS
+	// ========================================
+	
+	api.HandleFunc("/lights/directional", lights.CreateDirectionalLight).Methods("POST")
+	api.HandleFunc("/lights/point", lights.CreatePointLight).Methods("POST")
+	api.HandleFunc("/lights/spot", lights.CreateSpotLight).Methods("POST")
+	api.HandleFunc("/lights/ambient", lights.CreateAmbientLight).Methods("POST")
+	api.HandleFunc("/lights/hemisphere", lights.CreateHemisphereLight).Methods("POST")
+	
+	// ========================================
+	// THREE.JS CAMERA ENDPOINTS
+	// ========================================
+	
+	api.HandleFunc("/cameras/perspective", cameras.SetPerspectiveCamera).Methods("POST")
+	api.HandleFunc("/cameras/orthographic", cameras.SetOrthographicCamera).Methods("POST")
+	
+	// ========================================
+	// THREE.JS ANIMATION ENDPOINTS
+	// ========================================
+	
+	api.HandleFunc("/animations/keyframe", animations.CreateKeyframeAnimation).Methods("POST")
+	api.HandleFunc("/animations/timeline", animations.ControlTimeline).Methods("POST")
+	
+	// ========================================
+	// THREE.JS TEXTURE ENDPOINTS
+	// ========================================
+	
+	api.HandleFunc("/textures/load", textures.LoadTexture).Methods("POST")
+	api.HandleFunc("/textures/create", textures.CreateProceduralTexture).Methods("POST")
+	
 	logging.Info("HD1 API routes configured", map[string]interface{}{
-		"total_routes": 16,
+		"total_routes": 69,
 		"sync_ops": 4,
 		"entity_ops": 4,
 		"avatar_ops": 5,
 		"scene_ops": 2,
 		"system_ops": 1,
+		"geometry_ops": 10,
+		"material_ops": 4,
+		"light_ops": 5,
+		"camera_ops": 2,
+		"animation_ops": 2,
+		"texture_ops": 2,
 	})
 }

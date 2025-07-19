@@ -313,7 +313,7 @@ func main() {
 	defer routerFile.Close()
 
 	// Organize routes by category for Three.js template
-	var syncOps, entityOps, avatarOps, sceneOps, systemOps []RouteInfo
+	var syncOps, entityOps, avatarOps, sceneOps, systemOps, materialsOps []RouteInfo
 	for _, route := range routes {
 		if strings.HasPrefix(route.Path, "/sync") {
 			syncOps = append(syncOps, route)
@@ -325,6 +325,8 @@ func main() {
 			sceneOps = append(sceneOps, route)
 		} else if strings.HasPrefix(route.Path, "/system") {
 			systemOps = append(systemOps, route)
+		} else if strings.HasPrefix(route.Path, "/materials") {
+			materialsOps = append(materialsOps, route)
 		}
 	}
 
@@ -334,6 +336,7 @@ func main() {
 		Avatars []RouteInfo
 		Scene []RouteInfo
 		System []RouteInfo
+		Materials []RouteInfo
 		Imports []string
 		TotalRoutes int
 		SyncOpsCount int
@@ -341,12 +344,14 @@ func main() {
 		AvatarOpsCount int
 		SceneOpsCount int
 		SystemOpsCount int
+		MaterialsOpsCount int
 	}{
 		SyncOperations: syncOps,
 		Entities: entityOps,
 		Avatars: avatarOps,
 		Scene: sceneOps,
 		System: systemOps,
+		Materials: materialsOps,
 		Imports: imports,
 		TotalRoutes: len(routes),
 		SyncOpsCount: len(syncOps),
@@ -354,6 +359,7 @@ func main() {
 		AvatarOpsCount: len(avatarOps),
 		SceneOpsCount: len(sceneOps),
 		SystemOpsCount: len(systemOps),
+		MaterialsOpsCount: len(materialsOps),
 	}
 
 	if err := tmpl.Execute(routerFile, templateData); err != nil {
@@ -545,7 +551,7 @@ func generateJavaScriptAPIClient(outputDir string, spec OpenAPISpec, routes []Ro
 	}
 	
 	// Organize methods by category for Three.js JavaScript template
-	var syncOps, entityOps, avatarOps, sceneOps, systemOps []JSMethod
+	var syncOps, entityOps, avatarOps, sceneOps, systemOps, materialsOps []JSMethod
 	for _, method := range jsMethods {
 		if strings.Contains(method.Comment, "/sync") {
 			syncOps = append(syncOps, method)
@@ -555,6 +561,8 @@ func generateJavaScriptAPIClient(outputDir string, spec OpenAPISpec, routes []Ro
 			avatarOps = append(avatarOps, method)
 		} else if strings.Contains(method.Comment, "/scene") {
 			sceneOps = append(sceneOps, method)
+		} else if strings.Contains(method.Comment, "/materials") {
+			materialsOps = append(materialsOps, method)
 		} else if strings.Contains(method.Comment, "/system") {
 			systemOps = append(systemOps, method)
 		}
@@ -565,12 +573,14 @@ func generateJavaScriptAPIClient(outputDir string, spec OpenAPISpec, routes []Ro
 		Entities []JSMethod
 		Avatars []JSMethod
 		Scene []JSMethod
+		Materials []JSMethod
 		System []JSMethod
 	}{
 		SyncOperations: syncOps,
 		Entities: entityOps,
 		Avatars: avatarOps,
 		Scene: sceneOps,
+		Materials: materialsOps,
 		System: systemOps,
 	}
 	

@@ -125,6 +125,19 @@ class HD1ThreeJSAPIClient {
 {{end}}
 
     // ========================================
+    // MATERIALS (Generated from spec)
+    // ========================================
+
+{{range .Materials}}
+    /**
+     * {{.Comment}}
+     */
+    async {{.MethodName}}({{.Parameters}}) {
+        {{.Implementation}}
+    }
+{{end}}
+
+    // ========================================
     // SYSTEM (Generated from spec)
     // ========================================
 

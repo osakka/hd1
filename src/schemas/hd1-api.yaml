@@ -1,20 +1,20 @@
 openapi: 3.0.3
 info:
-  title: HD1 Core API
+  title: HD1 Complete Three.js API
   description: |
-    HD1 core functionality: synchronization, session management, and avatar lifecycle.
-    This schema contains HD1-specific operations, excluding Three.js geometry which is 
-    auto-generated from Three.js TypeScript definitions.
+    HD1 v0.9.0 - Comprehensive Three.js API covering all geometry, material, lighting, camera, 
+    texture, and animation systems. This unified specification drives HD1's transformation into
+    a pure WebGL REST platform - "GraphQL for 3D Graphics".
     
     **CORE PRINCIPLES:**
-    - Single source of truth for HD1 operations
+    - Single source of truth for all Three.js operations
     - Sequence-based synchronization (TCP-simple)
-    - Session-based avatar lifecycle management
-    - Zero manual geometry definitions
+    - Universal 3D interface platform
+    - Complete Three.js feature coverage via HTTP APIs
     
-  version: 0.7.2
+  version: 0.9.0
   contact:
-    name: HD1 Core Engine
+    name: HD1 Pure WebGL REST Platform
     
 servers:
   - url: http://localhost:8080/api
@@ -22,7 +22,7 @@ servers:
 
 paths:
   # ========================================
-  # SYNC OPERATIONS
+  # SYNC OPERATIONS (HD1 Core)
   # ========================================
   /sync/operations:
     post:
@@ -162,7 +162,7 @@ paths:
                         example: 3
 
   # ========================================
-  # AVATAR OPERATIONS
+  # AVATAR OPERATIONS (HD1 Core)
   # ========================================
   /avatars:
     get:
@@ -360,7 +360,7 @@ paths:
                     type: integer
 
   # ========================================
-  # SCENE MANAGEMENT
+  # SCENE MANAGEMENT (HD1 Core)
   # ========================================
   /scene:
     get:
@@ -425,8 +425,704 @@ paths:
                   seq_num:
                     type: integer
 
+  # ===========================================
+  # COMPREHENSIVE THREE.JS GEOMETRY ENDPOINTS
+  # ===========================================
+
+  /geometries/box:
+    post:
+      description: Create BoxGeometry
+      operationId: createBoxGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateBoxGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                width: { type: number, default: 1 }
+                height: { type: number, default: 1 }
+                depth: { type: number, default: 1 }
+                widthSegments: { type: integer, default: 1 }
+                heightSegments: { type: integer, default: 1 }
+                depthSegments: { type: integer, default: 1 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Box geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/sphere:
+    post:
+      description: Create SphereGeometry
+      operationId: createSphereGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateSphereGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                radius: { type: number, default: 1 }
+                widthSegments: { type: integer, default: 32 }
+                heightSegments: { type: integer, default: 16 }
+                phiStart: { type: number, default: 0 }
+                phiLength: { type: number, default: 6.283185307179586 }
+                thetaStart: { type: number, default: 0 }
+                thetaLength: { type: number, default: 3.141592653589793 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Sphere geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/cylinder:
+    post:
+      description: Create CylinderGeometry
+      operationId: createCylinderGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateCylinderGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                radiusTop: { type: number, default: 1 }
+                radiusBottom: { type: number, default: 1 }
+                height: { type: number, default: 1 }
+                radialSegments: { type: integer, default: 32 }
+                heightSegments: { type: integer, default: 1 }
+                openEnded: { type: boolean, default: false }
+                thetaStart: { type: number, default: 0 }
+                thetaLength: { type: number, default: 6.283185307179586 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Cylinder geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/cone:
+    post:
+      description: Create ConeGeometry
+      operationId: createConeGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateConeGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                radius: { type: number, default: 1 }
+                height: { type: number, default: 1 }
+                radialSegments: { type: integer, default: 32 }
+                heightSegments: { type: integer, default: 1 }
+                openEnded: { type: boolean, default: false }
+                thetaStart: { type: number, default: 0 }
+                thetaLength: { type: number, default: 6.283185307179586 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Cone geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/torus:
+    post:
+      description: Create TorusGeometry
+      operationId: createTorusGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateTorusGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                radius: { type: number, default: 1 }
+                tube: { type: number, default: 0.4 }
+                radialSegments: { type: integer, default: 12 }
+                tubularSegments: { type: integer, default: 48 }
+                arc: { type: number, default: 6.283185307179586 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Torus geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/torusknot:
+    post:
+      description: Create TorusKnotGeometry
+      operationId: createTorusKnotGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateTorusKnotGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                radius: { type: number, default: 1 }
+                tube: { type: number, default: 0.4 }
+                tubularSegments: { type: integer, default: 64 }
+                radialSegments: { type: integer, default: 8 }
+                p: { type: integer, default: 2 }
+                q: { type: integer, default: 3 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Torus knot geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/plane:
+    post:
+      description: Create PlaneGeometry
+      operationId: createPlaneGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreatePlaneGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                width: { type: number, default: 1 }
+                height: { type: number, default: 1 }
+                widthSegments: { type: integer, default: 1 }
+                heightSegments: { type: integer, default: 1 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Plane geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/ring:
+    post:
+      description: Create RingGeometry
+      operationId: createRingGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateRingGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                innerRadius: { type: number, default: 0.5 }
+                outerRadius: { type: number, default: 1 }
+                thetaSegments: { type: integer, default: 32 }
+                phiSegments: { type: integer, default: 1 }
+                thetaStart: { type: number, default: 0 }
+                thetaLength: { type: number, default: 6.283185307179586 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Ring geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/circle:
+    post:
+      description: Create CircleGeometry
+      operationId: createCircleGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateCircleGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                radius: { type: number, default: 1 }
+                segments: { type: integer, default: 32 }
+                thetaStart: { type: number, default: 0 }
+                thetaLength: { type: number, default: 6.283185307179586 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Circle geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  /geometries/capsule:
+    post:
+      description: Create CapsuleGeometry
+      operationId: createCapsuleGeometry
+      x-handler: "api/geometries/handlers.go"
+      x-function: "CreateCapsuleGeometry"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                radius: { type: number, default: 1 }
+                length: { type: number, default: 1 }
+                capSegments: { type: integer, default: 4 }
+                radialSegments: { type: integer, default: 8 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                scale: { $ref: '#/components/schemas/Vector3' }
+                material: { $ref: '#/components/schemas/MaterialRequest' }
+      responses:
+        '200':
+          description: Capsule geometry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+
+  # ===========================================
+  # COMPREHENSIVE THREE.JS MATERIAL ENDPOINTS
+  # ===========================================
+
+  /materials/basic:
+    post:
+      description: Create MeshBasicMaterial
+      operationId: createBasicMaterial
+      x-handler: "api/materials/handlers.go"
+      x-function: "CreateBasicMaterial"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                color: { type: string, default: "#ffffff" }
+                opacity: { type: number, default: 1 }
+                transparent: { type: boolean, default: false }
+                side: { type: string, enum: ["FrontSide", "BackSide", "DoubleSide"], default: "FrontSide" }
+                wireframe: { type: boolean, default: false }
+                visible: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Basic material created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaterialResponse'
+
+  /materials/phong:
+    post:
+      description: Create MeshPhongMaterial
+      operationId: createPhongMaterial
+      x-handler: "api/materials/handlers.go"
+      x-function: "CreatePhongMaterial"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                color: { type: string, default: "#ffffff" }
+                emissive: { type: string, default: "#000000" }
+                specular: { type: string, default: "#111111" }
+                shininess: { type: number, default: 30 }
+                opacity: { type: number, default: 1 }
+                transparent: { type: boolean, default: false }
+                wireframe: { type: boolean, default: false }
+                flatShading: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Phong material created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaterialResponse'
+
+  /materials/standard:
+    post:
+      description: Create MeshStandardMaterial (PBR)
+      operationId: createStandardMaterial
+      x-handler: "api/materials/handlers.go"
+      x-function: "CreateStandardMaterial"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                color: { type: string, default: "#ffffff" }
+                emissive: { type: string, default: "#000000" }
+                metalness: { type: number, default: 0 }
+                roughness: { type: number, default: 1 }
+                opacity: { type: number, default: 1 }
+                transparent: { type: boolean, default: false }
+                wireframe: { type: boolean, default: false }
+                flatShading: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Standard material created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaterialResponse'
+
+  /materials/physical:
+    post:
+      description: Create MeshPhysicalMaterial (Advanced PBR)
+      operationId: createPhysicalMaterial
+      x-handler: "api/materials/handlers.go"
+      x-function: "CreatePhysicalMaterial"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                color: { type: string, default: "#ffffff" }
+                emissive: { type: string, default: "#000000" }
+                metalness: { type: number, default: 0 }
+                roughness: { type: number, default: 1 }
+                clearcoat: { type: number, default: 0 }
+                clearcoatRoughness: { type: number, default: 0 }
+                transmission: { type: number, default: 0 }
+                thickness: { type: number, default: 0 }
+                ior: { type: number, default: 1.5 }
+                opacity: { type: number, default: 1 }
+                transparent: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Physical material created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaterialResponse'
+
+  # ===========================================
+  # COMPREHENSIVE THREE.JS LIGHTING ENDPOINTS
+  # ===========================================
+
+  /lights/directional:
+    post:
+      description: Create DirectionalLight
+      operationId: createDirectionalLight
+      x-handler: "api/lights/handlers.go"
+      x-function: "CreateDirectionalLight"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                color: { type: string, default: "#ffffff" }
+                intensity: { type: number, default: 1 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                target: { $ref: '#/components/schemas/Vector3' }
+                castShadow: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Directional light created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightResponse'
+
+  /lights/point:
+    post:
+      description: Create PointLight
+      operationId: createPointLight
+      x-handler: "api/lights/handlers.go"
+      x-function: "CreatePointLight"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                color: { type: string, default: "#ffffff" }
+                intensity: { type: number, default: 1 }
+                distance: { type: number, default: 0 }
+                decay: { type: number, default: 2 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                castShadow: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Point light created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightResponse'
+
+  /lights/spot:
+    post:
+      description: Create SpotLight
+      operationId: createSpotLight
+      x-handler: "api/lights/handlers.go"
+      x-function: "CreateSpotLight"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                color: { type: string, default: "#ffffff" }
+                intensity: { type: number, default: 1 }
+                distance: { type: number, default: 0 }
+                angle: { type: number, default: 1.0471975511965976 }
+                penumbra: { type: number, default: 0 }
+                decay: { type: number, default: 2 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                target: { $ref: '#/components/schemas/Vector3' }
+                castShadow: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Spot light created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightResponse'
+
+  /lights/ambient:
+    post:
+      description: Create AmbientLight
+      operationId: createAmbientLight
+      x-handler: "api/lights/handlers.go"
+      x-function: "CreateAmbientLight"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                color: { type: string, default: "#ffffff" }
+                intensity: { type: number, default: 1 }
+      responses:
+        '200':
+          description: Ambient light created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightResponse'
+
+  /lights/hemisphere:
+    post:
+      description: Create HemisphereLight
+      operationId: createHemisphereLight
+      x-handler: "api/lights/handlers.go"
+      x-function: "CreateHemisphereLight"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                skyColor: { type: string, default: "#ffffff" }
+                groundColor: { type: string, default: "#444444" }
+                intensity: { type: number, default: 1 }
+                position: { $ref: '#/components/schemas/Vector3' }
+      responses:
+        '200':
+          description: Hemisphere light created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightResponse'
+
+  # ===========================================
+  # CAMERA CONTROL ENDPOINTS
+  # ===========================================
+
+  /cameras/perspective:
+    post:
+      description: Create or update PerspectiveCamera
+      operationId: setPerspectiveCamera
+      x-handler: "api/cameras/handlers.go"
+      x-function: "SetPerspectiveCamera"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                fov: { type: number, default: 75 }
+                aspect: { type: number, default: 1 }
+                near: { type: number, default: 0.1 }
+                far: { type: number, default: 1000 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+                lookAt: { $ref: '#/components/schemas/Vector3' }
+      responses:
+        '200':
+          description: Perspective camera configured successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CameraResponse'
+
+  /cameras/orthographic:
+    post:
+      description: Create or update OrthographicCamera
+      operationId: setOrthographicCamera
+      x-handler: "api/cameras/handlers.go"
+      x-function: "SetOrthographicCamera"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                left: { type: number, default: -1 }
+                right: { type: number, default: 1 }
+                top: { type: number, default: 1 }
+                bottom: { type: number, default: -1 }
+                near: { type: number, default: 0.1 }
+                far: { type: number, default: 1000 }
+                position: { $ref: '#/components/schemas/Vector3' }
+                rotation: { $ref: '#/components/schemas/Vector3' }
+      responses:
+        '200':
+          description: Orthographic camera configured successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CameraResponse'
+
+  # ===========================================
+  # ANIMATION SYSTEM ENDPOINTS
+  # ===========================================
+
+  /animations/keyframe:
+    post:
+      description: Create keyframe animation
+      operationId: createKeyframeAnimation
+      x-handler: "api/animations/handlers.go"
+      x-function: "CreateKeyframeAnimation"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                target: { type: string, description: "Entity ID to animate" }
+                property: { type: string, description: "Property path (e.g., 'position.x', 'rotation.y')" }
+                keyframes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      time: { type: number }
+                      value: { type: number }
+                duration: { type: number, default: 1 }
+                loop: { type: boolean, default: false }
+                easing: { type: string, enum: ["linear", "easeIn", "easeOut", "easeInOut"], default: "linear" }
+      responses:
+        '200':
+          description: Keyframe animation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnimationResponse'
+
+  /animations/timeline:
+    post:
+      description: Control animation timeline
+      operationId: controlTimeline
+      x-handler: "api/animations/handlers.go"
+      x-function: "ControlTimeline"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                action: { type: string, enum: ["play", "pause", "stop", "reset"] }
+                speed: { type: number, default: 1 }
+                time: { type: number, description: "Seek to specific time" }
+      responses:
+        '200':
+          description: Timeline controlled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimelineResponse'
+
+  # ===========================================
+  # TEXTURE MANAGEMENT ENDPOINTS
+  # ===========================================
+
+  /textures/load:
+    post:
+      description: Load texture from URL
+      operationId: loadTexture
+      x-handler: "api/textures/handlers.go"
+      x-function: "LoadTexture"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                url: { type: string }
+                wrapS: { type: string, enum: ["RepeatWrapping", "ClampToEdgeWrapping", "MirroredRepeatWrapping"], default: "ClampToEdgeWrapping" }
+                wrapT: { type: string, enum: ["RepeatWrapping", "ClampToEdgeWrapping", "MirroredRepeatWrapping"], default: "ClampToEdgeWrapping" }
+                repeat: { $ref: '#/components/schemas/Vector2' }
+                offset: { $ref: '#/components/schemas/Vector2' }
+      responses:
+        '200':
+          description: Texture loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextureResponse'
+
+  /textures/create:
+    post:
+      description: Create procedural texture
+      operationId: createProceduralTexture
+      x-handler: "api/textures/handlers.go"
+      x-function: "CreateProceduralTexture"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                type: { type: string, enum: ["canvas", "data", "video"] }
+                width: { type: integer, default: 512 }
+                height: { type: integer, default: 512 }
+                pattern: { type: string, enum: ["checkerboard", "gradient", "noise"], default: "checkerboard" }
+                color1: { type: string, default: "#ffffff" }
+                color2: { type: string, default: "#000000" }
+      responses:
+        '200':
+          description: Procedural texture created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextureResponse'
+
   # ========================================
-  # ENTITY OPERATIONS
+  # LEGACY ENTITY OPERATIONS (HD1 Core)
   # ========================================
   /entities:
     get:
@@ -546,7 +1242,7 @@ paths:
                     type: integer
 
   # ========================================
-  # SYSTEM OPERATIONS
+  # SYSTEM OPERATIONS (HD1 Core)
   # ========================================
   /system/version:
     get:
@@ -566,10 +1262,80 @@ paths:
                 properties:
                   api_version:
                     type: string
-                    example: "0.7.2"
+                    example: "0.9.0"
                   js_version:
                     type: string
                   build_timestamp:
                     type: string
                   title:
                     type: string
+
+components:
+  schemas:
+    Vector3:
+      type: object
+      properties:
+        x: { type: number, default: 0 }
+        y: { type: number, default: 0 }
+        z: { type: number, default: 0 }
+
+    Vector2:
+      type: object
+      properties:
+        x: { type: number, default: 1 }
+        y: { type: number, default: 1 }
+
+    MaterialRequest:
+      type: object
+      properties:
+        type: { type: string, enum: ["basic", "phong", "standard", "physical"], default: "phong" }
+        color: { type: string, default: "#777777" }
+        metalness: { type: number, default: 0 }
+        roughness: { type: number, default: 1 }
+        wireframe: { type: boolean, default: false }
+
+    EntityResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        entity_id: { type: string }
+        seq_num: { type: integer }
+
+    MaterialResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        material_id: { type: string }
+
+    LightResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        light_id: { type: string }
+        seq_num: { type: integer }
+
+    CameraResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        camera_type: { type: string }
+        seq_num: { type: integer }
+
+    AnimationResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        animation_id: { type: string }
+
+    TimelineResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        action: { type: string }
+        time: { type: number }
+
+    TextureResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        texture_id: { type: string }

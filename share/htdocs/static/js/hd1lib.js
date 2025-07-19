@@ -78,10 +78,10 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /sync/full - getFullSync
+     * POST /sync/operations - submitOperation
      */
-    async getFullSync() {
-        return this.request('GET', '/sync/full');
+    async submitOperation(data = null) {
+        return this.request('POST', '/sync/operations', data);
     }
 
     /**
@@ -100,10 +100,10 @@ class HD1ThreeJSAPIClient {
     }
 
     /**
-     * POST /sync/operations - submitOperation
+     * GET /sync/full - getFullSync
      */
-    async submitOperation(data = null) {
-        return this.request('POST', '/sync/operations', data);
+    async getFullSync() {
+        return this.request('GET', '/sync/full');
     }
 
 
@@ -111,20 +111,6 @@ class HD1ThreeJSAPIClient {
     // ENTITIES (Generated from spec)
     // ========================================
 
-
-    /**
-     * POST /entities - createEntityWithGeometry
-     */
-    async createEntityWithGeometry(data = null) {
-        return this.request('POST', '/entities', data);
-    }
-
-    /**
-     * GET /entities - getEntities
-     */
-    async getEntities() {
-        return this.request('GET', '/entities');
-    }
 
     /**
      * PUT /entities/{entityId} - updateEntity
@@ -142,25 +128,25 @@ class HD1ThreeJSAPIClient {
         return this.request('DELETE', path);
     }
 
+    /**
+     * GET /entities - getEntities
+     */
+    async getEntities() {
+        return this.request('GET', '/entities');
+    }
+
+    /**
+     * POST /entities - createEntityWithGeometry
+     */
+    async createEntityWithGeometry(data = null) {
+        return this.request('POST', '/entities', data);
+    }
+
 
     // ========================================
     // AVATARS (Generated from spec)
     // ========================================
 
-
-    /**
-     * GET /avatars - getAvatars
-     */
-    async getAvatars() {
-        return this.request('GET', '/avatars');
-    }
-
-    /**
-     * POST /avatars - createAvatar
-     */
-    async createAvatar(data = null) {
-        return this.request('POST', '/avatars', data);
-    }
 
     /**
      * PUT /avatars/{avatarId} - updateAvatar
@@ -186,11 +172,32 @@ class HD1ThreeJSAPIClient {
         return this.request('POST', path, data);
     }
 
+    /**
+     * GET /avatars - getAvatars
+     */
+    async getAvatars() {
+        return this.request('GET', '/avatars');
+    }
+
+    /**
+     * POST /avatars - createAvatar
+     */
+    async createAvatar(data = null) {
+        return this.request('POST', '/avatars', data);
+    }
+
 
     // ========================================
     // SCENE MANAGEMENT (Generated from spec)
     // ========================================
 
+
+    /**
+     * PUT /scene - updateScene
+     */
+    async updateScene(data = null) {
+        return this.request('PUT', '/scene', data);
+    }
 
     /**
      * GET /scene - getScene
@@ -199,11 +206,38 @@ class HD1ThreeJSAPIClient {
         return this.request('GET', '/scene');
     }
 
+
+    // ========================================
+    // MATERIALS (Generated from spec)
+    // ========================================
+
+
     /**
-     * PUT /scene - updateScene
+     * POST /materials/basic - createBasicMaterial
      */
-    async updateScene(data = null) {
-        return this.request('PUT', '/scene', data);
+    async createBasicMaterial(data = null) {
+        return this.request('POST', '/materials/basic', data);
+    }
+
+    /**
+     * POST /materials/phong - createPhongMaterial
+     */
+    async createPhongMaterial(data = null) {
+        return this.request('POST', '/materials/phong', data);
+    }
+
+    /**
+     * POST /materials/physical - createPhysicalMaterial
+     */
+    async createPhysicalMaterial(data = null) {
+        return this.request('POST', '/materials/physical', data);
+    }
+
+    /**
+     * POST /materials/standard - createStandardMaterial
+     */
+    async createStandardMaterial(data = null) {
+        return this.request('POST', '/materials/standard', data);
     }
 
 
@@ -219,6 +253,173 @@ class HD1ThreeJSAPIClient {
         return this.request('GET', '/system/version');
     }
 
+
+    // ========================================
+    // THREE.JS GEOMETRY ENDPOINTS
+    // ========================================
+
+    /**
+     * POST /geometries/box - createBoxGeometry
+     */
+    async createBoxGeometry(data = null) {
+        return this.request('POST', '/geometries/box', data);
+    }
+
+    /**
+     * POST /geometries/sphere - createSphereGeometry
+     */
+    async createSphereGeometry(data = null) {
+        return this.request('POST', '/geometries/sphere', data);
+    }
+
+    /**
+     * POST /geometries/cylinder - createCylinderGeometry
+     */
+    async createCylinderGeometry(data = null) {
+        return this.request('POST', '/geometries/cylinder', data);
+    }
+
+    /**
+     * POST /geometries/cone - createConeGeometry
+     */
+    async createConeGeometry(data = null) {
+        return this.request('POST', '/geometries/cone', data);
+    }
+
+    /**
+     * POST /geometries/torus - createTorusGeometry
+     */
+    async createTorusGeometry(data = null) {
+        return this.request('POST', '/geometries/torus', data);
+    }
+
+    /**
+     * POST /geometries/torusknot - createTorusKnotGeometry
+     */
+    async createTorusKnotGeometry(data = null) {
+        return this.request('POST', '/geometries/torusknot', data);
+    }
+
+    /**
+     * POST /geometries/plane - createPlaneGeometry
+     */
+    async createPlaneGeometry(data = null) {
+        return this.request('POST', '/geometries/plane', data);
+    }
+
+    /**
+     * POST /geometries/ring - createRingGeometry
+     */
+    async createRingGeometry(data = null) {
+        return this.request('POST', '/geometries/ring', data);
+    }
+
+    /**
+     * POST /geometries/circle - createCircleGeometry
+     */
+    async createCircleGeometry(data = null) {
+        return this.request('POST', '/geometries/circle', data);
+    }
+
+    /**
+     * POST /geometries/capsule - createCapsuleGeometry
+     */
+    async createCapsuleGeometry(data = null) {
+        return this.request('POST', '/geometries/capsule', data);
+    }
+
+    // ========================================
+    // THREE.JS LIGHTING ENDPOINTS
+    // ========================================
+
+    /**
+     * POST /lights/directional - createDirectionalLight
+     */
+    async createDirectionalLight(data = null) {
+        return this.request('POST', '/lights/directional', data);
+    }
+
+    /**
+     * POST /lights/point - createPointLight
+     */
+    async createPointLight(data = null) {
+        return this.request('POST', '/lights/point', data);
+    }
+
+    /**
+     * POST /lights/spot - createSpotLight
+     */
+    async createSpotLight(data = null) {
+        return this.request('POST', '/lights/spot', data);
+    }
+
+    /**
+     * POST /lights/ambient - createAmbientLight
+     */
+    async createAmbientLight(data = null) {
+        return this.request('POST', '/lights/ambient', data);
+    }
+
+    /**
+     * POST /lights/hemisphere - createHemisphereLight
+     */
+    async createHemisphereLight(data = null) {
+        return this.request('POST', '/lights/hemisphere', data);
+    }
+
+    // ========================================
+    // THREE.JS CAMERA ENDPOINTS
+    // ========================================
+
+    /**
+     * POST /cameras/perspective - setPerspectiveCamera
+     */
+    async setPerspectiveCamera(data = null) {
+        return this.request('POST', '/cameras/perspective', data);
+    }
+
+    /**
+     * POST /cameras/orthographic - setOrthographicCamera
+     */
+    async setOrthographicCamera(data = null) {
+        return this.request('POST', '/cameras/orthographic', data);
+    }
+
+    // ========================================
+    // THREE.JS ANIMATION ENDPOINTS
+    // ========================================
+
+    /**
+     * POST /animations/keyframe - createKeyframeAnimation
+     */
+    async createKeyframeAnimation(data = null) {
+        return this.request('POST', '/animations/keyframe', data);
+    }
+
+    /**
+     * POST /animations/timeline - controlTimeline
+     */
+    async controlTimeline(data = null) {
+        return this.request('POST', '/animations/timeline', data);
+    }
+
+    // ========================================
+    // THREE.JS TEXTURE ENDPOINTS
+    // ========================================
+
+    /**
+     * POST /textures/load - loadTexture
+     */
+    async loadTexture(data = null) {
+        return this.request('POST', '/textures/load', data);
+    }
+
+    /**
+     * POST /textures/create - createProceduralTexture
+     */
+    async createProceduralTexture(data = null) {
+        return this.request('POST', '/textures/create', data);
+    }
 
     // ========================================
     // CONVENIENCE METHODS

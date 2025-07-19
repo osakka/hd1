@@ -33,6 +33,7 @@ import (
 	"holodeck1/api/avatars"
 	"holodeck1/api/scene"
 	"holodeck1/api/system"
+	"holodeck1/api/materials"
 )
 
 // APIRouter manages all auto-generated Three.js routes
@@ -100,6 +101,12 @@ func (ar *APIRouter) setupRoutes() {
 	api.HandleFunc("{{.Path}}", scene.{{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
 	
 	// ========================================
+	// MATERIALS (Generated from spec)
+	// ========================================
+{{range .Materials}}
+	api.HandleFunc("{{.Path}}", materials.{{.HandlerFunc}}).Methods("{{.Method}}"){{end}}
+	
+	// ========================================
 	// SYSTEM (Generated from spec)
 	// ========================================
 {{range .System}}
@@ -114,6 +121,7 @@ func (ar *APIRouter) setupRoutes() {
 		"entity_ops": {{.EntityOpsCount}},
 		"avatar_ops": {{.AvatarOpsCount}},
 		"scene_ops": {{.SceneOpsCount}},
+		"materials_ops": {{.MaterialsOpsCount}},
 		"system_ops": {{.SystemOpsCount}},
 	})
 }
