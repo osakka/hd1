@@ -154,5 +154,5 @@ HTTP Request → API Router → Handler → Business Logic → Response
 ---
 
 **Accuracy Verified**: ✅ All endpoints confirmed against `/src/api.yaml` and `/src/auto_router.go`  
-**Last Updated**: 2025-07-18  
-**Version**: v0.7.2
+**Last Updated**: 2025-07-19  
+**Version**: v0.7.3

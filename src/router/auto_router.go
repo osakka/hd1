@@ -88,8 +88,8 @@ func (ar *APIRouter) setupRoutes() {
 	// ENTITIES (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/entities", entities.GetEntities).Methods("GET")
 	api.HandleFunc("/entities", entities.CreateEntity).Methods("POST")
+	api.HandleFunc("/entities", entities.GetEntities).Methods("GET")
 	api.HandleFunc("/entities/{entityId}", entities.UpdateEntity).Methods("PUT")
 	api.HandleFunc("/entities/{entityId}", entities.DeleteEntity).Methods("DELETE")
 	
@@ -97,11 +97,11 @@ func (ar *APIRouter) setupRoutes() {
 	// AVATARS (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/avatars/{avatarId}", avatars.UpdateAvatar).Methods("PUT")
-	api.HandleFunc("/avatars/{avatarId}", avatars.RemoveAvatar).Methods("DELETE")
 	api.HandleFunc("/avatars/{sessionId}/move", avatars.MoveAvatar).Methods("POST")
 	api.HandleFunc("/avatars", avatars.GetAvatars).Methods("GET")
 	api.HandleFunc("/avatars", avatars.CreateAvatar).Methods("POST")
+	api.HandleFunc("/avatars/{avatarId}", avatars.UpdateAvatar).Methods("PUT")
+	api.HandleFunc("/avatars/{avatarId}", avatars.RemoveAvatar).Methods("DELETE")
 	
 	// ========================================
 	// SCENE MANAGEMENT (Generated from spec)

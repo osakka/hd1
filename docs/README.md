@@ -7,7 +7,7 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 ### 🔍 Navigation & Reference
 - **[VERSION.md](VERSION.md)** - Single source of truth for version information
 - **[INDEX.md](INDEX.md)** - Complete cross-reference index
-- **[API Endpoints](api/ENDPOINTS.md)** - Complete API reference (15 endpoints)
+- **[API Endpoints](api/ENDPOINTS.md)** - Complete API reference (16 endpoints)
 
 ### 📋 Strategic Planning
 - **[Universal Platform Plan](universal-interface-plan.md)** - Complete transformation strategy and business plan
@@ -15,7 +15,7 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 
 ### 🏗️ Architecture
 - **[System Overview](architecture/overview.md)** - High-level system design
-- **[API Specification](../src/api.yaml)** - Current API specification (v0.7.2)
+- **[API Specification](../src/api.yaml)** - Current API specification (v0.7.3)
 - **[Future API Specification](api/universal-interface-spec.yaml)** - Target universal interface API
 
 ### 📖 User Guides
