@@ -22,11 +22,9 @@ import (
 	"syscall"
 
 	"holodeck1/config"
-	"holodeck1/database"
 	"holodeck1/logging"
 	"holodeck1/router"
 	"holodeck1/server"
-	"holodeck1/session"
 )
 
 // main is the HD1 daemon entry point.
@@ -97,21 +95,8 @@ func main() {
 		})
 	}
 
-	// Initialize database connection (optional for avatar cleanup)
-	db, err := database.NewConnection()
-	var sessionManager *session.Manager
-	if err != nil {
-		logging.Warn("database connection failed - session cleanup disabled", map[string]interface{}{
-			"error": err.Error(),
-		})
-		sessionManager = nil
-	} else {
-		defer db.Close()
-		sessionManager = session.NewManager(db)
-	}
-	
-	// Initialize HD1 with session manager
-	hub := server.NewHub(sessionManager)
+	// Initialize HD1 with pure in-memory architecture (stateless)
+	hub := server.NewHub()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go hub.Run(ctx)

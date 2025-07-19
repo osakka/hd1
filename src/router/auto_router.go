@@ -81,8 +81,8 @@ func (ar *APIRouter) setupRoutes() {
 
 	api.HandleFunc("/sync/full", sync.GetFullSync).Methods("GET")
 	api.HandleFunc("/sync/missing/{from}/{to}", sync.GetMissingOperations).Methods("GET")
-	api.HandleFunc("/sync/operations", sync.SubmitOperation).Methods("POST")
 	api.HandleFunc("/sync/stats", sync.GetSyncStats).Methods("GET")
+	api.HandleFunc("/sync/operations", sync.SubmitOperation).Methods("POST")
 	
 	// ========================================
 	// ENTITIES (Generated from spec)
@@ -97,11 +97,11 @@ func (ar *APIRouter) setupRoutes() {
 	// AVATARS (Generated from spec)
 	// ========================================
 
-	api.HandleFunc("/avatars/{sessionId}/move", avatars.MoveAvatar).Methods("POST")
 	api.HandleFunc("/avatars", avatars.GetAvatars).Methods("GET")
 	api.HandleFunc("/avatars", avatars.CreateAvatar).Methods("POST")
 	api.HandleFunc("/avatars/{avatarId}", avatars.UpdateAvatar).Methods("PUT")
 	api.HandleFunc("/avatars/{avatarId}", avatars.RemoveAvatar).Methods("DELETE")
+	api.HandleFunc("/avatars/{sessionId}/move", avatars.MoveAvatar).Methods("POST")
 	
 	// ========================================
 	// SCENE MANAGEMENT (Generated from spec)
