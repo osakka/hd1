@@ -36,7 +36,7 @@ class HD1ThreeJSAPIClient {
         const url = this.baseURL + path;
         const headers = {
             'Content-Type': 'application/json',
-            'X-Client-ID': this.hd1Id // Server expects X-Client-ID header
+            'X-Client-ID': this.hd1Id
         };
 
         const options = {
@@ -78,14 +78,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * GET /sync/missing/{from}/{to} - getMissingOperations
-     */
-    async getMissingOperations(param1, param2) {
-        const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
-        return this.request('GET', path);
-    }
-
-    /**
      * POST /sync/operations - submitOperation
      */
     async submitOperation(data = null) {
@@ -104,6 +96,14 @@ class HD1ThreeJSAPIClient {
      */
     async getFullSync() {
         return this.request('GET', '/sync/full');
+    }
+
+    /**
+     * GET /sync/missing/{from}/{to} - getMissingOperations
+     */
+    async getMissingOperations(param1, param2) {
+        const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
+        return this.request('GET', path);
     }
 
 
@@ -149,14 +149,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * POST /avatars/{sessionId}/move - moveAvatar
-     */
-    async moveAvatar(param1, data = null) {
-        const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
-        return this.request('POST', path, data);
-    }
-
-    /**
      * POST /avatars - createAvatar
      */
     async createAvatar(data = null) {
@@ -184,6 +176,14 @@ class HD1ThreeJSAPIClient {
     async removeAvatar(param1) {
         const path = this.extractPathParams('/avatars/{avatarId}', [param1]);
         return this.request('DELETE', path);
+    }
+
+    /**
+     * POST /avatars/{sessionId}/move - moveAvatar
+     */
+    async moveAvatar(param1, data = null) {
+        const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
+        return this.request('POST', path, data);
     }
 
 

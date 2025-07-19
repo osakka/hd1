@@ -115,10 +115,10 @@ function connectWebSocket() {
         if (hd1Id) {
             const reconnectMsg = {
                 type: 'client_reconnect',
-                client_id: hd1Id // Server expects client_id, we send our hd1Id as client_id
+                hd1_id: hd1Id
             };
             ws.send(JSON.stringify(reconnectMsg));
-            addDebug('CLIENT_RECONNECT', 'Sent existing hd1_id as client_id: ' + hd1Id);
+            addDebug('CLIENT_RECONNECT', 'Sent existing hd1_id: ' + hd1Id);
         }
     };
     
@@ -130,8 +130,8 @@ function connectWebSocket() {
             addDebug('WS_MSG', data);
             
             // Handle client initialization from server
-            if (data.type === 'client_init' && data.client_id) {
-                hd1Id = data.client_id; // Server sends client_id, we store as hd1Id internally
+            if (data.type === 'client_init' && data.hd1_id) {
+                hd1Id = data.hd1_id;
                 window.hd1Id = hd1Id; // Make globally available
                 
                 // Update API client with server-provided hd1_id
@@ -140,7 +140,7 @@ function connectWebSocket() {
                 }
                 
                 updateRebootstrapButton();
-                addDebug('CLIENT_INIT', 'Server-provided client_id (stored as hd1_id): ' + hd1Id);
+                addDebug('CLIENT_INIT', 'Server-provided hd1_id: ' + hd1Id);
                 
                 // Client is already initialized with proper hd1_id - no need to join separate session
                 addDebug('HD1_READY', 'Client initialized with unified HD1 ID: ' + hd1Id);
@@ -150,8 +150,8 @@ function connectWebSocket() {
             }
             
             // Handle successful client reconnection
-            if (data.type === 'client_reconnect_success' && data.client_id) {
-                hd1Id = data.client_id; // Server sends client_id, we store as hd1Id internally
+            if (data.type === 'client_reconnect_success' && data.hd1_id) {
+                hd1Id = data.hd1_id;
                 window.hd1Id = hd1Id; // Make globally available
                 
                 // Update API client with reconnected hd1_id
@@ -160,7 +160,7 @@ function connectWebSocket() {
                 }
                 
                 updateRebootstrapButton();
-                addDebug('CLIENT_RECONNECT_SUCCESS', 'Reconnected with client_id (stored as hd1_id): ' + hd1Id);
+                addDebug('CLIENT_RECONNECT_SUCCESS', 'Reconnected with hd1_id: ' + hd1Id);
             }
             
             // Handle sync operations from server

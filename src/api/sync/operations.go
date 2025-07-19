@@ -88,7 +88,7 @@ func SubmitOperation(w http.ResponseWriter, r *http.Request) {
 // Helper functions
 func getClientID(r *http.Request) string {
 	// Try to get client ID from various sources
-	if clientID := r.Header.Get("X-Client-ID"); clientID != "" {
+	if clientID := r.Header.Get("X-HD1-ID"); clientID != "" {
 		return clientID
 	}
 	

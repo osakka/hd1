@@ -35,7 +35,7 @@ type Hub struct {
 // Message represents a WebSocket message
 type Message struct {
 	Type      string                 `json:"type"`
-	ClientID  string                 `json:"client_id,omitempty"`
+	ClientID  string                 `json:"hd1_id,omitempty"`
 	Operation *sync.Operation        `json:"operation,omitempty"`
 	From      uint64                 `json:"from,omitempty"`
 	To        uint64                 `json:"to,omitempty"`
@@ -113,16 +113,14 @@ func (h *Hub) registerClient(client *Client) {
 		
 		logging.Info("client registered with new avatar and sync channel", map[string]interface{}{
 			"client_count": len(h.clients),
-			"hd1_id":       client.GetHD1ID(),
-			"client_id":    client.GetClientID(),
+			"hd1_id":       client.GetClientID(),
 			"avatar_id":    avatar.ID,
 			"avatar_count": h.avatarRegistry.GetAvatarCount(),
 		})
 	} else {
 		logging.Info("client registered with existing avatar and sync channel", map[string]interface{}{
 			"client_count": len(h.clients),
-			"hd1_id":       client.GetHD1ID(),
-			"client_id":    client.GetClientID(),
+			"hd1_id":       client.GetClientID(),
 			"avatar_id":    client.GetAvatarID(),
 			"avatar_count": h.avatarRegistry.GetAvatarCount(),
 		})
@@ -148,8 +146,7 @@ func (h *Hub) unregisterClient(client *Client) {
 		
 		logging.Info("client unregistered with avatar cleanup and sync cleanup", map[string]interface{}{
 			"client_count": len(h.clients),
-			"hd1_id":       client.GetHD1ID(),
-			"client_id":    client.GetClientID(),
+			"hd1_id":       client.GetClientID(),
 			"avatar_id":    client.GetAvatarID(),
 			"avatar_count": h.avatarRegistry.GetAvatarCount(),
 		})

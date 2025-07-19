@@ -113,21 +113,21 @@ func (c *Client) ensureRegistered() {
 		// Send client ID to browser
 		clientID := c.GetClientID()
 		initMessage := map[string]interface{}{
-			"type":      "client_init",
-			"client_id": clientID,
-			"message":   "Client ID assigned by server",
+			"type":    "client_init",
+			"hd1_id":  clientID,
+			"message": "HD1 ID assigned by server",
 		}
 		
 		if initData, err := json.Marshal(initMessage); err == nil {
 			select {
 			case c.send <- initData:
 				logging.Info("late client ID sent to browser", map[string]interface{}{
-					"client_id": clientID,
+					"hd1_id": clientID,
 				})
 			default:
 				logging.Error("failed to send late client ID to browser", map[string]interface{}{
-					"client_id": clientID,
-					"error":     "send channel blocked",
+					"hd1_id": clientID,
+					"error":   "send channel blocked",
 				})
 			}
 		}
@@ -200,7 +200,7 @@ func (c *Client) handleClientMessage(message []byte) {
 	switch msgType {
 	case "client_reconnect":
 		// Handle client reconnection with existing client ID
-		if existingClientID, ok := msg["client_id"].(string); ok {
+		if existingClientID, ok := msg["hd1_id"].(string); ok {
 			// Try to reconnect to existing avatar
 			if avatar := c.hub.avatarRegistry.ReconnectClient(existingClientID, c); avatar != nil {
 				// Set client ID to the existing one
@@ -221,7 +221,7 @@ func (c *Client) handleClientMessage(message []byte) {
 				// Send confirmation back to client
 				confirmMsg := map[string]interface{}{
 					"type":      "client_reconnect_success",
-					"client_id": existingClientID,
+					"hd1_id":    existingClientID,
 					"avatar_id": avatar.ID,
 					"message":   "Reconnected to existing avatar",
 				}
@@ -229,7 +229,7 @@ func (c *Client) handleClientMessage(message []byte) {
 					select {
 					case c.send <- jsonData:
 						logging.Info("client reconnection confirmed", map[string]interface{}{
-							"client_id": existingClientID,
+							"hd1_id":    existingClientID,
 							"avatar_id": avatar.ID,
 						})
 					default:
@@ -239,7 +239,7 @@ func (c *Client) handleClientMessage(message []byte) {
 				return // Don't broadcast this message
 			} else {
 				logging.Info("client reconnection failed, creating new identity", map[string]interface{}{
-					"requested_client_id": existingClientID,
+					"requested_hd1_id": existingClientID,
 				})
 				// Avatar not found, client will get new client_init message
 			}
@@ -353,15 +353,15 @@ func (c *Client) forwardSyncOperations() {
 			select {
 			case c.send <- messageData:
 				logging.Trace("websocket", "sync operation forwarded to client", map[string]interface{}{
-					"client_id": c.GetClientID(),
-					"seq_num":   operation.SeqNum,
-					"op_type":   operation.Type,
+					"hd1_id":  c.GetClientID(),
+					"seq_num": operation.SeqNum,
+					"op_type": operation.Type,
 				})
 			default:
 				logging.Error("sync operation dropped - client send channel blocked", map[string]interface{}{
-					"client_id": c.GetClientID(),
-					"seq_num":   operation.SeqNum,
-					"op_type":   operation.Type,
+					"hd1_id":  c.GetClientID(),
+					"seq_num": operation.SeqNum,
+					"op_type": operation.Type,
 				})
 			}
 		}
@@ -376,10 +376,10 @@ func (c *Client) sendInitialSync() {
 		missingOps := c.hub.sync.GetMissingOperations(1, currentSeq)
 		
 		logging.Info("sending initial sync to client", map[string]interface{}{
-			"client_id":     c.GetClientID(),
-			"operations":    len(missingOps),
-			"from_seq":      1,
-			"to_seq":        currentSeq,
+			"hd1_id":     c.GetClientID(),
+			"operations": len(missingOps),
+			"from_seq":   1,
+			"to_seq":     currentSeq,
 		})
 		
 		for _, op := range missingOps {
@@ -389,9 +389,9 @@ func (c *Client) sendInitialSync() {
 				// Operation sent successfully
 			default:
 				logging.Error("initial sync operation dropped - sync channel blocked", map[string]interface{}{
-					"client_id": c.GetClientID(),
-					"seq_num":   op.SeqNum,
-					"op_type":   op.Type,
+					"hd1_id":  c.GetClientID(),
+					"seq_num": op.SeqNum,
+					"op_type": op.Type,
 				})
 			}
 		}
@@ -457,27 +457,27 @@ func ServeWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	
 	// Send client ID to browser for unified identification
 	initMessage := map[string]interface{}{
-		"type":      "client_init",
-		"client_id": clientID,
-		"message":   "Client ID assigned by server",
+		"type":    "client_init",
+		"hd1_id":  clientID,
+		"message": "HD1 ID assigned by server",
 	}
 	
 	if initData, err := json.Marshal(initMessage); err == nil {
 		select {
 		case client.send <- initData:
 			logging.Info("client ID sent to browser", map[string]interface{}{
-				"client_id": clientID,
+				"hd1_id": clientID,
 			})
 		default:
 			logging.Error("failed to send client ID to browser", map[string]interface{}{
-				"client_id": clientID,
-				"error":     "send channel blocked",
+				"hd1_id": clientID,
+				"error":   "send channel blocked",
 			})
 		}
 	} else {
 		logging.Error("failed to marshal client init message", map[string]interface{}{
-			"client_id": clientID,
-			"error":     err.Error(),
+			"hd1_id": clientID,
+			"error":   err.Error(),
 		})
 	}
 	

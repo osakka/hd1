@@ -16,7 +16,7 @@ type Vector3 struct {
 
 // GetClientID extracts client ID from request headers
 func GetClientID(r *http.Request) string {
-	if clientID := r.Header.Get("X-Client-ID"); clientID != "" {
+	if clientID := r.Header.Get("X-HD1-ID"); clientID != "" {
 		return clientID
 	}
 	return "api-client-" + time.Now().Format("20060102150405")
