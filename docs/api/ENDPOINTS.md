@@ -1,13 +1,14 @@
 # HD1 API Endpoints Reference
 
-**Complete reference for HD1 v0.7.2 API endpoints**
+**Complete reference for HD1 v0.7.3 API endpoints**
 
 ## 📋 Endpoint Summary
 
-**Total Endpoints**: 15 REST endpoints  
-**API Version**: v0.7.2  
+**Total Endpoints**: 16 REST endpoints  
+**API Version**: v0.7.3  
 **Base URL**: `http://localhost:8080/api`  
-**Specification**: `/src/api.yaml`
+**Specification**: `/src/api.yaml`  
+**ID System**: Unified `hd1_id` across all endpoints
 
 ## 🔄 Sync Operations (4 endpoints)
 

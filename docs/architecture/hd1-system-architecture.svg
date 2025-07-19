@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; text-anchor: middle; }
+      .subtitle { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; fill: #666; }
+      .component { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; text-anchor: middle; }
+      .description { font-family: Arial, sans-serif; font-size: 10px; text-anchor: middle; fill: #444; }
+      .flow-label { font-family: Arial, sans-serif; font-size: 9px; text-anchor: middle; fill: #666; }
+      .api-box { fill: #E3F2FD; stroke: #1976D2; stroke-width: 2; rx: 8; }
+      .client-box { fill: #F3E5F5; stroke: #7B1FA2; stroke-width: 2; rx: 8; }
+      .server-box { fill: #E8F5E8; stroke: #388E3C; stroke-width: 2; rx: 8; }
+      .sync-box { fill: #FFF3E0; stroke: #F57C00; stroke-width: 2; rx: 8; }
+      .flow-arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .websocket-flow { stroke: #1976D2; stroke-width: 2; fill: none; marker-end: url(#arrowhead-blue); stroke-dasharray: 5,5; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1976D2"/>
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="600" y="30" class="title">HD1 (Holodeck One) System Architecture v0.7.3</text>
+  <text x="600" y="50" class="subtitle">Universal 3D Interface Platform with Unified HD1 ID System</text>
+  
+  <!-- Client Layer -->
+  <rect x="50" y="100" width="300" height="120" class="client-box"/>
+  <text x="200" y="120" class="component">Client Layer</text>
+  
+  <!-- Three.js Client -->
+  <rect x="70" y="140" width="120" height="60" class="client-box"/>
+  <text x="130" y="160" class="component">Three.js Client</text>
+  <text x="130" y="175" class="description">Scene Rendering</text>
+  <text x="130" y="185" class="description">Entity Management</text>
+  <text x="130" y="195" class="description">Avatar Controls</text>
+  
+  <!-- Console -->
+  <rect x="210" y="140" width="120" height="60" class="client-box"/>
+  <text x="270" y="160" class="component">HD1 Console</text>
+  <text x="270" y="175" class="description">WebSocket Manager</text>
+  <text x="270" y="185" class="description">Debug Interface</text>
+  <text x="270" y="195" class="description">Status Monitor</text>
+  
+  <!-- API Layer -->
+  <rect x="450" y="100" width="300" height="120" class="api-box"/>
+  <text x="600" y="120" class="component">API Layer (Auto-Generated)</text>
+  
+  <!-- HTTP API -->
+  <rect x="470" y="140" width="120" height="60" class="api-box"/>
+  <text x="530" y="160" class="component">HTTP API</text>
+  <text x="530" y="175" class="description">16 Endpoints</text>
+  <text x="530" y="185" class="description">OpenAPI Spec</text>
+  <text x="530" y="195" class="description">Auto-Generated</text>
+  
+  <!-- WebSocket API -->
+  <rect x="610" y="140" width="120" height="60" class="api-box"/>
+  <text x="670" y="160" class="component">WebSocket API</text>
+  <text x="670" y="175" class="description">Real-time Sync</text>
+  <text x="670" y="185" class="description">HD1 ID Protocol</text>
+  <text x="670" y="195" class="description">Client Lifecycle</text>
+  
+  <!-- Server Core -->
+  <rect x="850" y="100" width="300" height="120" class="server-box"/>
+  <text x="1000" y="120" class="component">Server Core</text>
+  
+  <!-- Hub -->
+  <rect x="870" y="140" width="120" height="60" class="server-box"/>
+  <text x="930" y="160" class="component">WebSocket Hub</text>
+  <text x="930" y="175" class="description">Client Registry</text>
+  <text x="930" y="185" class="description">Avatar Registry</text>
+  <text x="930" y="195" class="description">Connection Pool</text>
+  
+  <!-- Sync Engine -->
+  <rect x="1010" y="140" width="120" height="60" class="server-box"/>
+  <text x="1070" y="160" class="component">Sync Engine</text>
+  <text x="1070" y="175" class="description">TCP-Simple</text>
+  <text x="1070" y="185" class="description">Sequence Based</text>
+  <text x="1070" y="195" class="description">Operation Queue</text>
+  
+  <!-- Synchronization Layer -->
+  <rect x="250" y="300" width="700" height="150" class="sync-box"/>
+  <text x="600" y="325" class="component">Unified HD1 ID Synchronization System</text>
+  
+  <!-- Sync Operations -->
+  <rect x="280" y="350" width="150" height="80" class="sync-box"/>
+  <text x="355" y="375" class="component">Sync Operations</text>
+  <text x="355" y="390" class="description">Entity Create/Update</text>
+  <text x="355" y="400" class="description">Avatar Move/Create</text>
+  <text x="355" y="410" class="description">Scene Updates</text>
+  <text x="355" y="420" class="description">Sequence Numbers</text>
+  
+  <!-- ID System -->
+  <rect x="450" y="350" width="150" height="80" class="sync-box"/>
+  <text x="525" y="375" class="component">HD1 ID System</text>
+  <text x="525" y="390" class="description">Single Source Truth</text>
+  <text x="525" y="400" class="description">Unified Protocol</text>
+  <text x="525" y="410" class="description">Zero Ambiguity</text>
+  <text x="525" y="420" class="description">Template Consistent</text>
+  
+  <!-- Operation Broadcast -->
+  <rect x="620" y="350" width="150" height="80" class="sync-box"/>
+  <text x="695" y="375" class="component">Operation Broadcast</text>
+  <text x="695" y="390" class="description">Multi-Client Sync</text>
+  <text x="695" y="400" class="description">Real-time Updates</text>
+  <text x="695" y="410" class="description">Missing Detection</text>
+  <text x="695" y="420" class="description">Ordered Application</text>
+  
+  <!-- State Management -->
+  <rect x="790" y="350" width="150" height="80" class="sync-box"/>
+  <text x="865" y="375" class="component">State Management</text>
+  <text x="865" y="390" class="description">Avatar Lifecycle</text>
+  <text x="865" y="400" class="description">Entity Persistence</text>
+  <text x="865" y="410" class="description">Session Isolation</text>
+  <text x="865" y="420" class="description">Cleanup Automation</text>
+  
+  <!-- Three.js Integration -->
+  <rect x="50" y="550" width="1100" height="180" style="fill: #F5F5F5; stroke: #666; stroke-width: 1; rx: 8;"/>
+  <text x="600" y="575" class="component">Three.js Integration Layer</text>
+  
+  <!-- Scene Management -->
+  <rect x="80" y="590" width="160" height="100" style="fill: #FFECB3; stroke: #FF8F00; stroke-width: 1; rx: 4;"/>
+  <text x="160" y="610" class="component">Scene Management</text>
+  <text x="160" y="625" class="description">Scene/Camera/Renderer</text>
+  <text x="160" y="635" class="description">Lights/Fog/Background</text>
+  <text x="160" y="645" class="description">Asset Loading (GLB)</text>
+  <text x="160" y="655" class="description">Material System</text>
+  <text x="160" y="665" class="description">Geometry Creation</text>
+  <text x="160" y="675" class="description">Performance Stats</text>
+  
+  <!-- Entity System -->
+  <rect x="260" y="590" width="160" height="100" style="fill: #FFECB3; stroke: #FF8F00; stroke-width: 1; rx: 4;"/>
+  <text x="340" y="610" class="component">Entity System</text>
+  <text x="340" y="625" class="description">Box/Sphere/Cylinder</text>
+  <text x="340" y="635" class="description">Position/Rotation/Scale</text>
+  <text x="340" y="645" class="description">Material Assignment</text>
+  <text x="340" y="655" class="description">Dynamic Creation</text>
+  <text x="340" y="665" class="description">Real-time Updates</text>
+  <text x="340" y="675" class="description">Sync Integration</text>
+  
+  <!-- Avatar System -->
+  <rect x="440" y="590" width="160" height="100" style="fill: #FFECB3; stroke: #FF8F00; stroke-width: 1; rx: 4;"/>
+  <text x="520" y="610" class="component">Avatar System</text>
+  <text x="520" y="625" class="description">Multi-user Avatars</text>
+  <text x="520" y="635" class="description">Real-time Movement</text>
+  <text x="520" y="645" class="description">Position Sync</text>
+  <text x="520" y="655" class="description">Lifecycle Management</text>
+  <text x="520" y="665" class="description">Auto Cleanup</text>
+  <text x="520" y="675" class="description">HD1 ID Binding</text>
+  
+  <!-- Control System -->
+  <rect x="620" y="590" width="160" height="100" style="fill: #FFECB3; stroke: #FF8F00; stroke-width: 1; rx: 4;"/>
+  <text x="700" y="610" class="component">Control System</text>
+  <text x="700" y="625" class="description">WASD Movement</text>
+  <text x="700" y="635" class="description">Mouse Look</text>
+  <text x="700" y="645" class="description">Touch Controls</text>
+  <text x="700" y="655" class="description">Pointer Lock</text>
+  <text x="700" y="665" class="description">Mobile Support</text>
+  <text x="700" y="675" class="description">Cross-platform</text>
+  
+  <!-- Build System -->
+  <rect x="800" y="590" width="160" height="100" style="fill: #FFECB3; stroke: #FF8F00; stroke-width: 1; rx: 4;"/>
+  <text x="880" y="610" class="component">Build System</text>
+  <text x="880" y="625" class="description">Auto-Generation</text>
+  <text x="880" y="635" class="description">Template Consistency</text>
+  <text x="880" y="645" class="description">Clean Builds</text>
+  <text x="880" y="655" class="description">Zero Warnings</text>
+  <text x="880" y="665" class="description">API Sync</text>
+  <text x="880" y="675" class="description">Schema Driven</text>
+  
+  <!-- Configuration -->
+  <rect x="980" y="590" width="160" height="100" style="fill: #FFECB3; stroke: #FF8F00; stroke-width: 1; rx: 4;"/>
+  <text x="1060" y="610" class="component">Configuration</text>
+  <text x="1060" y="625" class="description">Environment Variables</text>
+  <text x="1060" y="635" class="description">Command Flags</text>
+  <text x="1060" y="645" class="description">.env File Support</text>
+  <text x="1060" y="655" class="description">Priority Order</text>
+  <text x="1060" y="665" class="description">Runtime Control</text>
+  <text x="1060" y="675" class="description">Zero Hardcoding</text>
+  
+  <!-- Flow Arrows -->
+  <!-- HTTP API Flow -->
+  <line x1="350" y1="170" x2="470" y2="170" class="flow-arrow"/>
+  <text x="410" y="165" class="flow-label">HTTP Requests</text>
+  
+  <!-- API to Server -->
+  <line x1="590" y1="170" x2="870" y2="170" class="flow-arrow"/>
+  <text x="730" y="165" class="flow-label">Route to Handlers</text>
+  
+  <!-- WebSocket Flow -->
+  <line x1="270" y1="200" x2="670" y2="200" class="websocket-flow"/>
+  <text x="470" y="215" class="flow-label">WebSocket Connection</text>
+  
+  <!-- WebSocket to Hub -->
+  <line x1="670" y1="200" x2="930" y2="200" class="websocket-flow"/>
+  <text x="800" y="215" class="flow-label">Client Lifecycle</text>
+  
+  <!-- Server to Sync -->
+  <line x1="1000" y1="220" x2="600" y2="300" class="flow-arrow"/>
+  <text x="750" y="265" class="flow-label">Operations</text>
+  
+  <!-- Sync to Three.js -->
+  <line x1="600" y1="450" x2="600" y2="550" class="flow-arrow"/>
+  <text x="615" y="500" class="flow-label">Scene Updates</text>
+  
+  <!-- HD1 ID Flow -->
+  <rect x="400" y="750" width="400" height="30" style="fill: #E1F5FE; stroke: #0277BD; stroke-width: 1; rx: 4;"/>
+  <text x="600" y="770" class="component">HD1 ID Flow: WebSocket → Client → API → Database → Logging</text>
+</svg>

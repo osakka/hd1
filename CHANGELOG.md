@@ -28,6 +28,12 @@ This release achieves complete architectural purity with unified `hd1_id` system
 - **Breaking**: Database result aliases changed from `client_id` to `hd1_id`
 - **Architecture**: Complete elimination of parallel ID systems for true single source of truth
 
+### Documentation
+- **ADR System**: Added comprehensive architectural decision records (ADR 007-009)
+- **Timeline Accuracy**: Complete git history analysis for precise decision timeline
+- **System Architecture**: Created detailed SVG architecture diagram
+- **API Documentation**: Updated to reflect unified HD1 ID system and v0.7.3 endpoints
+
 ## [0.7.2] - 2025-07-18
 
 ### Major Enhancements - Complete Avatar Lifecycle Management
