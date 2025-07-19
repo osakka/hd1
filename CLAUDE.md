@@ -8,15 +8,15 @@
 - **Cross-Platform**: Web, mobile, desktop clients with plugin architecture
 - **Single Source of Truth**: Centralized database with incremental schemas
 
-## Current State (2025-07-18)
-HD1 v0.7.2 is a **universal 3D interface platform** with complete **multi-tenant architecture**, **real-time collaboration**, **AI integration**, **cross-platform support**, and **enterprise features**. The latest release achieves surgical precision single source of truth avatar lifecycle management with automatic cleanup, mobile touch controls, and zero architectural compromises.
+## Current State (2025-07-19)
+HD1 v0.7.2 is a **universal 3D interface platform** with complete **multi-tenant architecture**, **real-time collaboration**, **AI integration**, **cross-platform support**, and **enterprise features**. The latest release achieves surgical precision single source of truth with unified `hd1_id` system across entire stack, automatic avatar cleanup, mobile touch controls, and zero architectural compromises.
 
 ### ✅ Current Features
 - **Three.js Integration**: 3D rendering with native Three.js r170
 - **TCP-Simple Sync**: Sequence-based synchronization for bulletproof reliability
 - **Real-Time WebSocket**: Entity lifecycle synchronization with operation ordering
 - **Pure WebGL**: Direct Three.js Scene/Mesh/Material/Geometry operations
-- **Avatar System**: Real-time multiplayer avatars with surgical precision single source of truth lifecycle management
+- **Avatar System**: Real-time multiplayer avatars with unified `hd1_id` system and surgical precision lifecycle management
 - **Avatar Cleanup**: Automatic cleanup of inactive avatars via session inactivity timeout
 - **Mobile Touch Controls**: Left side for movement, right side for camera look
 - **FPS Controls**: WASD movement, mouse look, Escape key to exit pointer lock

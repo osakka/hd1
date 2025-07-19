@@ -534,7 +534,7 @@ func (m *Manager) CleanupInactiveSessions(ctx context.Context) {
 	
 	// Get inactive participant client IDs before updating
 	selectQuery := `
-		SELECT user_id::text as client_id
+		SELECT user_id::text as hd1_id
 		FROM participants 
 		WHERE left_at IS NULL 
 		AND last_seen < NOW() - INTERVAL '%d seconds'

@@ -131,7 +131,7 @@ func UpdateScene(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 
 	logging.Info("scene updated via API", map[string]interface{}{
-		"client_id": clientID,
+		"hd1_id": clientID,
 		"seq_num":   operation.SeqNum,
 		"updates":   len(operationData),
 	})

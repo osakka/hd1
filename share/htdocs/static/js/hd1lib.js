@@ -78,20 +78,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * POST /sync/operations - submitOperation
-     */
-    async submitOperation(data = null) {
-        return this.request('POST', '/sync/operations', data);
-    }
-
-    /**
-     * GET /sync/stats - getSyncStats
-     */
-    async getSyncStats() {
-        return this.request('GET', '/sync/stats');
-    }
-
-    /**
      * GET /sync/full - getFullSync
      */
     async getFullSync() {
@@ -104,6 +90,20 @@ class HD1ThreeJSAPIClient {
     async getMissingOperations(param1, param2) {
         const path = this.extractPathParams('/sync/missing/{from}/{to}', [param1, param2]);
         return this.request('GET', path);
+    }
+
+    /**
+     * POST /sync/operations - submitOperation
+     */
+    async submitOperation(data = null) {
+        return this.request('POST', '/sync/operations', data);
+    }
+
+    /**
+     * GET /sync/stats - getSyncStats
+     */
+    async getSyncStats() {
+        return this.request('GET', '/sync/stats');
     }
 
 
@@ -149,20 +149,6 @@ class HD1ThreeJSAPIClient {
 
 
     /**
-     * POST /avatars - createAvatar
-     */
-    async createAvatar(data = null) {
-        return this.request('POST', '/avatars', data);
-    }
-
-    /**
-     * GET /avatars - getAvatars
-     */
-    async getAvatars() {
-        return this.request('GET', '/avatars');
-    }
-
-    /**
      * PUT /avatars/{avatarId} - updateAvatar
      */
     async updateAvatar(param1, data = null) {
@@ -184,6 +170,20 @@ class HD1ThreeJSAPIClient {
     async moveAvatar(param1, data = null) {
         const path = this.extractPathParams('/avatars/{sessionId}/move', [param1]);
         return this.request('POST', path, data);
+    }
+
+    /**
+     * GET /avatars - getAvatars
+     */
+    async getAvatars() {
+        return this.request('GET', '/avatars');
+    }
+
+    /**
+     * POST /avatars - createAvatar
+     */
+    async createAvatar(data = null) {
+        return this.request('POST', '/avatars', data);
     }
 
 

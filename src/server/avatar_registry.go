@@ -13,7 +13,7 @@ import (
 // Avatar represents a connected client in the Three.js scene
 type Avatar struct {
 	ID           string                 `json:"id"`
-	ClientID     string                 `json:"client_id"`
+	ClientID     string                 `json:"hd1_id"`
 	Name         string                 `json:"name"`
 	Position     Vector3                `json:"position"`
 	Rotation     *Vector3               `json:"rotation,omitempty"`
@@ -134,7 +134,7 @@ func (ar *AvatarRegistry) ReconnectClient(clientID string, newClient *Client) *A
 			
 			logging.Info("client reconnected to existing avatar", map[string]interface{}{
 				"avatar_id":  avatar.ID,
-				"client_id":  clientID,
+				"hd1_id":  clientID,
 				"session_id": newClient.GetSessionID(),
 			})
 			
@@ -190,7 +190,7 @@ func (ar *AvatarRegistry) RemoveAvatarByClientID(clientID string) bool {
 			
 			logging.Info("avatar removed by client ID", map[string]interface{}{
 				"avatar_id": avatarID,
-				"client_id": clientID,
+				"hd1_id": clientID,
 				"duration":  time.Since(avatar.ConnectedAt).String(),
 			})
 			

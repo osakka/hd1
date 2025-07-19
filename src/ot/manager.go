@@ -165,7 +165,7 @@ func (m *Manager) JoinDocument(ctx context.Context, req *JoinDocumentRequest) (*
 	doc.Clients[clientID] = client
 
 	logging.Info("client joined OT document", map[string]interface{}{
-		"client_id":   clientID,
+		"hd1_id":   clientID,
 		"document_id": req.DocumentID,
 		"user_id":     req.UserID,
 		"version":     client.Version,
@@ -266,7 +266,7 @@ func (m *Manager) ApplyOperation(ctx context.Context, req *ApplyOperationRequest
 
 	logging.Debug("applied OT operation", map[string]interface{}{
 		"document_id":  req.DocumentID,
-		"client_id":    req.ClientID,
+		"hd1_id":    req.ClientID,
 		"operation_id": req.Operation.ID,
 		"type":         req.Operation.Type,
 		"version":      doc.Version,
@@ -413,13 +413,13 @@ func (m *Manager) LeaveDocument(ctx context.Context, documentID uuid.UUID, userI
 	_, err := m.db.ExecContext(ctx, query, clientID)
 	if err != nil {
 		logging.Error("failed to remove client from database", map[string]interface{}{
-			"client_id": clientID,
+			"hd1_id": clientID,
 			"error":     err.Error(),
 		})
 	}
 
 	logging.Info("client left OT document", map[string]interface{}{
-		"client_id":   clientID,
+		"hd1_id":   clientID,
 		"document_id": documentID,
 		"user_id":     userID,
 	})

@@ -108,7 +108,7 @@ func CreateAvatar(w http.ResponseWriter, r *http.Request) {
 
 	logging.Debug("avatar created via API", map[string]interface{}{
 		"avatar_id": avatarID,
-		"client_id": clientID,
+		"hd1_id": clientID,
 		"seq_num":   operation.SeqNum,
 		"name":      req.Name,
 	})
@@ -202,7 +202,7 @@ func UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 
 	logging.Debug("avatar updated via API", map[string]interface{}{
 		"avatar_id": avatarID,
-		"client_id": clientID,
+		"hd1_id": clientID,
 		"seq_num":   operation.SeqNum,
 	})
 }
@@ -253,7 +253,7 @@ func RemoveAvatar(w http.ResponseWriter, r *http.Request) {
 
 	logging.Debug("avatar removed via API", map[string]interface{}{
 		"avatar_id": avatarID,
-		"client_id": clientID,
+		"hd1_id": clientID,
 		"seq_num":   operation.SeqNum,
 	})
 }

@@ -27,12 +27,12 @@
             const data = JSON.parse(event.data);
             addLog('Received: ' + JSON.stringify(data));
             
-            if (data.type === 'client_init' && data.client_id) {
-                addLog('SUCCESS: Client ID assigned: ' + data.client_id);
-                window.clientId = data.client_id;
+            if (data.type === 'client_init' && data.hd1_id) {
+                addLog('SUCCESS: Client ID assigned: ' + data.hd1_id);
+                window.hd1Id = data.hd1_id;
                 
                 // Test avatar move
-                fetch('/api/avatars/' + data.client_id + '/move', {
+                fetch('/api/avatars/' + data.hd1_id + '/move', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({

@@ -79,9 +79,9 @@ func SubmitOperation(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 
 	logging.Info("operation submitted via API", map[string]interface{}{
-		"client_id": clientID,
-		"type":      req.Type,
-		"seq_num":   operation.SeqNum,
+		"hd1_id":  clientID,
+		"type":    req.Type,
+		"seq_num": operation.SeqNum,
 	})
 }
 

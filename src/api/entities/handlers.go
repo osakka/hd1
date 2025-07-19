@@ -243,7 +243,7 @@ func CreateEntity(w http.ResponseWriter, r *http.Request) {
 
 	logging.Info("entity created via API", map[string]interface{}{
 		"entity_id": entityID,
-		"client_id": clientID,
+		"hd1_id": clientID,
 		"seq_num":   operation.SeqNum,
 	})
 }
@@ -325,7 +325,7 @@ func UpdateEntity(w http.ResponseWriter, r *http.Request) {
 
 	logging.Info("entity updated via API", map[string]interface{}{
 		"entity_id": entityID,
-		"client_id": clientID,
+		"hd1_id": clientID,
 		"seq_num":   operation.SeqNum,
 	})
 }
@@ -373,7 +373,7 @@ func DeleteEntity(w http.ResponseWriter, r *http.Request) {
 
 	logging.Info("entity deleted via API", map[string]interface{}{
 		"entity_id": entityID,
-		"client_id": clientID,
+		"hd1_id": clientID,
 		"seq_num":   operation.SeqNum,
 	})
 }

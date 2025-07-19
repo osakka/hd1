@@ -5,6 +5,29 @@ All notable changes to HD1 (Holodeck One) are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.3] - 2025-07-19
+
+### Major Enhancements - Unified ID System & Complete Single Source of Truth
+This release achieves complete architectural purity with unified `hd1_id` system across entire stack, eliminating all parallel ID sources and ensuring true single source of truth.
+
+### Added
+- **Unified ID System**: Complete replacement of `client_id`, `session_id`, `avatar_id` with single `hd1_id` across entire stack
+- **Template System Updates**: Auto-generation templates now produce unified `hd1_id` API clients
+- **Protocol Consistency**: WebSocket messages, HTTP headers, database queries, and logging use unified `hd1_id`
+- **Zero Regression Architecture**: Surgical precision updates with complete backward compatibility elimination
+
+### Fixed
+- **ID System Consistency**: All logging, database queries, and API operations use unified `hd1_id` field names
+- **Auto-Generation Regression**: Fixed templates to prevent `client_id` reversion during code generation
+- **JSON Serialization**: Avatar struct now serializes with `hd1_id` instead of `client_id`
+- **WebSocket Protocol**: Client and server now exchange `hd1_id` in all WebSocket message types
+
+### Changed
+- **Breaking**: All WebSocket messages now use `hd1_id` field instead of `client_id`
+- **Breaking**: Avatar JSON structure now uses `hd1_id` field for client identification
+- **Breaking**: Database result aliases changed from `client_id` to `hd1_id`
+- **Architecture**: Complete elimination of parallel ID systems for true single source of truth
+
 ## [0.7.2] - 2025-07-18
 
 ### Major Enhancements - Complete Avatar Lifecycle Management

@@ -61,7 +61,7 @@ func (rs *ReliableSync) SubmitOperation(op *Operation) {
 	
 	logging.Debug("operation submitted", map[string]interface{}{
 		"seq_num":   op.SeqNum,
-		"client_id": op.ClientID,
+		"hd1_id": op.ClientID,
 		"type":      op.Type,
 	})
 	
@@ -86,7 +86,7 @@ func (rs *ReliableSync) RegisterClient(clientID string) chan *Operation {
 	rs.clientLastSeen[clientID] = 0
 	
 	logging.Info("client registered", map[string]interface{}{
-		"client_id": clientID,
+		"hd1_id": clientID,
 	})
 	
 	return clientChan
@@ -103,7 +103,7 @@ func (rs *ReliableSync) UnregisterClient(clientID string) {
 		delete(rs.clientLastSeen, clientID)
 		
 		logging.Info("client unregistered", map[string]interface{}{
-			"client_id": clientID,
+			"hd1_id": clientID,
 		})
 	}
 }
@@ -176,7 +176,7 @@ func (rs *ReliableSync) broadcastOperation(op *Operation) {
 		default:
 			// Client channel full - skip this client
 			logging.Warn("client channel full", map[string]interface{}{
-				"client_id": clientID,
+				"hd1_id": clientID,
 				"seq_num":   op.SeqNum,
 			})
 		}
