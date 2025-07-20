@@ -408,12 +408,7 @@ func generateUnifiedAPI(schemasDir, outputPath string) error {
 		"task": "dynamic-unified-api-generation",
 	})
 
-	// Step 1: Generate Three.js schema from TypeScript definitions
-	if err := generateThreeJSSchema(schemasDir); err != nil {
-		return fmt.Errorf("failed to generate Three.js schema: %w", err)
-	}
-
-	// Step 2: Merge all schemas into unified API
+	// Load and merge all schemas into unified API
 	merger := NewSchemaMerger()
 	if err := merger.LoadAllSchemas(schemasDir); err != nil {
 		return fmt.Errorf("failed to load schemas: %w", err)
@@ -431,34 +426,6 @@ func generateUnifiedAPI(schemasDir, outputPath string) error {
 	return nil
 }
 
-// generateThreeJSSchema generates Three.js API schema from TypeScript definitions
-func generateThreeJSSchema(schemasDir string) error {
-	logging.Info("generating Three.js schema from TypeScript definitions", map[string]interface{}{
-		"task": "threejs-schema-generation",
-	})
-
-	// Path to Three.js TypeScript definitions
-	threejsTypesPath := filepath.Join(schemasDir, "threejs-types")
-	threejsSchemaPath := filepath.Join(schemasDir, "threejs-api.yaml")
-
-	// Generate schema from TypeScript definitions
-	schema, err := ScanThreeJSDefinitions(threejsTypesPath)
-	if err != nil {
-		return fmt.Errorf("failed to scan Three.js definitions: %w", err)
-	}
-
-	// Write Three.js schema to file
-	if err := WriteThreeJSSchema(schema, threejsSchemaPath); err != nil {
-		return fmt.Errorf("failed to write Three.js schema: %w", err)
-	}
-
-	logging.Info("Three.js schema generated successfully", map[string]interface{}{
-		"output_path": threejsSchemaPath,
-		"dynamic_generation": true,
-	})
-
-	return nil
-}
 
 type RouteInfo struct {
 	Path        string
