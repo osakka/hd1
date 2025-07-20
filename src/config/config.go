@@ -12,6 +12,12 @@ import (
 	"time"
 )
 
+// Single source of truth constants
+const (
+	DefaultInstallPrefix = "/opt/hd1"
+	DefaultVersion       = "v1.0.0"
+)
+
 // HD1Config represents the complete HD1 configuration system
 // Priority: Flags > Environment Variables > Config File > Defaults
 type HD1Config struct {
@@ -166,10 +172,10 @@ func (c *HD1Config) loadDefaults() {
 	c.Server.Port = "8080"
 	c.Server.APIBase = "http://0.0.0.0:8080/api"
 	c.Server.InternalAPIBase = "http://localhost:8080/api"
-	c.Server.Version = "v0.7.0"
+	c.Server.Version = DefaultVersion
 	
 	// Path defaults - configurable root directory
-	rootDir := "/opt/hd1"
+	rootDir := DefaultInstallPrefix
 	c.Paths.RootDir = rootDir
 	c.Paths.BuildDir = filepath.Join(rootDir, "build")
 	c.Paths.BinDir = filepath.Join(rootDir, "build", "bin")
@@ -672,37 +678,49 @@ func (c *HD1Config) loadFlags() {
 
 // calculate_dependent_directory_paths calculates dependent paths from root directory
 func (c *HD1Config) calculate_dependent_directory_paths() {
-	if c.Paths.BuildDir == "" || strings.HasPrefix(c.Paths.BuildDir, "/opt/hd1") {
+	// Use configuration-driven install prefix detection
+	installPrefix := c.getInstallPrefix()
+	
+	if c.Paths.BuildDir == "" || strings.HasPrefix(c.Paths.BuildDir, installPrefix) {
 		c.Paths.BuildDir = filepath.Join(c.Paths.RootDir, "build")
 	}
-	if c.Paths.BinDir == "" || strings.HasPrefix(c.Paths.BinDir, "/opt/hd1") {
+	if c.Paths.BinDir == "" || strings.HasPrefix(c.Paths.BinDir, installPrefix) {
 		c.Paths.BinDir = filepath.Join(c.Paths.BuildDir, "bin")
 	}
-	if c.Paths.LogDir == "" || strings.HasPrefix(c.Paths.LogDir, "/opt/hd1") {
+	if c.Paths.LogDir == "" || strings.HasPrefix(c.Paths.LogDir, installPrefix) {
 		c.Paths.LogDir = filepath.Join(c.Paths.BuildDir, "logs")
 		c.Logging.LogDir = c.Paths.LogDir
 	}
-	if c.Paths.RuntimeDir == "" || strings.HasPrefix(c.Paths.RuntimeDir, "/opt/hd1") {
+	if c.Paths.RuntimeDir == "" || strings.HasPrefix(c.Paths.RuntimeDir, installPrefix) {
 		c.Paths.RuntimeDir = filepath.Join(c.Paths.BuildDir, "runtime")
 	}
-	if c.Paths.ShareDir == "" || strings.HasPrefix(c.Paths.ShareDir, "/opt/hd1") {
+	if c.Paths.ShareDir == "" || strings.HasPrefix(c.Paths.ShareDir, installPrefix) {
 		c.Paths.ShareDir = filepath.Join(c.Paths.RootDir, "share")
 	}
-	if c.Paths.HtDocsDir == "" || strings.HasPrefix(c.Paths.HtDocsDir, "/opt/hd1") {
+	if c.Paths.HtDocsDir == "" || strings.HasPrefix(c.Paths.HtDocsDir, installPrefix) {
 		c.Paths.HtDocsDir = filepath.Join(c.Paths.ShareDir, "htdocs")
 	}
-	if c.Paths.PIDFile == "" || strings.HasPrefix(c.Paths.PIDFile, "/opt/hd1") {
+	if c.Paths.PIDFile == "" || strings.HasPrefix(c.Paths.PIDFile, installPrefix) {
 		c.Paths.PIDFile = filepath.Join(c.Paths.RuntimeDir, "hd1.pid")
 	}
-	if c.Server.StaticDir == "" || strings.HasPrefix(c.Server.StaticDir, "/opt/hd1") {
+	if c.Server.StaticDir == "" || strings.HasPrefix(c.Server.StaticDir, installPrefix) {
 		c.Server.StaticDir = filepath.Join(c.Paths.HtDocsDir, "static")
 	}
-	if c.Paths.WorldsDir == "" || strings.HasPrefix(c.Paths.WorldsDir, "/opt/hd1") {
+	if c.Paths.WorldsDir == "" || strings.HasPrefix(c.Paths.WorldsDir, installPrefix) {
 		c.Paths.WorldsDir = filepath.Join(c.Paths.ShareDir, "worlds")
 	}
-	if c.Paths.AvatarsDir == "" || strings.HasPrefix(c.Paths.AvatarsDir, "/opt/hd1") {
+	if c.Paths.AvatarsDir == "" || strings.HasPrefix(c.Paths.AvatarsDir, installPrefix) {
 		c.Paths.AvatarsDir = filepath.Join(c.Paths.ShareDir, "avatars")
 	}
+}
+
+// getInstallPrefix returns the current install prefix for path detection
+func (c *HD1Config) getInstallPrefix() string {
+	// If RootDir is set and different from default, use it as prefix
+	if c.Paths.RootDir != "" && c.Paths.RootDir != DefaultInstallPrefix {
+		return c.Paths.RootDir
+	}
+	return DefaultInstallPrefix
 }
 
 // validate ensures configuration is valid and complete
@@ -750,7 +768,7 @@ func GetRootDir() string {
 	if Config != nil {
 		return Config.Paths.RootDir
 	}
-	return "/opt/hd1" // fallback
+	return DefaultInstallPrefix // fallback
 }
 
 // GetStaticDir returns the configured static files directory
@@ -758,7 +776,7 @@ func GetStaticDir() string {
 	if Config != nil {
 		return Config.Server.StaticDir
 	}
-	return "/opt/hd1/share/htdocs/static" // fallback
+	return filepath.Join(DefaultInstallPrefix, "share", "htdocs", "static") // fallback
 }
 
 // GetPIDFile returns the configured PID file path
@@ -766,7 +784,7 @@ func GetPIDFile() string {
 	if Config != nil {
 		return Config.Paths.PIDFile
 	}
-	return "/opt/hd1/build/runtime/hd1.pid" // fallback
+	return filepath.Join(DefaultInstallPrefix, "build", "runtime", "hd1.pid") // fallback
 }
 
 // GetHost returns the configured server host
@@ -790,7 +808,7 @@ func GetLogDir() string {
 	if Config != nil {
 		return Config.Paths.LogDir
 	}
-	return "/opt/hd1/build/logs" // fallback
+	return filepath.Join(DefaultInstallPrefix, "build", "logs") // fallback
 }
 
 // GetDaemon returns the daemon mode setting
@@ -806,7 +824,7 @@ func GetWorldsDir() string {
 	if Config != nil {
 		return Config.Paths.WorldsDir
 	}
-	return "/opt/hd1/share/worlds" // fallback
+	return filepath.Join(DefaultInstallPrefix, "share", "worlds") // fallback
 }
 
 // GetAvatarsDir returns the configured avatars directory
@@ -814,7 +832,7 @@ func GetAvatarsDir() string {
 	if Config != nil {
 		return Config.Paths.AvatarsDir
 	}
-	return "/opt/hd1/share/avatars" // fallback
+	return filepath.Join(DefaultInstallPrefix, "share", "avatars") // fallback
 }
 
 // GetRecordingsDir returns the configured recordings directory
@@ -822,7 +840,7 @@ func GetRecordingsDir() string {
 	if Config != nil {
 		return Config.Paths.RecordingsDir
 	}
-	return "/opt/hd1/recordings" // fallback
+	return filepath.Join(DefaultInstallPrefix, "recordings") // fallback
 }
 
 // GetWorldsConfigFile returns the configured worlds config file path
@@ -830,7 +848,7 @@ func GetWorldsConfigFile() string {
 	if Config != nil {
 		return filepath.Join(Config.Paths.WorldsDir, Config.Worlds.ConfigFile)
 	}
-	return "/opt/hd1/share/worlds/config.yaml" // fallback
+	return filepath.Join(DefaultInstallPrefix, "share", "worlds", "config.yaml") // fallback
 }
 
 // GetAvatarsConfigFile returns the configured avatars config file path
@@ -838,7 +856,7 @@ func GetAvatarsConfigFile() string {
 	if Config != nil {
 		return filepath.Join(Config.Paths.AvatarsDir, Config.Avatars.ConfigFile)
 	}
-	return "/opt/hd1/share/avatars/config.yaml" // fallback
+	return filepath.Join(DefaultInstallPrefix, "share", "avatars", "config.yaml") // fallback
 }
 
 // WebSocket configuration getters
@@ -963,7 +981,7 @@ func GetVersion() string {
 	if Config != nil {
 		return Config.Server.Version
 	}
-	return "v0.7.0" // fallback
+	return DefaultVersion // fallback
 }
 
 // Avatars configuration getters
