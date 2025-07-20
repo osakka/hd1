@@ -182,8 +182,8 @@ echo "HD1_PORT=3000" > .env
 
 ## 🛠️ Development
 
-⚠️ **XVC Required**: This project was developed with [XVC (eXtensible Version Control)](https://github.com/osakka/xvc/tree/main). 
-Understanding XVC workflows may be necessary for full development.
+⚠️ **XVC Methodology**: This project was developed with [XVC (eXtreme Vibe Coding)](https://github.com/osakka/xvc/tree/main). 
+Understanding XVC human-LLM collaboration patterns may be necessary for full development.
 
 ```bash
 # Build and start (basic development)
@@ -202,7 +202,7 @@ make logs
 make status
 ```
 
-**Note**: Some development workflows may require XVC commands and understanding of XVC's experimental data versioning approach.
+**Note**: Some development workflows may require understanding of XVC's human-LLM collaboration methodology.
 
 ## 📚 API Documentation
 
@@ -256,16 +256,16 @@ curl -X POST http://localhost:8080/api/geometries/box -d '{"color": "#00ff00"}'
 
 ## 🔗 Related Projects
 
-This project uses **[XVC (eXtensible Version Control)](https://xvc.dev)** for data and model versioning.
+This project was developed using **[XVC (eXtreme Vibe Coding)](https://github.com/osakka/xvc)** methodology for effective human-LLM collaboration.
 
 ## ⚠️ Important Disclaimers
 
 - **Experimental Code**: This is research/prototype quality, not production software
-- **XVC Development**: This project was developed using [XVC (eXtensible Version Control)](https://github.com/osakka/xvc/tree/main) for experimental data/model versioning
+- **XVC Development**: This project was developed using [XVC (eXtreme Vibe Coding)](https://github.com/osakka/xvc/tree/main) methodology for systematic human-LLM collaboration
 - **Expect Bugs**: Many features are incomplete or broken
 - **No Guarantees**: APIs may change, data may be lost, things may not work
 - **Use at Own Risk**: This is exploratory development, not a finished product
-- **Development Dependencies**: Full development requires XVC understanding and setup
+- **Development Dependencies**: Full development may benefit from understanding XVC collaboration patterns
 
 ---
 

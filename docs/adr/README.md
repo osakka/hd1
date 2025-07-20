@@ -46,7 +46,7 @@ HD1's experimental development follows these patterns:
 
 ### 3. Experimental Quality
 - **Research Code**: Prototype quality, expect bugs and limitations
-- **XVC Development**: Built with experimental versioning tool
+- **XVC Development**: Built using eXtreme Vibe Coding methodology for human-LLM collaboration
 - **No Production Goals**: Exploration, not finished product
 
 ## Decision Categories

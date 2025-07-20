@@ -118,8 +118,8 @@ curl -X POST http://localhost:8080/api/geometries/box \
 - **Feedback Welcome**: This is an exploration, not a product
 
 ### Development Context
-- **[XVC (eXtensible Version Control)](https://github.com/osakka/xvc/tree/main)**: This project was developed using XVC for experimental data/model versioning
-- **Experimental Toolchain**: Both HD1 and XVC are experimental projects exploring new approaches
+- **[XVC (eXtreme Vibe Coding)](https://github.com/osakka/xvc/tree/main)**: This project was developed using XVC methodology for systematic human-LLM collaboration
+- **XVC Methodology**: HD1 was developed using XVC (eXtreme Vibe Coding) - a methodology for effective human-LLM collaboration
 
 ---
 

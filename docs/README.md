@@ -61,7 +61,7 @@ Documentation for HD1 (Holodeck One) - **experimental WebGL REST platform** expl
 
 **For Contributors:**
 - Check [Development Context](../CLAUDE.md) for technical details
-- Review [XVC Development Dependency](../README.md#development)
+- Review [XVC Methodology Context](../README.md#development)
 - Understand experimental nature and expect bugs
 
 ## 📖 Document Conventions
@@ -82,7 +82,7 @@ Documentation for HD1 (Holodeck One) - **experimental WebGL REST platform** expl
 
 ### Development Reality
 - **Research Project**: Exploring HTTP-to-3D concepts
-- **XVC Dependency**: Developed with experimental versioning tool
+- **XVC Methodology**: Developed using eXtreme Vibe Coding human-LLM collaboration patterns
 - **Limited Scope**: Basic 3D object creation and scene management
 - **No Timeline**: Experimental development with no specific roadmap
 
