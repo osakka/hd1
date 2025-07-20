@@ -1,8 +1,10 @@
-# HD1 (Holodeck One) 🚀
+# HD1 (Holodeck One) 🧪
 
-**Turn any service into a 3D interface with simple HTTP calls**
+**Experimental 3D interface platform - Turn services into 3D with HTTP calls**
 
-HD1 is a **pure WebGL REST platform** that lets any application render rich 3D interfaces through simple HTTP API calls. Think "GraphQL for 3D Graphics" - a universal API that makes building 3D interfaces as easy as REST endpoints.
+⚠️ **EXPERIMENTAL SOFTWARE** - This is research/prototype code, not production ready!
+
+HD1 is an **experimental WebGL REST platform** exploring how applications could render 3D interfaces through simple HTTP API calls. The goal is "GraphQL for 3D Graphics" - but we're nowhere near that yet!
 
 ```bash
 # Create a 3D sphere
@@ -17,18 +19,18 @@ curl -X POST http://localhost:8080/api/lights/directional \
 
 ## 🎯 What HD1 Does
 
-**For Developers:**
-- ✅ **No Three.js Knowledge Required** - Simple REST API calls create 3D objects
-- ✅ **69 API Endpoints** - Complete coverage of geometries, materials, lighting, cameras, animations, textures
-- ✅ **Real-Time Sync** - WebSocket updates, multiple users see changes instantly
-- ✅ **Production Ready** - Multi-tenant, mobile controls, auto-generated client libraries
+**What We're Exploring:**
+- 🧪 **HTTP → 3D Concept** - Can REST API calls create 3D objects?
+- 🧪 **Basic Three.js Endpoints** - Some geometry, material, lighting endpoints working
+- 🧪 **WebSocket Sync** - Experimental real-time updates
+- ⚠️ **NOT Production Ready** - Rough prototype, expect bugs and missing features!
 
-**For Applications:**
-- 📧 **Email Apps** → Floating 3D mail objects in space
-- 📅 **Calendar Apps** → Spatial time blocks and 3D scheduling  
-- 🤖 **AI Services** → Interactive 3D avatars with visual interfaces
-- 📊 **Analytics** → Data visualization in immersive 3D environments
-- 🎮 **Any Service** → Rich 3D interfaces without WebGL complexity
+**Potential Applications (Future Goals):**
+- 📧 **Email Apps** → Maybe floating 3D mail objects in space?
+- 📅 **Calendar Apps** → Possibly spatial time blocks and 3D scheduling  
+- 🤖 **AI Services** → Could be interactive 3D avatars
+- 📊 **Analytics** → Might do 3D data visualization
+- 🎮 **Any Service** → The dream: 3D interfaces without WebGL complexity
 
 ## 🚀 Quick Start
 
@@ -47,27 +49,27 @@ curl -X POST http://localhost:8080/api/geometries/box \
 # 4. View it live at http://localhost:8080
 ```
 
-## 🎨 What You Get Out of the Box
+## 🎨 What Currently Works (Maybe)
 
-### **Complete Three.js API Coverage (69 Endpoints)**
-- **10 Geometries**: Box, sphere, cylinder, cone, torus, plane, ring, circle, capsule, torusknot
-- **4 Materials**: Basic, phong, standard PBR, physical advanced PBR  
-- **5 Lighting**: Directional, point, spot, ambient, hemisphere
-- **2 Cameras**: Perspective and orthographic with full control
-- **2 Animations**: Keyframe animations and timeline control
-- **2 Textures**: URL loading and procedural generation
+### **Some Three.js Endpoints (Work in Progress)**
+- **Geometries**: Box, sphere, cylinder - basic shapes mostly work
+- **Materials**: Basic, phong - simple materials implemented  
+- **Lighting**: Directional, point - basic lighting exists
+- **Cameras**: Perspective camera control somewhat functional
+- **Animations**: Experimental keyframe support
+- **Textures**: Basic texture loading attempts
 
-### **Real-Time Collaboration**
-- **WebSocket Sync**: Changes appear instantly for all connected users
-- **Multi-User Support**: Unlimited concurrent sessions
-- **Avatar System**: Real-time multiplayer with automatic cleanup
-- **Mobile Controls**: Touch-optimized for phones/tablets
+### **Experimental Features**
+- **WebSocket Sync**: Attempts real-time updates (sometimes works)
+- **Multi-User Support**: Basic session management
+- **Avatar System**: Simple avatar tracking with cleanup
+- **Mobile Controls**: Touch controls exist but need work
 
-### **Production Features**
-- **Auto-Generated Clients**: JavaScript library with all 69 API methods
-- **Configuration Management**: Environment variables, flags, .env files
-- **Logging System**: Structured JSON logging with runtime level control  
-- **Health Monitoring**: API status and performance metrics
+### **Basic Infrastructure**
+- **Auto-Generated Code**: JavaScript client generated from schema
+- **Configuration**: Environment variables, flags, .env files
+- **Logging**: Basic structured logging  
+- **Monitoring**: Simple API status endpoints
 
 ## 🏗️ Architecture
 
@@ -206,14 +208,14 @@ curl -X POST http://localhost:8080/api/geometries/box -d '{"color": "#00ff00"}'
 - 👥 **Team Development** - Designers work with HTTP APIs, not WebGL code
 - 🔄 **Real-Time Apps** - Built-in WebSocket sync for collaborative experiences
 
-## 📈 Status
+## 📈 Current Status
 
-- **Version**: v1.0.0 (Production Ready)
-- **API Endpoints**: 69 (Complete Three.js coverage)
-- **Platform**: Pure WebGL REST platform
-- **Architecture**: Single source of truth, zero hardcoded values
-- **Mobile**: Full touch control support
-- **Real-Time**: WebSocket synchronization with sequence-based reliability
+- **Version**: v1.0.0 (Experimental Prototype)
+- **API Endpoints**: ~40 implemented, many incomplete or buggy
+- **Platform**: Experimental WebGL REST platform 
+- **Architecture**: Work in progress, some hardcoded values cleaned up
+- **Mobile**: Basic touch controls, needs improvement
+- **Real-Time**: WebSocket sync working for simple operations
 
 ## 🚦 Getting Help
 
@@ -222,6 +224,17 @@ curl -X POST http://localhost:8080/api/geometries/box -d '{"color": "#00ff00"}'
 3. **Development**: Review `CLAUDE.md` for technical context
 4. **Performance**: Built-in metrics at `/api/sync/stats`
 
+## 🔗 Related Projects
+
+This project uses **[XVC (eXtensible Version Control)](https://xvc.dev)** for data and model versioning.
+
+## ⚠️ Important Disclaimers
+
+- **Experimental Code**: This is research/prototype quality, not production software
+- **Expect Bugs**: Many features are incomplete or broken
+- **No Guarantees**: APIs may change, data may be lost, things may not work
+- **Use at Own Risk**: This is exploratory development, not a finished product
+
 ---
 
-**HD1 v1.0.0**: Turn any service into a 3D interface with simple HTTP calls. The GraphQL for 3D Graphics. 🎯
+**HD1 v1.0.0**: Experimental platform exploring HTTP-to-3D concepts. Very much a work in progress! 🧪

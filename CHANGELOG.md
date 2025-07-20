@@ -2,350 +2,125 @@
 
 All notable changes to HD1 (Holodeck One) are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+⚠️ **EXPERIMENTAL PROJECT** - This changelog reflects actual implemented changes, not aspirational goals.
 
-## [Planned: 0.8.0 - 1.0.0] - 2025-07-19 to 2025-08-16
+## [1.0.0] - 2025-07-20 - Experimental Release
 
-### Major Architectural Transformation - Pure WebGL REST Platform
-**HD1 transforms into the definitive "GraphQL for 3D Graphics" platform**
+### Summary
+Current experimental release focusing on HTTP-to-3D concept exploration. 
+Basic Three.js REST API functionality working with significant limitations.
 
-This represents the most significant architectural evolution in HD1's history, transforming from a limited Three.js console into a comprehensive universal 3D interface platform where any service can render rich 3D interfaces through pure HTTP APIs.
+### What Actually Works
+- **~40 API Endpoints**: Basic geometry, material, lighting, camera endpoints
+- **WebSocket Sync**: Real-time updates for simple operations
+- **Configuration System**: Environment variables, command line flags, .env files
+- **Auto-Generated Client**: JavaScript client with API methods
+- **Basic 3D Rendering**: Three.js r170 with simple scene management
+- **Mobile Controls**: Basic touch controls for movement/camera
 
-### Planned Phases
+### Known Issues & Limitations
+- **Many APIs Incomplete**: Endpoints exist but functionality is limited
+- **Error Handling**: Basic error handling, expect crashes and bugs  
+- **Performance**: Not optimized, may be slow with complex scenes
+- **Mobile UX**: Touch controls work but need significant improvement
+- **Documentation**: Basic docs, many features undocumented
+- **Testing**: Limited testing, expect edge cases to fail
 
-#### **Phase 1: Database Elimination (v0.8.0)** - 2025-07-20
-- **Remove Database Dependency**: Eliminate PostgreSQL for pure stateless architecture
-- **In-Memory Avatar Registry**: WebSocket-based avatar lifecycle management
-- **Zero External Dependencies**: Single binary deployment
-- **Preserved Functionality**: All existing Three.js features maintained
+### Recent Changes (July 2025)
 
-#### **Phase 2: Enterprise Bloat Elimination (v0.8.1)** - 2025-07-22  
-- **75% Code Reduction**: Remove 4,489 lines of unused enterprise code
-- **Focus on 3D APIs**: Eliminate assets, auth, clients, enterprise, llm, ot, plugins, services, sessions, webrtc packages
-- **Clean Architecture**: Only Three.js-focused components remain
-- **Fast Builds**: Dramatic reduction in compilation time
+#### Configuration Improvements
+- **Eliminated Hardcoded Paths**: Removed hardcoded `/opt/hd1` references
+- **Single Source of Truth**: Constants for all default values
+- **Better Config Management**: Priority-based config system working
 
-#### **Phase 3: Three.js API Expansion (v0.9.0)** - 2025-08-19
-- **20x API Expansion**: From 11 to 200+ Three.js endpoints
-- **Complete Geometry System**: All 50+ Three.js geometry types via REST
-- **Full Material System**: Basic, phong, standard, physical, shader materials
-- **Comprehensive Lighting**: Directional, point, spot, ambient, hemisphere lights
-- **Camera Controls**: Perspective, orthographic, stereo camera management
-- **Texture Management**: Loading, creation, manipulation, procedural textures
-- **Animation System**: Keyframes, timeline, mixing, clips
-- **Post-Processing**: Effects, shaders, filters, render passes
-- **Physics Integration**: Collision detection, raycasting, constraints
+#### Schema Cleanup  
+- **Removed Obsolete Files**: Cleaned up old schema files
+- **Simplified Generation**: Streamlined code generation process
 
-#### **Phase 4: Pure WebGL REST Platform (v1.0.0)** - 2025-08-30
-- **Production Optimization**: Enterprise-grade performance and reliability
-- **Complete Documentation**: Comprehensive API reference with examples
-- **Developer Experience**: Interactive API explorer and guides
-- **Universal 3D Interface**: "Stripe for 3D Graphics" vision achieved
+#### API Development
+- **Basic Geometries**: Box, sphere, cylinder creation via HTTP
+- **Material System**: Basic, phong materials partially working
+- **Lighting**: Directional, point lights basic implementation
+- **Scene Management**: Background color, basic camera control
 
-### Architectural Decisions (ADRs)
-- **ADR-010**: Database Elimination for Stateless Architecture
-- **ADR-011**: Enterprise Bloat Elimination for Pure 3D Focus  
-- **ADR-012**: Three.js API Expansion Strategy for Universal Coverage
-- **ADR-013**: Pure WebGL REST Platform Vision
+### Previous Development (2025)
 
-### Implementation Principles
-- **One Source of Truth**: api.yaml drives everything
-- **No Regressions**: All existing functionality preserved
-- **No Parallel Implementations**: Single path for every operation
-- **No Hacks**: Clean, surgical precision implementation
-- **Bar Raising Solution**: Production-ready excellence
-- **Zero Compile Warnings**: Perfect build system
+#### v0.7.x Series - Avatar & Mobile Development
+- **Avatar System**: Basic avatar tracking and cleanup
+- **Mobile Touch**: Left/right screen split for movement/camera
+- **WebSocket Sync**: Real-time updates between clients
+- **Session Management**: Basic multi-user session handling
 
-### Expected Impact
-- **Developer Experience**: Any language can create 3D interfaces via HTTP
-- **Market Position**: First universal 3D interface platform
-- **Performance**: 60fps real-time rendering with WebSocket sync
-- **Scalability**: Cloud-native stateless horizontal scaling
-- **Ecosystem**: Foundation for 3D-native applications
+#### v0.6.x Series - Three.js Integration  
+- **Three.js Migration**: Moved from A-Frame to Three.js r170
+- **API-First Design**: REST endpoints for 3D operations
+- **Code Generation**: Auto-generated routes and clients
+- **Minimal Console**: Basic web interface for testing
 
----
+### Technical Architecture
 
-## [0.7.3] - 2025-07-19
+#### Current Stack
+- **Backend**: Go HTTP server with Gorilla Mux
+- **Frontend**: Three.js r170 with vanilla JavaScript
+- **Real-Time**: WebSocket for scene synchronization
+- **Config**: Environment variables + command line flags
+- **Generation**: OpenAPI 3.0.3 specification-driven development
 
-### Major Enhancements - Unified ID System & Complete Single Source of Truth
-This release achieves complete architectural purity with unified `hd1_id` system across entire stack, eliminating all parallel ID sources and ensuring true single source of truth.
-
-### Added
-- **Unified ID System**: Complete replacement of `client_id`, `session_id`, `avatar_id` with single `hd1_id` across entire stack
-- **Template System Updates**: Auto-generation templates now produce unified `hd1_id` API clients
-- **Protocol Consistency**: WebSocket messages, HTTP headers, database queries, and logging use unified `hd1_id`
-- **Zero Regression Architecture**: Surgical precision updates with complete backward compatibility elimination
-
-### Fixed
-- **ID System Consistency**: All logging, database queries, and API operations use unified `hd1_id` field names
-- **Auto-Generation Regression**: Fixed templates to prevent `client_id` reversion during code generation
-- **JSON Serialization**: Avatar struct now serializes with `hd1_id` instead of `client_id`
-- **WebSocket Protocol**: Client and server now exchange `hd1_id` in all WebSocket message types
-
-### Changed
-- **Breaking**: All WebSocket messages now use `hd1_id` field instead of `client_id`
-- **Breaking**: Avatar JSON structure now uses `hd1_id` field for client identification
-- **Breaking**: Database result aliases changed from `client_id` to `hd1_id`
-- **Architecture**: Complete elimination of parallel ID systems for true single source of truth
-
-### Documentation
-- **ADR System**: Added comprehensive architectural decision records (ADR 007-009)
-- **Timeline Accuracy**: Complete git history analysis for precise decision timeline
-- **System Architecture**: Created detailed SVG architecture diagram
-- **API Documentation**: Updated to reflect unified HD1 ID system and v0.7.3 endpoints
-
-## [0.7.2] - 2025-07-18
-
-### Major Enhancements - Complete Avatar Lifecycle Management
-This release achieves surgical precision avatar lifecycle management with automatic cleanup, mobile touch controls, and comprehensive single source of truth architecture.
-
-### Added
-- **Avatar Lifecycle Management**: Automatic cleanup of inactive avatars via session inactivity timeout
-- **Mobile Touch Controls**: Left side for movement, right side for camera look with seamless desktop/mobile experience
-- **Session-Avatar Integration**: Avatar registry connected to session cleanup worker for surgical precision cleanup
-- **Pointer Lock Security**: Fixed user gesture requirements for browser security compliance
-- **Enhanced Error Handling**: Comprehensive error handling for avatar operations and cleanup processes
-
-### Changed
-- **Avatar Cleanup Architecture**: Session manager now drives avatar cleanup through interface pattern
-- **Mobile UX**: Touch controls enable full 3D navigation without external keyboards
-- **Pointer Lock Behavior**: Escape key now only exits (no entry) to comply with browser security
-- **Code Generation**: Auto-generated API client method ordering improved for consistency
-
-### Fixed
-- **Browser Security Compliance**: Removed pointer lock request from keyboard events (user gesture required)
-- **Avatar Persistence**: Avatars now properly cleaned up when sessions become inactive
-- **Single Source of Truth**: Avatar registry cleanup integrated with session database lifecycle
-- **Mobile Touch Navigation**: Proper touch event handling for both movement and camera controls
-
-### Technical Details
-- **Interface Pattern**: `AvatarRegistryInterface` enables clean session-avatar coupling
-- **Cleanup Query**: Pre-query inactive participants before database update for avatar cleanup
-- **Touch Controls**: Screen-split approach (left=move, right=look) for intuitive mobile UX
-- **Error Prevention**: Eliminated "NotAllowedError" and "SecurityError" from pointer lock operations
-
-### Architecture Validation
-- ✅ **Single Source of Truth**: Session database drives avatar lifecycle
-- ✅ **No Parallel Implementations**: All avatar cleanup flows through session manager
-- ✅ **Mobile-First**: Touch controls work seamlessly alongside desktop controls
-- ✅ **Security Compliant**: Proper browser security model compliance
-- ✅ **Zero Regressions**: All existing functionality preserved and enhanced
-
-### Migration from v0.7.1
-- **Automatic**: No breaking changes, all existing functionality preserved
-- **Mobile Users**: Touch controls automatically available on mobile devices
-- **Configuration**: Optional session timeout configuration via `HD1_SESSION_INACTIVITY_TIMEOUT`
-- **API**: All 15 REST endpoints remain unchanged
-
-## [0.7.1] - 2025-07-17
-
-### Critical Fixes - Surgical Precision Avatar Movement
-This release completes the surgical precision single source of truth avatar movement system with full API-first architecture compliance.
-
-### Fixed
-- **Avatar Movement API Client**: Added missing `extractPathParams` method to JavaScript API client template
-- **Avatar Operation Data Structure**: Fixed `session_id` vs `client_id` handling in Three.js avatar operations
-- **Global API Client Access**: Made API client globally available for Three.js integration
-- **Avatar Movement Logging**: Restored comprehensive console logging and error handling
-- **Avatar Remove Operation**: Fixed avatar removal handling in Three.js scene manager
-
-### Technical Details
-- **Single Source of Truth**: Validated 100% compliance with no parallel implementations
-- **API-First Architecture**: All avatar movement flows through `/avatars/{sessionId}/move` endpoint
-- **Surgical Precision**: Zero regressions, zero hacks, zero architectural compromises
-- **Code Generation**: Fixed template to include proper path parameter extraction
-- **Build System**: Maintained clean build with zero warnings
-
-### Architecture Validation
-- ✅ **One Source of Truth**: `/avatars/{sessionId}/move` API endpoint only
-- ✅ **No Parallel Implementations**: All movement flows through sync system
-- ✅ **No WebSocket Bypasses**: All avatar updates come from sync operations
-- ✅ **No Manual Updates**: No code bypasses API/sync architecture
-- ✅ **Zero Ambiguity**: Clean, consistent, and foolproof implementation
-
-## [0.7.0] - 2025-07-16
-
-### Major Changes - Clean HD1-Native API Architecture
-This release completes the transformation to a clean, intuitive HD1-native API architecture with WebSocket-driven avatar lifecycle management.
-
-### Added
-- **Clean HD1-Native API Paths**: Resource-focused endpoints without implementation details
-  - `/api/avatars` (previously `/api/threejs/avatars`)
-  - `/api/entities` (previously `/api/threejs/entities`)
-  - `/api/scene` (previously `/api/threejs/scene`)
-- **WebSocket-Driven Avatar Lifecycle**: Automatic avatar creation/cleanup on connection/disconnection
-- **Avatar Registry System**: In-memory avatar state management tied to WebSocket connections
-- **Resource-Based File Organization**: Clean separation of concerns with dedicated handler packages
-- **Shared API Utilities**: Common helper functions for consistent request handling
-
-### Changed
-- **BREAKING**: API paths no longer expose Three.js implementation details
-- **Architecture**: Resource-based handler organization (`api/avatars/`, `api/entities/`, `api/scene/`)
-- **Avatar Management**: Automatic lifecycle tied to WebSocket connections instead of manual creation
-- **Code Generation**: Updated templates for clean package prefixes and method names
-- **JavaScript Client**: Intuitive method names (`api.getAvatars()` vs `api.getThreeJSAvatars()`)
-- **Version Numbering**: Standardized to semantic versioning (0.x.x format)
-
-### Improved
-- **Developer Experience**: Clean, intuitive API paths that feel HD1-native
-- **Real-time Updates**: Avatar position/animation updates through registry system
-- **Code Organization**: Logical separation of API concerns by resource type
-- **Maintainability**: Shared utilities reduce code duplication across handlers
-
-### Fixed
-- **Consistent Versioning**: Aligned all version references to semantic versioning scheme
-- **API Response Consistency**: Standardized response formats across all endpoints
-- **WebSocket Integration**: Seamless avatar lifecycle management without manual intervention
-
-## [0.6.0] - 2025-07-14
-
-### Major Changes - Ultra-Minimal Build Strategy
-This release represents a complete architectural transformation focusing on ultra-minimal Three.js console implementation with massive codebase optimization.
-
-### Added
-- **Ultra-Minimal Three.js Console**: Zero-framework debugging interface with essential features only
-- **Rebootstrap Recovery System**: Intelligent storage clearing and page reload on connection failures  
-- **Specification-Driven Development**: Complete code generation from OpenAPI specification
-- **Comprehensive Documentation**: Full documentation suite with ADRs, guides, and architecture docs
-- **Configuration Management**: Hierarchical configuration with environment variables, flags, and .env support
-- **WebSocket Synchronization Protocol**: High-performance real-time communication with session isolation
-- **Object Pooling**: Memory optimization for high-frequency operations
-- **Intelligent Reconnection**: Exponential backoff with automatic recovery mechanisms
-
-### Changed
-- **BREAKING**: Removed A-Frame framework dependencies (replaced with Three.js)
-- **BREAKING**: Eliminated CLI client generation system
-- **BREAKING**: Simplified avatar asset handling (removed WebSocket-based GLB streaming)
-- **Architecture**: Complete migration to API-first, specification-driven development
-- **Build System**: Streamlined Makefile with focused development workflow
-- **Console Interface**: Replaced complex dashboard with minimal debug panel
-- **WebSocket Protocol**: Optimized message handling with session-based routing
-- **Logging System**: Enhanced structured logging with module-based tracing
-- **Configuration**: Unified configuration system with clear priority hierarchy
-
-### Removed
-- **A-Frame WebVR Framework**: Complete removal of A-Frame dependencies and VR support
-- **CLI Client System**: Removed 350+ lines of CLI generation code
-- **UI Component Generation**: Removed dynamic UI component generation system (200+ lines)
-- **Form System Generation**: Removed automatic form generation (150+ lines)  
-- **Complex Avatar Asset Pipeline**: Removed base64 GLB streaming via WebSocket
-- **Redundant Dependencies**: Removed unused imports and dependencies throughout codebase
-- **Legacy Template System**: Simplified template architecture with external templates
-- **Semantic UI Integration**: Removed unused semantic UI components
-- **Shell Function Generation**: Removed shell integration code generation
-
-### Performance Improvements
-- **Code Reduction**: Generator reduced from 803 to 538 lines (-33%)
-- **Total Codebase**: Reduced from 8000+ to 4989 lines of Go code (-38%)
-- **File Count**: Reduced from 50+ to 27 core source files (-46%)
-- **Build Time**: Improved build performance with streamlined generation process
-- **Memory Usage**: Reduced allocation overhead through object pooling
-- **WebSocket Efficiency**: Optimized message broadcasting and connection handling
-
-### Technical Details
-
-#### Ultra-Minimal Console Implementation
-```javascript
-// Zero-framework Three.js console with essential features
-class HD1Console {
-    constructor() {
-        this.setupWebSocket();      // Real-time connection monitoring
-        this.setupDebugPanel();     // Collapsible system information
-        this.setupRebootstrap();    // Nuclear recovery option
-    }
-}
+#### File Structure
+```
+/opt/hd1/
+├── src/                    # Go source code
+│   ├── schemas/           # API specifications  
+│   ├── api/*/            # HTTP handlers
+│   ├── config/           # Configuration management
+│   └── router/           # Auto-generated routing
+├── share/htdocs/static/  # Frontend assets
+└── build/                # Compiled binaries
 ```
 
-#### Specification-Driven Architecture
-```yaml
-# Complete system definition in src/api.yaml
-paths:
-  /threejs/entities:
-    post:
-      operationId: createEntity
-      x-handler: api/threejs/create.go
-      x-function: CreateEntity
+### Development Status
+
+#### What's Working
+- ✅ Basic HTTP server with auto-generated routes
+- ✅ Simple 3D object creation via REST API
+- ✅ WebSocket real-time sync for basic operations
+- ✅ Mobile touch controls (basic functionality)
+- ✅ Configuration management system
+- ✅ JavaScript client auto-generation
+
+#### What's Broken/Missing
+- ❌ Many API endpoints incomplete or non-functional
+- ❌ Error handling is basic, expect crashes
+- ❌ No comprehensive testing or validation
+- ❌ Performance not optimized
+- ❌ Documentation incomplete
+- ❌ Mobile UX needs significant work
+- ❌ No production deployment considerations
+
+### Getting Started (Current State)
+
+```bash
+# 1. Build and start (may take a few tries)
+cd src && make && make start
+
+# 2. Try basic API (sometimes works)
+curl -X POST http://localhost:8080/api/geometries/box \
+  -d '{"width": 2, "height": 2, "depth": 2, "color": "#00ff00"}'
+
+# 3. View at http://localhost:8080 (if it loads)
 ```
 
-#### WebSocket Protocol Optimization
-```go
-// High-performance message broadcasting with session isolation
-func (h *Hub) broadcastToSession(sessionID string, message []byte) {
-    for _, client := range h.sessions[sessionID] {
-        select {
-        case client.send <- message: // Non-blocking send
-        default: h.unregisterClient(client) // Handle blocked clients
-        }
-    }
-}
-```
+### Important Notes
+- **Experimental Quality**: This is research/prototype code
+- **Frequent Changes**: APIs and functionality change often  
+- **No Guarantees**: Features may not work as expected
+- **Use Caution**: Not suitable for production use
+- **Feedback Welcome**: This is an exploration, not a product
 
-### Migration Guide
-For users migrating from v5.x:
-
-1. **A-Frame Removal**: Update any A-Frame-specific code to use Three.js directly
-2. **CLI Client**: Remove any dependencies on generated CLI clients
-3. **Avatar Assets**: Switch to HTTP-based asset loading instead of WebSocket streaming
-4. **Configuration**: Update environment variables to use HD1_ prefix consistently
-5. **WebSocket Messages**: Review custom message types for compatibility
-
-### Documentation
-- **Complete Documentation Suite**: Added comprehensive docs/ directory
-- **Architecture Decision Records**: 6 ADRs documenting key design decisions
-- **User Guides**: Quick start, development, configuration, and troubleshooting guides
-- **README Files**: Project, docs, and src-specific documentation
-- **API Reference**: Enhanced OpenAPI specification documentation
+### Related Projects
+- **[XVC (eXtensible Version Control)](https://xvc.dev)**: Used for data/model versioning
 
 ---
 
-## [5.0.6] - Previous Release
-
-### Added
-- Avatar control system with seamless transitions
-- Seamless world transition recovery  
-- GLB avatar asset loading with proper resource handling
-- Advanced camera system with orbital mode
-- Console UI with smooth animations
-- Vendor cleanup and optimized structure
-
-### Changed
-- Enhanced avatar management with real GLB models
-- Improved WebSocket avatar synchronization
-- Streamlined configuration management
-
----
-
-## Version History Summary
-
-- **v6.0.0**: Ultra-minimal Three.js console with specification-driven architecture
-- **v5.0.6**: Production avatar control system with seamless world transitions  
-- **v5.0.5**: Configuration management standardization
-- **v5.0.x**: Avatar system development and WebSocket optimization
-- **v4.x.x**: Initial Three.js integration and API development
-- **v3.x.x**: WebSocket implementation and real-time synchronization
-- **v2.x.x**: API-first architecture establishment
-- **v1.x.x**: Initial holodeck platform development
-
----
-
-## Development Metrics
-
-### v6.0.0 Optimization Results
-- **Lines of Code**: 8000+ → 4989 (-38% reduction)
-- **Source Files**: 50+ → 27 (-46% reduction)  
-- **Code Generator**: 803 → 538 lines (-33% reduction)
-- **Build Time**: <10 seconds (improved)
-- **Binary Size**: Optimized with dependency removal
-- **Memory Usage**: Reduced through object pooling and cleanup
-
-### Quality Improvements
-- **Zero Manual Routing**: 100% specification-driven route generation
-- **Test Coverage**: Enhanced with simplified codebase
-- **Documentation**: Complete documentation suite added
-- **Maintainability**: Significant improvement through code reduction
-- **Performance**: Optimized hot paths and memory management
-
----
-
-*HD1 v6.0.0: Where OpenAPI specifications become ultra-minimal Three.js game engine platforms.*
+**HD1 v1.0.0**: An experimental exploration of HTTP-to-3D concepts. 
+Very much a work in progress with many rough edges! 🧪
