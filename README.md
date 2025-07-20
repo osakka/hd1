@@ -1,8 +1,26 @@
-<div align="center">
-  <img src="docs/logo.svg" alt="HD1 Logo" width="200" height="120"/>
-</div>
+```
+     ██╗  ██╗██████╗       ██╗
+     ██║  ██║██╔══██╗     ███║
+     ███████║██║  ██║     ╚██║
+     ██╔══██║██║  ██║      ██║
+     ██║  ██║██████╔╝      ██║
+     ╚═╝  ╚═╝╚═════╝       ╚═╝
+                              
+   🏗️ CONCRETE FOUNDATION      
+                              
+      ┌─┐ ┌─┐ ┌─┐            
+      │ │ │ │ │ │      ╔═══╗ 
+      │ │ │ │ │ │      ║   ║ 
+      │ │ │ │ │ │      ║   ║ 
+      │ │ │ │ │ │      ║   ║ 
+      │ │ │ │ │ │      ║   ║ 
+      └─┘ └─┘ └─┘      ╚═══╝ 
+                              
+    HOLODECK ONE - HD1        
+   ========================     
+```
 
-# HD1 (Holodeck One) 🧪
+# HD1 (Holodeck One)
 
 **Experimental 3D interface platform - Turn services into 3D with HTTP calls**
 
@@ -20,7 +38,7 @@ HD1's development reveals the brutal complexity of 3D web development. Our git h
 
 **🌐 Early WebGL Era**: Started with raw WebGL and vanilla JavaScript - the performance was there, but the development complexity was crushing. Every 3D operation required dozens of lines of matrix math and shader management.
 
-**🎮 A-Frame VR Phase** (2024): Pivoted to A-Frame for its declarative HTML approach to VR. The entity-component-system was elegant, and VR support was built-in. But A-Frame's abstractions hid too much - we couldn't achieve the surgical precision needed for an API-driven platform.
+**🎮 A-Frame VR Phase** (2025): Pivoted to A-Frame for its declarative HTML approach to VR. The entity-component-system was elegant, and VR support was built-in. But A-Frame's abstractions hid too much - we couldn't achieve the surgical precision needed for an API-driven platform.
 
 **⚡ Three.js Migration** (2025): Finally settled on Three.js r170 as the sweet spot between power and usability. Direct access to scene graphs, materials, and geometries, but without the low-level pain of raw WebGL. The extensive API surface made it perfect for HTTP endpoint mapping.
 
