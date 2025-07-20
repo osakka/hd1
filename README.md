@@ -1,150 +1,227 @@
-# HD1 (Holodeck One) - Universal 3D Interface Platform
+# HD1 (Holodeck One) 🚀
 
-HD1 is the **universal 3D interface platform** where any service, application, or AI system can render immersive 3D interfaces for their users.
+**Turn any service into a 3D interface with simple HTTP calls**
 
-## 🚀 Current State (v0.7.3)
-
-**Complete Universal Platform Implementation:**
-- **16 Core API Endpoints**: Full Three.js integration with specification-driven development
-- **Multi-Tenant Architecture**: Unlimited concurrent sessions with isolation
-- **Real-Time Collaboration**: WebRTC P2P with operational transforms
-- **AI Integration**: LLM avatars with content generation
-- **Cross-Platform**: Web, mobile, desktop clients with plugin architecture
-- **Enterprise Features**: Organizations, RBAC, analytics, security & compliance
-- **Unified ID System**: Complete `hd1_id` system across entire stack with single source of truth
-- **Avatar Lifecycle Management**: Automatic cleanup with session inactivity timeout
-- **Mobile Touch Controls**: Left side movement, right side camera look
+HD1 is a **pure WebGL REST platform** that lets any application render rich 3D interfaces through simple HTTP API calls. Think "GraphQL for 3D Graphics" - a universal API that makes building 3D interfaces as easy as REST endpoints.
 
 ```bash
-# Build and start HD1
-cd src && make clean && make && make start
+# Create a 3D sphere
+curl -X POST http://localhost:8080/api/geometries/sphere \
+  -H "Content-Type: application/json" \
+  -d '{"radius": 2, "color": "#ff0000", "position": {"x": 0, "y": 1, "z": 0}}'
 
-# Access the console
-open http://localhost:8080
-
-# Check API status
-curl http://localhost:8080/api/health
+# Add some lighting  
+curl -X POST http://localhost:8080/api/lights/directional \
+  -d '{"color": "#ffffff", "intensity": 1, "position": {"x": 10, "y": 10, "z": 5}}'
 ```
 
-## 🎯 Universal Platform Achieved
+## 🎯 What HD1 Does
 
-**Every service can now render as a 3D interface:**
-- Email services → 3D mail objects floating in space
-- Calendar apps → Spatial time blocks and scheduling
-- LLM systems → Intelligent 3D avatars with visual understanding  
-- Mobile apps → Floating 3D panels and interactions
-- Any API → Interactive 3D visualizations and controls
+**For Developers:**
+- ✅ **No Three.js Knowledge Required** - Simple REST API calls create 3D objects
+- ✅ **69 API Endpoints** - Complete coverage of geometries, materials, lighting, cameras, animations, textures
+- ✅ **Real-Time Sync** - WebSocket updates, multiple users see changes instantly
+- ✅ **Production Ready** - Multi-tenant, mobile controls, auto-generated client libraries
 
-## 🏗️ Architecture Completed
+**For Applications:**
+- 📧 **Email Apps** → Floating 3D mail objects in space
+- 📅 **Calendar Apps** → Spatial time blocks and 3D scheduling  
+- 🤖 **AI Services** → Interactive 3D avatars with visual interfaces
+- 📊 **Analytics** → Data visualization in immersive 3D environments
+- 🎮 **Any Service** → Rich 3D interfaces without WebGL complexity
 
-### Universal Platform Architecture (v0.7.3)
-- **16 Core API Endpoints**: Complete Three.js platform with comprehensive coverage
-- **Universal Service Registry**: Any service can register and render 3D interfaces
-- **Multi-Tenant Platform**: Thousands of concurrent sessions and services
-- **Real-Time Collaboration**: WebRTC P2P with operational transforms
-- **AI-Native Integration**: LLM avatars with content generation
-- **Cross-Platform**: Web, mobile, desktop clients with plugin architecture
-- **Enterprise Features**: Organizations, RBAC, analytics, security & compliance
+## 🚀 Quick Start
+
+```bash
+# 1. Start HD1
+cd src && make && make start
+
+# 2. Open the console
+open http://localhost:8080
+
+# 3. Create your first 3D scene via API
+curl -X POST http://localhost:8080/api/geometries/box \
+  -H "Content-Type: application/json" \
+  -d '{"width": 2, "height": 2, "depth": 2, "color": "#00ff00"}'
+
+# 4. View it live at http://localhost:8080
+```
+
+## 🎨 What You Get Out of the Box
+
+### **Complete Three.js API Coverage (69 Endpoints)**
+- **10 Geometries**: Box, sphere, cylinder, cone, torus, plane, ring, circle, capsule, torusknot
+- **4 Materials**: Basic, phong, standard PBR, physical advanced PBR  
+- **5 Lighting**: Directional, point, spot, ambient, hemisphere
+- **2 Cameras**: Perspective and orthographic with full control
+- **2 Animations**: Keyframe animations and timeline control
+- **2 Textures**: URL loading and procedural generation
+
+### **Real-Time Collaboration**
+- **WebSocket Sync**: Changes appear instantly for all connected users
+- **Multi-User Support**: Unlimited concurrent sessions
+- **Avatar System**: Real-time multiplayer with automatic cleanup
+- **Mobile Controls**: Touch-optimized for phones/tablets
+
+### **Production Features**
+- **Auto-Generated Clients**: JavaScript library with all 69 API methods
+- **Configuration Management**: Environment variables, flags, .env files
+- **Logging System**: Structured JSON logging with runtime level control  
+- **Health Monitoring**: API status and performance metrics
+
+## 🏗️ Architecture
+
+```
+HTTP API → Sync Operations → WebSocket Events → Three.js Rendering
+```
+
+**Single Source of Truth**: Everything driven by `src/schemas/hd1-api.yaml`
+
+- **Backend**: Go server with auto-generated routes
+- **Frontend**: Pure Three.js r170 with zero abstraction layers  
+- **Sync**: TCP-simple reliability with sequence numbers
+- **Config**: Zero hardcoded values, fully configurable
+
+## 📊 API Examples
+
+### Create 3D Objects
+```bash
+# Spinning torus with PBR material
+curl -X POST http://localhost:8080/api/geometries/torus \
+  -d '{"radius": 3, "tube": 1, "radialSegments": 16}'
+
+curl -X POST http://localhost:8080/api/materials/physical \
+  -d '{"color": "#8844ff", "metalness": 0.8, "roughness": 0.2}'
+```
+
+### Scene Management  
+```bash
+# Set background color
+curl -X PUT http://localhost:8080/api/scene \
+  -d '{"background": "#87CEEB"}'
+
+# Add fog for atmosphere
+curl -X PUT http://localhost:8080/api/scene \
+  -d '{"fog": {"color": "#ffffff", "near": 1, "far": 100}}'
+```
+
+### Camera Control
+```bash
+# Position the camera
+curl -X POST http://localhost:8080/api/cameras/perspective \
+  -d '{"fov": 75, "position": {"x": 10, "y": 5, "z": 10}, "lookAt": {"x": 0, "y": 0, "z": 0}}'
+```
+
+## 🎮 Controls
+
+- **Desktop**: WASD movement, mouse look, ESC to exit pointer lock
+- **Mobile**: Left side for movement, right side for camera look
+- **Touch**: Fully optimized for mobile devices
 
 ## 📁 Project Structure
 
 ```
 /opt/hd1/
-├── src/           # Go server source code
-├── share/         # Static assets and configuration
-├── docs/          # Complete documentation
-├── build/         # Build artifacts and binaries
-└── CLAUDE.md      # Development context and principles
+├── src/                      # Go backend source
+│   ├── schemas/hd1-api.yaml  # Single source of truth API spec
+│   ├── api/*/handlers.go     # Generated HTTP handlers  
+│   ├── router/auto_router.go # Generated routing
+│   └── config/config.go      # Configuration management
+├── share/htdocs/static/      # Frontend assets
+│   ├── js/hd1lib.js         # Generated API client (69 methods)
+│   ├── js/hd1-threejs.js    # Three.js scene manager
+│   └── vendor/threejs/      # Three.js r170 library
+└── build/                   # Build artifacts
+    ├── bin/hd1             # Compiled server
+    └── logs/               # Application logs
 ```
 
-## 🛠️ Platform Features (v0.7.0)
+## 🔧 Configuration
 
-### ✅ Phase 1: Foundation (Completed)
-- **Multi-Tenant Sessions**: Unlimited concurrent sessions with isolation
-- **Service Registry**: Any service can register and render 3D interfaces
-- **Enterprise Authentication**: JWT-based authentication with refresh tokens
-- **Database Architecture**: PostgreSQL with incremental schema management
-
-### ✅ Phase 2: Collaboration (Completed)
-- **Real-Time Collaboration**: WebRTC P2P with operational transforms
-- **Asset Management**: File upload, versioning, and usage tracking
-- **WebSocket Synchronization**: Real-time state synchronization
-- **Collaborative Editing**: Conflict-free document editing
-
-### ✅ Phase 3: AI Integration (Completed)
-- **LLM Avatars**: Multi-provider support (OpenAI, Claude)
-- **AI Content Generation**: Template-based content creation
-- **Natural Language Interface**: Chat with AI avatars
-- **Usage Tracking**: Token consumption and cost monitoring
-
-### ✅ Phase 4: Universal Platform (Completed)
-- **Cross-Platform Clients**: Web, mobile, desktop adapters
-- **Plugin Architecture**: Extensible hook-based system
-- **Client Management**: Registration, capabilities, and synchronization
-- **Message Broadcasting**: Platform-wide communication system
-- **Enterprise Features**: Complete organization, RBAC, analytics, and security
-
-## 🏢 Enterprise Features (v0.7.0)
-
-### Organization Management
-- **Multi-Organization Support**: Unlimited organizations with isolated data
-- **Subscription Tiers**: Flexible pricing and feature tiers
-- **User Management**: Invite users, manage departments and roles
-
-### Role-Based Access Control (RBAC)
-- **System Roles**: Owner, Admin, Manager, Member, Viewer
-- **Custom Roles**: Create organization-specific roles
-- **Granular Permissions**: Resource-level access control
-- **Dynamic Assignment**: Time-based and conditional permissions
-
-### Analytics & Reporting
-- **Event Tracking**: Comprehensive user and system events
-- **Real-Time Aggregates**: Performance metrics and usage patterns
-- **Custom Reports**: Generate insights on demand
-- **Data Export**: Export analytics data for external analysis
-
-### Security & Compliance
-- **Audit Logging**: Complete security event tracking
-- **API Key Management**: Secure API access with rate limiting
-- **Compliance Records**: GDPR, HIPAA, SOX, PCI-DSS support
-- **Risk Assessment**: Automated threat detection and alerting
-
-## 📖 Documentation
-
-- **[Universal Platform Plan](docs/universal-interface-plan.md)** - Complete transformation strategy
-- **[Implementation Plans](docs/implementation/)** - Detailed phase-by-phase implementation
-- **[Architecture Overview](docs/architecture/overview.md)** - System design and components
-- **[ADR](docs/adr/)** - Architectural decision records including universal transformation
-- **[API Reference](src/api.yaml)** - Original API specification
-- **[Development Context](CLAUDE.md)** - Current system state and principles
-
-## 🔧 Development
-
-HD1 follows specification-driven development where `src/api.yaml` is the single source of truth:
+HD1 uses a priority-based config system: **Flags > Environment Variables > .env File > Defaults**
 
 ```bash
-# Generate code from specification
-make generate
+# Environment variables (HD1_ prefix)
+export HD1_HOST=0.0.0.0
+export HD1_PORT=8080
+export HD1_LOG_LEVEL=INFO
 
+# Command line flags  
+./hd1 --host=127.0.0.1 --port=9090 --log-level=DEBUG
+
+# .env file support
+echo "HD1_PORT=3000" > .env
+```
+
+## 🛠️ Development
+
+```bash
 # Build and start
-make build && make start
+cd src && make && make start
+
+# Clean rebuild  
+make clean && make build
+
+# Stop daemon
+make stop
 
 # View logs
 make logs
+
+# Check status
+make status
 ```
 
-## 📊 Status & Implementation
+## 📚 API Documentation
 
-**Current Version**: v0.7.2 (Three.js platform with avatar lifecycle management)  
-**API Endpoints**: 15 endpoints with comprehensive Three.js integration  
-**Implementation Status**: Foundation phase completed, future phases planned  
-**Architecture**: Multi-tenant, real-time synchronization, avatar lifecycle management  
-**Platform Coverage**: Web with mobile touch controls
+- **[Complete API Reference](src/schemas/hd1-api.yaml)** - OpenAPI 3.0.3 specification
+- **[Development Context](CLAUDE.md)** - Technical implementation details
+- **JavaScript Client**: Auto-generated `hd1lib.js` with all 69 methods
 
-## 📄 License
+## 🌟 Why HD1?
 
-Development platform - See documentation for details.
+**Before HD1:**
+```javascript
+// Complex Three.js setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+// ... 50+ more lines of WebGL setup
+```
+
+**With HD1:**
+```bash
+# One HTTP call
+curl -X POST http://localhost:8080/api/geometries/box -d '{"color": "#00ff00"}'
+```
+
+**Perfect for:**
+- 🚀 **Rapid Prototyping** - 3D interfaces in minutes, not weeks
+- 🌐 **Any Backend** - Python, Node.js, Java, PHP - if it can make HTTP calls, it can render 3D
+- 📱 **Mobile First** - Touch controls built-in, works on any device
+- 👥 **Team Development** - Designers work with HTTP APIs, not WebGL code
+- 🔄 **Real-Time Apps** - Built-in WebSocket sync for collaborative experiences
+
+## 📈 Status
+
+- **Version**: v1.0.0 (Production Ready)
+- **API Endpoints**: 69 (Complete Three.js coverage)
+- **Platform**: Pure WebGL REST platform
+- **Architecture**: Single source of truth, zero hardcoded values
+- **Mobile**: Full touch control support
+- **Real-Time**: WebSocket synchronization with sequence-based reliability
+
+## 🚦 Getting Help
+
+1. **API Issues**: Check `make logs` for detailed error information
+2. **Configuration**: See environment variables section above  
+3. **Development**: Review `CLAUDE.md` for technical context
+4. **Performance**: Built-in metrics at `/api/sync/stats`
 
 ---
 
-*HD1 v0.7.2: Where avatar lifecycle management meets mobile-first 3D navigation.*
+**HD1 v1.0.0**: Turn any service into a 3D interface with simple HTTP calls. The GraphQL for 3D Graphics. 🎯
