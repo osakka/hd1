@@ -1,0 +1,52 @@
+<svg width="200" height="120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cement HD letters -->
+  <defs>
+    <linearGradient id="concrete" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B8680;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#A8A29E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6B7280;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="wireframe" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0891B2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0E7490;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Concrete HD -->
+  <!-- H -->
+  <rect x="10" y="20" width="8" height="40" fill="url(#concrete)" stroke="#4B5563" stroke-width="1"/>
+  <rect x="30" y="20" width="8" height="40" fill="url(#concrete)" stroke="#4B5563" stroke-width="1"/>
+  <rect x="18" y="36" width="12" height="8" fill="url(#concrete)" stroke="#4B5563" stroke-width="1"/>
+  
+  <!-- D -->
+  <rect x="50" y="20" width="8" height="40" fill="url(#concrete)" stroke="#4B5563" stroke-width="1"/>
+  <path d="M58 20 Q78 20 78 40 Q78 60 58 60 Z" fill="url(#concrete)" stroke="#4B5563" stroke-width="1"/>
+  
+  <!-- Wireframe 1 -->
+  <g transform="translate(120, 10)">
+    <!-- Main vertical line -->
+    <line x1="20" y1="10" x2="20" y2="50" stroke="url(#wireframe)" stroke-width="3" fill="none"/>
+    <!-- Top horizontal line -->
+    <line x1="15" y1="10" x2="25" y2="10" stroke="url(#wireframe)" stroke-width="2" fill="none"/>
+    <!-- Base line -->
+    <line x1="10" y1="50" x2="30" y2="50" stroke="url(#wireframe)" stroke-width="2" fill="none"/>
+    <!-- Diagonal support -->
+    <line x1="15" y1="15" x2="20" y2="25" stroke="url(#wireframe)" stroke-width="1" fill="none"/>
+    
+    <!-- Wireframe grid overlay -->
+    <g opacity="0.6">
+      <line x1="20" y1="15" x2="25" y2="15" stroke="#06B6D4" stroke-width="1" fill="none"/>
+      <line x1="20" y1="20" x2="25" y2="20" stroke="#06B6D4" stroke-width="1" fill="none"/>
+      <line x1="20" y1="25" x2="25" y2="25" stroke="#06B6D4" stroke-width="1" fill="none"/>
+      <line x1="20" y1="30" x2="25" y2="30" stroke="#06B6D4" stroke-width="1" fill="none"/>
+      <line x1="20" y1="35" x2="25" y2="35" stroke="#06B6D4" stroke-width="1" fill="none"/>
+      <line x1="20" y1="40" x2="25" y2="40" stroke="#06B6D4" stroke-width="1" fill="none"/>
+      <line x1="20" y1="45" x2="25" y2="45" stroke="#06B6D4" stroke-width="1" fill="none"/>
+    </g>
+  </g>
+  
+  <!-- Project title -->
+  <text x="10" y="85" font-family="monospace" font-size="12" font-weight="bold" fill="#374151">HOLODECK ONE</text>
+  <text x="10" y="100" font-family="monospace" font-size="10" fill="#6B7280">experimental 3D platform</text>
+</svg>

@@ -1,10 +1,30 @@
+<div align="center">
+  <img src="docs/logo.svg" alt="HD1 Logo" width="200" height="120"/>
+</div>
+
 # HD1 (Holodeck One) 🧪
 
 **Experimental 3D interface platform - Turn services into 3D with HTTP calls**
 
 ⚠️ **EXPERIMENTAL SOFTWARE** - This is research/prototype code, not production ready!
 
-HD1 is an **experimental WebGL REST platform** exploring how applications could render 3D interfaces through simple HTTP API calls. The goal is "GraphQL for 3D Graphics" - but we're nowhere near that yet!
+## The Holodeck Dream
+
+HD1 is named after Star Trek's holodeck - the ultimate interactive 3D environment where any reality could be simulated and experienced. The vision is equally ambitious: **what if any software service could render as an immersive 3D interface?** Instead of flat web pages and mobile apps, imagine email floating as 3D objects in space, calendar events as physical blocks you can walk around, or AI assistants as interactive avatars you can meet in virtual rooms.
+
+The dream is simple: **HTTP calls that create 3D worlds**. Just like REST APIs revolutionized how we build web services, HD1 explores whether 3D interfaces could be as easy as making HTTP requests. No WebGL expertise, no 3D engine complexity - just send JSON and get immersive experiences.
+
+## The Technical Journey
+
+HD1's development reveals the brutal complexity of 3D web development. Our git history tells a story of constant framework switching as we searched for the right abstraction:
+
+**🌐 Early WebGL Era**: Started with raw WebGL and vanilla JavaScript - the performance was there, but the development complexity was crushing. Every 3D operation required dozens of lines of matrix math and shader management.
+
+**🎮 A-Frame VR Phase** (2024): Pivoted to A-Frame for its declarative HTML approach to VR. The entity-component-system was elegant, and VR support was built-in. But A-Frame's abstractions hid too much - we couldn't achieve the surgical precision needed for an API-driven platform.
+
+**⚡ Three.js Migration** (2025): Finally settled on Three.js r170 as the sweet spot between power and usability. Direct access to scene graphs, materials, and geometries, but without the low-level pain of raw WebGL. The extensive API surface made it perfect for HTTP endpoint mapping.
+
+**Current Reality**: HD1 is an **experimental WebGL REST platform** exploring HTTP-to-3D concepts with Three.js. We're nowhere near the holodeck dream, but we're learning what's possible when you treat 3D graphics like REST APIs.
 
 ```bash
 # Create a 3D sphere
