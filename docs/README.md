@@ -1,22 +1,23 @@
 # HD1 Documentation
 
-Complete documentation for HD1 (Holodeck One) - transforming from a Three.js game engine into the **universal 3D interface platform** where any service can render immersive 3D interfaces.
+Documentation for HD1 (Holodeck One) - **experimental WebGL REST platform** exploring HTTP-to-3D concepts.
+
+⚠️ **EXPERIMENTAL PROJECT** - This is research/prototype code, not production software!
 
 ## 📚 Documentation Structure
 
 ### 🔍 Navigation & Reference
 - **[VERSION.md](VERSION.md)** - Single source of truth for version information
 - **[INDEX.md](INDEX.md)** - Complete cross-reference index
-- **[API Endpoints](api/ENDPOINTS.md)** - Complete API reference (16 endpoints)
+- **[API Endpoints](api/ENDPOINTS.md)** - Current API reference (~40 endpoints, many incomplete)
 
-### 📋 Strategic Planning
-- **[Universal Platform Plan](universal-interface-plan.md)** - Complete transformation strategy and business plan
-- **[Implementation Plans](implementation/)** - Detailed phase-by-phase implementation guides
+### 📋 Experimental Development
+- **[Development Context](../CLAUDE.md)** - Current technical implementation details
+- **[Changelog](../CHANGELOG.md)** - Actual changes and current limitations
 
 ### 🏗️ Architecture
 - **[System Overview](architecture/overview.md)** - High-level system design
-- **[API Specification](../src/api.yaml)** - Current API specification (v0.7.3)
-- **[Future API Specification](api/universal-interface-spec.yaml)** - Target universal interface API
+- **[API Specification](../src/schemas/hd1-api.yaml)** - Current experimental API specification
 
 ### 📖 User Guides
 - **[Quick Start](guides/quick-start.md)** - Get up and running
@@ -25,22 +26,19 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 - **[Troubleshooting](guides/troubleshooting.md)** - Common issues and solutions
 
 ### Architectural Decision Records (ADR)
+⚠️ **Note**: Many ADRs contain aspirational content that doesn't match current experimental reality
 - **[ADR-001](adr/001-api-first-architecture.md)** - API-First Architecture
 - **[ADR-002](adr/002-specification-driven-development.md)** - Specification-Driven Development
 - **[ADR-003](adr/003-threejs-minimal-console.md)** - Three.js Minimal Console
-- **[ADR-004](adr/004-websocket-synchronization.md)** - WebSocket Synchronization Protocol
-- **[ADR-005](adr/005-ultra-minimal-build.md)** - Ultra-Minimal Build Strategy
-- **[ADR-006](adr/006-universal-3d-interface-transformation.md)** - Universal 3D Interface Platform Transformation
 
-### Implementation Plans
-- **[Phase 1: Foundation](implementation/phase-1-foundation.md)** - Multi-tenant architecture (11 → 30 endpoints)
-- **[Phase 2: Collaboration](implementation/phase-2-collaboration.md)** - Real-time collaboration (30 → 60 endpoints)
-- **[Phase 3: AI Integration](implementation/phase-3-ai-integration.md)** - AI-native platform (60 → 80 endpoints)
-- **[Phase 4: Universal Platform](implementation/phase-4-universal-platform.md)** - Complete platform (80 → 100+ endpoints)
+### Experimental Status
+- **Current State**: ~40 API endpoints, many incomplete or non-functional
+- **Working Features**: Basic Three.js operations, WebSocket sync, configuration
+- **Known Issues**: Limited error handling, performance not optimized, mobile UX rough
 
 ## 🔍 Quick Navigation
 
-### Current Platform (v0.7.2)
+### Current Experimental Platform (v1.0.0)
 **For Developers:**
 - Start with [Quick Start Guide](guides/quick-start.md)
 - Review [Development Guide](guides/development.md)
@@ -55,21 +53,16 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 - Configure via [Configuration Guide](guides/configuration.md)
 - Use [Troubleshooting Guide](guides/troubleshooting.md)
 
-### Universal Platform (Future Vision)
-**For Strategists:**
-- Review [Universal Platform Plan](universal-interface-plan.md)
-- Study [ADR-006](adr/006-universal-3d-interface-transformation.md)
-- Understand market opportunity and business model
+### Experimental Development
+**For Researchers:**
+- Review [Current Limitations](../CHANGELOG.md#what-s-broken-missing)
+- Study [Working Features](../CHANGELOG.md#what-actually-works)
+- Understand HTTP-to-3D exploration approach
 
-**For Engineers:**
-- Follow [Implementation Plans](implementation/) for detailed technical specifications
-- Review [Future API Specification](api/universal-interface-spec.yaml) for target endpoints
-- Understand phased transformation approach
-
-**For Service Providers:**
-- Learn how to register services and render 3D interfaces
-- Study service integration patterns and examples
-- Understand the universal platform ecosystem
+**For Contributors:**
+- Check [Development Context](../CLAUDE.md) for technical details
+- Review [XVC Development Dependency](../README.md#development)
+- Understand experimental nature and expect bugs
 
 ## 📖 Document Conventions
 
@@ -79,38 +72,31 @@ Complete documentation for HD1 (Holodeck One) - transforming from a Three.js gam
 - **ADRs**: Historical architectural decisions with context and rationale
 - **Implementation plans**: Detailed phase-by-phase technical specifications
 
-## 🔄 Platform Evolution
+## 🔄 Experimental Evolution
 
-### Current State (v0.7.2)
-- **15 API Endpoints**: Three.js platform with avatar lifecycle management
-- **Multi-tenant**: Session-based architecture with cleanup
-- **Cross-platform**: Web with mobile touch controls
-- **Production-ready**: Avatar cleanup, mobile support, security compliance
+### Current State (v1.0.0)
+- **~40 API Endpoints**: Basic Three.js operations, many incomplete
+- **WebSocket Sync**: Simple real-time updates for basic operations
+- **Configuration**: Environment variables, command line flags working
+- **Experimental Quality**: Expect bugs, crashes, and missing features
 
-### Target State (Future Vision)
-- **100+ API Endpoints**: Universal 3D interface platform
-- **Multi-tenant**: Thousands of concurrent sessions
-- **Cross-platform**: Web, mobile, desktop, AR/VR
-- **Enterprise-ready**: Security, compliance, and scalability
+### Development Reality
+- **Research Project**: Exploring HTTP-to-3D concepts
+- **XVC Dependency**: Developed with experimental versioning tool
+- **Limited Scope**: Basic 3D object creation and scene management
+- **No Timeline**: Experimental development with no specific roadmap
 
-### Transformation Timeline
-- **Phase 1**: Foundation (2 months, $600K)
-- **Phase 2**: Collaboration (3 months, $1.2M)
-- **Phase 3**: AI Integration (2 months, $800K)
-- **Phase 4**: Universal Platform (3 months, $1.1M)
-- **Total**: 12 months, $3.7M investment
+## 🔄 Keeping Documentation Accurate
 
-## 🔄 Keeping Documentation Updated
+This documentation should reflect the experimental reality of HD1 v1.0.0. When making changes:
 
-This documentation reflects both the current state of HD1 v0.7.2 and the strategic vision for the universal platform. When making changes:
-
-1. Update relevant guides for user-facing changes
-2. Create new ADRs for significant architectural decisions
-3. Update architecture docs for system design changes
-4. Update implementation plans for technical specifications
-5. Maintain the changelog with all modifications
+1. Update guides to match actual working features
+2. Document what actually works vs what's broken
+3. Remove aspirational content that doesn't match reality
+4. Keep experimental warnings prominent
+5. Maintain honest assessment in changelog
 
 ---
 
-*Documentation for HD1 v0.7.2 - Three.js platform with avatar lifecycle management and mobile controls*  
-*Strategic vision for Universal 3D Interface Platform - where every service becomes a 3D interface*
+*Documentation for HD1 v1.0.0 - Experimental WebGL REST platform exploring HTTP-to-3D concepts*  
+*This is research/prototype code - expect bugs, limitations, and missing features!*
