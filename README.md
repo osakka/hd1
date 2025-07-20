@@ -157,8 +157,11 @@ echo "HD1_PORT=3000" > .env
 
 ## 🛠️ Development
 
+⚠️ **XVC Required**: This project was developed with [XVC (eXtensible Version Control)](https://github.com/osakka/xvc/tree/main). 
+Understanding XVC workflows may be necessary for full development.
+
 ```bash
-# Build and start
+# Build and start (basic development)
 cd src && make && make start
 
 # Clean rebuild  
@@ -173,6 +176,8 @@ make logs
 # Check status
 make status
 ```
+
+**Note**: Some development workflows may require XVC commands and understanding of XVC's experimental data versioning approach.
 
 ## 📚 API Documentation
 
@@ -231,9 +236,11 @@ This project uses **[XVC (eXtensible Version Control)](https://xvc.dev)** for da
 ## ⚠️ Important Disclaimers
 
 - **Experimental Code**: This is research/prototype quality, not production software
+- **XVC Development**: This project was developed using [XVC (eXtensible Version Control)](https://github.com/osakka/xvc/tree/main) for experimental data/model versioning
 - **Expect Bugs**: Many features are incomplete or broken
 - **No Guarantees**: APIs may change, data may be lost, things may not work
 - **Use at Own Risk**: This is exploratory development, not a finished product
+- **Development Dependencies**: Full development requires XVC understanding and setup
 
 ---
 

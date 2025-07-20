@@ -117,8 +117,9 @@ curl -X POST http://localhost:8080/api/geometries/box \
 - **Use Caution**: Not suitable for production use
 - **Feedback Welcome**: This is an exploration, not a product
 
-### Related Projects
-- **[XVC (eXtensible Version Control)](https://xvc.dev)**: Used for data/model versioning
+### Development Context
+- **[XVC (eXtensible Version Control)](https://github.com/osakka/xvc/tree/main)**: This project was developed using XVC for experimental data/model versioning
+- **Experimental Toolchain**: Both HD1 and XVC are experimental projects exploring new approaches
 
 ---
 
